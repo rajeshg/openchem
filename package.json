@@ -48,7 +48,7 @@
     "test:verbose": "VERBOSE=1 bun test",
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
     "build": "node scripts/build.mjs",
-    "serve": "bun run build && bunx serve . -p 3000",
+    "serve": "bun run build && bun run serve-playground.js",
     "prepublishOnly": "bun run build && bun run test",
     "lint": "npx oxlint@latest .",
     "fmt": "npx oxfmt@latest ."
