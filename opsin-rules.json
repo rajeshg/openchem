@@ -10,7 +10,13 @@
     "CCCCCCCC": "oct",
     "CCCCCCCCC": "non",
     "CCCCCCCCCC": "dec",
-    "CCCCCCCCCCC": "undec"
+    "CCCCCCCCCCC": "undec",
+    "CCCCCCCCCCCCCCCCCCCCCCCC": "tetracosa",
+    "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC": "hentriaconta",
+    "CCCCCCCCCCCCCCCCCCCCCCCCCC": "hexacosa",
+    "CCCCCCCCCCCCCC": "tetradec",
+    "CCCCCCCCCCCCCCCC": "hexadec",
+    "CCCCCCCCCCCCCCCCCC": "octadec"
   },
   "alkaneStemComponents": {
     "units": {
@@ -167,6 +173,42 @@
     }
   },
   "suffixes": {
+    "ane": {
+      "aliases": [
+        "ane"
+      ],
+      "type": "aliphatic"
+    },
+    "ene": {
+      "aliases": [
+        "ene"
+      ],
+      "type": "unsaturated"
+    },
+    "yne": {
+      "aliases": [
+        "yne"
+      ],
+      "type": "unsaturated"
+    },
+    "hydro": {
+      "aliases": [
+        "hydro"
+      ],
+      "type": "saturation"
+    },
+    "an": {
+      "aliases": [
+        "an"
+      ],
+      "type": "infix"
+    },
+    "a": {
+      "aliases": [
+        "a"
+      ],
+      "type": "infix"
+    },
     "amine": {
       "aliases": [
         "amine",
@@ -533,9 +575,9 @@
     },
     "ate": {
       "aliases": [
-        "ic acid anion"
+        "ate"
       ],
-      "type": "root"
+      "type": "ester"
     },
     "ite": {
       "aliases": [
@@ -794,10 +836,326 @@
         "sulton"
       ],
       "type": "root"
+    },
+    "anoic": {
+      "aliases": [
+        "anoic",
+        "anoi",
+        "anoic acid"
+      ],
+      "type": "root"
+    },
+    "oic": {
+      "aliases": [
+        "oic"
+      ],
+      "type": "root"
+    },
+    "ionic": {
+      "aliases": [
+        "ionic"
+      ],
+      "type": "root"
+    },
+    "acid": {
+      "aliases": [
+        "acid"
+      ],
+      "type": "descriptor"
+    },
+    "yl": {
+      "aliases": [
+        "yl"
+      ],
+      "type": "connector"
+    },
+    "idene": {
+      "aliases": [
+        "idene"
+      ],
+      "type": "connector"
+    },
+    "ylidene": {
+      "aliases": [
+        "ylidene"
+      ],
+      "type": "connector"
+    },
+    "ynyl": {
+      "aliases": [
+        "ynyl"
+      ],
+      "type": "connector"
+    },
+    "oxa": {
+      "aliases": [
+        "oxa"
+      ],
+      "type": "heteroatom"
+    },
+    "aza": {
+      "aliases": [
+        "aza"
+      ],
+      "type": "heteroatom"
+    },
+    "thia": {
+      "aliases": [
+        "thia"
+      ],
+      "type": "heteroatom"
+    },
+    "phospha": {
+      "aliases": [
+        "phospha"
+      ],
+      "type": "heteroatom"
+    },
+    "arsa": {
+      "aliases": [
+        "arsa"
+      ],
+      "type": "heteroatom"
+    },
+    "stiba": {
+      "aliases": [
+        "stiba"
+      ],
+      "type": "heteroatom"
+    },
+    "bismuta": {
+      "aliases": [
+        "bismuta"
+      ],
+      "type": "heteroatom"
+    },
+    "selena": {
+      "aliases": [
+        "selena"
+      ],
+      "type": "heteroatom"
+    },
+    "tellura": {
+      "aliases": [
+        "tellura"
+      ],
+      "type": "heteroatom"
+    },
+    "oxy": {
+      "aliases": [
+        "oxy"
+      ],
+      "type": "connector"
+    },
+    "borane": {
+      "aliases": [
+        "borane"
+      ],
+      "type": "functional"
+    },
+    "anilino": {
+      "aliases": [
+        "anilino"
+      ],
+      "type": "substituent"
+    },
+    "sulfamoyl": {
+      "aliases": [
+        "sulfamoyl"
+      ],
+      "type": "functional"
+    },
+    "oate": {
+      "aliases": [
+        "oate"
+      ],
+      "type": "ester"
+    },
+    "diene": {
+      "aliases": [
+        "diene"
+      ],
+      "type": "unsaturated"
+    },
+    "triene": {
+      "aliases": [
+        "triene"
+      ],
+      "type": "unsaturated"
+    },
+    "en": {
+      "aliases": [
+        "en"
+      ],
+      "type": "unsaturated"
+    },
+    "sulfinyl": {
+      "aliases": [
+        "sulfinyl"
+      ],
+      "type": "functional"
+    },
+    "sulfonyl": {
+      "aliases": [
+        "sulfonyl"
+      ],
+      "type": "functional"
+    },
+    "sulfanyl": {
+      "aliases": [
+        "sulfanyl"
+      ],
+      "type": "functional"
+    },
+    "thiocyanate": {
+      "aliases": [
+        "thiocyanate"
+      ],
+      "type": "root"
+    },
+    "formate": {
+      "aliases": [
+        "formate"
+      ],
+      "type": "root"
+    },
+    "acetate": {
+      "aliases": [
+        "acetate"
+      ],
+      "type": "root"
+    },
+    "oyl": {
+      "aliases": [
+        "oyl"
+      ],
+      "type": "infix"
+    },
+    "benzoate": {
+      "aliases": [
+        "benzoate"
+      ],
+      "type": "root"
+    },
+    "sulfenyl": {
+      "aliases": [
+        "sulfenyl"
+      ],
+      "type": "functional"
+    },
+    "sulfonate": {
+      "aliases": [
+        "sulfonate"
+      ],
+      "type": "functional_group"
+    },
+    "disulfonate": {
+      "type": "functional_group",
+      "aliases": [
+        "disulfonate"
+      ]
+    },
+    "lambda": {
+      "type": "coordination",
+      "aliases": [
+        "lambda"
+      ]
+    },
+    "dien": {
+      "aliases": [
+        "dien"
+      ],
+      "type": "unsaturated"
     }
   },
   "substituents": {
-    "-N=NC=NN": {
+    "Cl": {
+      "aliases": [
+        "chloro"
+      ]
+    },
+    "Br": {
+      "aliases": [
+        "bromo"
+      ]
+    },
+    "F": {
+      "aliases": [
+        "fluoro"
+      ]
+    },
+    "I": {
+      "aliases": [
+        "iodo"
+      ]
+    },
+    "OH": {
+      "aliases": [
+        "hydroxy"
+      ]
+    },
+    "O": {
+      "aliases": [
+        "oxo"
+      ]
+    },
+    "OCH3": {
+      "aliases": [
+        "methoxy"
+      ]
+    },
+    "OCH2CH3": {
+      "aliases": [
+        "ethoxy"
+      ]
+    },
+    "SH": {
+      "aliases": [
+        "mercapto",
+        "sulfanyl"
+      ]
+    },
+    "NH2": {
+      "aliases": [
+        "amino"
+      ]
+    },
+    "NO2": {
+      "aliases": [
+        "nitro"
+      ]
+    },
+    "CN": {
+      "aliases": [
+        "cyano"
+      ]
+    },
+    "CO": {
+      "aliases": [
+        "hydroxymethyl"
+      ]
+    },
+    "CHO": {
+      "aliases": [
+        "formyl"
+      ]
+    },
+    "C(=O)C": {
+      "aliases": [
+        "acetyl"
+      ]
+    },
+    "COOH": {
+      "aliases": [
+        "carboxy"
+      ]
+    },
+    "C=O": {
+      "aliases": [
+        "oxo"
+      ]
+    },
+    "N=NC=NN": {
       "aliases": [
         "1-formazano"
       ]
@@ -834,7 +1192,8 @@
     },
     "-OC(=O)C": {
       "aliases": [
-        "acetoxyl"
+        "acetoxyl",
+        "acetoxy"
       ]
     },
     "-NC(=O)C": {
@@ -852,6 +1211,11 @@
         "aci-nitro"
       ]
     },
+    "C(=O)C=C": {
+      "aliases": [
+        "acryl"
+      ]
+    },
     "-C(=O)C=C": {
       "aliases": [
         "acryl"
@@ -864,9 +1228,19 @@
         "activeamyl"
       ]
     },
+    "-OCH3": {
+      "aliases": [
+        "methoxy"
+      ]
+    },
     "-C(=O)C(=O)N": {
       "aliases": [
         "amidoxalyl"
+      ]
+    },
+    "-OCH2CH3": {
+      "aliases": [
+        "ethoxy"
       ]
     },
     "-[NH-]": {
@@ -882,8 +1256,8 @@
     },
     "-ON": {
       "aliases": [
-        "aminoxy",
-        "aminoxyl"
+        "aminoxyl",
+        "aminoxy"
       ]
     },
     "-N": {
@@ -906,10 +1280,16 @@
         "amoxy"
       ]
     },
+    "-OCCC(C)C": {
+      "aliases": [
+        "iso-amoxy",
+        "isoamoxy"
+      ]
+    },
     "=Cc1ccccc1": {
       "aliases": [
-        "benzal",
-        "benzylene"
+        "benzylene",
+        "benzal"
       ]
     },
     "-c1c(OC)cc(OC)c(OC)c1": {
@@ -920,12 +1300,6 @@
     "-N=[N+]=[N-]": {
       "aliases": [
         "azido"
-      ]
-    },
-    "-OCCC(C)C": {
-      "aliases": [
-        "iso-amoxy",
-        "isoamoxy"
       ]
     },
     "-Nc1ccccc1": {
@@ -971,31 +1345,31 @@
     "-C(=O)OC(C)(C)C": {
       "aliases": [
         "carbo-tertiary-butoxy",
-        "carbo-tertbutoxy",
+        "carb-tertiary-butoxy",
+        "carbotertiary-butoxy",
+        "carb-tertiarybutoxy",
+        "carbotertiarybutoxy",
+        "carbtertiary-butoxy",
+        "carbo-tert.-butoxy",
+        "carbtertiarybutoxy",
         "carbo-tert.butoxy",
         "carbo-tert-butoxy",
-        "carbo-tert.-butoxy",
-        "carbo-t-butoxy",
-        "carb-tertiarybutoxy",
-        "carb-tertiary-butoxy",
-        "carb-tertbutoxy",
+        "carb-tert.-butoxy",
+        "carbotert.-butoxy",
+        "carbo-tertbutoxy",
         "carb-tert.butoxy",
         "carb-tert-butoxy",
-        "carb-tert.-butoxy",
-        "carb-t-butoxy",
-        "carbotertiarybutoxy",
-        "carbotertiary-butoxy",
-        "carbotertbutoxy",
         "carbotert.butoxy",
         "carbotert-butoxy",
-        "carbotert.-butoxy",
-        "carbot-butoxy",
-        "carbtertiarybutoxy",
-        "carbtertiary-butoxy",
-        "carbtertbutoxy",
+        "carbtert.-butoxy",
+        "carb-tertbutoxy",
+        "carbotertbutoxy",
         "carbtert.butoxy",
         "carbtert-butoxy",
-        "carbtert.-butoxy",
+        "carbo-t-butoxy",
+        "carbtertbutoxy",
+        "carb-t-butoxy",
+        "carbot-butoxy",
         "carbt-butoxy"
       ]
     },
@@ -1048,8 +1422,8 @@
     },
     "-C(=O)OCC": {
       "aliases": [
-        "carbethoxy",
-        "carboethoxy"
+        "carboethoxy",
+        "carbethoxy"
       ]
     },
     "-C(=O)OCCC": {
@@ -1132,10 +1506,10 @@
     },
     "-C(=O)OCC=C": {
       "aliases": [
-        "carballoxy",
-        "carboalloxy",
+        "carboallyloxy",
         "carballyloxy",
-        "carboallyloxy"
+        "carboalloxy",
+        "carballoxy"
       ]
     },
     "-C(=O)OCc1ccccc1": {
@@ -1145,18 +1519,18 @@
     },
     "-C(=O)OC(C)C": {
       "aliases": [
-        "carbisopropoxy",
         "carboisopropoxy",
-        "carb-i-propoxy",
-        "carbo-i-propoxy"
+        "carbo-i-propoxy",
+        "carbisopropoxy",
+        "carb-i-propoxy"
       ]
     },
     "-C(=O)Oc1ccccc1": {
       "aliases": [
-        "carbphenoxy",
-        "carbophenoxy",
+        "carbophenyloxy",
         "carbphenyloxy",
-        "carbophenyloxy"
+        "carbophenoxy",
+        "carbphenoxy"
       ]
     },
     "#C": {
@@ -1186,7 +1560,8 @@
     },
     "-c1ccccc1": {
       "aliases": [
-        "phenetyl"
+        "phenetyl",
+        "phenyl"
       ]
     },
     "-CC=CC": {
@@ -1213,8 +1588,8 @@
     },
     "-C(C)(C)c1ccccc1": {
       "aliases": [
-        "cumyl",
-        "alpha-cumyl"
+        "alpha-cumyl",
+        "cumyl"
       ]
     },
     "-NC#N": {
@@ -1366,8 +1741,8 @@
     },
     "-OCC(C)C": {
       "aliases": [
-        "isobutoxyl",
-        "iso-butoxyl"
+        "iso-butoxyl",
+        "isobutoxyl"
       ]
     },
     "-C=C(C)C": {
@@ -1524,8 +1899,8 @@
     },
     "-Oc1ccccc1": {
       "aliases": [
-        "phenoxy",
-        "phenoxyl"
+        "phenoxyl",
+        "phenoxy"
       ]
     },
     "-c1c([N+](=O)[O-])cc([N+](=O)[O-])cc1[N+](=O)[O-]": {
@@ -1600,8 +1975,8 @@
     },
     "-OC(C)CC": {
       "aliases": [
-        "sec-butoxyl",
         "sec.-butoxyl",
+        "sec-butoxyl",
         "secbutoxyl"
       ]
     },
@@ -1691,10 +2066,10 @@
       "aliases": [
         "tertiary-butoxyl",
         "tertiarybutoxyl",
-        "tert-butoxyl",
-        "tertbutoxyl",
         "tert.-butoxyl",
+        "tert-butoxyl",
         "tert.butoxyl",
+        "tertbutoxyl",
         "t-butoxyl",
         "tbutoxyl"
       ]
@@ -1750,9 +2125,9 @@
     },
     "-S": {
       "aliases": [
-        "mercapto",
         "sulfhydryl",
-        "sulfydryl"
+        "sulfydryl",
+        "mercapto"
       ]
     },
     "-c1cc(C)ccc1C(C)C": {
@@ -2008,8 +2383,8 @@
     },
     "=O": {
       "aliases": [
-        "oxo",
-        "keto"
+        "keto",
+        "oxo"
       ]
     },
     "=S": {
@@ -2034,12 +2409,15 @@
     },
     "-P=O": {
       "aliases": [
-        "phosphoroso"
+        "phosphoroso",
+        "phosphoryl"
       ]
     },
     "-P": {
       "aliases": [
-        "phosphino"
+        "phosphino",
+        "phosphanyl",
+        "phosphinyl"
       ]
     },
     "=[P|5]=O": {
@@ -2174,8 +2552,8 @@
     },
     "-C(=O)O": {
       "aliases": [
-        "carboxy",
-        "carboxyl"
+        "carboxyl",
+        "carboxy"
       ]
     },
     "-C(=O)[O-]": {
@@ -2216,66 +2594,66 @@
     },
     "-[Si](C)(C)C(C)(C)C": {
       "aliases": [
-        "t-butyl(dimethyl)silanyl",
-        "t-butyl(dimethyl)silyl",
-        "t-butyl-dimethylsilanyl",
-        "t-butyl-dimethylsilyl",
-        "t-butyldimethylsilanyl",
-        "t-butyldimethylsilyl",
         "tert-butyl(dimethyl)silanyl",
-        "tert-butyl(dimethyl)silyl",
         "tert-butyl-dimethylsilanyl",
-        "tert-butyl-dimethylsilyl",
+        "tert-butyl(dimethyl)silyl",
         "tert-butyldimethylsilanyl",
-        "tert-butyldimethylsilyl"
+        "t-butyl(dimethyl)silanyl",
+        "tert-butyl-dimethylsilyl",
+        "t-butyl-dimethylsilanyl",
+        "tert-butyldimethylsilyl",
+        "t-butyl(dimethyl)silyl",
+        "t-butyldimethylsilanyl",
+        "t-butyl-dimethylsilyl",
+        "t-butyldimethylsilyl"
       ]
     },
     "-[Si](c1ccccc1)(c1ccccc1)C(C)(C)C": {
       "aliases": [
-        "t-butyl(diphenyl)silanyl",
-        "t-butyl(diphenyl)silyl",
-        "t-butyl-diphenylsilanyl",
-        "t-butyl-diphenylsilyl",
-        "t-butyldiphenylsilanyl",
-        "t-butyldiphenylsilyl",
         "tert-butyl(diphenyl)silanyl",
-        "tert-butyl(diphenyl)silyl",
         "tert-butyl-diphenylsilanyl",
-        "tert-butyl-diphenylsilyl",
+        "tert-butyl(diphenyl)silyl",
         "tert-butyldiphenylsilanyl",
-        "tert-butyldiphenylsilyl"
+        "t-butyl(diphenyl)silanyl",
+        "tert-butyl-diphenylsilyl",
+        "t-butyl-diphenylsilanyl",
+        "tert-butyldiphenylsilyl",
+        "t-butyl(diphenyl)silyl",
+        "t-butyldiphenylsilanyl",
+        "t-butyl-diphenylsilyl",
+        "t-butyldiphenylsilyl"
       ]
     },
     "-O[Si](C)(C)C(C)(C)C": {
       "aliases": [
-        "t-butyl(dimethyl)silanoxy",
-        "t-butyl(dimethyl)siloxy",
-        "t-butyl-dimethylsilanoxy",
-        "t-butyl-dimethylsiloxy",
-        "t-butyldimethylsilanoxy",
-        "t-butyldimethylsiloxy",
         "tert-butyl(dimethyl)silanoxy",
-        "tert-butyl(dimethyl)siloxy",
         "tert-butyl-dimethylsilanoxy",
-        "tert-butyl-dimethylsiloxy",
+        "tert-butyl(dimethyl)siloxy",
         "tert-butyldimethylsilanoxy",
-        "tert-butyldimethylsiloxy"
+        "t-butyl(dimethyl)silanoxy",
+        "tert-butyl-dimethylsiloxy",
+        "t-butyl-dimethylsilanoxy",
+        "tert-butyldimethylsiloxy",
+        "t-butyl(dimethyl)siloxy",
+        "t-butyldimethylsilanoxy",
+        "t-butyl-dimethylsiloxy",
+        "t-butyldimethylsiloxy"
       ]
     },
     "-O[Si](c1ccccc1)(c1ccccc1)C(C)(C)C": {
       "aliases": [
-        "t-butyl(diphenyl)silanoxy",
-        "t-butyl(diphenyl)siloxy",
-        "t-butyl-diphenylsilanoxy",
-        "t-butyl-diphenylsiloxy",
-        "t-butyldiphenylsilanoxy",
-        "t-butyldiphenylsiloxy",
         "tert-butyl(diphenyl)silanoxy",
-        "tert-butyl(diphenyl)siloxy",
         "tert-butyl-diphenylsilanoxy",
-        "tert-butyl-diphenylsiloxy",
+        "tert-butyl(diphenyl)siloxy",
         "tert-butyldiphenylsilanoxy",
-        "tert-butyldiphenylsiloxy"
+        "t-butyl(diphenyl)silanoxy",
+        "tert-butyl-diphenylsiloxy",
+        "t-butyl-diphenylsilanoxy",
+        "tert-butyldiphenylsiloxy",
+        "t-butyl(diphenyl)siloxy",
+        "t-butyldiphenylsilanoxy",
+        "t-butyl-diphenylsiloxy",
+        "t-butyldiphenylsiloxy"
       ]
     },
     "-[Ac]": {
@@ -2335,7 +2713,9 @@
     },
     "-[B]": {
       "aliases": [
-        "borio"
+        "borio",
+        "boryl",
+        "boranyl"
       ]
     },
     "-[Br]": {
@@ -2666,7 +3046,9 @@
     },
     "-[Si]": {
       "aliases": [
-        "silicio"
+        "silicio",
+        "silyl",
+        "silanyl"
       ]
     },
     "-[Ag]": {
@@ -2676,8 +3058,8 @@
     },
     "-[Na]": {
       "aliases": [
-        "sodio",
-        "natrio"
+        "natrio",
+        "sodio"
       ]
     },
     "-[Sr]": {
@@ -2783,20 +3165,20 @@
     },
     "-P(=O)(O)OCC(O)CO": {
       "aliases": [
-        "glycero-1-phospho",
-        "glycero-1-phosphoryl"
+        "glycero-1-phosphoryl",
+        "glycero-1-phospho"
       ]
     },
     "OCC(OP(=O)O)CO": {
       "aliases": [
-        "glycero-2-phospho",
-        "glycero-2-phosphoryl"
+        "glycero-2-phosphoryl",
+        "glycero-2-phospho"
       ]
     },
     "OCC(O)COP(=O)O": {
       "aliases": [
-        "glycero-3-phospho",
-        "glycero-3-phosphoryl"
+        "glycero-3-phosphoryl",
+        "glycero-3-phospho"
       ]
     },
     "-[P|5](=O)(O)O": {
@@ -2816,20 +3198,20 @@
     },
     "-P(=O)(O)OC[C@@H](O)CO": {
       "aliases": [
-        "sn-glycero-1-phospho",
-        "sn-glycero-1-phosphoryl"
+        "sn-glycero-1-phosphoryl",
+        "sn-glycero-1-phospho"
       ]
     },
     "OC[C@@H](OP(=O)O)CO": {
       "aliases": [
-        "sn-glycero-2-phospho",
-        "sn-glycero-2-phosphoryl"
+        "sn-glycero-2-phosphoryl",
+        "sn-glycero-2-phospho"
       ]
     },
     "OC[C@@H](O)COP(=O)O": {
       "aliases": [
-        "sn-glycero-3-phospho",
-        "sn-glycero-3-phosphoryl"
+        "sn-glycero-3-phosphoryl",
+        "sn-glycero-3-phospho"
       ]
     },
     "-P(=O)(O)OP(=O)(O)OP(=O)(O)O": {
@@ -2850,16 +3232,16 @@
     },
     "-Cc1c(COP(=O)(O)O)cnc(C)c1O": {
       "aliases": [
-        "p-pyridoxyl",
-        "5'-p-pyridoxyl"
+        "5'-p-pyridoxyl",
+        "p-pyridoxyl"
       ]
     },
     "=Cc1c(COP(=O)(O)O)cnc(C)c1O": {
       "aliases": [
-        "p-pyridoxylidene",
-        "p-pyridoxyliden",
         "5'-p-pyridoxylidene",
-        "5'-p-pyridoxyliden"
+        "5'-p-pyridoxyliden",
+        "p-pyridoxylidene",
+        "p-pyridoxyliden"
       ]
     },
     "-S(=O)(=O)CCN": {
@@ -2869,8 +3251,8 @@
     },
     "-CNCCS(=O)(=O)O": {
       "aliases": [
-        "taurinomethyl",
-        "taurino-methyl"
+        "taurino-methyl",
+        "taurinomethyl"
       ]
     },
     "[C@@H]1([C@H](O)[C@H](OP(=O)O)[C@@H](CO)O1)n2cnc3c([nH2])ncnc23": {
@@ -2985,8 +3367,8 @@
     },
     "[C@@H]1([C@H](O)[C@H](O)[C@@H](C)O1)n2cnc3c([nH2])ncnc23": {
       "aliases": [
-        "5'-adenosyl",
         "5'-deoxy-5'-adenosyl",
+        "5'-adenosyl",
         "adenosyl"
       ]
     },
@@ -3164,6 +3546,177 @@
       "aliases": [
         "amylidene",
         "amyliden"
+      ]
+    },
+    "-C": {
+      "aliases": [
+        "methyl"
+      ]
+    },
+    "-CC": {
+      "aliases": [
+        "ethyl"
+      ]
+    },
+    "-CCC": {
+      "aliases": [
+        "n-propyl",
+        "propyl"
+      ]
+    },
+    "-C(C)C": {
+      "aliases": [
+        "iso-propyl",
+        "isopropyl"
+      ]
+    },
+    "-CCCC": {
+      "aliases": [
+        "n-butyl",
+        "butyl"
+      ]
+    },
+    "-C(C)CC": {
+      "aliases": [
+        "iso-butyl",
+        "isobutyl"
+      ]
+    },
+    "-C(C)(C)C": {
+      "aliases": [
+        "tertiary-butyl",
+        "tert-butyl",
+        "t-butyl"
+      ]
+    },
+    "-C(C)CCC": {
+      "aliases": [
+        "iso-pentyl",
+        "isopentyl"
+      ]
+    },
+    "-CCCCCC": {
+      "aliases": [
+        "n-hexyl",
+        "hexyl"
+      ]
+    },
+    "-CCCCCCC": {
+      "aliases": [
+        "n-heptyl",
+        "heptyl"
+      ]
+    },
+    "-CCCCCCCC": {
+      "aliases": [
+        "n-octyl",
+        "octyl"
+      ]
+    },
+    "-CCCCCCCCC": {
+      "aliases": [
+        "n-nonyl",
+        "nonyl"
+      ]
+    },
+    "-CCCCCCCCCC": {
+      "aliases": [
+        "n-decyl",
+        "decyl"
+      ]
+    },
+    "-C1CC1": {
+      "aliases": [
+        "cyclopropyl",
+        "cyclopropan-1-yl"
+      ]
+    },
+    "-C1CCCC1": {
+      "aliases": [
+        "cyclopentyl",
+        "cyclopentan-1-yl"
+      ]
+    },
+    "-C1CCCCC1": {
+      "aliases": [
+        "cyclohexyl",
+        "cyclohexan-1-yl"
+      ]
+    },
+    "-c1ccc2ccccc2c1": {
+      "aliases": [
+        "naphthalen-yl",
+        "naphthyl"
+      ]
+    },
+    "-OC(=O)c1ccccc1": {
+      "aliases": [
+        "benzoyloxy",
+        "benzoxy"
+      ]
+    },
+    "-C(=O)c1ccccc1": {
+      "aliases": [
+        "benzoyl",
+        "benzyl"
+      ]
+    },
+    "-CC(C)C": {
+      "aliases": [
+        "isobutyl",
+        "isobut"
+      ]
+    },
+    "-CC(C)(C)C": {
+      "aliases": [
+        "tert-butyl",
+        "tert-butyl",
+        "neopentyl"
+      ]
+    },
+    "c1ccccc1S": {
+      "aliases": [
+        "phenylsulfanyl"
+      ]
+    },
+    "C(F)(F)F": {
+      "aliases": [
+        "trifluoromethyl"
+      ]
+    },
+    "OC": {
+      "aliases": [
+        "methoxy"
+      ]
+    },
+    "OCC": {
+      "aliases": [
+        "ethoxy"
+      ]
+    },
+    "OCCC": {
+      "aliases": [
+        "propoxy"
+      ]
+    },
+    "C[Si](C)C": {
+      "aliases": [
+        "trimethylsilyl"
+      ]
+    },
+    "O[Si](C)(C)C": {
+      "aliases": [
+        "trimethylsilyloxy"
+      ]
+    },
+    "c1ccccc1P(c2ccccc2)": {
+      "aliases": [
+        "diphenylphosphanyl"
+      ]
+    },
+    "c1ccccc1P(c2ccccc2)O": {
+      "aliases": [
+        "diphenylphosphanyloxy"
       ]
     }
   },
@@ -3515,11 +4068,6 @@
     "poly": {
       "aliases": [
         "poly"
-      ]
-    },
-    "cyclo": {
-      "aliases": [
-        "cyclo"
       ]
     },
     "[O-]": {
@@ -3975,189 +4523,3661 @@
         "tritid"
       ],
       "type": "monoValentStandaloneGroup"
+    },
+    "-[Si](C)(C)C": {
+      "aliases": [
+        "trimethylsilyl",
+        "trimethylsilanyl"
+      ]
+    },
+    "-[Si](C)(C)C(C)(C)C": {
+      "aliases": [
+        "triethylsilyl",
+        "triethylsilanyl"
+      ]
+    },
+    "-[Si](c1ccccc1)(c1ccccc1)C": {
+      "aliases": [
+        "diphenylmethylsilyl",
+        "diphenylmethylsilanyl"
+      ]
     }
   },
-  "functionalGroupsRules": {
-    "description": "Functional groups ordered by priority (lower priority number = higher priority in naming)",
-    "groups": [
-      {
-        "priority": 1,
-        "name": "carboxylic acid",
-        "smarts": "[CX3](=O)[OX2H1]",
-        "suffix": "oic acid",
-        "parenthesized": false
-      },
-      {
-        "priority": 2,
-        "name": "aldehyde",
-        "smarts": "[CX3H1](=O)[#6]",
-        "suffix": "al",
-        "parenthesized": false
-      },
-      {
-        "priority": 3,
-        "name": "ketone",
-        "smarts": "[#6][CX3](=O)[#6]",
-        "suffix": "one",
-        "parenthesized": false
-      },
-      {
-        "priority": 4,
-        "name": "alcohol",
-        "smarts": "[OX2H]",
-        "suffix": "ol",
-        "parenthesized": false
-      },
-      {
-        "priority": 5,
-        "name": "amine",
-        "smarts": "[NX3;H2,H1]",
-        "suffix": "amine",
-        "parenthesized": false
-      },
-      {
-        "priority": 6,
-        "name": "ether",
-        "smarts": "[OD2]([#6])[#6]",
-        "suffix": "ether",
-        "parenthesized": true,
-        "ignoreIfInRing": true
-      },
-      {
-        "priority": 7,
-        "name": "amide",
-        "smarts": "[NX3][CX3](=[OX1])[#6]",
-        "suffix": "amide",
-        "parenthesized": true
-      },
-      {
-        "priority": 8,
-        "name": "ester",
-        "smarts": "[OX2H0][CX3](=[OX1])[#6]",
-        "suffix": "ate",
-        "parenthesized": false
-      }
-    ]
+  "ringSystems": {
+    "C1Cc2cccc3cc4ccccc4c1c23": {
+      "aliases": [
+        "aceanthren"
+      ],
+      "labels": "1/2/2a/3/4/5/5a/6/6a/7/8/9/10/10a/10b/10c"
+    },
+    "c1cc2cccc3cc4ccccc4c1c23": {
+      "aliases": [
+        "aceanthrylen"
+      ],
+      "labels": "1/2/2a/3/4/5/5a/6/6a/7/8/9/10/10a/10b/10c"
+    },
+    "c1cc2cccc3cccc1c23": {
+      "aliases": [
+        "acenaphthoquinon",
+        "acenaphthylen"
+      ],
+      "labels": "1/2/2a/3/4/5/5a/6/7/8/8a/8b"
+    },
+    "C1Cc2cccc3cccc1c23": {
+      "aliases": [
+        "acenaphthen"
+      ],
+      "labels": "1/2/2a/3/4/5/5a/6/7/8/8a/8b"
+    },
+    "c1ccc2CCc3cc4ccccc4c1c23": {
+      "aliases": [
+        "acephenanthren"
+      ],
+      "labels": "1/2/3/3a/4/5/5a/6/6a/7/8/9/10/10a/10b/10c"
+    },
+    "c1ccc2ccc3cc4ccccc4c1c23": {
+      "aliases": [
+        "acephenanthrylen"
+      ],
+      "labels": "1/2/3/3a/4/5/5a/6/6a/7/8/9/10/10a/10b/10c"
+    },
+    "c1cccc2Nc3ccccc3Cc12": {
+      "aliases": [
+        "acridan"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2[as]c3ccccc3cc12": {
+      "aliases": [
+        "acridarsin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2nc3ccccc3cc12": {
+      "aliases": [
+        "acridin"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2pc3ccccc3cc12": {
+      "aliases": [
+        "acridophosphin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2c3ccc4cc5ccccc5nc4c3nc12": {
+      "aliases": [
+        "acrindolin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/6a/7/7a/8/9/10/11/11a/12/12a/12b/13/13a"
+    },
+    "CNCC(O)c1cc(O)c(O)cc1": {
+      "aliases": [
+        "adrenalin"
+      ],
+      "labels": "/////1/2/3//4//5/6"
+    },
+    "N1C(=O)NC(=O)C(=O)C(=O)1": {
+      "aliases": [
+        "alloxan"
+      ],
+      "labels": "1/2//3/4//5//6/"
+    },
+    "NC(C)Cc1ccccc1": {
+      "aliases": [
+        "amphetamin"
+      ],
+      "labels": "////1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1(ccc(C=CC)cc1)OC": {
+      "aliases": [
+        "anethol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para////5/6//alpha"
+    },
+    "Nc1ccccc1": {
+      "aliases": [
+        "toluidin",
+        "xylidin",
+        "aniline",
+        "anilin"
+      ],
+      "labels": "/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "COc1ccccc1": {
+      "aliases": [
+        "anisidin",
+        "anisole"
+      ],
+      "labels": "alpha//1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1(ccccc1)OC": {
+      "aliases": [
+        "anisol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6//alpha"
+    },
+    "c1cccc2cc3ccccc3cc12": {
+      "aliases": [
+        "anthradiquinon",
+        "anthraquinon",
+        "anthracen"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2cc3c4nc5ccc6cc7ccccc7cc6c5nc4ccc3cc12": {
+      "aliases": [
+        "anthrazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/5b/6/6a/7/8/8a/9/9a/10/11/12/13/13a/14/14a/14b/15/15a/16/17/17a/18/18a"
+    },
+    "n1cccc2cc3cccnc3nc12": {
+      "aliases": [
+        "anthyridin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[as]c3ccccc3[as]c12": {
+      "aliases": [
+        "arsanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[as]cc3ccccc3c12": {
+      "aliases": [
+        "arsanthridin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/7/8/9/10/10a/10b"
+    },
+    "[asH]1ccc2ccccc12": {
+      "aliases": [
+        "arsindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "[AsH]1CCc2ccccc12": {
+      "aliases": [
+        "arsindolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1CC[As]2CCCCC12": {
+      "aliases": [
+        "arsindolizidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "c1cc[as]2ccccc12": {
+      "aliases": [
+        "arsindolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "[as]1cccc2ccccc12": {
+      "aliases": [
+        "arsinolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1cc[cH2][as]2ccccc12": {
+      "aliases": [
+        "arsinolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9/9a"
+    },
+    "c1ccc2ccc3cccc3c12": {
+      "aliases": [
+        "as-indacen"
+      ],
+      "labels": "1/2/3/3a/4/5/5a/6/7/8/8a/8b"
+    },
+    "n1ncncc1": {
+      "aliases": [
+        "asym-triazin",
+        "as-triazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccc2cccccc12": {
+      "aliases": [
+        "azulen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/8/8a"
+    },
+    "c1ccc2cccc3c(=O)c4ccccc4c1c23": {
+      "aliases": [
+        "benzanthron"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/7//7a/8/9/10/11/11a/11b/11c"
+    },
+    "c1(ccc(N)cc1)c2ccc(N)cc2": {
+      "aliases": [
+        "4,4'-benzidin",
+        "benzidin"
+      ],
+      "labels": "1/2/3/4//5/6/1'/2'/3'/4'//5'/6'"
+    },
+    "c1ccccc1": {
+      "aliases": [
+        "benzene",
+        "benzen"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1(ccccc1)C(=O)C(O)c2ccccc2": {
+      "aliases": [
+        "benzoin"
+      ],
+      "labels": "1/2/3/4/5/6///alpha//1'/2'/3'/4'/5'/6'"
+    },
+    "c12ccccc1.C2(Br)(Br)Br": {
+      "aliases": [
+        "benzotribromid"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/alpha///"
+    },
+    "c12ccccc1.C2(Cl)(Cl)Cl": {
+      "aliases": [
+        "benzotrichlorid"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/alpha///"
+    },
+    "c12ccccc1.C2(F)(F)F": {
+      "aliases": [
+        "benzotrifluorid"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/alpha///"
+    },
+    "c12ccccc1.C2(I)(I)I": {
+      "aliases": [
+        "benzotriiodid"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/alpha///"
+    },
+    "C1#CC=CC=C1": {
+      "aliases": [
+        "benzyn"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1nccc2c3ccccc3[nH]c12": {
+      "aliases": [
+        "beta-carbolin",
+        "betacarbolin",
+        "b-carbolin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9/9a"
+    },
+    "c1(ccccc1)CCc2ccccc2": {
+      "aliases": [
+        "bibenzyl"
+      ],
+      "labels": "1/2/3/4/5/6/alpha/alpha'/1'/2'/3'/4'/5'/6'"
+    },
+    "c1cccc2c3ccccc3c12": {
+      "aliases": [
+        "biphenylen"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/8b"
+    },
+    "C1=CC=CC=2B=C3C=CC=CC3=BC12": {
+      "aliases": [
+        "boranthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "C123C4CC5CC1.C25(C)C.C3.O4": {
+      "aliases": [
+        "borneol"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9/10/"
+    },
+    "n1(C)c(=O)n(C)c2ncn(C)c2c1=O": {
+      "aliases": [
+        "caffein"
+      ],
+      "labels": "1//2//3//4/9/8/7//5/6/"
+    },
+    "C12C(C)(C)C(=C)C(CC2)C1": {
+      "aliases": [
+        "camphen"
+      ],
+      "labels": "1/2///3//4/5/6/7"
+    },
+    "C123C(=O)C(=O)C4CC1.C24(C)C.C3": {
+      "aliases": [
+        "camphorquinon"
+      ],
+      "labels": "1/2//3//4/5/6/7/8/9/10"
+    },
+    "c1cccc2c3ccccc3[nH]c12": {
+      "aliases": [
+        "carbazol"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9/9a"
+    },
+    "[nH]1c(=O)ccc2ccccc12": {
+      "aliases": [
+        "carbostyril"
+      ],
+      "labels": "1/2//3/4/4a/5/6/7/8/8a"
+    },
+    "c1(O)c(O)cccc1": {
+      "aliases": [
+        "pyrocatechol",
+        "catechol"
+      ],
+      "labels": "1//2,ortho//3,meta/4,para/5/6"
+    },
+    "c1(ccccc1)/C=C/C(=O)c2ccccc2": {
+      "aliases": [
+        "chalcon"
+      ],
+      "labels": "1/2/3/4/5/6/////1'/2'/3'/4'/5'/6'"
+    },
+    "n1cccc2ccccc12": {
+      "aliases": [
+        "chinolin",
+        "quinolin",
+        "quinolon"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1Cc2cccc3cc4c5ccccc5ccc4c1c23": {
+      "aliases": [
+        "cholanthren"
+      ],
+      "labels": "1/2/2a/3/4/5/5a/6/6a/6b/7/8/9/10/10a/11/12/12a/12b/12c"
+    },
+    "O1CCCc2ccccc12": {
+      "aliases": [
+        "chroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "S1CCCc2ccccc12": {
+      "aliases": [
+        "thiochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[Se]1CCCc2ccccc12": {
+      "aliases": [
+        "selenochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[Te]1CCCc2ccccc12": {
+      "aliases": [
+        "tellurochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "o1[cH2]ccc2ccccc12": {
+      "aliases": [
+        "chromen",
+        "chromon"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "O1C=CCc2ccccc12": {
+      "aliases": [
+        "chrom-2-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "O1CC=Cc2ccccc12": {
+      "aliases": [
+        "chrom-3-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "s1[cH2]ccc2ccccc12": {
+      "aliases": [
+        "thiochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[se]1[cH2]ccc2ccccc12": {
+      "aliases": [
+        "selenochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[te]1[cH2]ccc2ccccc12": {
+      "aliases": [
+        "tellurochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[o+]1cccc2ccccc12": {
+      "aliases": [
+        "chromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[s+]1cccc2ccccc12": {
+      "aliases": [
+        "thiochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[se+]1cccc2ccccc12": {
+      "aliases": [
+        "selenochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[te+]1cccc2ccccc12": {
+      "aliases": [
+        "tellurochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Cr+2]": {
+      "aliases": [
+        "chromocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1cccc2c3ccc4ccccc4c3ccc12": {
+      "aliases": [
+        "chrysen"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/6a/7/8/9/10/10a/10b/11/12/12a"
+    },
+    "n1nccc2ccccc12": {
+      "aliases": [
+        "cinnolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Co+2]": {
+      "aliases": [
+        "cobaltocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "n1ccccc1": {
+      "aliases": [
+        "pyridine",
+        "collidin",
+        "lutidine",
+        "pyridin",
+        "lutidin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "O1CCc2ccccc12": {
+      "aliases": [
+        "coumaran"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "o1c(=O)ccc2ccccc12": {
+      "aliases": [
+        "coumarin",
+        "cumarin"
+      ],
+      "labels": "1/2//3/4/4a/5/6/7/8/8a"
+    },
+    "o1ccc2ccccc12": {
+      "aliases": [
+        "coumaron"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c1cc2ccc3ccc4ccc5ccc6ccc71.c28c3c4c5c6c78": {
+      "aliases": [
+        "coronen"
+      ],
+      "labels": "1/2/2a/3/4/4a/5/6/6a/7/8/8a/9/10/10a/11/12/12a/12b/12c/12d/12e/12f/12g"
+    },
+    "c1ccccc1O": {
+      "aliases": [
+        "cresol"
+      ],
+      "labels": "2,ortho/3,meta/4,para/5/6/1/"
+    },
+    "c12ccccc1.C2(C)C": {
+      "aliases": [
+        "cumen",
+        "cymen"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6///"
+    },
+    "c1cccc2ccc3c4[cH2]ccc4ccc3c12": {
+      "aliases": [
+        "cyclopenta[a]phenanthren"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/14/15/16/17/13/12/11/9/10"
+    },
+    "C1CCCC2CCCCC12": {
+      "aliases": [
+        "decalin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "NCCc1cc(O)c(O)cc1": {
+      "aliases": [
+        "dopamin"
+      ],
+      "labels": "///1/2/3//4//5/6"
+    },
+    "c1(C)c(C)cc(C)c(C)c1": {
+      "aliases": [
+        "duren"
+      ],
+      "labels": "1//2//3/4//5//6"
+    },
+    "N1CC1": {
+      "aliases": [
+        "ethylenimin"
+      ],
+      "labels": "1/2/3"
+    },
+    "c1(c(O)ccc(CC=C)c1)OC": {
+      "aliases": [
+        "eugenol"
+      ],
+      "labels": "1/2,ortho//3,meta/4,para/5////6//alpha"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Fe+2]": {
+      "aliases": [
+        "ferrocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "[o+]1c(ccc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavylium"
+      ],
+      "labels": "1/2/3/4/4a,10/5/6/7/8/8a,9/1'/2'/3'/4'/5'/6'"
+    },
+    "c1ccc2cccc3c4ccccc4c1c23": {
+      "aliases": [
+        "fluoranthen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/6b/7/8/9/10/10a/10b/10c"
+    },
+    "c1cccc2c3ccccc3[cH2]c12": {
+      "aliases": [
+        "fluoren"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2c3ccccc3C4(c5ccccc5c6ccccc64)c12": {
+      "aliases": [
+        "spiro-9,9'-bifluoren"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9,9'/9a'/1'/2'/3'/4'/4a'/4b'/5'/6'/7'/8'/8a'/9a"
+    },
+    "C1=CC=CC1=C": {
+      "aliases": [
+        "fulven"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "o1cccc1": {
+      "aliases": [
+        "furan"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "s1cccc1": {
+      "aliases": [
+        "thiofuran",
+        "thiophen"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[se]1cccc1": {
+      "aliases": [
+        "selenofuran",
+        "selenophen"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[te]1cccc1": {
+      "aliases": [
+        "tellurofuran",
+        "tellurophen"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "o1nccn1": {
+      "aliases": [
+        "furazan"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "o1[n+]([O-])ccn1": {
+      "aliases": [
+        "furoxan"
+      ],
+      "labels": "1/2//3/4/5"
+    },
+    "c1(c(O)cccc1)OC": {
+      "aliases": [
+        "guaiacol"
+      ],
+      "labels": "1/2,ortho//3,meta/4,para/5/6//alpha"
+    },
+    "c1(C)nCCc2c3ccc(OC)cc3[nH]c12": {
+      "aliases": [
+        "harmalin"
+      ],
+      "labels": "1//2/3/4/4a/4b/5/6/7///8/8a/9/9a"
+    },
+    "c1(C)nCCc2c3ccc(O)cc3[nH]c12": {
+      "aliases": [
+        "harmalol"
+      ],
+      "labels": "1//2/3/4/4a/4b/5/6/7//8/8a/9/9a"
+    },
+    "c1(C)nCCc2c3ccccc3[nH]c12": {
+      "aliases": [
+        "harman"
+      ],
+      "labels": "1//2/3/4/4a/4b/5/6/7/8/8a/9/9a"
+    },
+    "c1(C(=O)N)nccc2c3ccc(OC)cc3[nH]c12": {
+      "aliases": [
+        "harmanamid"
+      ],
+      "labels": "1////2/3/4/4a/4b/5/6/7///8/8a/9/9a"
+    },
+    "c1(C)nccc2c3ccc(OC)cc3[nH]c12": {
+      "aliases": [
+        "harmin"
+      ],
+      "labels": "1//2/3/4/4a/4b/5/6/7///8/8a/9/9a"
+    },
+    "c1(C)c(C)c(C)ccc1": {
+      "aliases": [
+        "hemimelliten"
+      ],
+      "labels": "1//2//3//4/5/6"
+    },
+    "NCCc1c[nH]cn1": {
+      "aliases": [
+        "histamin"
+      ],
+      "labels": "/alpha/beta/4/5/1,tele,tau/2/3,pros,pi"
+    },
+    "N1CCOCCC1": {
+      "aliases": [
+        "homomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/7/6/5"
+    },
+    "N1CCSCCC1": {
+      "aliases": [
+        "thiahomomorpholin",
+        "thiohomomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/7/6/5"
+    },
+    "N1CC[Se]CCC1": {
+      "aliases": [
+        "selenohomomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/7/6/5"
+    },
+    "N1CC[Te]CCC1": {
+      "aliases": [
+        "tellurohomomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/7/6/5"
+    },
+    "N1CCNCCC1": {
+      "aliases": [
+        "homopiperazin"
+      ],
+      "labels": "1/2/3/4/5/6/7"
+    },
+    "N1CCCCCC1": {
+      "aliases": [
+        "homopiperidin"
+      ],
+      "labels": "1/2/3/4/5/6/7"
+    },
+    "N1C(=O)NC(=O)C1": {
+      "aliases": [
+        "hydantoin"
+      ],
+      "labels": "1/2//3/4//5"
+    },
+    "c1(ccccc1)C(O)C(O)c2ccccc2": {
+      "aliases": [
+        "hydrobenzoin"
+      ],
+      "labels": "1/2/3/4/5/6/////1'/2'/3'/4'/5'/6'"
+    },
+    "c1(O)ccc(O)cc1": {
+      "aliases": [
+        "hydroquinon",
+        "quinol"
+      ],
+      "labels": "1//2,ortho/3,meta/4,para//5/6"
+    },
+    "[nH]1cncc1": {
+      "aliases": [
+        "imidazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "N1CNCC1": {
+      "aliases": [
+        "imidazolidin",
+        "imidazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCc2ccccc12": {
+      "aliases": [
+        "indan"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1=CCc2ccccc12": {
+      "aliases": [
+        "ind-1-en"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1C=Cc2ccccc12": {
+      "aliases": [
+        "ind-2-en"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "[nH]1ncc2ccccc12": {
+      "aliases": [
+        "indazol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "[cH2]1ccc2ccccc12": {
+      "aliases": [
+        "inden"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "[nH]1ccc2ccccc12": {
+      "aliases": [
+        "indol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "N1CCc2ccccc12": {
+      "aliases": [
+        "indolin",
+        "oxindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1CCN2CCCCC12": {
+      "aliases": [
+        "indolizidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "c1ccn2ccccc12": {
+      "aliases": [
+        "indolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "o1ncc2ccccc12": {
+      "aliases": [
+        "indoxazen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "N1C(=O)C(=O)c2ccccc12": {
+      "aliases": [
+        "isatin"
+      ],
+      "labels": "1/2//3//3a/4/5/6/7/7a"
+    },
+    "c1[asH]cc2ccccc12": {
+      "aliases": [
+        "isoarsindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1[AsH]Cc2ccccc12": {
+      "aliases": [
+        "isoarsindolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c1[as]ccc2ccccc12": {
+      "aliases": [
+        "isoarsinolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1occ2ccccc12": {
+      "aliases": [
+        "isobenzofuran"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c1scc2ccccc12": {
+      "aliases": [
+        "isobenzothiofuran",
+        "isobenzothiophen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c(=O)1[nH]ccc2ccccc12": {
+      "aliases": [
+        "isocarbostyril"
+      ],
+      "labels": "1//2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1nccc2ccccc12": {
+      "aliases": [
+        "isochinolin",
+        "isoquinolin",
+        "isoquinolon"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1OCCc2ccccc12": {
+      "aliases": [
+        "isochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1SCCc2ccccc12": {
+      "aliases": [
+        "isothiochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1[Se]CCc2ccccc12": {
+      "aliases": [
+        "isoselenochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1[Te]CCc2ccccc12": {
+      "aliases": [
+        "isotellurochroman"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[cH2]1occc2ccccc12": {
+      "aliases": [
+        "isochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[cH2]1sccc2ccccc12": {
+      "aliases": [
+        "isothiochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[cH2]1[se]ccc2ccccc12": {
+      "aliases": [
+        "isoselenochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "[cH2]1[te]ccc2ccccc12": {
+      "aliases": [
+        "isotellurochromen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1[o+]ccc2ccccc12": {
+      "aliases": [
+        "isochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1[s+]ccc2ccccc12": {
+      "aliases": [
+        "isothiochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1[se+]ccc2ccccc12": {
+      "aliases": [
+        "isoselenochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1[te+]ccc2ccccc12": {
+      "aliases": [
+        "isotellurochromenylium"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1(=O)occc2ccccc12": {
+      "aliases": [
+        "isocoumarin",
+        "isocumarin"
+      ],
+      "labels": "1//2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1(C)c(C)c(C)cc(C)c1": {
+      "aliases": [
+        "isoduren"
+      ],
+      "labels": "1//2//3//4/5//6"
+    },
+    "c1[nH]cc2ccccc12": {
+      "aliases": [
+        "isoindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1NCc2ccccc12": {
+      "aliases": [
+        "isoindolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c1[pH]cc2ccccc12": {
+      "aliases": [
+        "isophosphindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1PCc2ccccc12": {
+      "aliases": [
+        "isophosphindolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "c1pccc2ccccc12": {
+      "aliases": [
+        "isophosphinolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "O1COc2cc(C=CC)ccc12": {
+      "aliases": [
+        "isosafrol"
+      ],
+      "labels": "1/2/3/3a/4/5/1'/2'/3'/6/7/7a"
+    },
+    "[se]1nccc1": {
+      "aliases": [
+        "isoselenazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[Se]1NCCC1": {
+      "aliases": [
+        "isoselenazolidin",
+        "isoselenazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[te]1nccc1": {
+      "aliases": [
+        "isotellurazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[Te]1NCCC1": {
+      "aliases": [
+        "isotellurazolidin",
+        "isotellurazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "s1nccc1": {
+      "aliases": [
+        "isothiazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "S1NCCC1": {
+      "aliases": [
+        "isothiazolidin",
+        "isothiazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "o1nccc1": {
+      "aliases": [
+        "isooxazol",
+        "isoxazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "O1NCCC1": {
+      "aliases": [
+        "isooxazolidin",
+        "isoxazolidin",
+        "isooxazolin",
+        "isoxazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1cccc2c3ccc4c5ccc6Cc7ccccc7c8ccc9c%10ccc%11Cc12.c3%11c4%10.c59c68": {
+      "aliases": [
+        "isoviolanthren"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/6a/6b/7/8/8a/9/9a/10/11/12/13/13a/13b/14/15/15a/15b/16/17/17a/18/18a/18b/18c/18d/18e"
+    },
+    "n1ccc(C)c2ccccc12": {
+      "aliases": [
+        "lepidin"
+      ],
+      "labels": "1/2/3/4//4a/5/6/7/8/8a"
+    },
+    "N1CCCCC1": {
+      "aliases": [
+        "lupetidin",
+        "piperidin"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "C12CC3C4CC1.C2.C4(C)C.O3": {
+      "aliases": [
+        "menthol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/7/8/9/10/"
+    },
+    "c1cccc2[Hg]c3ccccc3[Hg]c12": {
+      "aliases": [
+        "mercuranthren",
+        "phenomercurin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c12cc3cc4c1.C2.C3.C4": {
+      "aliases": [
+        "mesitylen"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6///"
+    },
+    "c1(C)c(C)c(C)c(C)c(C)c1C": {
+      "aliases": [
+        "melliten"
+      ],
+      "labels": "1//2//3//4//5//6/"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Mo+2]": {
+      "aliases": [
+        "molybdocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "N1CCOCC1": {
+      "aliases": [
+        "morpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/6/5"
+    },
+    "N1CCSCC1": {
+      "aliases": [
+        "thiamorpholin",
+        "thiomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/6/5"
+    },
+    "N1CC[Se]CC1": {
+      "aliases": [
+        "selenomorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/6/5"
+    },
+    "N1CC[Te]CC1": {
+      "aliases": [
+        "telluromorpholin"
+      ],
+      "labels": "4,para/3,meta/2,ortho/1/6/5"
+    },
+    "c1cccc2cc3cc4ccccc4cc3cc12": {
+      "aliases": [
+        "naphthacen"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/6a/7/8/9/10/10a/11/11a/12/12a"
+    },
+    "c1cccc2ccccc12": {
+      "aliases": [
+        "naphthodiquinon",
+        "naphthoquinon",
+        "naphthyridin",
+        "naphthalene",
+        "naphthalen",
+        "naphthalin"
+      ],
+      "labels": "1,alpha/2,beta/3/4/4a/5/6/7/8/8a"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Ni+2]": {
+      "aliases": [
+        "nickelocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Nb+2]": {
+      "aliases": [
+        "niobocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "C12C=CC(CC2)C1": {
+      "aliases": [
+        "norbornylen",
+        "norcamphen",
+        "norbornen"
+      ],
+      "labels": "1/2/3/4/5/6/7"
+    },
+    "c1nccc2c3ccc(OC)cc3[nH]c12": {
+      "aliases": [
+        "norharmin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7///8/8a/9/9a"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Os+2]": {
+      "aliases": [
+        "osmocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1cc2ccc3ccc4cc5ccc6ccc7ccc8cc91.c19c2c3c4c9c5c6c7c8c19": {
+      "aliases": [
+        "ovalen"
+      ],
+      "labels": "1/2/2a/3/4/4a/5/6/6a/7/7a/8/9/9a/10/11/11a/12/13/13a/14/14a/14b/14c/14d/14e/14f/14g/14h/14i/14j/14k"
+    },
+    "c1cccc2oc3ccccc3oc12": {
+      "aliases": [
+        "oxanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "N(C(=O)C)c1ccc(O)cc1": {
+      "aliases": [
+        "paracetamol"
+      ],
+      "labels": "////1/2,ortho/3,meta/4,para//5/6"
+    },
+    "n1(C)c(=O)[nH]c2ncn(C)c2c1=O": {
+      "aliases": [
+        "paraxanthin"
+      ],
+      "labels": "1//2//3/4/9/8/7//5/6/"
+    },
+    "[nH]1cnc2cccc3cccc1c23": {
+      "aliases": [
+        "perimidin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/7/8/9/9a/9b"
+    },
+    "c1ccc2cccc3c4cccc5cccc6c71.c237.c456": {
+      "aliases": [
+        "perylen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/6b/7/8/9/9a/10/11/12/12a/12b/12c/12d"
+    },
+    "[cH2]1ccc2cccc3cccc1c23": {
+      "aliases": [
+        "phenalen"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/7/8/9/9a/9b"
+    },
+    "c1cccc2c3ccccc3c4nc5c6ccccc6c7ccccc7c5nc4c12": {
+      "aliases": [
+        "phenanthrazin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/8b/9/9a/9b/10/11/12/13/13a/13b/14/15/16/17/17a/17b/18/18a/18b"
+    },
+    "c1cccc2c3ccccc3ccc12": {
+      "aliases": [
+        "phenanthren"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9/10/10a"
+    },
+    "c1cccc2ncc3ccccc3c12": {
+      "aliases": [
+        "phenanthridin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/7/8/9/10/10a/10b"
+    },
+    "c1cccc2ccc3ccccc3c12": {
+      "aliases": [
+        "phenanthrolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/7/8/9/10/10a/10b"
+    },
+    "c1cccc2nc3ccccc3[as]c12": {
+      "aliases": [
+        "phenarsazinin",
+        "phenoarsazin",
+        "phenarsazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2nc3ccccc3nc12": {
+      "aliases": [
+        "phenazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "CCOc1ccccc1": {
+      "aliases": [
+        "phenetidin"
+      ],
+      "labels": "beta/alpha//1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1(ccccc1)OCC": {
+      "aliases": [
+        "phenetol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6//alpha/beta"
+    },
+    "[O-]c1ccccc1": {
+      "aliases": [
+        "phenoxid"
+      ],
+      "labels": "/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[O+]c1ccccc1": {
+      "aliases": [
+        "phenoxylium"
+      ],
+      "labels": "/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1cccc2oc3ccccc3[nH]c12": {
+      "aliases": [
+        "phenoxazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2sc3ccccc3[nH]c12": {
+      "aliases": [
+        "phenothiazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[se]c3ccccc3[nH]c12": {
+      "aliases": [
+        "phenoselenazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[te]c3ccccc3[nH]c12": {
+      "aliases": [
+        "phenotellurazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2nc3ccccc3pc12": {
+      "aliases": [
+        "phenophosphazinin",
+        "phenophosphazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2nc3ccccc3[siH]c12": {
+      "aliases": [
+        "phenazasilin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[nH]c3ccccc3[Hg]c12": {
+      "aliases": [
+        "phenomercurazin",
+        "phenomercazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3sc12": {
+      "aliases": [
+        "phenoxathiin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[se]c12": {
+      "aliases": [
+        "phenoxaselenin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[siH2]c12": {
+      "aliases": [
+        "phenoxasilin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[te]c12": {
+      "aliases": [
+        "phenoxatellurin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[pH]c12": {
+      "aliases": [
+        "phenoxaphosphinin",
+        "phenoxaphosphin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[asH]c12": {
+      "aliases": [
+        "phenoxarsinin",
+        "phenoxarsin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2oc3ccccc3[sbH]c12": {
+      "aliases": [
+        "phenoxastibinin",
+        "phenoxantimonin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2sc3ccccc3[asH]c12": {
+      "aliases": [
+        "phenothiarsinin",
+        "phenothiarsin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1(O)cc(O)cc(O)c1": {
+      "aliases": [
+        "phloroglucinol"
+      ],
+      "labels": "1//2,ortho/3,meta//4,para/5//6"
+    },
+    "c1cccc2pc3ccccc3pc12": {
+      "aliases": [
+        "phosphanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2pcc3ccccc3c12": {
+      "aliases": [
+        "phosphanthridin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/7/8/9/10/10a/10b"
+    },
+    "[pH]1ccc2ccccc12": {
+      "aliases": [
+        "phosphindol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "P1CCc2ccccc12": {
+      "aliases": [
+        "phosphindolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1CCP2CCCCC12": {
+      "aliases": [
+        "phosphindolizidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "c1ccp2ccccc12": {
+      "aliases": [
+        "phosphindolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/8a"
+    },
+    "p1cccc2ccccc12": {
+      "aliases": [
+        "phosphinolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1cc[cH2]p2ccccc12": {
+      "aliases": [
+        "phosphinolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9/9a"
+    },
+    "c1nncc2ccccc12": {
+      "aliases": [
+        "phthalazin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "C1(=O)OCc2ccccc12": {
+      "aliases": [
+        "phthalid"
+      ],
+      "labels": "1//2/3/3a/4/5/6/7/7a"
+    },
+    "c1ccc2cccc3nc4c5ccccc5cn4c1c23": {
+      "aliases": [
+        "phthaloperin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/7/7a/7b/8/9/10/11/11a/12/13/13a/13b"
+    },
+    "n1[se]nc2ccccc12": {
+      "aliases": [
+        "piazselenol",
+        "piaselenol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "n1snc2ccccc12": {
+      "aliases": [
+        "piazthiol"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "C1NCCc2c3cc(OC)ccc3[nH]c12": {
+      "aliases": [
+        "pinolin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6///7/8/8a/9/9a"
+    },
+    "[nH]1ccccc1": {
+      "aliases": [
+        "picolin"
+      ],
+      "labels": "1/2,ortho,alpha/3,meta,beta/4,para,gamma/5/6"
+    },
+    "N1CCNCC1": {
+      "aliases": [
+        "piperazine",
+        "piperazin"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1cccc2ccc3c4ccc5ccccc5c4ccc3c21": {
+      "aliases": [
+        "picen"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/6b/7/8/8a/9/10/11/12/12a/12b/13/14/14a/14b"
+    },
+    "c1ccc2cccc3cc4ccccc4cc51.c235": {
+      "aliases": [
+        "pleiaden"
+      ],
+      "labels": "1/2/3/3a/4/5/6/6a/7/7a/8/9/10/11/11a/12/12a/12b"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Pb+2]": {
+      "aliases": [
+        "plumbocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1(C)c(C)c(C)c(C)cc1": {
+      "aliases": [
+        "prehniten"
+      ],
+      "labels": "1//2//3//4//5/6"
+    },
+    "c1(C)c(C)cc(C)cc1": {
+      "aliases": [
+        "pseudocumen"
+      ],
+      "labels": "1//2//3/4//5/6"
+    },
+    "n1cncc2nccnc12": {
+      "aliases": [
+        "pteridin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "n1cnc2nc[nH]c2c1": {
+      "aliases": [
+        "purine",
+        "purin"
+      ],
+      "labels": "1/2/3/4/9/8/7/5/6"
+    },
+    "o1[cH2]cccc1": {
+      "aliases": [
+        "pyran"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "s1[cH2]cccc1": {
+      "aliases": [
+        "thiopyran"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[se]1[cH2]cccc1": {
+      "aliases": [
+        "selenopyran"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[te]1[cH2]cccc1": {
+      "aliases": [
+        "telluropyran"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1cccc2c3cc4ccc5cc6ccccc6c6cc7ccc8cc12.c38c7c4c56": {
+      "aliases": [
+        "pyranthren"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/5a/6/7/7a/8/8a/9/10/11/12/12a/12b/13/13a/14/15/15a/16/16a/15b/15c/15d/15e"
+    },
+    "n1ccncc1": {
+      "aliases": [
+        "pyrazin"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[nH]1nccc1": {
+      "aliases": [
+        "pyrazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "N1NCCC1": {
+      "aliases": [
+        "pyrazolidin",
+        "pyrazolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1ccc2ccc3cccc4ccc1c2c34": {
+      "aliases": [
+        "pyren"
+      ],
+      "labels": "1/2/3/3a/4/5/5a/6/7/8/8a/9/10/10a/10b/10c"
+    },
+    "n1ncccc1": {
+      "aliases": [
+        "pyridazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "n1cnccc1": {
+      "aliases": [
+        "pyrimidin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1cccc2CCCc12": {
+      "aliases": [
+        "pyrindan"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/7a"
+    },
+    "c1cccc2cccc12": {
+      "aliases": [
+        "pyrinden",
+        "pyrindin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/7a"
+    },
+    "c1(O)c(O)c(O)ccc1": {
+      "aliases": [
+        "pyrogallol"
+      ],
+      "labels": "1//2,ortho//3,meta//4,para/5/6"
+    },
+    "[nH]1cccc1": {
+      "aliases": [
+        "pyrrole",
+        "pyrrol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCN2CCCC12": {
+      "aliases": [
+        "pyrrolizidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/7a"
+    },
+    "[cH2]1ccn2cccc12": {
+      "aliases": [
+        "pyrrolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/7a"
+    },
+    "N1CCCC1": {
+      "aliases": [
+        "pyrrolidin",
+        "pyrrolidon",
+        "pyrrolin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[o+]1ccccc1": {
+      "aliases": [
+        "pyrylium"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "n1c(C)ccc2ccccc12": {
+      "aliases": [
+        "quinaldin"
+      ],
+      "labels": "1/2//3/4/4a/5/6/7/8/8a"
+    },
+    "n1cncc2ccccc12": {
+      "aliases": [
+        "quinazolin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1cccc2nc3c4ccccc4nc3cc12": {
+      "aliases": [
+        "quindolin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/5b/6/7/8/9/9a/10/10a/11/11a"
+    },
+    "c1cccc2nc3nc4ccccc4c3cc12": {
+      "aliases": [
+        "quinindolin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/6a/7/8/9/10/10a/10b/11/11a"
+    },
+    "C1CCCN2CCCCC12": {
+      "aliases": [
+        "quinolizidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9/9a"
+    },
+    "c1cc[cH2]n2ccccc12": {
+      "aliases": [
+        "quinolizin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9/9a"
+    },
+    "n1ccnc2ccccc12": {
+      "aliases": [
+        "quinoxalin"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "N1(CCC2CC1)CC2": {
+      "aliases": [
+        "quinuclidin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8"
+    },
+    "c1(O)cc(O)ccc1": {
+      "aliases": [
+        "resorcinol",
+        "resorcin"
+      ],
+      "labels": "1//2,ortho/3,meta//4,para/5/6"
+    },
+    "S1C(=S)NC(=O)C1": {
+      "aliases": [
+        "rhodanin"
+      ],
+      "labels": "1/2//3/4//5"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Rh+2]": {
+      "aliases": [
+        "rhodocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1ccc2c3ccccc3c3c4cccc5c6ccccc6c6c71.c237.c456": {
+      "aliases": [
+        "rubicen"
+      ],
+      "labels": "1/2/3/3a/3b/4/5/6/7/7a/7b/7c/8/9/10/10a/10b/11/12/13/14/14a/14b/14c/14d/14e"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Ru+2]": {
+      "aliases": [
+        "ruthenocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "O1COc2cc(CC=C)ccc12": {
+      "aliases": [
+        "safrol"
+      ],
+      "labels": "1/2/3/3a/4/5/1'/2'/3'/6/7/7a"
+    },
+    "c1ccc2cc3cccc3cc12": {
+      "aliases": [
+        "s-indacen"
+      ],
+      "labels": "1/2/3/3a/4/4a/5/6/7/7a/8/8a"
+    },
+    "n1cncnc1": {
+      "aliases": [
+        "sym-triazin",
+        "s-triazin"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[nH]1ncnc1": {
+      "aliases": [
+        "sym-triazol",
+        "s-triazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1cccc2[siH]c3ccccc3[siH]c12": {
+      "aliases": [
+        "silanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "[nH]1cc(C)c2ccccc12": {
+      "aliases": [
+        "skatol"
+      ],
+      "labels": "1/2/3//3a/4/5/6/7/7a"
+    },
+    "c1(ccccc1)C=Cc2ccccc2": {
+      "aliases": [
+        "stilben"
+      ],
+      "labels": "1/2/3/4/5/6/alpha/beta/1'/2'/3'/4'/5'/6'"
+    },
+    "S1(=O)(=O)CCCC1": {
+      "aliases": [
+        "sulfolan",
+        "sulfolen"
+      ],
+      "labels": "1///2/3/4/5"
+    },
+    "S1(=O)(=O)C=CCC1": {
+      "aliases": [
+        "sulfol-2-en"
+      ],
+      "labels": "1///2/3/4/5"
+    },
+    "S1(=O)(=O)CC=CC1": {
+      "aliases": [
+        "sulfol-3-en"
+      ],
+      "labels": "1///2/3/4/5"
+    },
+    "C=Cc1ccccc1": {
+      "aliases": [
+        "styren",
+        "styrol"
+      ],
+      "labels": "beta/alpha/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "c1cccc2[se]c3ccccc3[se]c12": {
+      "aliases": [
+        "selenanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "c1cccc2[te]c3ccccc3[te]c12": {
+      "aliases": [
+        "telluranthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "C1CCCc2ccccc12": {
+      "aliases": [
+        "tetralin",
+        "tetralon"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a"
+    },
+    "c1ccc2ncc3cccc4ccc1c2c34": {
+      "aliases": [
+        "thebenidin"
+      ],
+      "labels": "1/2/3/3a/4/5/5a/6/7/8/8a/9/10/10a/10b/10c"
+    },
+    "[nH]1c(=O)n(C)c2ncn(C)c2c1=O": {
+      "aliases": [
+        "theobromin"
+      ],
+      "labels": "1/2//3//4/9/8/7//5/6/"
+    },
+    "n1(C)c(=O)n(C)c2nc[nH]c2c1=O": {
+      "aliases": [
+        "theophyllin"
+      ],
+      "labels": "1//2//3//4/9/8/7/5/6/"
+    },
+    "c1cccc2sc3ccccc3sc12": {
+      "aliases": [
+        "thianthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/8/9/9a/10/10a"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Ti+2]": {
+      "aliases": [
+        "titanocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1(ccccc1)C#Cc2ccccc2": {
+      "aliases": [
+        "tolan"
+      ],
+      "labels": "1/2/3/4/5/6///1'/2'/3'/4'/5'/6'"
+    },
+    "Cc1ccccc1": {
+      "aliases": [
+        "toluene",
+        "toluen"
+      ],
+      "labels": "alpha/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "[cH2]1ccc2c3cccc3c4cccc4c12": {
+      "aliases": [
+        "trinden"
+      ],
+      "labels": "1/2/3/3a/3b/4/5/6/6a/6b/7/8/9/9a/9b"
+    },
+    "c1cccc2cc3c4cc5ccccc5cc4c4cc5ccccc5cc4c3cc12": {
+      "aliases": [
+        "trinaphthylen"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/5b/6/6a/7/8/9/10/10a/11/11a/11b/12/12a/13/14/15/16/16a/17/17a/17b/18/18a"
+    },
+    "c1cccc2oc3cc4nc5ccccc5oc4cc3nc12": {
+      "aliases": [
+        "triphenodioxazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/6a/7/7a/8/9/10/11/11a/12/12a/13/13a/14/14a"
+    },
+    "c1cccc2sc3cc4nc5ccccc5sc4cc3nc12": {
+      "aliases": [
+        "triphenodithiazin"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/6a/7/7a/8/9/10/11/11a/12/12a/13/13a/14/14a"
+    },
+    "c1cccc2c3ccccc3c3ccccc3c12": {
+      "aliases": [
+        "triphenylen"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/8b/9/10/11/12/12a/12b"
+    },
+    "C(c1ccccc1)(c1ccccc1)c1ccccc1": {
+      "aliases": [
+        "tritan"
+      ],
+      "labels": "/1/2/3/4/5/6/1'/2'/3'/4'/5'/6'/1''/2''/3''/4''/5''/6''"
+    },
+    "NCCc1ccc(cc1)O": {
+      "aliases": [
+        "tyramin"
+      ],
+      "labels": "/alpha/beta/1/2,ortho/3,meta/4,para/5/6/"
+    },
+    "NCCc1c[nH]c2ccccc12": {
+      "aliases": [
+        "tryptamin"
+      ],
+      "labels": "/alpha/beta/3/2/1/7a/7/6/5/4/3a"
+    },
+    "C1NCCc2c3ccccc3[nH]c12": {
+      "aliases": [
+        "tryptolin"
+      ],
+      "labels": "1/2/3/4/4a/4b/5/6/7/8/8a/9/9a"
+    },
+    "[cH-]1ccc[cH-]ccc1.[cH-]1ccc[cH-]ccc1.[U+4]": {
+      "aliases": [
+        "uranocen"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/1'/2'/3'/4'/5'/6'/7'/8'/"
+    },
+    "N1NC(=O)NC1=O": {
+      "aliases": [
+        "urazol"
+      ],
+      "labels": "1/2/3//4/5/"
+    },
+    "n1nnccc1": {
+      "aliases": [
+        "v-triazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[V+2]": {
+      "aliases": [
+        "vanadocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "c1(c(OC)cccc1)OC": {
+      "aliases": [
+        "veratrol"
+      ],
+      "labels": "1/2,ortho//alpha'/3,meta/4,para/5/6//alpha"
+    },
+    "c1cccc2oc3ccccc3[cH2]c12": {
+      "aliases": [
+        "xanthen"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2sc3ccccc3[cH2]c12": {
+      "aliases": [
+        "thioxanthen"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2[se]c3ccccc3[cH2]c12": {
+      "aliases": [
+        "selenoxanthen"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2[te]c3ccccc3[cH2]c12": {
+      "aliases": [
+        "telluroxanthen"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2[o+]c3ccccc3cc12": {
+      "aliases": [
+        "xanthylium"
+      ],
+      "labels": "1/2/3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2Cc3ccc4c5ccc6Cc7ccccc7c8ccc9c%10ccc%11c12.c3%11c4%10.c59c68": {
+      "aliases": [
+        "violanthren"
+      ],
+      "labels": "1/2/3/4/4a/5/5a/6/7/7a/7b/8/9/9a/10/10a/11/12/13/14/14a/14b/15/16/16a/16b/17/18/18a/18b/18c/18d/18e/18f"
+    },
+    "[CH-]1cccc1.[CH-]1cccc1.[Zr+2]": {
+      "aliases": [
+        "zirconocen"
+      ],
+      "labels": "1/2/3/4/5/1'/2'/3'/4'/5'/"
+    },
+    "n1cnc2nc[nH]c2c1N": {
+      "aliases": [
+        "adenin"
+      ],
+      "labels": "1/2/3/4/9/8/7/5/6/"
+    },
+    "[nH]1c(=O)nc(N)cc1": {
+      "aliases": [
+        "cytosin"
+      ],
+      "labels": "1/2//3/4//5/6"
+    },
+    "n1c(N)[nH]c(=O)cc1": {
+      "aliases": [
+        "isocytosin"
+      ],
+      "labels": "1/2//3/4//5/6"
+    },
+    "[nH]1c(N)nc2nc[nH]c2c1=O": {
+      "aliases": [
+        "guanin"
+      ],
+      "labels": "1/2//3/4/9/8/7/5/6/"
+    },
+    "[nH]1c(=O)nc2nc[nH]c2c1N": {
+      "aliases": [
+        "isoguanin"
+      ],
+      "labels": "1/2//3/4/9/8/7/5/6/"
+    },
+    "[nH]1cnc2nc[nH]c2c1=O": {
+      "aliases": [
+        "hypoxanthin"
+      ],
+      "labels": "1/2/3/4/9/8/7/5/6/"
+    },
+    "[nH]1c(=O)[nH]c(=O)c(C)c1": {
+      "aliases": [
+        "thymin"
+      ],
+      "labels": "1/2//3/4//5/alpha/6"
+    },
+    "[nH]1c(=O)[nH]c(=O)cc1": {
+      "aliases": [
+        "uracil"
+      ],
+      "labels": "1/2//3/4//5/6"
+    },
+    "[nH]1c(=O)[nH]c2nc[nH]c2c1=O": {
+      "aliases": [
+        "xanthin"
+      ],
+      "labels": "1/2//3/4/9/8/7/5/6/"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c([nH2])ncnc23": {
+      "aliases": [
+        "adenosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6/N/1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2c(=O)nc([nH2])cc2": {
+      "aliases": [
+        "cytidin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///1/2//3/4/N/5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2c(N)nc(=O)cc2": {
+      "aliases": [
+        "isocytidin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///1/2//3/4/N/5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c(o)[nH]c(N)nc23": {
+      "aliases": [
+        "guanosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c(N)[nH]c(=O)nc23": {
+      "aliases": [
+        "isoguanosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c([oH])ncnc23": {
+      "aliases": [
+        "inosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c([sH])ncnc23": {
+      "aliases": [
+        "thioinosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1(C[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)c(C)c2": {
+      "aliases": [
+        "deoxythymidin",
+        "thymidin"
+      ],
+      "labels": "1'/2'/3'//4'/5'///1/2//3/4//5/alpha/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2": {
+      "aliases": [
+        "uridin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///1/2//3/4//5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c(=O)[nH]c(=O)[nH]c23": {
+      "aliases": [
+        "xanthosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@](F)(COS(=O)(=O)N)O1)n2cnc3c(N)ncnc23": {
+      "aliases": [
+        "nucleocidin"
+      ],
+      "labels": "1'/2'//3'//4'//5'///////9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1(C[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)c(I)c2": {
+      "aliases": [
+        "idoxuridin"
+      ],
+      "labels": "1'/2'/3'//4'/5'///1/2//3/4//5//6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)c(C)c2": {
+      "aliases": [
+        "ribosylthymin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///1/2//3/4//5/alpha/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2C(=O)O": {
+      "aliases": [
+        "orotidin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///1/2//3/4//5/6///"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)c2c[nH]c(=O)[nH]c2(=O)": {
+      "aliases": [
+        "pseudouridin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///5/6/1/2//3/4/"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](CO)O1)n2cnc3c(=O)n4c(CC[C@@H](C(=O)OC)NC(=O)OC)c(C)nc4n(C)c32": {
+      "aliases": [
+        "wybutosin"
+      ],
+      "labels": "1'/2'//3'//4'/5'///3/2/1/9a/9//8/7/gamma/beta/alpha//////////6//5/4a/4//3a"
+    },
+    "o1c(cc(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "apigenin"
+      ],
+      "labels": "1/2/3/4//4a,10/5//6/7//8/8a,9/1'/2'/3'/4'//5'/6'"
+    },
+    "O1[C@@H]([C@@H](O)C(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "dihydrokaempferol",
+        "aromadendrin",
+        "aromodendrin"
+      ],
+      "labels": "1/2/3//4//4a/5//6/7//8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "O1[C@@H]([C@@H](O)C(=O)c2c(O)cc(O)cc12)c3cc(O)c(O)cc3": {
+      "aliases": [
+        "dihydroquercetin",
+        "taxifolin"
+      ],
+      "labels": "1/2/3//4//4a/5//6/7//8/8a/1'/2'/3'//4'//5'/6'"
+    },
+    "O1\\C(=C/c2ccccc2)C(=O)c3ccccc13": {
+      "aliases": [
+        "auron"
+      ],
+      "labels": "1/2/21/1'/2'/3'/4'/5'/6'/3//3a/4/5/6/7/7a"
+    },
+    "c1cccc2OCc3c4ccccc4oc3c12": {
+      "aliases": [
+        "coumestan"
+      ],
+      "labels": "1/2/3/4/4a/5/6/6a/6b/7/8/9/10/10a/11/11a/11b"
+    },
+    "[o+]1c(c(O)cc2c(O)cc(O)cc12)c3cc(O)c(O)cc3": {
+      "aliases": [
+        "cyanidin"
+      ],
+      "labels": "1/2/3//4/4a/5//6/7//8/8a/1'/2'/3'//4'//5'/6'"
+    },
+    "o1c(cc(=O)c2c(O)cc(O)cc12)c3cc(O)c(OC)cc3": {
+      "aliases": [
+        "diosmetin"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'//4'///5'/6'"
+    },
+    "O1C(CCc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavan"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1C(=CCc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavan-2-en",
+        "flav-2-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1C(C=Cc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavan-3-en",
+        "flav-3-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "o1c(cc(=O)c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavon"
+      ],
+      "labels": "1/2/3/4//4a,10/5/6/7/8/8a,9/1'/2'/3'/4'/5'/6'"
+    },
+    "O1C(CC(=O)c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "flavanon"
+      ],
+      "labels": "1/2/3/4//4a,10/5/6/7/8/8a,9/1'/2'/3'/4'/5'/6'"
+    },
+    "o1cc(c(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "genistein"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "O1CC(C(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "dihydrogenistein"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "o1cc(c(=O)c2c(O)cc(O[C@H]4[C@H](O)[C@@H](O)[C@H](O)[C@@H](CO)O4)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "genistin"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//1''/2'//3''//4''//5''/6''///8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "O1CC(Cc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "iso-flavan",
+        "isoflavan"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1C=C(Cc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "iso-flavan-2-en",
+        "isoflavan-2-en",
+        "iso-flav-2-en",
+        "isoflav-2-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1CC(=Cc2ccccc12)c3ccccc3": {
+      "aliases": [
+        "iso-flavan-3-en",
+        "isoflavan-3-en",
+        "iso-flav-3-en",
+        "isoflav-3-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "o1cc(c(=O)c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "iso-flavon",
+        "isoflavon"
+      ],
+      "labels": "1/2/3/4//4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "o1c(cc(=O)c2c(O)cc(O)cc12)c3cc(O)c(O)cc3": {
+      "aliases": [
+        "luteolin"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'//4'//5'/6'"
+    },
+    "O1[C@@H](CC(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "naringenin"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "O1CCC(c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "neo-flavan",
+        "neoflavan"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1C=CC(c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "neo-flavan-2-en",
+        "neoflavan-2-en",
+        "neo-flav-2-en",
+        "neoflav-2-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "O1CC=C(c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "neo-flavan-3-en",
+        "neoflavan-3-en",
+        "neo-flav-3-en",
+        "neoflav-3-en"
+      ],
+      "labels": "1/2/3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "o1c(=O)cc(c2ccccc12)c3ccccc3": {
+      "aliases": [
+        "neo-flavon",
+        "neoflavon"
+      ],
+      "labels": "1/2//3/4/4a/5/6/7/8/8a/1'/2'/3'/4'/5'/6'"
+    },
+    "o1c(c(O)c(=O)c2c(O)cc(O)cc12)c3cc(O)c(O)cc3": {
+      "aliases": [
+        "quercetin"
+      ],
+      "labels": "1/2/3//4//4a/5//6/7//8/8a/1'/2'/3'//4'//5'/6'"
+    },
+    "[nH]1cccc1cc2ccc(n2)cc3ccc(n3)cc4cccn4": {
+      "aliases": [
+        "bilin"
+      ],
+      "labels": "21/1/2/3/4/5/6/7/8/9/22/10/11/12/13/14/23/15/16/17/18/19/24"
+    },
+    "C12CCc(n1)cc3CCc(n3)cc4CCc(n4)cc5CCC2[nH]5": {
+      "aliases": [
+        "corrin"
+      ],
+      "labels": "1/2/3/4/21/5/6/7/8/9/22/10/11/12/13/14/23/15/16/17/18/19/24"
+    },
+    "C1(=O)C=C(O)CC(O)C1": {
+      "aliases": [
+        "dihydrophloroglucinol"
+      ]
+    },
+    "c12ccc([nH]1)cc3ccc(n3)cc4ccc([nH]4)cc5ccc(n5)c2": {
+      "aliases": [
+        "porphyrin",
+        "porphin"
+      ],
+      "labels": "1/2/3/4/21/5/6/7/8/9/22/10/11/12/13/14/23/15/16/17/18/19/24/20"
+    },
+    "N1NC(=O)C=C1": {
+      "aliases": [
+        "3-pyrazolone",
+        "3-pyrazolon"
+      ],
+      "labels": "1/2/3//4/5"
+    },
+    "N1N=CC(=O)C1": {
+      "aliases": [
+        "4-pyrazolone",
+        "4-pyrazolon"
+      ],
+      "labels": "1/2/3/4//5"
+    },
+    "N1N=CCC1=O": {
+      "aliases": [
+        "5-pyrazolone",
+        "5-pyrazolon"
+      ],
+      "labels": "1/2/3/4/5/"
+    },
+    "C/C=C/C1=C(OC)C=C(OC)C(OC)=C1": {
+      "aliases": [
+        "alpha-asarone",
+        "alpha-asaron"
+      ]
+    },
+    "C/C=C\\C1=C(OC)C=C(OC)C(OC)=C1": {
+      "aliases": [
+        "beta-asarone",
+        "beta-asaron"
+      ]
+    },
+    "o1cccc1C(=O)C(=O)c2ccco2": {
+      "aliases": [
+        "alpha-furil",
+        "2,2'-furil"
+      ],
+      "labels": "1/2/3/4/5/////2'/3'/4'/5'/1'"
+    },
+    "o1cccc1C(=O)C(O)c2ccco2": {
+      "aliases": [
+        "2,2'-furoin"
+      ],
+      "labels": "1/2/3/4/5///alpha//2'/3'/4'/5'/1'"
+    },
+    "C[C@@]1([C@H]2[C@@](CCC1)(C)[C@H]3CCC(C(C)C)=CC3=CC2)C(=O)N": {
+      "aliases": [
+        "abietamide",
+        "abietamid"
+      ]
+    },
+    "CC(=O)c1cc(OC)c(O)cc1": {
+      "aliases": [
+        "acetovanillone",
+        "acetovanillon",
+        "apocynin"
+      ],
+      "labels": "///1/2/3///4//5/6"
+    },
+    "OCc1ccc(OC)cc1": {
+      "aliases": [
+        "anise alcohol"
+      ]
+    },
+    "c1(ccc(OC)cc1)C(=O)C(=O)c2ccc(OC)cc2": {
+      "aliases": [
+        "p-anisil",
+        "anisil"
+      ],
+      "labels": "1/2/3/4///5/6/////1'/2'/3'/4'///5'/6'"
+    },
+    "c1(ccc(OC)cc1)C(=O)C(O)c2ccc(OC)cc2": {
+      "aliases": [
+        "p-anisoin",
+        "anisoin"
+      ],
+      "labels": "1/2/3/4///5/6///alpha//1'/2'/3'/4'///5'/6'"
+    },
+    "c1(=O)c(=O)ccc2cc3ccccc3cc12": {
+      "aliases": [
+        "anthra-1,2-quinone",
+        "anthra-1,2-quinon"
+      ],
+      "labels": "1//2//3/4/4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1(=O)ccc(=O)c2cc3ccccc3cc12": {
+      "aliases": [
+        "anthra-1,4-quinone",
+        "anthra-1,4-quinon"
+      ],
+      "labels": "1//2/3/4//4a/10/10a/5/6/7/8/8a/9/9a"
+    },
+    "c1cccc2c(=O)c3ccccc3c(=O)c12": {
+      "aliases": [
+        "anthra-9,10-quinone",
+        "anthra-9,10-quinon"
+      ],
+      "labels": "1/2/3/4/4a/10//10a/5/6/7/8/8a/9//9a"
+    },
+    "n1occ2ccccc12": {
+      "aliases": [
+        "anthranil"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a"
+    },
+    "N1C(=O)NC(=O)CC(=O)1": {
+      "aliases": [
+        "barbituric acid",
+        "barbituricacid",
+        "barbituric"
+      ],
+      "labels": "1/2//3/4//5/6/"
+    },
+    "c1(ccccc1)C(=O)C(=O)c2ccccc2": {
+      "aliases": [
+        "benzil"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/////1'/2'/3'/4'/5'/6'"
+    },
+    "c1(=O)c(=O)cccc1": {
+      "aliases": [
+        "benzo-1,2-quinone",
+        "benzo-1,2-quinon"
+      ],
+      "labels": "1//2,ortho//3,meta/4,para/5/6"
+    },
+    "c1(=O)ccc(=O)cc1": {
+      "aliases": [
+        "benzo-1,4-quinone",
+        "benzo-1,4-quinon"
+      ],
+      "labels": "1//2,ortho/3,meta/4,para//5/6"
+    },
+    "c1(ccccc1)C(O)(c2ccccc2)C(O)(c3ccccc3)c4ccccc4": {
+      "aliases": [
+        "benzopinacol"
+      ],
+      "labels": "1/2/3/4/5/6///1'/2'/3'/4'/5'/6'///1''/2''/3''/4''/5''/6''/1'''/2'''/3'''/4'''/5'''/6'''"
+    },
+    "c1(ccccc1)C(c2ccccc2)(c3ccccc3)C(=O)c4ccccc4": {
+      "aliases": [
+        "benzopinacolone",
+        "benzopinacolon"
+      ]
+    },
+    "Oc1ccc(cc1)C(C)(C)c2ccc(cc2)O": {
+      "aliases": [
+        "bisphenol a",
+        "bisphenol-a"
+      ]
+    },
+    "O=Cc1cc(OCC)c(O)cc1": {
+      "aliases": [
+        "ethyl vanillin",
+        "ethylvanillin",
+        "bourbonal"
+      ],
+      "labels": "//1/2/3////4//5/6"
+    },
+    "c1c(O)c(C)ccc1C(C)C": {
+      "aliases": [
+        "carvacrol"
+      ]
+    },
+    "c1([O-])c([O-])cccc1": {
+      "aliases": [
+        "pyrocatecholate",
+        "pyrocatecholat",
+        "catecholate",
+        "catecholat"
+      ],
+      "labels": "1//2,ortho//3,meta/4,para/5/6"
+    },
+    "c1(ccc(CC=C)cc1)O": {
+      "aliases": [
+        "chavicol"
+      ]
+    },
+    "OC/C=C/c1cc(OC)c(O)cc1": {
+      "aliases": [
+        "coniferol"
+      ]
+    },
+    "c1(c(OC)cc(C)cc1)O": {
+      "aliases": [
+        "creosol"
+      ]
+    },
+    "O=Cc1ccc(C(C)C)cc1": {
+      "aliases": [
+        "cuminaldehyde",
+        "cuminaldehyd",
+        "cumaldehyde",
+        "cumaldehyd",
+        "cuminal"
+      ],
+      "labels": "//1/2/3/4////5/6"
+    },
+    "OC(=O)c1ccc(C(C)C)cc1": {
+      "aliases": [
+        "cuminic acid",
+        "cuminicacid",
+        "cumic acid",
+        "cumicacid"
+      ],
+      "labels": "///1/2/3/4////5/6"
+    },
+    "OCc1ccc(C(C)C)cc1": {
+      "aliases": [
+        "cuminol"
+      ],
+      "labels": "//1/2/3/4////5/6"
+    },
+    "COc1cc(ccc1O)\\C=C\\C(=O)CC(=O)\\C=C\\c1ccc(O)c(OC)c1": {
+      "aliases": [
+        "curcumin"
+      ]
+    },
+    "n1c(N)nc(N)nc1N": {
+      "aliases": [
+        "cyanurotriamide",
+        "cyanurotriamine",
+        "cyanurotriamid",
+        "cyanurotriamin",
+        "cyanuramide",
+        "cyanuramid",
+        "melamine",
+        "melamin"
+      ],
+      "labels": "1/2/N/3/4/N'/5/6/N''"
+    },
+    "n1c(Br)nc(Br)nc1Br": {
+      "aliases": [
+        "cyanuric bromide",
+        "cyanuryl bromide",
+        "cyanuric bromid",
+        "cyanuryl bromid"
+      ]
+    },
+    "n1c(Cl)nc(Cl)nc1Cl": {
+      "aliases": [
+        "cyanuric chloride",
+        "cyanuryl chloride",
+        "cyanuric chlorid",
+        "cyanuryl chlorid"
+      ]
+    },
+    "n1c(F)nc(F)nc1F": {
+      "aliases": [
+        "cyanuric fluoride",
+        "cyanuryl fluoride",
+        "cyanuric fluorid",
+        "cyanuryl fluorid"
+      ]
+    },
+    "n1c(I)nc(I)nc1I": {
+      "aliases": [
+        "cyanuric iodide",
+        "cyanuryl iodide",
+        "cyanuric iodid",
+        "cyanuryl iodid"
+      ]
+    },
+    "[CH-]1C=CC=C1": {
+      "aliases": [
+        "cyclopentadienide",
+        "cyclopentadienid"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "[CH+]1C=CC=C1": {
+      "aliases": [
+        "cyclopentadienylium"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "N1=PN=PN=PN=P1": {
+      "aliases": [
+        "cyclotetraphosphazene",
+        "cyclotetraphosphazen"
+      ],
+      "labels": "1/2/3/4/5/6/7/8"
+    },
+    "N1=PN=PN=P1": {
+      "aliases": [
+        "cyclotriphosphazene",
+        "cyclotriphosphazen"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccccc1C(=O)NC(=O)c2ccccc2": {
+      "aliases": [
+        "dibenzamide",
+        "dibenzamid"
+      ]
+    },
+    "c1(c(C(=O)[O-])cccc1)c2c(C(=O)[O-])cccc2": {
+      "aliases": [
+        "diphenate"
+      ],
+      "labels": "1/2////3/4/5/6/1'/2'////3'/4'/5'/6'"
+    },
+    "c1(c(C(=O)O)cccc1)c2c(C(=O)O)cccc2": {
+      "aliases": [
+        "diphenic acid",
+        "diphenicacid",
+        "diphenic"
+      ],
+      "labels": "1/2////3/4/5/6/1'/2'////3'/4'/5'/6'"
+    },
+    "c1(c(C)c(C)c(O)c(C)c1C)O": {
+      "aliases": [
+        "durohydroquinone",
+        "durohydroquinon"
+      ]
+    },
+    "CC(c1ccccc1)=CC(c2ccccc2)=O": {
+      "aliases": [
+        "dypnone"
+      ]
+    },
+    "COc1c(OC)c(OC)cc(CC=C)c1": {
+      "aliases": [
+        "elemicin"
+      ]
+    },
+    "c1(ccc(CC=C)cc1)OC": {
+      "aliases": [
+        "estragole",
+        "estragol"
+      ]
+    },
+    "O=CCc1cc(O)c(OC)cc1": {
+      "aliases": [
+        "homoisovanillin"
+      ],
+      "labels": "///1/2/3//4///5/6"
+    },
+    "O=CCc1cc(OC)c(O)cc1": {
+      "aliases": [
+        "homovanillin"
+      ],
+      "labels": "///1/2/3///4//5/6"
+    },
+    "O=CCc1c(O)c(OC)ccc1": {
+      "aliases": [
+        "o-homovanillin"
+      ],
+      "labels": "///1/2//3///4/5/6"
+    },
+    "[n-]1cncc1": {
+      "aliases": [
+        "imidazolate",
+        "imidazolat"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1(c(N)cccc1)C(=O)C(=O)O": {
+      "aliases": [
+        "isatic acid",
+        "isaticacid",
+        "isatic"
+      ],
+      "labels": "1/2//3/4/5/6/////"
+    },
+    "c1(C(=O)O)c(NC(=O)O)cccc1": {
+      "aliases": [
+        "isatoic acid",
+        "isatoicacid",
+        "isatoic"
+      ],
+      "labels": "1////2/////3/4/5/6"
+    },
+    "COc1c(OC)c(OC)cc(C=CC)c1": {
+      "aliases": [
+        "isoelemicin"
+      ]
+    },
+    "c1(c(O)ccc(C=CC)c1)OC": {
+      "aliases": [
+        "isoeugenol"
+      ],
+      "labels": "1/2,ortho//3,meta/4,para/5////6//alpha"
+    },
+    "OCc1cc(CO)ccc1": {
+      "aliases": [
+        "isophthalyl alcohol"
+      ],
+      "labels": "//1/2,ortho/3,meta///4,para/5/6"
+    },
+    "O=Cc1cc(O)c(OC)cc1": {
+      "aliases": [
+        "isovanillin"
+      ],
+      "labels": "//1/2/3//4///5/6"
+    },
+    "c12cc3cc4c1.C2(=O)[O-].C3.C4": {
+      "aliases": [
+        "mesitylenate",
+        "mesitylenat"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/////"
+    },
+    "c12cc3cc4c1.C2(=O)O.C3.C4": {
+      "aliases": [
+        "mesitylenic acid",
+        "mesitylenicacid",
+        "mesitylenic"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/////"
+    },
+    "c1(=O)c(=O)ccc2ccccc12": {
+      "aliases": [
+        "naphtho-1,2-quinone",
+        "naphtho-1,2-quinon"
+      ],
+      "labels": "1//2//3/4/4a/5/6/7/8/8a"
+    },
+    "c1(=O)ccc(=O)c2ccccc12": {
+      "aliases": [
+        "naphtho-1,4-quinone",
+        "naphtho-1,4-quinon"
+      ],
+      "labels": "1//2/3/4//4a/5/6/7/8/8a"
+    },
+    "n1cccc(c1)C2N(C)CCC2": {
+      "aliases": [
+        "nicotine",
+        "nicotin"
+      ]
+    },
+    "c1(cc(O)cc(CCCCC)c1)O": {
+      "aliases": [
+        "olivetol"
+      ]
+    },
+    "c1(cc(O)cc(C)c1)O": {
+      "aliases": [
+        "orcinol"
+      ]
+    },
+    "c1ccccc1C(=O)O[O-]": {
+      "aliases": [
+        "perbenzoate",
+        "perbenzoat"
+      ],
+      "labels": "2,ortho/3,meta/4,para/5/6/1////"
+    },
+    "c1ccccc1C(=O)OO": {
+      "aliases": [
+        "perbenzoic acid",
+        "perbenzoicacid",
+        "perbenzoic"
+      ],
+      "labels": "2,ortho/3,meta/4,para/5/6/1////"
+    },
+    "c1(C(=O)N2)c(C(=O)N2)cccc1": {
+      "aliases": [
+        "phthalhydrazide",
+        "phthalhydrazid"
+      ],
+      "labels": "1////2////3/4/5/6"
+    },
+    "OCc1c(CO)cccc1": {
+      "aliases": [
+        "phthalyl alcohol"
+      ],
+      "labels": "//1/2,ortho///3,meta/4,para/5/6"
+    },
+    "c1(ccccc1)O": {
+      "aliases": [
+        "phenol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/"
+    },
+    "c1(ccccc1)[O-]": {
+      "aliases": [
+        "phenolate",
+        "phenolat"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/"
+    },
+    "[c+]1(ccccc1)": {
+      "aliases": [
+        "phenylium"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6"
+    },
+    "Oc1ccc(CCC(=O)c2c(O)cc(O)cc2O)cc1": {
+      "aliases": [
+        "phloretin"
+      ]
+    },
+    "c1(c(CC)cccc1)O": {
+      "aliases": [
+        "phlorol"
+      ]
+    },
+    "c1([N+](=O)[O-])cc([N+](=O)[O-])cc([N+](=O)[O-])c1[O-]": {
+      "aliases": [
+        "picrate",
+        "picrat"
+      ],
+      "labels": "2,ortho////3,meta/4,para////5/6////1/"
+    },
+    "c1([N+](=O)[O-])cc([N+](=O)[O-])cc([N+](=O)[O-])c1O": {
+      "aliases": [
+        "picric acid",
+        "picricacid",
+        "picric"
+      ],
+      "labels": "2,ortho////3,meta/4,para////5/6////1/"
+    },
+    "c1(c(C)c(C)c(O)c(C)c1)O": {
+      "aliases": [
+        "pseudocumohydroquinone",
+        "pseudocumohydroquinon"
+      ]
+    },
+    "n1c(N)[nH]c(=O)c2nccnc12": {
+      "aliases": [
+        "pterin"
+      ],
+      "labels": "1/2//3/4//4a/5/6/7/8/8a"
+    },
+    "n1c(N)[nH]c(=O)c2ncCNc12": {
+      "aliases": [
+        "dihydropterin"
+      ],
+      "labels": "1/2//3/4//4a/5/6/7/8/8a"
+    },
+    "n1c(N)[nH]c(=O)c2NCCNc12": {
+      "aliases": [
+        "tetrahydropterin"
+      ],
+      "labels": "1/2//3/4//4a/5/6/7/8/8a"
+    },
+    "n1c(C(=O)O)c(C(=O)O)ccc1": {
+      "aliases": [
+        "quinolinic acid",
+        "quinolinicacid",
+        "quinolinic"
+      ],
+      "labels": "1/2,ortho////3,meta////4,para/5/6"
+    },
+    "n1c2c(=O)[nH]c(N)nc2nc(C)c1[C@@H](C)Nc1ccc(C[C@@H]([C@@H]([C@@H](CO[C@H]2O[C@H](COP(O[C@@H](CCC(O)=O)C(O)=O)(O)=O)[C@H]([C@H]2O)O)O)O)O)cc1": {
+      "aliases": [
+        "methanopterin"
+      ],
+      "labels": "5/4a/4//3/2//1/8a/8/7//6////////////////////////////////////////"
+    },
+    "N1c2c(=O)[nH]c(N)nc2N[C@@H](C)C1[C@@H](C)Nc1ccc(C[C@@H]([C@@H]([C@@H](CO[C@H]2O[C@H](COP(O[C@@H](CCC(O)=O)C(O)=O)(O)=O)[C@H]([C@H]2O)O)O)O)O)cc1": {
+      "aliases": [
+        "5,6,7,8-tetrahydromethanopterin",
+        "tetrahydromethanopterin"
+      ],
+      "labels": "5/4a/4//3/2//1/8a/8/7//6////////////////////////////////////////"
+    },
+    "c1(cc(O)cc(O)c1)C=Cc2ccc(O)cc2": {
+      "aliases": [
+        "resveratrol"
+      ],
+      "labels": "1/2/3//4/5//6/alpha/beta/1'/2'/3'/4'//5'/6'"
+    },
+    "c1(cc(O)cc(O)c1)C=Cc2cc(O)c(OC)cc2": {
+      "aliases": [
+        "rhapontigenin"
+      ],
+      "labels": "1/2/3//4/5//6/alpha/beta/1'/2'/3'//4'///5'/6'"
+    },
+    "OCc1ccccc1O": {
+      "aliases": [
+        "saligenin"
+      ]
+    },
+    "CC/C(c1ccc(O)cc1)=C(c2ccc(O)cc2)/CC": {
+      "aliases": [
+        "diethylstilbestrol"
+      ]
+    },
+    "c1([N+](=O)[O-])c([O-])c([N+](=O)[O-])cc([N+](=O)[O-])c1[O-]": {
+      "aliases": [
+        "styphnate",
+        "styphnat"
+      ],
+      "labels": "2,ortho////3,meta//4,para////5/6////1/"
+    },
+    "c1([N+](=O)[O-])c(O)c([N+](=O)[O-])cc([N+](=O)[O-])c1O": {
+      "aliases": [
+        "styphnic acid",
+        "styphnicacid",
+        "styphnic"
+      ],
+      "labels": "2,ortho////3,meta//4,para////5/6////1/"
+    },
+    "C(OC(=O)O1)C1c1ccccc1": {
+      "aliases": [
+        "styrene carbonate",
+        "styrene carbonat"
+      ],
+      "labels": "beta/////alpha/1/2,ortho/3,meta/4,para/5/6"
+    },
+    "O1[N-][NH+]=CC1(=O)": {
+      "aliases": [
+        "sydnone",
+        "sydnon"
+      ],
+      "labels": "1/2/3/4/5/"
+    },
+    "OCc1ccc(CO)cc1": {
+      "aliases": [
+        "terephthalyl alcohol"
+      ],
+      "labels": "//1/2,ortho/3,meta/4,para///5/6"
+    },
+    "c1(c(C(C)C)cc(O)c(C)c1)O": {
+      "aliases": [
+        "thymohydroquinone",
+        "thymohydroquinon"
+      ]
+    },
+    "c1c(C)ccc(C(C)C)c1O": {
+      "aliases": [
+        "thymol"
+      ]
+    },
+    "c1(c(C)cc(O)cc1)O": {
+      "aliases": [
+        "toluhydroquinone",
+        "toluhydroquinon"
+      ]
+    },
+    "c1(ccccc1)C": {
+      "aliases": [
+        "toluol"
+      ],
+      "labels": "1/2,ortho/3,meta/4,para/5/6/alpha"
+    },
+    "c1ccccc1C(=O)N(C(=O)c2ccccc2)C(=O)c3ccccc3": {
+      "aliases": [
+        "tribenzamide",
+        "tribenzamid"
+      ]
+    },
+    "[nH]1c(=O)[nH]c2[nH]c(=O)[nH]c2c1=O": {
+      "aliases": [
+        "uric acid",
+        "uricacid",
+        "uric"
+      ],
+      "labels": "1/2//3/4/9/8//7/5/6/"
+    },
+    "O=Cc1cc(OC)c(O)cc1": {
+      "aliases": [
+        "vanillin"
+      ],
+      "labels": "//1/2/3///4//5/6"
+    },
+    "O=Cc1c(O)c(OC)ccc1": {
+      "aliases": [
+        "o-vanillin"
+      ],
+      "labels": "//1/2//3///4/5/6"
+    },
+    "c1(c(C)c(C)c(O)cc1)O": {
+      "aliases": [
+        "ortho-xylohydroquinone",
+        "ortho-xylohydroquinon",
+        "o-xylohydroquinone",
+        "o-xylohydroquinon"
+      ]
+    },
+    "c1(c(C)cc(O)cc1C)O": {
+      "aliases": [
+        "meta-xylohydroquinone",
+        "meta-xylohydroquinon",
+        "m-xylohydroquinone",
+        "m-xylohydroquinon"
+      ]
+    },
+    "c1(c(C)cc(O)c(C)c1)O": {
+      "aliases": [
+        "para-xylohydroquinone",
+        "para-xylohydroquinon",
+        "p-xylohydroquinone",
+        "p-xylohydroquinon"
+      ]
+    },
+    "O=C(C)CCc1cc(OC)c(O)cc1": {
+      "aliases": [
+        "zingerone",
+        "zingeron"
+      ]
+    },
+    "n1c(C)c(O)c(C(=O)O)c(CO)c1": {
+      "aliases": [
+        "4-pyridoxic acid",
+        "4-pyridoxic",
+        "4-pyridoxic"
+      ],
+      "labels": "1/2/2'/3//4/4'///5/5'//6"
+    },
+    "n1c(C)c(O)c(C(=O)O2)c(C2)c1": {
+      "aliases": [
+        "4-pyridoxolactone",
+        "4-pyridoxolacton"
+      ],
+      "labels": "1/2/2'/3//4/4'///5/5'/6"
+    },
+    "n1c(C)c(O)c(CO)c(C(=O)O)c1": {
+      "aliases": [
+        "5-pyridoxic acid",
+        "5-pyridoxic",
+        "5-pyridoxic"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'///6"
+    },
+    "n1c(C)c(O)c(C2)c(C(=O)O2)c1": {
+      "aliases": [
+        "5-pyridoxolactone",
+        "5-pyridoxolacton"
+      ],
+      "labels": "1/2/2'/3//4/4'/5/5'///6"
+    },
+    "n1c(C)c(O)c(CO)c(C=O)c1": {
+      "aliases": [
+        "isopyridoxal"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//6"
+    },
+    "n1c(C)c(O)c(C=O)c(CO)c1": {
+      "aliases": [
+        "pyridoxal"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//6"
+    },
+    "n1c(C)c(O)c(CN)c(CO)c1": {
+      "aliases": [
+        "pyridoxamine",
+        "pyridoxamin"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//6"
+    },
+    "n1c(C)c(O)c(CO)c(CO)c1": {
+      "aliases": [
+        "pyridoxine",
+        "pyridoxin",
+        "pyridoxol"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//6"
+    },
+    "n1c(C)c(O)c(C=O)c(COP(=O)(O)O)c1": {
+      "aliases": [
+        "pyridoxal-p"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//////6"
+    },
+    "n1c(C)c(O)c(CN)c(COP(=O)(O)O)c1": {
+      "aliases": [
+        "pyridoxamine-p",
+        "pyridoxamin-p"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//////6"
+    },
+    "n1c(C)c(O)c(CO)c(COP(=O)(O)O)c1": {
+      "aliases": [
+        "pyridoxine-p",
+        "pyridoxin-p",
+        "pyridoxol-p"
+      ],
+      "labels": "1/2/2'/3//4/4'//5/5'//////6"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2cnc3c([nH2])ncnc23": {
+      "aliases": [
+        "2'-adenylic acid",
+        "2'-adenylicacid",
+        "2'-adenylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///9/8/7/5/6/N/1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2cnc3c([nH2])ncnc23": {
+      "aliases": [
+        "3'-adenylic acid",
+        "3'-adenylicacid",
+        "3'-adenylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///9/8/7/5/6/N/1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2cnc3c([nH2])ncnc23": {
+      "aliases": [
+        "5'-adenylic acid",
+        "5'-adenylicacid",
+        "5'-adenylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////9/8/7/5/6/N/1/2/3/4"
+    },
+    "[C@@H]1(C[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)c(C)c2": {
+      "aliases": [
+        "3'-thymidylic acid",
+        "3'-thymidylicacid",
+        "3'-thymidylic"
+      ],
+      "labels": "1'/2'/3'//////4'/5'///1/2//3/4//5/alpha/6"
+    },
+    "[C@@H]1(C[C@H](O)[C@@H](COP(=O)(O)O)O1)n2c(=O)[nH]c(=O)c(C)c2": {
+      "aliases": [
+        "5'-thymidylic acid",
+        "5'-thymidylicacid",
+        "5'-thymidylic"
+      ],
+      "labels": "1'/2'/3'//4'/5'///////1/2//3/4//5/alpha/6"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2cnc3c(=O)[nH]c(N)nc23": {
+      "aliases": [
+        "2'-guanylic acid",
+        "2'-guanylicacid",
+        "2'-guanylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2cnc3c(=O)[nH]c(N)nc23": {
+      "aliases": [
+        "3'-guanylic acid",
+        "3'-guanylicacid",
+        "3'-guanylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2cnc3c(=O)[nH]c(N)nc23": {
+      "aliases": [
+        "5'-guanylic acid",
+        "5'-guanylicacid",
+        "5'-guanylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2cnc3c([oH])ncnc23": {
+      "aliases": [
+        "2'-inosinic acid",
+        "2'-inosinicacid",
+        "2'-inosinic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2cnc3c([oH])ncnc23": {
+      "aliases": [
+        "3'-inosinic acid",
+        "3'-inosinicacid",
+        "3'-inosinic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2cnc3c([oH])ncnc23": {
+      "aliases": [
+        "5'-inosinic acid",
+        "5'-inosinicacid",
+        "inosinic acid",
+        "5'-inosinic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2cnc3c([sH])ncnc23": {
+      "aliases": [
+        "thioinosinic acid"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////9/8/7/5/6//1/2/3/4"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2cnc3c(=O)[nH]c(=O)[nH]c23": {
+      "aliases": [
+        "2'-xanthylic acid",
+        "2'-xanthylicacid",
+        "2'-xanthylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2cnc3c(=O)[nH]c(=O)[nH]c23": {
+      "aliases": [
+        "3'-xanthylic acid",
+        "3'-xanthylicacid",
+        "3'-xanthylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2cnc3c(=O)[nH]c(=O)[nH]c23": {
+      "aliases": [
+        "5'-xanthylic acid",
+        "5'-xanthylicacid",
+        "5'-xanthylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////9/8/7/5/6//1/2//3/4"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2c(=O)nc([nH2])cc2": {
+      "aliases": [
+        "2'-cytidylic acid",
+        "2'-cytidylicacid",
+        "2'-cytidylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///1/2//3/4/N/5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2c(=O)nc([nH2])cc2": {
+      "aliases": [
+        "3'-cytidylic acid",
+        "3'-cytidylicacid",
+        "3'-cytidylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///1/2//3/4/N/5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2c(=O)nc([nH2])cc2": {
+      "aliases": [
+        "5'-cytidylic acid",
+        "5'-cytidylicacid",
+        "5'-cytidylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////1/2//3/4/N/5/6"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2": {
+      "aliases": [
+        "2'-uridylic acid",
+        "2'-uridylicacid",
+        "2'-uridylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///1/2//3/4//5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2": {
+      "aliases": [
+        "3'-uridylic acid",
+        "3'-uridylicacid",
+        "3'-uridylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///1/2//3/4//5/6"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2c(=O)[nH]c(=O)cc2": {
+      "aliases": [
+        "5'-uridylic acid",
+        "5'-uridylicacid",
+        "5'-uridylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////1/2//3/4//5/6"
+    },
+    "[C@@H]1([C@H](OP(=O)(O)O)[C@H](O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2C(=O)O": {
+      "aliases": [
+        "2'-orotidylic acid",
+        "2'-orotidylicacid",
+        "2'-orotidylic"
+      ],
+      "labels": "1'/2'//////3'//4'/5'///1/2//3/4//5/6///"
+    },
+    "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](CO)O1)n2c(=O)[nH]c(=O)cc2C(=O)O": {
+      "aliases": [
+        "3'-orotidylic acid",
+        "3'-orotidylicacid",
+        "3'-orotidylic"
+      ],
+      "labels": "1'/2'//3'//////4'/5'///1/2//3/4//5/6///"
+    },
+    "[C@@H]1([C@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O1)n2c(=O)[nH]c(=O)cc2C(=O)O": {
+      "aliases": [
+        "5'-orotidylic acid",
+        "5'-orotidylicacid",
+        "5'-orotidylic"
+      ],
+      "labels": "1'/2'//3'//4'/5'///////1/2//3/4//5/6///"
+    },
+    "o1c(cc(=O)c2c(O)cc(O)cc12)c3cc(OC)c(O)cc3": {
+      "aliases": [
+        "chrysoeriol"
+      ],
+      "labels": "1/2/3/4//4a/5//6/7//8/8a/1'/2'/3'///4'//5'/6'"
+    },
+    "o1c(c(O)c(=O)c2c(O)cc(O)cc12)c3ccc(O)cc3": {
+      "aliases": [
+        "kaempferol"
+      ],
+      "labels": "1/2/3//4//4a/5//6/7//8/8a/1'/2'/3'/4'//5'/6'"
+    },
+    "C(=O)O": {
+      "aliases": [
+        "formicacid"
+      ],
+      "labels": "1"
+    },
+    "CC(=O)O": {
+      "aliases": [
+        "aceticacid"
+      ],
+      "labels": "1"
+    },
+    "C=O": {
+      "aliases": [
+        "formaldehyde"
+      ],
+      "labels": "1"
+    },
+    "CC=O": {
+      "aliases": [
+        "acetaldehyde"
+      ],
+      "labels": "1"
+    },
+    "CC(=O)C": {
+      "aliases": [
+        "acetone"
+      ],
+      "labels": "1"
+    },
+    "Oc1ccccc1": {
+      "aliases": [
+        "phenol"
+      ],
+      "labels": "1"
+    },
+    "C(=O)(N)c1ccccc1": {
+      "aliases": [
+        "benzamide"
+      ],
+      "labels": "1"
+    },
+    "C1CCCCC1": {
+      "aliases": [
+        "cyclohexane",
+        "cyclohexan"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "C1=CCCCC1": {
+      "aliases": [
+        "cyclohexene",
+        "cyclohexen"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "C1CCCC1": {
+      "aliases": [
+        "cyclopentane"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1=CCCC1": {
+      "aliases": [
+        "cyclopentene"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCC1": {
+      "aliases": [
+        "cyclobutane"
+      ],
+      "labels": "1/2/3/4"
+    },
+    "C1=CC=C1": {
+      "aliases": [
+        "cyclobutene"
+      ],
+      "labels": "1/2/3/4"
+    },
+    "C1CC1": {
+      "aliases": [
+        "cyclopropane"
+      ],
+      "labels": "1/2/3"
+    },
+    "c1ccc(C(=O)O)cc1": {
+      "aliases": [
+        "benzoic"
+      ],
+      "labels": "1/2/3/4/5/6/carboxyl"
+    },
+    "n1cnc2c(n1)ncnc2": {
+      "aliases": [
+        "purin"
+      ],
+      "labels": "1/2/3/4/5/6/7/8/9"
+    },
+    "C1CO1": {
+      "aliases": [
+        "oxirane"
+      ],
+      "labels": "1/2/3"
+    },
+    "C1CN1": {
+      "aliases": [
+        "aziridine",
+        "aziridin"
+      ],
+      "labels": "1/2/3"
+    },
+    "C1=CN1": {
+      "aliases": [
+        "azirin"
+      ],
+      "labels": "1/2/3"
+    },
+    "C1CS1": {
+      "aliases": [
+        "thiirane",
+        "thiiran"
+      ],
+      "labels": "1/2/3"
+    },
+    "C1COC1": {
+      "aliases": [
+        "oxetane",
+        "oxetan"
+      ],
+      "labels": "1/2/3/4"
+    },
+    "C1CNC1": {
+      "aliases": [
+        "azetidine",
+        "azetidin"
+      ],
+      "labels": "1/2/3/4"
+    },
+    "C1CSC1": {
+      "aliases": [
+        "thietane",
+        "thietan"
+      ],
+      "labels": "1/2/3/4"
+    },
+    "C1CCOC1": {
+      "aliases": [
+        "tetrahydrofuran",
+        "oxolane",
+        "oxolan",
+        "thf"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCSC1": {
+      "aliases": [
+        "tetrahydrothiophene",
+        "thiolane",
+        "thiolan"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCNC1": {
+      "aliases": [
+        "pyrrolidine",
+        "pyrrolidin"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1ccsc1": {
+      "aliases": [
+        "thiophene",
+        "thiophen"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1cncs1": {
+      "aliases": [
+        "thiazole",
+        "thiazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1cnco1": {
+      "aliases": [
+        "oxazole",
+        "oxazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1c[nH]cn1": {
+      "aliases": [
+        "imidazole",
+        "imidazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1cn[nH]c1": {
+      "aliases": [
+        "pyrazole",
+        "pyrazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1nncn1": {
+      "aliases": [
+        "tetrazole",
+        "tetrazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1conc1": {
+      "aliases": [
+        "isoxazole",
+        "isoxazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "c1csnc1": {
+      "aliases": [
+        "isothiazole",
+        "isothiazol"
+      ],
+      "labels": "1/2/3/4/5"
+    },
+    "C1CCOCC1": {
+      "aliases": [
+        "tetrahydropyran",
+        "oxane",
+        "oxan"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "C1CCSCC1": {
+      "aliases": [
+        "tetrahydrothiopyran",
+        "thiane",
+        "thian"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "C1CCNCC1": {
+      "aliases": [
+        "piperidine",
+        "piperidin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccncc1": {
+      "aliases": [
+        "pyridine",
+        "pyridin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1cncnc1": {
+      "aliases": [
+        "pyrimidine",
+        "pyrimidin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1cnccn1": {
+      "aliases": [
+        "pyrazine",
+        "pyrazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccnnc1": {
+      "aliases": [
+        "pyridazine",
+        "pyridazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1nc[nH]cn1": {
+      "aliases": [
+        "1,2,4-triazine",
+        "1,2,4-triazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1nccnc1": {
+      "aliases": [
+        "1,3,5-triazine",
+        "1,3,5-triazin",
+        "triazine",
+        "triazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccnc[nH]1": {
+      "aliases": [
+        "1,2,3-triazine",
+        "1,2,3-triazin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccc2ncccc2c1": {
+      "aliases": [
+        "quinoline",
+        "quinolin"
+      ],
+      "labels": "1/2/3/3a/4/5/6/7/7a/8"
+    },
+    "c1ccc2[nH]ccc2c1": {
+      "aliases": [
+        "indole",
+        "indol"
+      ],
+      "labels": "1/2/3/3a/7a/4/5/6/7"
+    },
+    "c1ccc2occc2c1": {
+      "aliases": [
+        "benzofuran",
+        "benzofuran"
+      ],
+      "labels": "1/2/3/3a/7a/4/5/6/7"
+    },
+    "c1ccc2sccc2c1": {
+      "aliases": [
+        "benzothiophene",
+        "benzothiophen"
+      ],
+      "labels": "1/2/3/3a/7a/4/5/6/7"
+    },
+    "C1COCCN1": {
+      "aliases": [
+        "morpholine",
+        "morpholin"
+      ],
+      "labels": "1/2/3/4/5/6"
+    },
+    "c1ccc2c(c1)cc1ccccc1c2": {
+      "aliases": [
+        "fluorene"
+      ],
+      "labels": {}
+    },
+    "c1ncnn1": {
+      "aliases": [
+        "triazole"
+      ],
+      "labels": {}
+    }
   },
-  "substituentPatterns": {
-    "description": "Common substituent patterns for prefix generation",
-    "patterns": [
-      {
-        "name": "methyl",
-        "smarts": "C",
-        "prefix": "methyl"
-      },
-      {
-        "name": "ethyl",
-        "smarts": "CC",
-        "prefix": "ethyl"
-      },
-      {
-        "name": "propyl",
-        "smarts": "CCC",
-        "prefix": "propyl"
-      },
-      {
-        "name": "butyl",
-        "smarts": "CCCC",
-        "prefix": "butyl"
-      },
-      {
-        "name": "phenyl",
-        "smarts": "c1ccccc1",
-        "prefix": "phenyl"
-      },
-      {
-        "name": "hydroxyl",
-        "smarts": "O",
-        "prefix": "hydroxy"
-      },
-      {
-        "name": "amino",
-        "smarts": "N",
-        "prefix": "amino"
-      },
-      {
-        "name": "chloro",
-        "smarts": "Cl",
-        "prefix": "chloro"
-      },
-      {
-        "name": "bromo",
-        "smarts": "Br",
-        "prefix": "bromo"
-      },
-      {
-        "name": "iodo",
-        "smarts": "I",
-        "prefix": "iodo"
-      },
-      {
-        "name": "fluoro",
-        "smarts": "F",
-        "prefix": "fluoro"
-      }
-    ]
-  },
-  "chainSelectionRules": {
-    "description": "Rules for selecting the principal chain (in priority order)",
-    "rules": [
-      {
-        "priority": 1,
-        "name": "principal functional group",
-        "description": "Chain must contain the principal functional group"
-      },
-      {
-        "priority": 2,
-        "name": "longest carbon chain",
-        "description": "If multiple chains available, select the one with most carbon atoms"
-      },
-      {
-        "priority": 3,
-        "name": "most substituents",
-        "description": "Chain with the most substituent branches"
-      },
-      {
-        "priority": 4,
-        "name": "best numbering",
-        "description": "Chain that gives lowest locants to substituents"
-      }
-    ]
-  },
-  "numberingRules": {
-    "description": "Rules for numbering the principal chain (in priority order)",
-    "rules": [
-      {
-        "priority": 1,
-        "name": "functional group at lowest position",
-        "description": "Principal functional group gets lowest numbered position"
-      },
-      {
-        "priority": 2,
-        "name": "locant sum",
-        "description": "Use numbering that gives lowest sum of locant positions"
-      },
-      {
-        "priority": 3,
-        "name": "first difference rule",
-        "description": "Compare locant sequences from both ends, choose numbering with lowest number at first difference"
-      }
-    ]
-  },
-  "vowelElisionRules": {
-    "description": "Rules for vowel elision when combining name parts",
-    "rules": [
-      {
-        "description": "Drop 'a' or 'e' from end of alkane stem before suffix starting with vowel",
-        "pattern": "([aeiou])$",
-        "condition": "suffixStartsWithVowel",
-        "action": "removeTrailingVowel"
-      },
-      {
-        "description": "Keep 'a' in certain cases like 'methanal' and 'ethanal'",
-        "exceptions": ["methanal", "ethanal"],
-        "action": "keepVowel"
-      }
-    ]
+  "functionalGroupPriorities": {
+    "carboxylic acid": 1,
+    "carboxylic acid salt": 2,
+    "sulfinic acid": 2,
+    "sulfonic acid": 2,
+    "sulfonic acid salt": 2,
+    "ester": 4,
+    "carboxylic acidesterderivative": 5,
+    "amide": 6,
+    "nitrile": 7,
+    "aldehyde": 8,
+    "ketone": 9,
+    "alcohol": 10,
+    "amine": 13,
+    "ether": 14
   }
 }

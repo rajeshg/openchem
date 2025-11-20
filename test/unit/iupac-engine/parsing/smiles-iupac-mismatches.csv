@@ -1,0 +1,2 @@
+smiles,expected,actual
+C1=CC(=C(C=C1C2=NC(=CS2)CC(=O)O)Cl)O,"2-[2-(3-chloro-4-hydroxyphenyl)-1,3-thiazol-4-yl]ethanoic acid","2-chloro-4-(5-cyclopentylcyclopentyl)benzene"

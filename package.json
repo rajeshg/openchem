@@ -49,10 +49,13 @@
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
     "build": "node scripts/build.mjs",
     "serve": "bun run build && bunx serve . -p 3000",
-    "prepublishOnly": "bun run build && bun run test"
+    "prepublishOnly": "bun run build && bun run test",
+    "lint": "npx oxlint@latest .",
+    "fmt": "npx oxfmt@latest ."
   },
   "devDependencies": {
     "@rdkit/rdkit": "latest",
+    "@total-typescript/ts-reset": "^0.6.1",
     "@types/bun": "latest"
   },
   "peerDependencies": {

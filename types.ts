@@ -1,18 +1,20 @@
 // Core types for SMILES parsing
 
+import type { StructuralSubstituent } from "src/iupac-engine/types";
+
 export enum BondType {
-  SINGLE = 'single',
-  DOUBLE = 'double',
-  TRIPLE = 'triple',
-  QUADRUPLE = 'quadruple',
-  AROMATIC = 'aromatic',
+  SINGLE = "single",
+  DOUBLE = "double",
+  TRIPLE = "triple",
+  QUADRUPLE = "quadruple",
+  AROMATIC = "aromatic",
 }
 
 export enum StereoType {
-  NONE = 'none',
-  UP = 'up', // /
-  DOWN = 'down', // \
-  EITHER = 'either',
+  NONE = "none",
+  UP = "up", // /
+  DOWN = "down", // \
+  EITHER = "either",
 }
 
 /**
@@ -34,7 +36,7 @@ export interface Atom {
   readonly degree?: number;
   readonly isInRing?: boolean;
   readonly ringIds?: readonly number[];
-  readonly hybridization?: 'sp' | 'sp2' | 'sp3' | 'other';
+  readonly hybridization?: "sp" | "sp2" | "sp3" | "other";
 }
 
 /**
@@ -78,6 +80,23 @@ export interface ParseError {
 export interface ParseResult {
   molecules: Molecule[];
   errors: ParseError[]; // any parsing errors with position info
+}
+
+// IUPAC engine types
+export interface Chain {
+  atoms: Atom[];
+  bonds: Bond[];
+  length: number;
+  multipleBonds: MultipleBond[];
+  substituents: StructuralSubstituent[];
+  locants: number[];
+}
+
+export interface MultipleBond {
+  atoms: Atom[];
+  bond: Bond;
+  type: "double" | "triple";
+  locant: number;
 }
 
 // Molecular descriptors

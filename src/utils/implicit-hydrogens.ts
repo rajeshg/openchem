@@ -1,20 +1,24 @@
-import type { Molecule, Atom, Bond } from 'types';
-import { BondType } from 'types';
-import { DEFAULT_VALENCES, AROMATIC_VALENCES } from 'src/constants';
+import type { Molecule, Atom, Bond } from "types";
+import { BondType } from "types";
+import { DEFAULT_VALENCES, AROMATIC_VALENCES } from "src/constants";
 
 /**
  * Recompute implicit hydrogen counts for a molecule based on bond orders and valences.
  * Returns a new Molecule with updated atom.hydrogens values.
  */
+type MutableAtom = {
+  -readonly [K in keyof Atom]: Atom[K];
+} & { isBracket?: boolean };
+
 export function computeImplicitHydrogens(m: Molecule): Molecule {
-  const atoms = m.atoms.map(a => ({ ...a } as Atom));
+  const atoms = m.atoms.map((a) => ({ ...a }) as MutableAtom);
   const bonds = m.bonds;
 
   for (let i = 0; i < atoms.length; i++) {
     const atom = atoms[i];
     if (!atom) continue;
-    if ((atom as any).isBracket) {
-      if ((atom as any).hydrogens < 0) (atom as any).hydrogens = 0;
+    if (atom.isBracket) {
+      if (atom.hydrogens < 0) atom.hydrogens = 0;
       continue;
     }
 
@@ -41,14 +45,15 @@ export function computeImplicitHydrogens(m: Molecule): Molecule {
       }
     }
 
-    if (atom.symbol === '*' || atom.symbol === 'H' || atom.atomicNumber === 1) {
-      (atom as any).hydrogens = 0;
+    if (atom.symbol === "*" || atom.symbol === "H" || atom.atomicNumber === 1) {
+      atom.hydrogens = 0;
       continue;
     }
 
     const defaultValences = atom.aromatic
-      ? (AROMATIC_VALENCES[atom.symbol] || DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber])
-      : (DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]);
+      ? AROMATIC_VALENCES[atom.symbol] ||
+        DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]
+      : DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber];
 
     // For carbons, allow multi-step enolization by not prematurely setting hydrogens to zero
     const maxValence = Math.max(...defaultValences);
@@ -64,24 +69,39 @@ export function computeImplicitHydrogens(m: Molecule): Molecule {
           break;
         }
       }
-      hydrogens = Math.max(0, targetValence + (atom.charge || 0) - bondOrderSum);
+      hydrogens = Math.max(
+        0,
+        targetValence + (atom.charge || 0) - bondOrderSum,
+      );
     }
 
     // Special case: for non-aromatic carbons adjacent to C=O or C-OH, allow hydrogens if valence permits
-    if (atom.symbol === 'C' && !atom.aromatic) {
+    if (atom.symbol === "C" && !atom.aromatic) {
       // Count number of O neighbors
-      const oNeighbors = bonds.filter(b => (b.atom1 === atom.id || b.atom2 === atom.id)).map(b => {
-        const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
-        const otherAtom = atoms.find(a => a.id === otherId);
-        return otherAtom && otherAtom.symbol === 'O' ? otherAtom : null;
-      }).filter(Boolean);
-      if (oNeighbors.length > 0 && hydrogens === 0 && bondOrderSum < maxValence) {
+      const oNeighbors = bonds
+        .filter((b) => b.atom1 === atom.id || b.atom2 === atom.id)
+        .map((b) => {
+          const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
+          const otherAtom = atoms.find((a) => a.id === otherId);
+          return otherAtom && otherAtom.symbol === "O" ? otherAtom : null;
+        })
+        .filter(Boolean);
+      if (
+        oNeighbors.length > 0 &&
+        hydrogens === 0 &&
+        bondOrderSum < maxValence
+      ) {
         // If valence allows, restore one hydrogen for possible further tautomerization
         hydrogens = 1;
       }
     }
-    (atom as any).hydrogens = hydrogens;
+    atom.hydrogens = hydrogens;
   }
 
-  return { atoms: atoms as readonly Atom[], bonds: bonds as readonly Bond[], rings: m.rings, ringInfo: m.ringInfo } as Molecule;
+  return {
+    atoms: atoms as readonly Atom[],
+    bonds: bonds as readonly Bond[],
+    rings: m.rings,
+    ringInfo: m.ringInfo,
+  } as Molecule;
 }

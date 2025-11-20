@@ -1,0 +1,210 @@
+import type { IUPACRule, StructuralSubstituent } from "../../types";
+import { BLUE_BOOK_RULES, RulePriority } from "../../types";
+import type {
+  ImmutableNamingContext,
+  ContextState,
+} from "../../immutable-context";
+import { ExecutionPhase } from "../../immutable-context";
+import type { NamingSubstituent } from "../../naming/iupac-types";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {
+  findSubstituentsOnMonocyclicRing: _findSubstituentsOnMonocyclicRing,
+  getHeterocyclicName: _getHeterocyclicName,
+} = require("../../naming/iupac-rings");
+
+/**
+ * Rule: P-44.4 (chain-analysis placement)
+ *
+ * Ensure that when both ring candidates and chain candidates exist (i.e., after
+ * initial-structure seeding), the ring vs chain decision is made before the
+ * acyclic chain seniority rules are applied. This duplicates P-44.4 logic but
+ * runs in the chain-analysis layer (so it executes after candidateChains are
+ * seeded).
+ */
+export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
+  id: "P-44.4.chain-analysis",
+  name: "Ring vs Chain Selection (chain-analysis)",
+  description:
+    "Prefer ring system as parent when both ring and chain candidates exist (P-44.4)",
+  blueBookReference: BLUE_BOOK_RULES.P44_4,
+  priority: RulePriority.TEN,
+  conditions: (context: ImmutableNamingContext) => {
+    const state = context.getState();
+    // Skip if parent structure already selected
+    if (state.parentStructure) {
+      return false;
+    }
+    const candidateRings = state.candidateRings;
+    const candidateChains = state.candidateChains;
+    return (
+      Array.isArray(candidateRings) &&
+      candidateRings.length > 0 &&
+      Array.isArray(candidateChains) &&
+      candidateChains.length > 0
+    );
+  },
+  action: (context: ImmutableNamingContext) => {
+    const state = context.getState() as ContextState;
+    const candidateRings = state.candidateRings;
+    const candidateChains = state.candidateChains;
+
+    if (!candidateRings || candidateRings.length === 0) return context;
+    if (!candidateChains || candidateChains.length === 0) return context;
+
+    const ring = candidateRings[0]!;
+
+    // For fused ring systems, we need to count ALL atoms in the fused system,
+    // not just atoms in a single ring. This is critical for naphthalene, anthracene, etc.
+    let ringSize = ring.size || (ring.atoms ? ring.atoms.length : 0);
+
+    // Check if this is a fused ring system by examining the RingSystem's fused flag
+    // or by checking if ring.atoms contains more atoms than a single ring would
+    if (ring.fused || (ring.rings && ring.rings.length > 1)) {
+      // For fused systems, count all unique atoms in the entire system
+      if (ring.atoms && ring.atoms.length > 0) {
+        ringSize = ring.atoms.length;
+        if (process.env.VERBOSE) {
+          console.log(
+            `[P-44.4] Detected fused ring system with ${ring.rings?.length || 0} rings`,
+          );
+          console.log(
+            `[P-44.4] Total unique atoms in fused system: ${ringSize}`,
+          );
+        }
+      }
+    }
+
+    // Get the longest chain length
+    const longestChain = candidateChains[0]!;
+    const chainLength = longestChain.atoms ? longestChain.atoms.length : 0;
+
+    // Check if the candidate chain is mostly composed of ring atoms
+    // If so, it's traversing through the ring system and we should prefer ring naming
+    let ringAtomCount = 0;
+    if (longestChain.atoms && ring.atoms) {
+      const ringAtomIds = new Set(ring.atoms.map((a) => a.id));
+      ringAtomCount = longestChain.atoms.filter((a) =>
+        ringAtomIds.has(a.id),
+      ).length;
+    }
+    const ringAtomPercentage =
+      chainLength > 0 ? ringAtomCount / chainLength : 0;
+
+    if (process.env.VERBOSE) {
+      console.log(`[P-44.4] candidateRings.length: ${candidateRings.length}`);
+      console.log(
+        `[P-44.4] First ring system - fused: ${ring.fused}, rings count: ${ring.rings?.length || 0}`,
+      );
+      console.log(`[P-44.4] Ring size (total atoms): ${ringSize}`);
+      console.log(`[P-44.4] Chain length: ${chainLength}`);
+      console.log(
+        `[P-44.4] Chain atoms in ring system: ${ringAtomCount} (${(ringAtomPercentage * 100).toFixed(1)}%)`,
+      );
+    }
+
+    // P-44.4 criterion: Compare lengths first
+    // But if the chain is mostly composed of ring atoms (>70%), prefer the ring
+    // This handles cases where amine-derived chains traverse through fused ring systems
+    if (ringAtomPercentage > 0.7) {
+      if (process.env.VERBOSE) {
+        console.log(
+          `[P-44.4] Chain is ${(ringAtomPercentage * 100).toFixed(1)}% ring atoms: preferring ring as parent`,
+        );
+      }
+      // Continue to select ring as parent (don't return early)
+    } else if (chainLength > ringSize) {
+      // Prefer the larger structure (more atoms)
+      // If ring has fewer atoms than the longest acyclic chain, prefer the chain
+      if (process.env.VERBOSE) {
+        console.log(
+          `[P-44.4] Chain (${chainLength} atoms) > Ring (${ringSize} atoms): selecting chain as parent`,
+        );
+      }
+      // Don't select ring - let chain selection rules handle it
+      return context;
+    }
+
+    // Ring is equal or larger: prefer ring per P-44.4
+    if (process.env.VERBOSE) {
+      console.log(
+        `[P-44.4] Ring (${ringSize} atoms) >= Chain (${chainLength} atoms): selecting ring as parent`,
+      );
+    }
+
+    // Generate a simple ring name (aromatic vs aliphatic)
+    const type =
+      ring.type ||
+      (ring.atoms && ring.atoms.some((a) => a.aromatic)
+        ? "aromatic"
+        : "aliphatic");
+
+    // Check for heterocyclic name first
+    let name = "";
+    const mol = state.molecule;
+    if (ring && ring.atoms && mol) {
+      const atomIndices = ring.atoms.map((a) => a.id);
+      const heterocyclicName = _getHeterocyclicName(atomIndices, mol);
+      if (heterocyclicName) {
+        name = heterocyclicName;
+        if (process.env.VERBOSE) {
+          console.log("[P-44.4] Using heterocyclic name:", name);
+        }
+      }
+    }
+
+    // Fallback to generic names if no heterocyclic name found
+    if (!name) {
+      if (type === "aromatic") {
+        const aromaticNames: { [key: number]: string } = {
+          6: "benzene",
+          5: "cyclopentadiene",
+          7: "cycloheptatriene",
+        };
+        name = aromaticNames[ringSize] || `aromatic-${ringSize}-membered`;
+      } else {
+        const ringNames: { [key: number]: string } = {
+          3: "cyclopropane",
+          4: "cyclobutane",
+          5: "cyclopentane",
+          6: "cyclohexane",
+          7: "cycloheptane",
+          8: "cyclooctane",
+        };
+        name = ringNames[ringSize] || `cyclo${ringSize}ane`;
+      }
+    }
+    const locants =
+      ring && ring.atoms ? ring.atoms.map((_, idx: number) => idx + 1) : [];
+    // Try to find substituents on the ring atoms so substituted ring names can be produced
+    let substituents: (StructuralSubstituent | NamingSubstituent)[] = [];
+    try {
+      const mol = state.molecule;
+      if (ring && ring.atoms && mol) {
+        substituents =
+          (_findSubstituentsOnMonocyclicRing(
+            ring.atoms.map((a) => a.id),
+            mol,
+          ) as (StructuralSubstituent | NamingSubstituent)[]) || [];
+      }
+    } catch (_e) {
+      substituents = [];
+    }
+
+    const parentStructure = {
+      type: "ring" as const,
+      ring,
+      name,
+      locants,
+      substituents,
+    };
+    return context.withParentStructure(
+      parentStructure,
+      "P-44.4.chain-analysis",
+      "Ring vs Chain Selection (chain-analysis)",
+      BLUE_BOOK_RULES.P44_4,
+      ExecutionPhase.PARENT_STRUCTURE,
+      `Selected ring (${ringSize} atoms) as parent over chain (${chainLength} atoms)`,
+    );
+  },
+};
