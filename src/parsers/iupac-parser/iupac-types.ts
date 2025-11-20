@@ -64,7 +64,10 @@ export interface OPSINRules {
   suffixes: Record<string, { aliases: string[]; type?: string }>;
   substituents: Record<string, { aliases: string[]; smiles?: string }>;
   functionalGroups: Record<string, { aliases: string[]; type?: string }>;
-  ringSystems: Record<string, { aliases: string[]; labels?: string }>;
+  ringSystems: Record<
+    string,
+    { aliases: string[]; labels?: string | Record<string, never> }
+  >;
   heteroAtoms?: Record<string, unknown>;
   heteroAtomPriorityOrder?: string[];
   functionalGroupPriorities?: Record<string, number>;

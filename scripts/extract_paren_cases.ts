@@ -15,8 +15,10 @@ for (const line of lines) {
   const parts = line.split("|");
   if (parts.length < 3) continue;
 
-  const name = parts[1].replace(/^"/, "").replace(/"$/, "");
-  const expected = parts[2].replace(/^"/, "").replace(/"$/, "");
+  const name = parts[1]?.replace(/^"/, "").replace(/"$/, "");
+  const expected = parts[2]?.replace(/^"/, "").replace(/"$/, "");
+
+  if (!name || !expected) continue;
 
   if (name.includes("(") && name.includes(")")) {
     count++;

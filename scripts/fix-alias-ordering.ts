@@ -1,7 +1,17 @@
 import fs from "fs";
 
+interface RuleData {
+  aliases: string[];
+  [key: string]: unknown;
+}
+
+interface OPSINRules {
+  ringSystems: Record<string, RuleData>;
+  substituents: Record<string, RuleData>;
+}
+
 const rulesPath = "./opsin-rules.json";
-const rules = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+const rules = JSON.parse(fs.readFileSync(rulesPath, "utf-8")) as OPSINRules;
 
 let changesCount = 0;
 

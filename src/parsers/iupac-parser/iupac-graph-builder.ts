@@ -1772,7 +1772,9 @@ export class IUPACGraphBuilder
             }
           } else if (type === "alkene" && config) {
             // E/Z - double bond
-            const bonds = builder.getBonds(atomIdx);
+            const bonds = builder
+              .getBonds()
+              .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
             const doubleBond = bonds.find(
               (b) => b.type === BondTypeEnum.DOUBLE,
             );
@@ -1791,7 +1793,9 @@ export class IUPACGraphBuilder
                     b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
-              const otherBonds = builder.getBonds(otherAtom);
+              const otherBonds = builder
+                .getBonds()
+                .filter((b) => b.atom1 === otherAtom || b.atom2 === otherAtom);
               const singleBond2 = otherBonds.find(
                 (b) =>
                   (b.type === BondTypeEnum.SINGLE ||
@@ -1822,7 +1826,9 @@ export class IUPACGraphBuilder
           // This is a simplification; robust logic would match position if implied
           // But usually (E)-but-2-ene implies the double bond at 2
           for (const atomIdx of mainChainAtoms) {
-            const bonds = builder.getBonds(atomIdx);
+            const bonds = builder
+              .getBonds()
+              .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
             const doubleBond = bonds.find(
               (b) => b.type === BondTypeEnum.DOUBLE,
             );
@@ -1841,7 +1847,9 @@ export class IUPACGraphBuilder
                     b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
-              const otherBonds = builder.getBonds(otherAtom);
+              const otherBonds = builder
+                .getBonds()
+                .filter((b) => b.atom1 === otherAtom || b.atom2 === otherAtom);
               const singleBond2 = otherBonds.find(
                 (b) =>
                   (b.type === BondTypeEnum.SINGLE ||

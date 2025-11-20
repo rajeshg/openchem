@@ -105,7 +105,12 @@ export function getRDKitAromaticity(
     }
 
     const jsonStr = mol.get_json();
-    const molData = JSON.parse(jsonStr);
+    const molData = JSON.parse(jsonStr) as {
+      molecules?: Array<{
+        atoms?: unknown[];
+        extensions?: Array<{ aromaticAtoms?: number[] }>;
+      }>;
+    };
 
     const molecule = molData.molecules?.[0];
     if (!molecule || !molecule.atoms) {

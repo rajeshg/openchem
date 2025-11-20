@@ -64,7 +64,7 @@ describe("Pyrimidine SMARTS Test - Aromaticity Case Sensitivity", () => {
       const rdkitMol = rdkit.get_mol("c1ncccn1");
       const rdkitMatches = JSON.parse(
         rdkitMol.get_substruct_matches("[n&R&D2]"),
-      );
+      ) as number[][];
       if (process.env.RUN_VERBOSE) console.log("RDKit matches:", rdkitMatches);
       if (process.env.RUN_VERBOSE)
         console.log("RDKit match count:", rdkitMatches.length);

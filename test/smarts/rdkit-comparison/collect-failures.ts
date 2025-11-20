@@ -56,7 +56,7 @@ async function main() {
       }
 
       const rdkitMatchJson = rdkitMol.get_substruct_matches(rdkitQuery);
-      const rdkitMatches = JSON.parse(rdkitMatchJson);
+      const rdkitMatches = JSON.parse(rdkitMatchJson) as number[][];
 
       rdkitMol.delete();
       rdkitQuery.delete();

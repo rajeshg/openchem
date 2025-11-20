@@ -223,7 +223,10 @@ describe("LogP Bulk Comparison with RDKit", () => {
       const ourLogP = computeLogP(mol, true);
 
       const rdkitMol = rdkit.get_mol(smiles);
-      const rdkitLogP = JSON.parse(rdkitMol.get_descriptors()).CrippenClogP;
+      const descriptors = JSON.parse(rdkitMol.get_descriptors()) as {
+        CrippenClogP: number;
+      };
+      const rdkitLogP = descriptors.CrippenClogP;
       rdkitMol.delete();
 
       const diff = Math.abs(ourLogP - rdkitLogP);

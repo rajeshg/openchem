@@ -66,17 +66,17 @@ export class OPSINService {
     try {
       const rulesPath = `${import.meta.dir}/../../../opsin-rules.json`;
       const rulesData = fs.readFileSync(rulesPath, "utf8");
-      return JSON.parse(rulesData);
+      return JSON.parse(rulesData) as OPSINRules;
     } catch (_error) {
       try {
         const cwdPath = `${process.cwd()}/opsin-rules.json`;
         const rulesData = fs.readFileSync(cwdPath, "utf8");
-        return JSON.parse(rulesData);
+        return JSON.parse(rulesData) as OPSINRules;
       } catch (_fallbackError) {
         if (process.env.VERBOSE) {
           console.warn("Failed to load OPSIN rules, using fallback");
         }
-        return {};
+        return {} as OPSINRules;
       }
     }
   }

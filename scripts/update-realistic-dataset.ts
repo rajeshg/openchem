@@ -1,10 +1,17 @@
 import { readFileSync, writeFileSync } from "fs";
 
+interface DatasetEntry {
+  smiles: string;
+  iupac: string;
+}
+
 const datasetPath =
   "test/unit/iupac-engine/smiles-to-iupac-realistic-dataset.json";
 
 // Read current dataset
-const dataset = JSON.parse(readFileSync(datasetPath, "utf-8"));
+const dataset = JSON.parse(
+  readFileSync(datasetPath, "utf-8"),
+) as DatasetEntry[];
 
 // SMILES of molecules to remove (the 12 failing complex ones)
 const moleculesToRemove = new Set([
@@ -40,7 +47,7 @@ const replacements = [
 
 // Filter out molecules to remove
 const filtered = dataset.filter(
-  (entry: any) => !moleculesToRemove.has(entry.smiles),
+  (entry: DatasetEntry) => !moleculesToRemove.has(entry.smiles),
 );
 
 console.log(`Original dataset: ${dataset.length} molecules`);

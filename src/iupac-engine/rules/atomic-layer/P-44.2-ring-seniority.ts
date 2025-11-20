@@ -45,13 +45,29 @@ export const P_44_2_RING_SENIORITY: IUPACRule = {
         : hasHetero
           ? RingSystemType.HETEROCYCLIC
           : RingSystemType.ALIPHATIC;
+
+      // Construct proper Ring object
+      const ring = {
+        atoms,
+        bonds,
+        size: atoms.length,
+        aromatic: hasAromatic,
+        heteroatoms: atoms
+          .filter((a: Atom) => a.symbol !== "C")
+          .map((a: Atom, idx: number) => ({
+            atom: a,
+            type: a.symbol,
+            locant: idx + 1,
+          })),
+      };
+
       ringSystems.push({
         atoms,
         bonds,
-        rings: [ringIdxs],
+        rings: [ring],
         size: atoms.length,
         ringCount: 1, // Single ring system
-        heteroatoms: atoms.filter((a: Atom) => a.symbol !== "C"),
+        heteroatoms: ring.heteroatoms,
         type,
         fused: false,
         bridged: false,
