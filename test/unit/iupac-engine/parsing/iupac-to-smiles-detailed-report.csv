@@ -1,7 +1,7 @@
 iupac,expected_smiles,generated_smiles,status,error
-"17,20-dimethoxy-5,10-dimethyl-4,19,23-trioxa-1,10-diazaheptacyclo[12.7.1.12,9.13,6.02,13.03,7.018,22]tetracosa-14(22),15,17-triene-21,24-dione","C36CC7OC4(C(CCN7C)c1ccc(OC)c2OC(C(N4c12)=O)OC)C56OC(C)C3C5=O","c56c4cc7oc1(c(ccn7C)c2ccc(c3oc(c(n1c23)=O)OC)OC)c4(oc5C)c6=O","STRUCTURAL_MISMATCH",""
-"20-methoxy-5,10-dimethyl-4,19,24-trioxa-1,10-diazaheptacyclo[12.7.1.12,9.16,13.02,13.03,7.018,22]tetracosa-14(22),15,17-triene-21,23-dione","C456C7(C(C3C(OC5C3CC(N(C)CC7)O6)C)=O)c1c2c(ccc1)OC(C(=O)N24)OC","O=c1c(OC)oc5cccc4c23ccn(c7cc6c(c(oc6c2(c7=O)n1c45)C)o3)C","STRUCTURAL_MISMATCH",""
+"20-methoxy-5,10-dimethyl-4,19,24-trioxa-1,10-diazaheptacyclo[12.7.1.12,9.16,13.02,13.03,7.018,22]tetracosa-14(22),15,17-triene-21,23-dione","C456C7(C(C3C(OC5C3CC(N(C)CC7)O6)C)=O)c1c2c(ccc1)OC(C(=O)N24)OC","O=C1C(OC)OC5=CC=C=C4C23CCN(C7CC6C(C(OC6C2(C7=O)N1C45)C)O3)C","STRUCTURAL_MISMATCH",""
 "[30-acetyloxy-31-(14-oxo-azacyclohexacos-1-yl)-29-bicyclo[25.3.1]hentriaconta-1(30),27(31),28-trienyl] acetate","N1(CCCCCCCCCCCCC(CCCCCCCCCCCC1)=O)c2c3cc(c(c2CCCCCCCCCCCCCCCCCCCCCCCCC3)OC(C)=O)OC(C)=O","C(CCCCOC(=O)C)CCCCCCCCCCCCCCCCCCCCCCCCCC","STRUCTURAL_MISMATCH",""
+"N-[4-[2,4-bis(2-methylbutan-2-yl)phenoxy]butyl]-1-(2-chlorophenyl)-3-(4-fluorophenyl)pyrazole-5-carboxamide","c2ccc(N1N=C(c3ccc(F)cc3)C=C1C(=O)NCCCCOc4c(cc(C(C)(C)CC)cc4)C(C)(C)CC)c(Cl)c2","c2ccc(N1NC(c3ccc(F)cc3)CC1C(=O)NCCCCOc4c(cc(C(C)(C)CC)cc4)C(C)(C)CC)c(Cl)c2","STRUCTURAL_MISMATCH",""
 "methane","C","C","MATCH",""
 "ethane","CC","CC","MATCH",""
 "propane","CCC","CCC","MATCH",""
@@ -91,6 +91,7 @@ iupac,expected_smiles,generated_smiles,status,error
 "3-methylbutanoic acid","CC(C)CC(=O)O","OC(=O)CC(C)C","MATCH",""
 "3-hydroxy-3-methylbutanoic acid","CC(C)(O)CC(=O)O","OC(=O)CC(O)(C)C","MATCH",""
 "4,4,11,11-tetramethyl-3,12-dioxatricyclo[6.4.0.02,7]dodecane-6,9-dione","CC1(CC(=O)C2C3C(C2O1)OC(CC3=O)(C)C)C","O=C3CC(OC2C1OC(C)(C)CC(=O)C1C23)(C)C","MATCH_FINGERPRINT_EQUIV",""
+"17,20-dimethoxy-5,10-dimethyl-4,19,23-trioxa-1,10-diazaheptacyclo[12.7.1.12,9.13,6.02,13.03,7.018,22]tetracosa-14(22),15,17-triene-21,24-dione","CC1C2C3CC4N(CCC5C6=C7C(=C(C=C6)OC)OC(C(=O)N7C5(C3(C2=O)O1)O4)OC)C","C56CC7OC1(C(CCN7C)C2=C=CC(OC)=C3OC(C(N1C23)=O)OC)C45OC(C)C6C4=O","MATCH_FINGERPRINT_EQUIV",""
 "2-diphenylphosphanyloxy-N,N-dimethylethanamine","CN(C)CCOP(C1=CC=CC=C1)C2=CC=CC=C2","C(COP(c2ccccc2)c1ccccc1)N(C)C","MATCH",""
 "16-(furan-3-yl)-8,15,19-trioxapentacyclo[12.3.2.01,13.02,10.06,10]nonadec-5-en-7-one","C1CC2C3(CCC4C25CC(OC4OC5)C6=COC=C6)COC(=O)C3=C1","C4C1C6(COC(C6=CC4)=O)CCC3C12COC3OC(c5cocc5)C2","MATCH_FINGERPRINT_EQUIV",""
 "2,2-dimethyl-3-(propan-2-ylideneamino)imidazolidin-4-one","CC(=NN1C(=O)CNC1(C)C)C","C1C(N(C(C)(C)N1)NN=C(C)C)=O","MATCH_FINGERPRINT_EQUIV",""
@@ -149,5 +150,4 @@ iupac,expected_smiles,generated_smiles,status,error
 "2-[2-[4-(2,4-dimethoxyanilino)-6,8-dimethoxy-2-methyl-3,4-dihydro-2H-quinolin-1-yl]-2-oxoethyl]isoindole-1,3-dione","CC1CC(C2=C(N1C(=O)CN3C(=O)C4=CC=CC=C4C3=O)C(=CC(=C2)OC)OC)NC5=C(C=C(C=C5)OC)OC","c4(cc(OC)ccc4NC2CC(C)N(C(CN1C(=O)c5c(C1=O)cccc5)=O)c3c(OC)cc(OC)cc23)OC","MATCH_FINGERPRINT_EQUIV",""
 "N-[2-chloro-5-[(2-methoxyphenyl)sulfamoyl]phenyl]-2-(4-methoxyphenyl)quinoline-4-carboxamide","COC1=CC=C(C=C1)C2=NC3=CC=CC=C3C(=C2)C(=O)NC4=C(C=CC(=C4)S(=O)(=O)NC5=CC=CC=C5OC)Cl","c2(ccc(cc2)-c1nc5c(c(C(Nc3cc(S(=O)(=O)Nc4ccccc4OC)ccc3Cl)=O)c1)cccc5)OC","MATCH_FINGERPRINT_EQUIV",""
 "[(2Z)-2-[(2,5-dimethoxyphenyl)methylidene]-3-oxo-1-benzofuran-6-yl] 5-ethoxy-2-phenyl-1-benzofuran-3-carboxylate","CCOC1=CC2=C(C=C1)OC(=C2C(=O)OC3=CC4=C(C=C3)C(=O)/C(=C/C5=C(C=CC(=C5)OC)OC)/O4)C6=CC=CC=C6","c4(OCC)ccc6oc(c(C(Oc1cc2-o-c(C(c2cc1)=O)=C/c3ccccc3)=O)c6c4)-c5ccccc5","MATCH_FINGERPRINT_EQUIV",""
-"N-[4-[2,4-bis(2-methylbutan-2-yl)phenoxy]butyl]-1-(2-chlorophenyl)-3-(4-fluorophenyl)pyrazole-5-carboxamide","CCC(C)(C)C1=CC(=C(C=C1)OCCCCNC(=O)C2=CC(=NN2C3=CC=CC=C3Cl)C4=CC=C(C=C4)F)C(C)(C)CC","c2ccc(N1NC(c3ccc(F)cc3)CC1C(=O)NCCCCOc4c(cc(C(C)(C)CC)cc4)C(C)(C)CC)c(Cl)c2","MATCH",""
 "diethyl 1-[(6R,8R,9R)-4-amino-9-[tert-butyl(dimethyl)silyl]oxy-6-[[tert-butyl(dimethyl)silyl]oxymethyl]-2,2-dioxo-1,7-dioxa-2lambda6-thiaspiro[4.4]non-3-en-8-yl]triazole-4,5-dicarboxylate","CCOC(=O)C1=C(N(N=N1)[C@H]2[C@@H](C3([C@H](O2)CO[Si](C)(C)C(C)(C)C)C(=CS(=O)(=O)O3)N)O[Si](C)(C)C(C)(C)C)C(=O)OCC","C([Si](Oc3c2(c(oc3N1NCN(C(=O)OCC)C1C(=O)OCC)CO[Si](C)(C)C(C)(C)C)os(=O)(=O)cc2N)(C)C)(C)(C)C","MATCH_FINGERPRINT_EQUIV",""

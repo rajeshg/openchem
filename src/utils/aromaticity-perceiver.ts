@@ -161,6 +161,7 @@ function countPiElectronsRDKit(
   atomBonds: Bond[],
   originalAromaticFlags: Record<number, boolean>,
   _allAtomsWereAromatic: boolean,
+  atomMap?: Map<number, Atom>,
 ): number {
   const bondCount = atomBonds.length;
 
@@ -174,6 +175,23 @@ function countPiElectronsRDKit(
     ringAtoms,
     atomBonds,
   );
+
+  // Helper to check if nitrogen has exocyclic bond to electronegative atom
+  // that prevents lone pair donation (C-N breaks aromaticity, but N-O doesn't)
+  const hasExocyclicToElectronegative = (nAtom: Atom): boolean => {
+    if (!atomMap) return false;
+    const exocyclicBonds = atomBonds.filter((b) => {
+      const otherId = b.atom1 === nAtom.id ? b.atom2 : b.atom1;
+      return !ringAtoms.has(otherId);
+    });
+    return exocyclicBonds.some((b) => {
+      const otherId = b.atom1 === nAtom.id ? b.atom2 : b.atom1;
+      const otherAtom = atomMap.get(otherId);
+      // N-O (N-oxide) and N-N can still donate lone pair, so they don't break aromaticity
+      // Only N-C (alkyl) substituents prevent lone pair donation
+      return otherAtom && ['C'].includes(otherAtom.symbol);
+    });
+  };
 
   switch (atom.symbol) {
     case "C":
@@ -205,18 +223,25 @@ function countPiElectronsRDKit(
         return 2;
       }
 
-      // If nitrogen was marked aromatic in original input (SMILES/IUPAC) and has 2 ring bonds,
-      // it contributes 1 pi electron (e.g., thiazole, oxazole, imidazole)
-      // UNLESS it has explicit hydrogen (e.g. pyrrole, indole), then it contributes 2
-      if (originalAromaticFlags[atom.id] && ringBonds.length === 2) {
-        if (atom.hydrogens > 0) {
-          return 2; // Pyrrolic nitrogen with explicit H
+      // Nitrogen with 3 bonds (2 ring + 1 exocyclic)
+      if (bondCount === 3 && ringBonds.length === 2) {
+        // If exocyclic bond is to carbon (alkyl), nitrogen uses lone pair for bonding
+        // and contributes only 1 electron (pyridinic). Example: n-methyl imidazole
+        if (hasExocyclicToElectronegative(atom)) {
+          return 1;
         }
-        return 1; // Pyridinic nitrogen
+        // If exocyclic bond is to O, N, etc. (N-oxide, N-N), nitrogen can still
+        // donate lone pair and contributes 2 electrons. Example: c1nccn1O (N-oxide)
+        return 2;
       }
 
-      if (bondCount === 3 && ringBonds.length === 2) {
-        return 2;
+      // If nitrogen was marked aromatic in original input (SMILES/IUPAC) and has 2 ring bonds,
+      // it contributes 1 pi electron (pyridinic). Examples: pyridine, thiazole, oxazole
+      if (originalAromaticFlags[atom.id] && ringBonds.length === 2) {
+        if (atom.hydrogens > 0) {
+          return 2; // Pyrrolic nitrogen with explicit H (pyrrole, indole)
+        }
+        return 1; // Pyridinic nitrogen
       }
 
       if (bondCount === 2) {
@@ -356,6 +381,7 @@ function isRingHuckelAromatic(
       atomBonds,
       originalAromaticFlags,
       allAtomsWereAromatic,
+      atomMap,
     );
     if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
       console.log(
@@ -416,6 +442,7 @@ function isFusedSystemAromatic(
       atomBonds,
       originalAromaticFlags,
       allAtomsWereAromatic,
+      map,
     );
     totalPiElectrons += piElectrons;
   }

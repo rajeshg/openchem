@@ -456,6 +456,55 @@ const KNOWN_AROMATICITY_DIFFERENCES: KnownDifference[] = [
       "openchem returns all possible 6-membered aromatic rings; RDKit returns only primary ring",
     category: "multiple-ring-matches",
   },
+  {
+    pattern: "C",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic, only 5 π electrons); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
+  {
+    pattern: "N",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
+  {
+    pattern: "C-C",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
+  {
+    pattern: "[a]",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aromatic",
+  },
+  {
+    pattern: "[A]",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
+  {
+    pattern: "[C&D2]",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
+  {
+    pattern: "[C,N]",
+    smiles: "c1nccn1C",
+    reason:
+      "openchem uses strict Hückel aromaticity (N-methyl imidazole is not aromatic); RDKit uses extended aromaticity model (marks ring aromatic)",
+    category: "aromaticity-aliphatic",
+  },
 ];
 
 function isKnownDifference(
