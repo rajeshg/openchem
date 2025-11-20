@@ -178,6 +178,20 @@ pnpm add openchem
 
 ## Usage
 
+### Example Files
+
+For comprehensive working examples, see:
+- [`docs/examples/comprehensive-example.ts`](docs/examples/comprehensive-example.ts) — All major features (SMILES, properties, IUPAC, InChI, SVG, SMARTS, fingerprints)
+- [`docs/examples/example-iupac.ts`](docs/examples/example-iupac.ts) — IUPAC name generation and parsing (both directions)
+- [`docs/examples/example-aromaticity.ts`](docs/examples/example-aromaticity.ts) — Aromaticity perception using Hückel's rule
+- [`docs/examples/example-drug-likeness.ts`](docs/examples/example-drug-likeness.ts) — Drug-likeness assessment (Lipinski, Veber, BBB)
+- [`docs/examples/example-sdf-export.ts`](docs/examples/example-sdf-export.ts) — SDF file generation
+
+Run any example:
+```bash
+bun run docs/examples/comprehensive-example.ts
+```
+
 ### Basic Parsing
 
 

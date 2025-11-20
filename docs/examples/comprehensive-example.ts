@@ -25,6 +25,8 @@ import {
   tanimotoSimilarity,
   generateInChI,
   generateInChIKey,
+  parseIUPACName,
+  generateIUPACName,
 } from "index";
 import type { SDFRecord } from "src/generators/sdf-writer";
 
@@ -244,8 +246,41 @@ if (parseResult.molecules.length > 0) {
   })();
 }
 
-// 8. SVG Rendering
-console.log("\n8. SVG Rendering");
+// 8. IUPAC Name Generation and Parsing
+console.log("\n8. IUPAC Name Generation and Parsing");
+console.log("-------------------------------------");
+
+if (parseResult.molecules.length > 0) {
+  const molecule = parseResult.molecules[0]!;
+
+  // Generate IUPAC name from molecule
+  const iupacResult = generateIUPACName(molecule);
+  if (iupacResult.errors.length > 0) {
+    console.log("IUPAC generation errors:", iupacResult.errors);
+  } else {
+    console.log("✓ Generated IUPAC name for aspirin");
+    console.log(`  Name: ${iupacResult.name}`);
+    if (iupacResult.confidence !== undefined) {
+      console.log(`  Confidence: ${(iupacResult.confidence * 100).toFixed(0)}%`);
+    }
+  }
+}
+
+// Parse IUPAC name to molecule
+const iupacTestNames = ["ethane", "2-methylpropane", "propan-2-ol"];
+console.log("\n  Testing IUPAC name parsing:");
+for (const name of iupacTestNames) {
+  const result = parseIUPACName(name);
+  if (result.errors.length === 0 && result.molecule) {
+    const smiles = generateSMILES(result.molecule, true);
+    console.log(`  ✓ ${name} → ${smiles}`);
+  } else {
+    console.log(`  ✗ ${name}: ${result.errors[0] || "Parse failed"}`);
+  }
+}
+
+// 9. SVG Rendering
+console.log("\n9. SVG Rendering");
 console.log("-----------------");
 
 if (parseResult.molecules.length > 0) {
@@ -274,5 +309,6 @@ console.log("- MOL and SDF file I/O");
 console.log("- SMARTS pattern matching");
 console.log("- Morgan fingerprints and similarity");
 console.log("- InChI generation");
+console.log("- IUPAC name generation and parsing");
 console.log("- 2D SVG rendering");
 console.log("- And much more!");
