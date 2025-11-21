@@ -12,6 +12,7 @@ import type {
 import { enrichMolecule } from "src/utils/molecule-enrichment";
 import { calculateValence } from "src/utils/valence-calculator";
 import { parseSMARTS } from "src/parsers/smarts-parser";
+import { getCSRGraph } from "src/utils/csr-graph";
 
 const debugSmarts: boolean = !!process.env.OPENCHEM_DEBUG_SMARTS;
 const debug: boolean = debugSmarts;
@@ -57,6 +58,7 @@ export function matchSMARTS(
 
   const enriched = enrichMolecule(molecule);
   molecule = enriched;
+  const graph = getCSRGraph(molecule);
 
   const matches: Match[] = [];
   const maxMatches = options?.maxMatches ?? Infinity;
@@ -66,7 +68,7 @@ export function matchSMARTS(
     i < molecule.atoms.length && matches.length < maxMatches;
     i++
   ) {
-    const foundMatches = tryMatchFromAtom(parsedPattern, molecule, i);
+    const foundMatches = tryMatchFromAtom(parsedPattern, molecule, graph, i);
     for (const match of foundMatches) {
       if (matches.length >= maxMatches) break;
       if (!options?.uniqueMatches || !isDuplicateMatch(match, matches)) {
@@ -94,6 +96,7 @@ export function matchSMARTS(
 function tryMatchFromAtom(
   pattern: SMARTSPattern,
   molecule: Molecule,
+  graph: ReturnType<typeof getCSRGraph>,
   startAtomIndex: number,
 ): Match[] {
   if (pattern.atoms.length === 0) {
@@ -106,6 +109,7 @@ function tryMatchFromAtom(
   collectAllMatches(
     pattern,
     molecule,
+    graph,
     0,
     startAtomIndex,
     mapping,
@@ -249,6 +253,7 @@ function validateRingClosures(
 function collectAllMatches(
   pattern: SMARTSPattern,
   molecule: Molecule,
+  graph: ReturnType<typeof getCSRGraph>,
   patternAtomIdx: number,
   moleculeAtomIdx: number,
   mapping: Map<number, number>,
@@ -276,6 +281,7 @@ function collectAllMatches(
       collectAllMatches(
         pattern,
         molecule,
+        graph,
         patternAtomIdx + 1,
         moleculeAtomIdx,
         mapping,
@@ -320,11 +326,7 @@ function collectAllMatches(
       return;
     }
 
-    const moleculeBond = molecule.bonds.find(
-      (b) =>
-        (b.atom1 === moleculeAtom.id && b.atom2 === targetMoleculeAtom.id) ||
-        (b.atom2 === moleculeAtom.id && b.atom1 === targetMoleculeAtom.id),
-    );
+    const moleculeBond = graph.getBond(moleculeAtomIdx, targetMoleculeIdx);
 
     if (!moleculeBond) {
       mapping.delete(patternAtomIdx);
@@ -364,6 +366,7 @@ function collectAllMatches(
           collectAllMatches(
             pattern,
             molecule,
+            graph,
             nextUnmatched,
             i,
             mapping,
@@ -379,14 +382,19 @@ function collectAllMatches(
     return;
   }
 
-  const moleculeAtomId = moleculeAtom.id;
-  const moleculeBonds = molecule.bonds.filter(
-    (b) => b.atom1 === moleculeAtomId || b.atom2 === moleculeAtomId,
-  );
+  const neighbors = graph.getNeighbors(moleculeAtomIdx);
+  const moleculeBonds: Bond[] = [];
+  for (const neighborIdx of neighbors) {
+    const bond = graph.getBond(moleculeAtomIdx, neighborIdx);
+    if (bond) {
+      moleculeBonds.push(bond);
+    }
+  }
 
   collectAllBondMatches(
     pattern,
     molecule,
+    graph,
     regularBonds,
     moleculeBonds,
     moleculeAtomIdx,
@@ -402,6 +410,7 @@ function collectAllMatches(
 function collectAllBondMatches(
   pattern: SMARTSPattern,
   molecule: Molecule,
+  graph: ReturnType<typeof getCSRGraph>,
   patternBonds: typeof pattern.bonds,
   moleculeBonds: typeof molecule.bonds,
   currentMoleculeAtom: number,
@@ -431,6 +440,7 @@ function collectAllBondMatches(
         collectAllMatches(
           pattern,
           molecule,
+          graph,
           nextUnmatched,
           i,
           mapping,
@@ -445,6 +455,7 @@ function collectAllBondMatches(
   collectAllBondPermutations(
     pattern,
     molecule,
+    graph,
     patternBonds,
     moleculeBonds,
     currentMoleculeAtom,
@@ -459,6 +470,7 @@ function collectAllBondMatches(
 function collectAllBondPermutations(
   pattern: SMARTSPattern,
   molecule: Molecule,
+  graph: ReturnType<typeof getCSRGraph>,
   patternBonds: typeof pattern.bonds,
   moleculeBonds: typeof molecule.bonds,
   currentMoleculeAtomIdx: number,
@@ -490,6 +502,7 @@ function collectAllBondPermutations(
         collectAllMatches(
           pattern,
           molecule,
+          graph,
           nextUnmatched,
           i,
           mapping,
@@ -543,6 +556,7 @@ function collectAllBondPermutations(
     collectAllMatches(
       pattern,
       molecule,
+      graph,
       targetPatternAtom,
       neighborAtomIdx,
       mapping,
@@ -562,6 +576,7 @@ function collectAllBondPermutations(
         collectAllBondPermutations(
           pattern,
           molecule,
+          graph,
           patternBonds,
           moleculeBonds,
           currentMoleculeAtomIdx,
