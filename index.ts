@@ -49,6 +49,18 @@ export {
   generateInChI,
   generateInChIKey,
 } from "src/generators/inchi-generator";
+export {
+  bulkMatchSMARTS,
+  bulkComputeProperties,
+  bulkComputeSimilarities,
+  bulkFindSimilar,
+  bulkFilterDrugLike,
+} from "src/utils/bulk-operations";
+export type {
+  BulkSMARTSResult,
+  BulkPropertiesResult,
+  BulkFingerprintResult,
+} from "src/utils/bulk-operations";
 // IUPAC naming using the new rule engine
 import { IUPACNamer } from "src/iupac-engine";
 import { parseMolfile } from "src/parsers/molfile-parser";
