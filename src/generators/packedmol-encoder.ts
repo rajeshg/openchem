@@ -5,8 +5,11 @@
  * Encodes all structural information deterministically into typed arrays.
  */
 
-import type { Molecule, BondType, StereoType } from "types";
-import type { PackedMol, PackedMolEncodingInfo } from "src/types/packedmol-types";
+import type { Molecule, BondType } from "types";
+import type {
+  PackedMol,
+  PackedMolEncodingInfo,
+} from "src/types/packedmol-types";
 import {
   ATOM_FLAG,
   BOND_FLAG,
@@ -39,7 +42,7 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   }
 
   // Canonicalize first - ensures deterministic encoding
-  const { molecule: canonical, ordering } = canonicalizeMolecule(molecule);
+  const { molecule: canonical } = canonicalizeMolecule(molecule);
 
   const N = canonical.atoms.length;
   const M = canonical.bonds.length;
@@ -74,8 +77,6 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   const offsetAtomFlags = atomOffset;
   atomOffset += N * 2; // Uint16Array
 
-  const atomBlockSize = atomOffset - atomBlockStartSize;
-
   // Bond block needs 4-byte alignment for Uint32Array
   let bondOffset = align(atomOffset, 4);
   const offsetBondBlock = bondOffset;
@@ -92,8 +93,6 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   const offsetBondFlags = bondOffset;
   bondOffset += M; // Uint8Array
 
-  const bondBlockSize = bondOffset - offsetBondBlock;
-
   // Graph block needs 4-byte alignment for Uint32Array
   let graphOffset = align(bondOffset, 4);
   const offsetGraphBlock = graphOffset;
@@ -108,8 +107,6 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   graphOffset = align(graphOffset, 2);
   const offsetBondAdj = graphOffset;
   graphOffset += 2 * M * 2; // Uint16Array
-
-  const graphBlockSize = graphOffset - offsetGraphBlock;
 
   // Stereo block (all Uint8 and Int8, no alignment needed)
   const offsetStereoBlock = graphOffset;
@@ -154,7 +151,8 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     // Build flags
     let flags = 0;
     if (atom.aromatic) flags |= ATOM_FLAG.AROMATIC;
-    if (atom.chiral !== null && atom.chiral !== "none") flags |= ATOM_FLAG.CHIRAL;
+    if (atom.chiral !== null && atom.chiral !== "none")
+      flags |= ATOM_FLAG.CHIRAL;
     if (atom.symbol === "*") flags |= ATOM_FLAG.DUMMY;
     atomFlags[i] = flags;
   }
@@ -193,21 +191,9 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   const csr = buildCSRGraph(N, canonical.bonds, atomIndexMap);
 
   // Create graph block views
-  const degreeOffset = new Uint32Array(
-    buffer,
-    offsetDegreeOffset,
-    N + 1,
-  );
-  const bondTargets = new Uint32Array(
-    buffer,
-    offsetBondTargets,
-    2 * M,
-  );
-  const bondAdj = new Uint16Array(
-    buffer,
-    offsetBondAdj,
-    2 * M,
-  );
+  const degreeOffset = new Uint32Array(buffer, offsetDegreeOffset, N + 1);
+  const bondTargets = new Uint32Array(buffer, offsetBondTargets, 2 * M);
+  const bondAdj = new Uint16Array(buffer, offsetBondAdj, 2 * M);
 
   // Copy CSR data
   degreeOffset.set(csr.degreeOffset);
@@ -280,11 +266,7 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     graph: {
       degreeOffset: new Uint32Array(buffer, offsetDegreeOffset, N + 1),
       bondTargets: new Uint32Array(buffer, offsetBondTargets, 2 * M),
-      bondAdj: new Uint16Array(
-        buffer,
-        offsetBondAdj,
-        2 * M,
-      ),
+      bondAdj: new Uint16Array(buffer, offsetBondAdj, 2 * M),
     },
     stereo: {
       atomType: new Uint8Array(buffer, offsetStereoAtomType, N),

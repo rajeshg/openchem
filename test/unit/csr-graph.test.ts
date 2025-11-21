@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
+import { BondType } from "types";
 import { CSRGraph, getCSRGraph } from "src/utils/csr-graph";
 
 describe("CSR Graph Representation", () => {
@@ -55,7 +56,7 @@ describe("CSR Graph Representation", () => {
 
     const bond = graph.getBond(0, 1);
     expect(bond).toBeDefined();
-    expect(bond?.type).toBe("double");
+    expect(bond?.type).toBe(BondType.DOUBLE);
   });
 
   it("should handle iterator interface efficiently", () => {

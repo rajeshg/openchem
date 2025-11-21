@@ -19,12 +19,14 @@ describe("SMARTS Performance with CSR Integration", () => {
   it("SMARTS matching with CSR graphs", () => {
     // Warmup
     const warmupMol = parseSMILES("c1ccccc1").molecules[0];
+    if (!warmupMol) return;
     matchSMARTS("[#6]", warmupMol);
 
     const results: Record<string, number[]> = {};
 
     for (const { smiles, name } of testMolecules) {
       const mol = parseSMILES(smiles).molecules[0];
+      if (!mol) continue;
 
       for (const { pattern } of testPatterns) {
         const key = pattern;

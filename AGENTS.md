@@ -148,43 +148,29 @@
 
 ## Performance Optimizations
 
-### LogP Caching
+### LogP Calculation
 
-The LogP (octanol-water partition coefficient) computation is now cached using a WeakMap to dramatically improve performance for repeated calculations on the same molecule object.
+LogP (octanol-water partition coefficient) is computed using the Wildman-Crippen method. Calculations are internally optimized for repeated calls on the same molecule object.
 
-**Implementation Details:**
-- Cache storage: `WeakMap<Molecule, LogPCache>` in `src/utils/logp.ts`
-- Entry point: `calcCrippenDescriptors(mol, includeHs?)` checks cache before SMARTS pattern matching
-- Automatic cleanup: WeakMap ensures cache is garbage collected when molecule is no longer referenced
-- Zero memory leaks: No need to manually clear cache
+**Implementation:**
+- Algorithm: Wildman-Crippen atom typing with published parameters
+- Entry point: `computeLogP(mol, includeHs?)` in `src/utils/logp.ts`
+- Typical performance: ~100-200 ms for drug-like molecules
+- Immutable molecule design ensures calculation correctness
 
-**Performance Impact:**
-
-| Molecule | First Call | Cached Call | Speedup |
-|----------|-----------|-----------|---------|
-| Methane (CH₄) | 14.6 ms | 0.004 ms | 4,171× |
-| Ethanol (C₂H₆O) | 24.4 ms | 0.002 ms | 10,614× |
-| Aspirin (C₉H₈O₄) | 138 ms | 0.001 ms | 92,064× |
-| Caffeine (C₈H₁₀N₄O₂) | 191 ms | 0.002 ms | 83,193× |
-| Strychnine (C₂₁H₂₂N₂O₂) | 12.1 s | 0.003 ms | **4.6 million ×** |
-
-**Why This Matters:**
-- Bottleneck is Wildman-Crippen atom type matching (68 SMARTS patterns per atom)
-- Cache hit is just a WeakMap lookup: < 0.01 ms
-- Direct benefit for drug-likeness assessment (`checkLipinskiRuleOfFive()`)
-- Typical drug discovery workflows process same molecules multiple times
-
-**Usage (transparent - no code changes needed):**
+**Usage:**
 ```typescript
-import { parseSMILES, checkLipinskiRuleOfFive } from 'index';
+import { parseSMILES, computeLogP, checkLipinskiRuleOfFive } from 'index';
 
 const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
 
-// First call: 138 ms (SMARTS pattern matching)
-const result1 = checkLipinskiRuleOfFive(aspirin);
+// Direct computation
+const logP = computeLogP(aspirin);
+console.log(`LogP: ${logP.toFixed(2)}`);
 
-// Second call: 0.001 ms (cache hit)
-const result2 = checkLipinskiRuleOfFive(aspirin);
+// Or via drug-likeness rules
+const result = checkLipinskiRuleOfFive(aspirin);
+console.log(`LogP contribution to Lipinski: ${result.properties.logP}`);
 ```
 
 ### Morgan Fingerprints

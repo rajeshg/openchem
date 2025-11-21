@@ -1,5 +1,4 @@
 import type { Atom, Bond, Molecule } from "types";
-import { bondKey } from "./bond-utils";
 
 /**
  * Compressed Sparse Row (CSR) graph representation for efficient traversal
@@ -79,10 +78,13 @@ export class CSRGraph {
     rowPtr[0] = 0;
 
     // First pass: count degree of each atom
-    const degrees = new Array(this.numAtoms).fill(0);
-    for (const bond of this.bonds) {
-      degrees[bond.atom1]++;
-      degrees[bond.atom2]++;
+    const degrees: number[] = [];
+    for (let i = 0; i < this.numAtoms; i++) {
+      degrees[i] = 0;
+    }
+    for (const _bond of this.bonds) {
+      degrees[_bond.atom1]!++;
+      degrees[_bond.atom2]!++;
     }
 
     // Calculate row pointers (cumulative sum of degrees)
@@ -95,7 +97,7 @@ export class CSRGraph {
     const edgeData = new Uint32Array(totalEdges);
 
     // Second pass: fill in column indices and edge data
-    const currentPtr = new Array(this.numAtoms).fill(0);
+    const currentPtr: number[] = [];
     for (let i = 0; i < this.numAtoms; i++) {
       currentPtr[i] = rowPtr[i]!;
     }
@@ -167,7 +169,12 @@ export class CSRGraph {
    * @returns Bond or undefined if not connected
    */
   getBond(atom1: number, atom2: number): Bond | undefined {
-    if (atom1 < 0 || atom1 >= this.numAtoms || atom2 < 0 || atom2 >= this.numAtoms) {
+    if (
+      atom1 < 0 ||
+      atom1 >= this.numAtoms ||
+      atom2 < 0 ||
+      atom2 >= this.numAtoms
+    ) {
       return undefined;
     }
 
@@ -205,7 +212,12 @@ export class CSRGraph {
    * @returns True if connected
    */
   isConnected(atom1: number, atom2: number): boolean {
-    if (atom1 < 0 || atom1 >= this.numAtoms || atom2 < 0 || atom2 >= this.numAtoms) {
+    if (
+      atom1 < 0 ||
+      atom1 >= this.numAtoms ||
+      atom2 < 0 ||
+      atom2 >= this.numAtoms
+    ) {
       return false;
     }
 

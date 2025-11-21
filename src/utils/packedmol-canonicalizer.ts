@@ -8,9 +8,9 @@
 import type { Atom, Bond, Molecule } from "types";
 
 export interface CanonicalOrdering {
-  atomRanking: number[];       // Canonical rank for each atom (0-based)
-  oldToNewIndex: Map<number, number>;  // Map old atom ID to new index
-  newToOldIndex: number[];     // Array: newIndex -> oldAtomID
+  atomRanking: number[]; // Canonical rank for each atom (0-based)
+  oldToNewIndex: Map<number, number>; // Map old atom ID to new index
+  newToOldIndex: number[]; // Array: newIndex -> oldAtomID
 }
 
 /**
@@ -52,7 +52,7 @@ export function computeCanonicalOrdering(mol: Molecule): CanonicalOrdering {
         .sort((a, b) => a - b);
 
       for (const nbLabel of neighbors) {
-        hash = ((hash << 5) - hash) + nbLabel; // DJB2 hash
+        hash = (hash << 5) - hash + nbLabel; // DJB2 hash
       }
 
       newLabels.set(atom.id, hash >>> 0); // Convert to unsigned 32-bit

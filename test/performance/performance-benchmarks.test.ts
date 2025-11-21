@@ -39,14 +39,18 @@ describe("Performance Benchmarks", () => {
     const avgMs = totalMs / (iterations * smilesList.length);
 
     console.log(`\n📊 SMILES Parsing Performance:`);
-    console.log(`   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${smilesList.length} molecules)`);
+    console.log(
+      `   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${smilesList.length} molecules)`,
+    );
     console.log(`   Average: ${avgMs.toFixed(4)}ms per molecule`);
 
     expect(avgMs).toBeGreaterThan(0);
   });
 
   it("should benchmark SMILES generation", () => {
-    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
+    const molecules = Object.values(MOLECULES).map(
+      (s) => parseSMILES(s).molecules[0]!,
+    );
     const iterations = 50;
 
     const start = performance.now();
@@ -61,14 +65,18 @@ describe("Performance Benchmarks", () => {
     const avgMs = totalMs / (iterations * molecules.length);
 
     console.log(`\n📊 SMILES Generation Performance:`);
-    console.log(`   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules)`);
+    console.log(
+      `   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules)`,
+    );
     console.log(`   Average: ${avgMs.toFixed(4)}ms per molecule`);
 
     expect(avgMs).toBeGreaterThan(0);
   });
 
   it("should benchmark molecular properties calculation", () => {
-    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
+    const molecules = Object.values(MOLECULES).map(
+      (s) => parseSMILES(s).molecules[0]!,
+    );
     const iterations = 50;
 
     const start = performance.now();
@@ -85,14 +93,18 @@ describe("Performance Benchmarks", () => {
     const avgMs = totalMs / (iterations * molecules.length * 3);
 
     console.log(`\n📊 Molecular Properties Performance:`);
-    console.log(`   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules × 3 operations)`);
+    console.log(
+      `   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules × 3 operations)`,
+    );
     console.log(`   Average: ${avgMs.toFixed(4)}ms per operation`);
 
     expect(avgMs).toBeGreaterThan(0);
   });
 
   it("should benchmark SMARTS matching", () => {
-    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
+    const molecules = Object.values(MOLECULES).map(
+      (s) => parseSMILES(s).molecules[0]!,
+    );
 
     // Simple SMARTS patterns that are known to work
     const patterns = ["c1ccccc1", "[C,N]", "[#6]=[#6]", "[O;H]"];
@@ -123,14 +135,18 @@ describe("Performance Benchmarks", () => {
     const avgMs = totalMs / totalMatches;
 
     console.log(`\n📊 SMARTS Matching Performance:`);
-    console.log(`   Total time: ${totalMs.toFixed(2)}ms (${totalMatches} match operations)`);
+    console.log(
+      `   Total time: ${totalMs.toFixed(2)}ms (${totalMatches} match operations)`,
+    );
     console.log(`   Average: ${avgMs.toFixed(4)}ms per pattern match`);
 
     expect(avgMs).toBeGreaterThan(0);
   });
 
   it("should benchmark MOL file I/O", () => {
-    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
+    const molecules = Object.values(MOLECULES).map(
+      (s) => parseSMILES(s).molecules[0]!,
+    );
     const iterations = 20;
 
     // Generate MOL files
@@ -157,8 +173,12 @@ describe("Performance Benchmarks", () => {
     const totalOps = iterations * molecules.length;
 
     console.log(`\n📊 MOL File I/O Performance:`);
-    console.log(`   Write time: ${writeMs.toFixed(2)}ms (${(writeMs / totalOps).toFixed(4)}ms per molecule)`);
-    console.log(`   Read time: ${readMs.toFixed(2)}ms (${(readMs / totalOps).toFixed(4)}ms per molecule)`);
+    console.log(
+      `   Write time: ${writeMs.toFixed(2)}ms (${(writeMs / totalOps).toFixed(4)}ms per molecule)`,
+    );
+    console.log(
+      `   Read time: ${readMs.toFixed(2)}ms (${(readMs / totalOps).toFixed(4)}ms per molecule)`,
+    );
 
     expect(writeMs + readMs).toBeGreaterThan(0);
   });
@@ -207,9 +227,15 @@ describe("Performance Benchmarks", () => {
     const compressionRatio = originalSize / compressedSize;
 
     console.log(`\n📊 PackedMol Performance:`);
-    console.log(`   Encode time: ${encodeMs.toFixed(2)}ms (${(encodeMs / totalOps).toFixed(4)}ms per molecule)`);
-    console.log(`   Decode time: ${decodeMs.toFixed(2)}ms (${(decodeMs / totalOps).toFixed(4)}ms per molecule)`);
-    console.log(`   Compression ratio: ${compressionRatio.toFixed(1)}× (${compressedSize} bytes for ${firstMol.atoms.length} atoms, ${firstMol.bonds.length} bonds)`);
+    console.log(
+      `   Encode time: ${encodeMs.toFixed(2)}ms (${(encodeMs / totalOps).toFixed(4)}ms per molecule)`,
+    );
+    console.log(
+      `   Decode time: ${decodeMs.toFixed(2)}ms (${(decodeMs / totalOps).toFixed(4)}ms per molecule)`,
+    );
+    console.log(
+      `   Compression ratio: ${compressionRatio.toFixed(1)}× (${compressedSize} bytes for ${firstMol.atoms.length} atoms, ${firstMol.bonds.length} bonds)`,
+    );
 
     expect(encodeMs + decodeMs).toBeGreaterThan(0);
   });

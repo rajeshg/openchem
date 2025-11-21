@@ -10,9 +10,9 @@
 import type { Bond } from "types";
 
 export interface CSRGraph {
-  degreeOffset: Uint32Array;  // N+1 elements
-  bondTargets: Uint32Array;   // 2M elements
-  bondAdj: Uint16Array;       // 2M elements
+  degreeOffset: Uint32Array; // N+1 elements
+  bondTargets: Uint32Array; // 2M elements
+  bondAdj: Uint16Array; // 2M elements
 }
 
 /**
@@ -93,10 +93,7 @@ export function buildCSRGraph(
 /**
  * Get neighbors of an atom using CSR structure
  */
-export function getNeighborsCSR(
-  atomIdx: number,
-  csr: CSRGraph,
-): number[] {
+export function getNeighborsCSR(atomIdx: number, csr: CSRGraph): number[] {
   const start = csr.degreeOffset[atomIdx] as number;
   const end = csr.degreeOffset[atomIdx + 1] as number;
   return Array.from(csr.bondTargets.slice(start, end));
@@ -105,10 +102,7 @@ export function getNeighborsCSR(
 /**
  * Get bond indices for neighbors using CSR structure
  */
-export function getBondIndicesCSR(
-  atomIdx: number,
-  csr: CSRGraph,
-): number[] {
+export function getBondIndicesCSR(atomIdx: number, csr: CSRGraph): number[] {
   const start = csr.degreeOffset[atomIdx] as number;
   const end = csr.degreeOffset[atomIdx + 1] as number;
   return Array.from(csr.bondAdj.slice(start, end));
@@ -117,10 +111,7 @@ export function getBondIndicesCSR(
 /**
  * Get degree (number of neighbors) for an atom
  */
-export function getDegreeCSR(
-  atomIdx: number,
-  csr: CSRGraph,
-): number {
+export function getDegreeCSR(atomIdx: number, csr: CSRGraph): number {
   const end = csr.degreeOffset[atomIdx + 1] as number;
   const start = csr.degreeOffset[atomIdx] as number;
   return end - start;

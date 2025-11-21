@@ -7,7 +7,10 @@ import {
   checkVeberRules,
   checkBBBPenetration,
 } from "src/utils/molecular-properties";
-import { computeMorganFingerprint, tanimotoSimilarity } from "src/utils/morgan-fingerprint";
+import {
+  computeMorganFingerprint,
+  tanimotoSimilarity,
+} from "src/utils/morgan-fingerprint";
 
 /**
  * Bulk SMARTS matching results for a set of molecules
@@ -231,9 +234,7 @@ export function bulkFindSimilar(
  * const bbbPassers = candidates.bbbPassers;
  * ```
  */
-export function bulkFilterDrugLike(
-  molecules: Molecule[],
-): {
+export function bulkFilterDrugLike(molecules: Molecule[]): {
   lipinskiPassers: Array<{ index: number; molecule: Molecule }>;
   veberPassers: Array<{ index: number; molecule: Molecule }>;
   bbbPassers: Array<{ index: number; molecule: Molecule }>;

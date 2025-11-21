@@ -20,25 +20,25 @@ describe("Performance Regression Tests", () => {
   const PERF_BUDGETS = {
     // SMILES parsing should be very fast
     smilesParsing: 5, // 5ms for typical molecules
-    
+
     // SMILES generation should be fast
     smilesGeneration: 5,
-    
+
     // LogP computation (first call with hydrogen addition)
     logpComputation: 50,
-    
+
     // LogP cached calls should be nearly instant
     logpCached: 1,
-    
+
     // SMARTS pattern matching on small molecules
     smartsMatching: 10,
-    
+
     // Fingerprint computation
     fingerprintComputation: 10,
-    
+
     // Drug-likeness checks
     drugLikenessCheck: 5,
-    
+
     // Bulk operations should be proportional to molecule count
     bulkSMARTS: 100, // for 100 molecules
     bulkProperties: 100,
@@ -206,9 +206,7 @@ describe("Performance Regression Tests", () => {
 
   it("Bulk SMARTS matching performance", () => {
     warmup();
-    const molecules = testMolecules.map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = testMolecules.map((s) => parseSMILES(s).molecules[0]!);
 
     const start = performance.now();
     for (let i = 0; i < 10; i++) {
@@ -229,9 +227,7 @@ describe("Performance Regression Tests", () => {
 
   it("Bulk properties computation performance", () => {
     warmup();
-    const molecules = testMolecules.map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = testMolecules.map((s) => parseSMILES(s).molecules[0]!);
 
     const start = performance.now();
     for (let i = 0; i < 10; i++) {
@@ -251,9 +247,7 @@ describe("Performance Regression Tests", () => {
 
   it("Bulk similarity computation performance", () => {
     warmup();
-    const molecules = testMolecules.map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = testMolecules.map((s) => parseSMILES(s).molecules[0]!);
 
     const start = performance.now();
     for (let i = 0; i < 10; i++) {
@@ -275,7 +269,9 @@ describe("Performance Regression Tests", () => {
   it("performance test summary", () => {
     if (process.env.VERBOSE) {
       console.log("\n=== Performance Regression Test Summary ===");
-      console.log("Budgets are 2x the typical performance to allow for CI variance");
+      console.log(
+        "Budgets are 2x the typical performance to allow for CI variance",
+      );
       console.log("If tests fail, performance has degraded significantly");
       console.log("==========================================\n");
     }

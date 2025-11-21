@@ -186,4 +186,3 @@ describe("PackedMol Encoder/Decoder", () => {
     });
   });
 });
-

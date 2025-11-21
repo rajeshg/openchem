@@ -1,4 +1,4 @@
-import type { SMARTSPattern } from "src/matchers/smarts-matcher";
+import type { SMARTSPattern } from "src/types/smarts-types";
 import { parseSMARTS as parseSMARTSRaw } from "src/parsers/smarts-parser";
 
 /**

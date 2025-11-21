@@ -22,7 +22,10 @@ export function getCachedPackedMol(molecule: Molecule): PackedMol | null {
 /**
  * Cache a PackedMol representation for a molecule
  */
-export function setCachedPackedMol(molecule: Molecule, packed: PackedMol): void {
+export function setCachedPackedMol(
+  molecule: Molecule,
+  packed: PackedMol,
+): void {
   packedMolCache.set(molecule, packed);
 }
 

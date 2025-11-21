@@ -14,11 +14,11 @@
  * Header contains metadata and offsets to all data sections
  */
 export interface PackedMolHeader {
-  version: number;          // Format version (currently 1)
-  atomCount: number;        // Number of atoms (N)
-  bondCount: number;        // Number of bonds (M)
-  offsetAtomBlock: number;  // Byte offset to atom fields
-  offsetBondBlock: number;  // Byte offset to bond fields
+  version: number; // Format version (currently 1)
+  atomCount: number; // Number of atoms (N)
+  bondCount: number; // Number of bonds (M)
+  offsetAtomBlock: number; // Byte offset to atom fields
+  offsetBondBlock: number; // Byte offset to bond fields
   offsetGraphBlock: number; // Byte offset to CSR adjacency
   offsetStereoBlock: number; // Byte offset to stereochemistry
 }
@@ -27,20 +27,20 @@ export interface PackedMolHeader {
  * Atom flags bitfield
  */
 export const ATOM_FLAG = {
-  AROMATIC: 0x0001,        // Bit 0: aromatic atom
-  CHIRAL: 0x0002,          // Bit 1: chiral center present
-  RADICAL: 0x0004,         // Bit 2: radical center
-  DUMMY: 0x0008,           // Bit 3: dummy atom (*)
+  AROMATIC: 0x0001, // Bit 0: aromatic atom
+  CHIRAL: 0x0002, // Bit 1: chiral center present
+  RADICAL: 0x0004, // Bit 2: radical center
+  DUMMY: 0x0008, // Bit 3: dummy atom (*)
 } as const;
 
 /**
  * Bond flags bitfield
  */
 export const BOND_FLAG = {
-  DIRECTION_UP: 0x01,       // Bit 0: wedge (/)
-  DIRECTION_DOWN: 0x02,     // Bit 1: hash (\)
-  STEREOGENIC: 0x04,        // Bit 2: stereogenic double bond
-  AROMATIC_OVERRIDE: 0x08,  // Bit 3: aromatic bond override
+  DIRECTION_UP: 0x01, // Bit 0: wedge (/)
+  DIRECTION_DOWN: 0x02, // Bit 1: hash (\)
+  STEREOGENIC: 0x04, // Bit 2: stereogenic double bond
+  AROMATIC_OVERRIDE: 0x08, // Bit 3: aromatic bond override
 } as const;
 
 /**
@@ -57,38 +57,38 @@ export const BOND_ORDER = {
  * Stereo type values for atoms (SMILES chirality notation)
  */
 export const ATOM_STEREO_TYPE = {
-  NONE: 0,              // No stereochemistry
-  TETRAHEDRAL: 1,       // @ or @@ (tetrahedral chirality)
-  ALLENIC: 2,           // @AL1, @AL2 (allenic chirality)
-  SQUARE_PLANAR: 3,     // @SP1-@SP3 (square planar)
+  NONE: 0, // No stereochemistry
+  TETRAHEDRAL: 1, // @ or @@ (tetrahedral chirality)
+  ALLENIC: 2, // @AL1, @AL2 (allenic chirality)
+  SQUARE_PLANAR: 3, // @SP1-@SP3 (square planar)
   TRIGONAL_BIPYRAMIDAL: 4, // @TB1-@TB20 (trigonal bipyramidal)
-  OCTAHEDRAL: 5,        // @OH1-@OH30 (octahedral)
+  OCTAHEDRAL: 5, // @OH1-@OH30 (octahedral)
 } as const;
 
 /**
  * Stereo configuration for atoms (parity)
  */
 export const ATOM_STEREO_CONFIG = {
-  UNKNOWN: 0,    // 0: unknown/unspecified
-  AT: 1,         // 1: @ (counterclockwise, S-like)
-  ATAT: -1,      // -1: @@ (clockwise, R-like)
+  UNKNOWN: 0, // 0: unknown/unspecified
+  AT: 1, // 1: @ (counterclockwise, S-like)
+  ATAT: -1, // -1: @@ (clockwise, R-like)
 } as const;
 
 /**
  * Stereo type values for bonds
  */
 export const BOND_STEREO_TYPE = {
-  NONE: 0,       // No stereochemistry
-  CIS_TRANS: 1,  // E/Z stereochemistry on double bonds
+  NONE: 0, // No stereochemistry
+  CIS_TRANS: 1, // E/Z stereochemistry on double bonds
 } as const;
 
 /**
  * Bond stereo configuration (E/Z or geometric)
  */
 export const BOND_STEREO_CONFIG = {
-  UNSPECIFIED: 0,  // 0: unspecified
-  CIS: 1,          // 1: cis / Z configuration
-  TRANS: -1,       // -1: trans / E configuration
+  UNSPECIFIED: 0, // 0: unspecified
+  CIS: 1, // 1: cis / Z configuration
+  TRANS: -1, // -1: trans / E configuration
 } as const;
 
 /**
@@ -104,20 +104,20 @@ export const STEREO_TYPE = {
  * Atom block: fixed-width per-atom typed arrays
  */
 export interface PackedAtomBlock {
-  atomicNumber: Uint8Array;   // Element (1-118), length N
-  formalCharge: Int8Array;    // Integer charge, length N
-  isotope: Uint16Array;       // Isotope mass number (0 = natural), length N
-  atomFlags: Uint16Array;     // Bitfield (aromatic, chiral, etc), length N
+  atomicNumber: Uint8Array; // Element (1-118), length N
+  formalCharge: Int8Array; // Integer charge, length N
+  isotope: Uint16Array; // Isotope mass number (0 = natural), length N
+  atomFlags: Uint16Array; // Bitfield (aromatic, chiral, etc), length N
 }
 
 /**
  * Bond block: fixed-width per-bond typed arrays
  */
 export interface PackedBondBlock {
-  atomA: Uint32Array;         // First atom index, length M
-  atomB: Uint32Array;         // Second atom index, length M
-  order: Uint8Array;          // Bond order (1,2,3,4), length M
-  flags: Uint8Array;          // Bitfield (wedge, stereogenic), length M
+  atomA: Uint32Array; // First atom index, length M
+  atomB: Uint32Array; // Second atom index, length M
+  order: Uint8Array; // Bond order (1,2,3,4), length M
+  flags: Uint8Array; // Bitfield (wedge, stereogenic), length M
 }
 
 /**
@@ -125,19 +125,19 @@ export interface PackedBondBlock {
  * Enables O(1) neighbor lookup instead of O(M) scan
  */
 export interface PackedGraphBlock {
-  degreeOffset: Uint32Array;  // CSR degree offset, length N+1
-  bondTargets: Uint32Array;   // CSR bond targets, length 2M
-  bondAdj: Uint16Array;       // Bond indices parallel to bondTargets, length 2M
+  degreeOffset: Uint32Array; // CSR degree offset, length N+1
+  bondTargets: Uint32Array; // CSR bond targets, length 2M
+  bondAdj: Uint16Array; // Bond indices parallel to bondTargets, length 2M
 }
 
 /**
  * Stereochemistry block: atom and bond stereo information
  */
 export interface PackedStereoBlock {
-  atomType: Uint8Array;       // Stereo type (0=none, 1=tetrahedral), length N
-  atomParity: Int8Array;      // Atom parity (+1=CW, -1=CCW, 0=unknown), length N
-  bondType: Uint8Array;       // Bond stereo type (0=none, 1=cis-trans), length M
-  bondConfig: Int8Array;      // Bond config (+1=Z, -1=E, 0=unspecified), length M
+  atomType: Uint8Array; // Stereo type (0=none, 1=tetrahedral), length N
+  atomParity: Int8Array; // Atom parity (+1=CW, -1=CCW, 0=unknown), length N
+  bondType: Uint8Array; // Bond stereo type (0=none, 1=cis-trans), length M
+  bondConfig: Int8Array; // Bond config (+1=Z, -1=E, 0=unspecified), length M
 }
 
 /**
@@ -150,31 +150,31 @@ export interface PackedStereoBlock {
  * - Memory-mapped file I/O
  */
 export interface PackedMol {
-  buffer: ArrayBuffer;        // Single contiguous binary buffer
-  header: Uint32Array;        // Header overlay (8 fields, length 8)
-  atoms: PackedAtomBlock;     // Atom data overlays
-  bonds: PackedBondBlock;     // Bond data overlays
-  graph: PackedGraphBlock;    // CSR graph overlays
-  stereo: PackedStereoBlock;  // Stereo data overlays
+  buffer: ArrayBuffer; // Single contiguous binary buffer
+  header: Uint32Array; // Header overlay (8 fields, length 8)
+  atoms: PackedAtomBlock; // Atom data overlays
+  bonds: PackedBondBlock; // Bond data overlays
+  graph: PackedGraphBlock; // CSR graph overlays
+  stereo: PackedStereoBlock; // Stereo data overlays
 }
 
 /**
  * Metadata about encoding
  */
 export interface PackedMolEncodingInfo {
-  totalSize: number;           // Total buffer size in bytes
-  atomBlockSize: number;       // Size of atom block
-  bondBlockSize: number;       // Size of bond block
-  graphBlockSize: number;      // Size of graph block
-  stereoBlockSize: number;     // Size of stereo block
-  compressionRatio: number;    // Original size / packed size
+  totalSize: number; // Total buffer size in bytes
+  atomBlockSize: number; // Size of atom block
+  bondBlockSize: number; // Size of bond block
+  graphBlockSize: number; // Size of graph block
+  stereoBlockSize: number; // Size of stereo block
+  compressionRatio: number; // Original size / packed size
 }
 
 /**
  * Canonical ordering information for deterministic encoding
  */
 export interface CanonicalOrdering {
-  atomRanking: number[];       // Canonical rank for each atom (0-based)
-  oldToNewIndex: Map<number, number>;  // Map old atom ID to new index
-  newToOldIndex: number[];     // Array: newIndex -> oldAtomID
+  atomRanking: number[]; // Canonical rank for each atom (0-based)
+  oldToNewIndex: Map<number, number>; // Map old atom ID to new index
+  newToOldIndex: number[]; // Array: newIndex -> oldAtomID
 }

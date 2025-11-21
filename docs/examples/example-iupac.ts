@@ -177,9 +177,7 @@ console.log("\n5. IUPAC Engine Capabilities");
 console.log("-----------------------------\n");
 
 console.log("openchem IUPAC engine accuracy (realistic dataset):");
-console.log(
-  "✓ Overall: 100% (149/149 molecules, 3 complex alkaloids skipped)",
-);
+console.log("✓ Overall: 100% (149/149 molecules, 3 complex alkaloids skipped)");
 console.log("✓ Simple chains: 100%");
 console.log("✓ Branched alkanes: 100%");
 console.log("✓ Functional groups: 100%");

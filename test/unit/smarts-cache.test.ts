@@ -127,13 +127,7 @@ describe("SMARTS Pattern Cache", () => {
   it("should handle concurrent cache operations", () => {
     clearSMARTSCache();
 
-    const patterns = [
-      "c1ccccc1",
-      "[C,N]",
-      "[#6]=[#6]",
-      "[O;H]",
-      "[C;X4]",
-    ];
+    const patterns = ["c1ccccc1", "[C,N]", "[#6]=[#6]", "[O;H]", "[C;X4]"];
 
     // Parse patterns multiple times
     for (let i = 0; i < 5; i++) {
@@ -164,7 +158,8 @@ describe("SMARTS Pattern Cache", () => {
       if (!mol) continue;
 
       const result = matchSMARTS(pattern, mol) as MatchResult;
-      const hasMatches = result.success && result.matches && result.matches.length > 0;
+      const hasMatches =
+        result.success && result.matches && result.matches.length > 0;
 
       if (testCase.shouldMatch) {
         expect(hasMatches).toBe(true);

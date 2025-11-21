@@ -89,8 +89,14 @@ describe("PackedMol Realistic Dataset", () => {
         }
 
         // Total charges should match
-        const origTotalCharge = original.atoms.reduce((sum, a) => sum + (a.charge ?? 0), 0);
-        const decodedTotalCharge = decoded.atoms.reduce((sum, a) => sum + (a.charge ?? 0), 0);
+        const origTotalCharge = original.atoms.reduce(
+          (sum, a) => sum + (a.charge ?? 0),
+          0,
+        );
+        const decodedTotalCharge = decoded.atoms.reduce(
+          (sum, a) => sum + (a.charge ?? 0),
+          0,
+        );
         expect(decodedTotalCharge).toBe(origTotalCharge);
 
         // Aromatic atom count should match
@@ -253,7 +259,9 @@ describe("PackedMol Realistic Dataset", () => {
       const packed = encodePackedMol(mol);
       const decoded = decodePackedMol(packed);
 
-      const isotopicCarbon = decoded.atoms.find((a) => a.isotope && a.isotope > 0);
+      const isotopicCarbon = decoded.atoms.find(
+        (a) => a.isotope && a.isotope > 0,
+      );
       expect(isotopicCarbon).toBeDefined();
       expect(isotopicCarbon?.isotope).toBe(13);
     });

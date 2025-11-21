@@ -226,7 +226,10 @@ function decodeBondStereoFromBlock(
   if (flags & BOND_FLAG.DIRECTION_DOWN) return StereoType.DOWN;
 
   // For future use: CIS_TRANS stereo configurations
-  if (stereoType === BOND_STEREO_TYPE.CIS_TRANS && stereoConfig !== BOND_STEREO_CONFIG.UNSPECIFIED) {
+  if (
+    stereoType === BOND_STEREO_TYPE.CIS_TRANS &&
+    stereoConfig !== BOND_STEREO_CONFIG.UNSPECIFIED
+  ) {
     // Could map CIS -> EITHER, TRANS -> EITHER for now
     // In full implementation, this would track E/Z stereochemistry
   }
@@ -237,7 +240,10 @@ function decodeBondStereoFromBlock(
 /**
  * Decode atom chirality from stereo block
  */
-function decodeAtomChirality(stereoType: number, stereoParity: number): string | null {
+function decodeAtomChirality(
+  stereoType: number,
+  stereoParity: number,
+): string | null {
   if (stereoType === ATOM_STEREO_TYPE.NONE) {
     return null;
   }
@@ -257,13 +263,4 @@ function decodeAtomChirality(stereoType: number, stereoParity: number): string |
   }
 
   return null;
-}
-
-/**
- * Decode bond stereo from flags
- */
-function decodeBondStereo(flags: number): StereoType {
-  if (flags & BOND_FLAG.DIRECTION_UP) return StereoType.UP;
-  if (flags & BOND_FLAG.DIRECTION_DOWN) return StereoType.DOWN;
-  return StereoType.NONE;
 }

@@ -13,6 +13,7 @@ describe("LogP Performance Profile", () => {
   it("profile LogP computation", () => {
     for (const { smiles, name } of testMolecules) {
       const mol = parseSMILES(smiles).molecules[0];
+      if (!mol) return;
 
       // First call (with hydrogen addition and SMARTS matching)
       const start1 = performance.now();
@@ -25,7 +26,9 @@ describe("LogP Performance Profile", () => {
       const time2 = performance.now() - start2;
 
       if (process.env.VERBOSE) {
-        console.log(`${name}: first=${time1.toFixed(3)}ms, cached=${time2.toFixed(3)}ms, speedup=${(time1/time2).toFixed(0)}x`);
+        console.log(
+          `${name}: first=${time1.toFixed(3)}ms, cached=${time2.toFixed(3)}ms, speedup=${(time1 / time2).toFixed(0)}x`,
+        );
       }
     }
   });
