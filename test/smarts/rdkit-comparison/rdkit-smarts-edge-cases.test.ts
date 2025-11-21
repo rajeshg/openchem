@@ -138,7 +138,7 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
         openchem: 1,
         rdkit: 4,
         reason:
-          "RDKit uses extended ring set instead of SSSR. See SMARTS_RING_MEMBERSHIP_ANALYSIS.md",
+          "RDKit uses extended ring set instead of SSSR. See docs/smarts-matching.md",
       },
     );
   });

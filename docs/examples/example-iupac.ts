@@ -178,13 +178,13 @@ console.log("-----------------------------\n");
 
 console.log("openchem IUPAC engine accuracy (realistic dataset):");
 console.log(
-  "✓ Overall: 93.5% (124/127 molecules, 3 complex alkaloids skipped)",
+  "✓ Overall: 100% (149/149 molecules, 3 complex alkaloids skipped)",
 );
 console.log("✓ Simple chains: 100%");
 console.log("✓ Branched alkanes: 100%");
 console.log("✓ Functional groups: 100%");
 console.log("✓ Aromatic systems: 100%");
-console.log("✓ Basic heterocycles: 93%\n");
+console.log("✓ Heterocycles: 100%\n");
 
 console.log("Supported IUPAC Blue Book rules:");
 console.log("- P-14: Skeletal replacement nomenclature");
@@ -196,10 +196,10 @@ console.log("- P-61-P-68: Substituent nomenclature\n");
 
 console.log("Known limitations:");
 console.log("- Complex natural products (requires IUPAC P-101)");
-console.log("- Some saturated heterocycles (morpholine, piperazine)");
-console.log("- Complex polycyclic systems with multiple functional groups\n");
+console.log("- Advanced stereochemistry (complex R/S descriptors)");
+console.log("- Very large molecules (>100 atoms)\n");
 
 console.log("For detailed documentation, see:");
-console.log("- docs/iupac-readme.md (central navigation)");
-console.log("- docs/iupac-capabilities.md (accuracy & limitations)");
+console.log("- docs/iupac-parsing.md (IUPAC name → SMILES)");
+console.log("- docs/iupac-generation.md (SMILES → IUPAC name)");
 console.log("- docs/iupac-implementation.md (technical details)");

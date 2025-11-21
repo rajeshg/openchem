@@ -139,4 +139,4 @@ console.log("- openchem: Strict Hückel (mathematically rigorous)");
 console.log("- RDKit: Extended aromaticity (empirical, chemical intuition)");
 console.log("- Both approaches are valid for different use cases\n");
 
-console.log("See docs/SMARTS_AROMATICITY_ANALYSIS.md for detailed comparison");
+console.log("See docs/smarts-matching.md for detailed comparison");

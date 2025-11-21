@@ -3,7 +3,7 @@
 This guide provides technical architecture and implementation details for contributors and maintainers of the openchem IUPAC naming engine.
 
 **Audience:** Contributors, maintainers, developers extending the engine  
-**Related docs:** [Rules Reference](./iupac-rules-reference.md) | [Capabilities](./iupac-capabilities.md) | [Documentation Hub](./iupac-readme.md)
+**Related docs:** [Rules Reference](./iupac-rules-reference.md) | [SMILES → IUPAC Generation](./iupac-generation.md) | [IUPAC → SMILES Parsing](./iupac-parsing.md)
 
 ---
 
@@ -752,7 +752,8 @@ interface IUPACContext {
 - [OPSIN GitHub](https://github.com/dan2097/opsin)
 - [RDKit Documentation](https://www.rdkit.org/docs/)
 - [Rules Reference](./iupac-rules-reference.md) - Detailed rule specifications
-- [Capabilities & Roadmap](./iupac-capabilities.md) - Current status and future plans
+- [SMILES → IUPAC Generation](./iupac-generation.md) - User guide for name generation
+- [IUPAC → SMILES Parsing](./iupac-parsing.md) - User guide for name parsing
 
 ---
 

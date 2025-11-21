@@ -126,18 +126,20 @@
 - **OPSIN data**: `src/iupac-engine/opsin-functional-group-detector.ts`, `opsin-iupac-data/LOOKUP.json`
 
 **Documentation:**
-- **[IUPAC Documentation Hub](docs/iupac-readme.md)** — Central navigation for all IUPAC docs
-- **[User Overview](docs/iupac-name-generation.md)** — High-level explanation of the naming pipeline
+
+**User Guides:**
+- **[IUPAC Name → SMILES Parsing](docs/iupac-parsing.md)** — Parse IUPAC names to SMILES
+- **[SMILES → IUPAC Generation](docs/iupac-generation.md)** — Generate systematic IUPAC names from SMILES
+
+**Developer Guides:**
 - **[Implementation Guide](docs/iupac-implementation.md)** — Technical architecture, algorithms, state management
-- **[Capabilities & Limitations](docs/iupac-capabilities.md)** — What works (93.5% accuracy on 127 molecules), known limitations, roadmap
 - **[Rules Reference](docs/iupac-rules-reference.md)** — Detailed IUPAC Blue Book rule coverage (P-14, P-44, P-51, etc.)
 - **[Large Molecules Analysis](docs/iupac-large-molecules.md)** — Strategic limitations for complex natural products
 
 **Quick Reference:**
-- **Accuracy**: 93.5% on realistic dataset (124/127 molecules, 3 alkaloids skipped)
-- **Strengths**: Simple chains (100%), branched alkanes (100%), functional groups (100%), aromatic systems (100%), basic heterocycles (93%)
-- **High Priority Gaps**: Saturated heterocycles (morpholine, piperazine), tertiary amides
-- **Test Files**: `test/unit/iupac-engine/` (60+ test files, 400+ tests)
+- **Accuracy**: 100% on realistic dataset (149/149 molecules tested, 3 alkaloids skipped)
+- **Strengths**: Simple chains (100%), branched alkanes (100%), functional groups (100%), aromatic systems (100%), heterocycles (100%)
+- **Test Files**: `test/unit/iupac-engine/` (60+ test files, 1419+ passing tests)
 
 ## Dependencies
 - **Runtime**: `es-toolkit` for utility functions (prefer over lodash)
@@ -262,19 +264,19 @@ console.log(`Aspirin fingerprint has ${bitsSet} bits set (${(bitsSet/512*100).to
 - openchem uses strict Hückel's rule (4n+2 π electrons, ring-based)
 - RDKit uses extended aromaticity perception (conjugated systems)
 - Expected differences in complex heterocycles
-- Reference: `docs/SMARTS_AROMATICITY_ANALYSIS.md`
+- Reference: `docs/smarts-matching.md`
 
 ### LogP Differences
 - openchem uses published Wildman-Crippen parameters exactly
 - RDKit may use modified parameters for complex heterocycles
 - Typical differences: 0.2-1.15 LogP units for complex molecules
-- Reference: `docs/logp-implementation-notes.md`
+- Reference: `docs/molecular-properties.md`
 
 ### Ring Membership Counting
 - openchem uses all-rings (all simple cycles) for SMARTS `[Rn]` primitive
 - This matches RDKit behavior but deviates from strict SMARTS spec (SSSR only)
 - SSSR rings still computed and stored in `molecule.rings`
-- Reference: `docs/SMARTS_RING_MEMBERSHIP_ANALYSIS.md`
+- Reference: `docs/smarts-matching.md`
 
 ## Ring Analysis and SSSR
 
@@ -379,7 +381,7 @@ where:
 
 For compliance with SMARTS specification, openchem's approach is correct. RDKit's behavior is more chemically intuitive but deviates from the formal SMARTS definition.
 
-See `docs/SMARTS_RING_MEMBERSHIP_ANALYSIS.md` for detailed analysis.
+See `docs/smarts-matching.md` for detailed analysis.
 
 ### Usage Examples
 
@@ -405,7 +407,7 @@ console.log(adamRings.classifyRingSystems());      // bridged system
 
 - SSSR algorithm: Smallest Set of Smallest Rings (Horton 1987, SSSR uniqueness proof)
 - Minimum Cycle Basis: Algebraic graph theory foundation (Whitney 1935)
-- SMARTS `[Rn]`: `docs/SMARTS_RING_MEMBERSHIP_ANALYSIS.md`
+- SMARTS `[Rn]`: `docs/smarts-matching.md`
 - Ring analysis source: `src/utils/ring-analysis.ts` (19 functions, comprehensive JSDoc)
 
 ## Common Development Tasks

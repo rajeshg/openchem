@@ -83,4 +83,4 @@ const result = parseIUPACName("2-methylpropan-2-ol");
 
 ## Known Limitations
 
-See `docs/iupac-capabilities.md` for detailed capabilities and roadmap.
+See `docs/iupac-parsing.md` for detailed capabilities and usage guide.
