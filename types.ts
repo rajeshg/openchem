@@ -58,12 +58,17 @@ export interface Bond {
  * Molecule representation.
  * After parsing, all molecules are enriched with ring analysis.
  * Molecules are immutable post-parse - create new molecules instead of mutating.
+ *
+ * PackedMol caching: molecules automatically cache their binary representation
+ * on first encode, enabling O(1) access for subsequent operations.
  */
 export interface Molecule {
   readonly atoms: readonly Atom[];
   readonly bonds: readonly Bond[];
   readonly rings?: readonly (readonly number[])[];
   readonly ringInfo?: Readonly<RingInfo>;
+  /** @internal PackedMol cache - do not access directly */
+  readonly _packedMol?: unknown;
 }
 
 export interface RingInfo {
