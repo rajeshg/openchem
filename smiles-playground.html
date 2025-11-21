@@ -119,17 +119,24 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Provide a tiny browser shim for `process` so the bundled ESM can run
+    // (some builds reference `process.env` at module-eval time).
+    if (typeof globalThis.process === 'undefined') {
+      globalThis.process = { env: {} };
+    }
     // Lightweight fallback implementation derived from the project's utilities.
     (function(){
       const monoMass = {H:1.007825032, C:12.0, N:14.003074, O:15.994915, S:31.972071, P:30.973762, F:18.998403, Cl:34.968853, Br:78.918337, I:126.90447};
 
-      function tryLoadLibrary() {
-        // Try to import compiled project exports (if user built a browser bundle as index.js at project root)
-        if (window.openchem) return Promise.resolve(window.openchem);
-        const paths = ['./index.js','./dist/index.js','/index.js'];
-        let lastErr = null;
-        return paths.reduce((p,path)=>p.catch(()=>import(path)).catch(e=>{ lastErr=e; return Promise.reject(e); }), Promise.reject()).catch(()=>{ return Promise.reject(lastErr); });
+      async function tryLoadLibrary() {
+        // Try loading the ESM bundle via dynamic import
+        try {
+          const lib = await import('./dist/index.js?v=' + Date.now());
+          return lib;
+        } catch (err) {
+          throw new Error('Failed to load dist/index.js: ' + err.message);
+        }
       }
 
       function parseSMILESFallback(smiles) {
@@ -262,7 +269,16 @@
 
       let lib = null;
       diag.textContent = 'Library auto-detection: attempting dynamic import of common bundle locations...';
-       tryLoadLibrary().then(mod=>{ lib = mod; diag.textContent = '✅ Full library loaded — SVG rendering, InChI, and IUPAC names available.'}).catch(err=>{ diag.textContent = '⚠️ Fallback mode — Basic parsing and descriptors only. Run `bun run serve` for full functionality (SVG, InChI, IUPAC).'; lib = null });
+       tryLoadLibrary().then(mod=>{ 
+          lib = mod; 
+          diag.textContent = '✅ Full library loaded — SVG rendering, InChI, and IUPAC names available.';
+          // Re-run the current SMILES calculation so the full library output (SVG, InChI, IUPAC) appears on first load
+          try { if (smilesInput && smilesInput.value) computeFromSmiles(smilesInput.value); } catch(e) { console.warn('Recompute after lib load failed', e); }
+        }).catch(err=>{ 
+          diag.textContent = '⚠️ Fallback mode — ' + err.message; 
+          lib = null; 
+          try{ fetch('/__import_error',{method:'POST',headers:{'Content-Type':'text/plain'}, body: (err.stack||err.message) + '\nUA: '+(navigator?.userAgent||'') }).catch(()=>{}); }catch(e){}
+        });
 
       function renderChecks(checks){
         function renderCheck(name, check, props) {

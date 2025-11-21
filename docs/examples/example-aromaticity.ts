@@ -1,4 +1,9 @@
-import { parseSMILES, generateSMILES, getAromaticRingCount, getRingCount } from "index";
+import {
+  parseSMILES,
+  generateSMILES,
+  getAromaticRingCount,
+  getRingCount,
+} from "index";
 
 console.log("openchem Aromaticity Perception Examples");
 console.log("========================================\n");
@@ -69,7 +74,9 @@ for (const example of huckelExamples) {
     const aromaticRings = getAromaticRingCount(molecule);
 
     console.log(`✓ ${example.name}`);
-    console.log(`  Formula: 4n+2 = 4(${example.n})+2 = ${example.piElectrons} π electrons`);
+    console.log(
+      `  Formula: 4n+2 = 4(${example.n})+2 = ${example.piElectrons} π electrons`,
+    );
     console.log(`  Aromatic rings detected: ${aromaticRings}`);
     console.log(`  SMILES: ${example.smiles}\n`);
   }
@@ -112,7 +119,9 @@ for (const example of nOxideExamples) {
     console.log(`  SMILES: ${example.smiles}`);
     console.log(`  π electron count: ${example.piElectrons}`);
     console.log(`  Result: ${aromaticStatus}`);
-    console.log(`  Expected: ${example.aromatic ? "AROMATIC" : "NOT AROMATIC"}\n`);
+    console.log(
+      `  Expected: ${example.aromatic ? "AROMATIC" : "NOT AROMATIC"}\n`,
+    );
   }
 }
 

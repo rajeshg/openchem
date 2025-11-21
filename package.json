@@ -47,8 +47,8 @@
     "test:full": "RUN_RDKIT_BULK=1 bun test",
     "test:verbose": "VERBOSE=1 bun test",
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
-    "build": "node scripts/build.mjs",
-    "serve": "bun run build && bun run serve-playground.js",
+    "build": "bun build index.ts --outdir ./dist --format esm",
+    "serve": "bun run build && bun ./serve-playground.js",
     "prepublishOnly": "bun run build && bun run test",
     "lint": "npx oxlint@latest .",
     "fmt": "npx oxfmt@latest ."

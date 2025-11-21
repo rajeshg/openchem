@@ -261,7 +261,9 @@ if (parseResult.molecules.length > 0) {
     console.log("✓ Generated IUPAC name for aspirin");
     console.log(`  Name: ${iupacResult.name}`);
     if (iupacResult.confidence !== undefined) {
-      console.log(`  Confidence: ${(iupacResult.confidence * 100).toFixed(0)}%`);
+      console.log(
+        `  Confidence: ${(iupacResult.confidence * 100).toFixed(0)}%`,
+      );
     }
   }
 }

@@ -189,7 +189,7 @@ function countPiElectronsRDKit(
       const otherAtom = atomMap.get(otherId);
       // N-O (N-oxide) and N-N can still donate lone pair, so they don't break aromaticity
       // Only N-C (alkyl) substituents prevent lone pair donation
-      return otherAtom && ['C'].includes(otherAtom.symbol);
+      return otherAtom && ["C"].includes(otherAtom.symbol);
     });
   };
 

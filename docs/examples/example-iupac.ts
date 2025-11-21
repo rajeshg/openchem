@@ -138,7 +138,9 @@ for (const iupacName of roundtripExamples) {
     nameResult.name.toLowerCase() === iupacName.toLowerCase() ||
     nameResult.name.toLowerCase().replace(/\s/g, "") ===
       iupacName.toLowerCase().replace(/\s/g, "");
-  console.log(`  ${match ? "✓" : "~"} Round-trip ${match ? "successful" : "differs"}`);
+  console.log(
+    `  ${match ? "✓" : "~"} Round-trip ${match ? "successful" : "differs"}`,
+  );
 }
 
 // Part 4: Complex Molecules
@@ -175,7 +177,9 @@ console.log("\n5. IUPAC Engine Capabilities");
 console.log("-----------------------------\n");
 
 console.log("openchem IUPAC engine accuracy (realistic dataset):");
-console.log("✓ Overall: 93.5% (124/127 molecules, 3 complex alkaloids skipped)");
+console.log(
+  "✓ Overall: 93.5% (124/127 molecules, 3 complex alkaloids skipped)",
+);
 console.log("✓ Simple chains: 100%");
 console.log("✓ Branched alkanes: 100%");
 console.log("✓ Functional groups: 100%");
