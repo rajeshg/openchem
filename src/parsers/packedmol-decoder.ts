@@ -8,7 +8,15 @@
 import type { Atom, Bond, Molecule } from "types";
 import { BondType, StereoType } from "types";
 import type { PackedMol } from "src/types/packedmol-types";
-import { ATOM_FLAG, BOND_FLAG, BOND_ORDER } from "src/types/packedmol-types";
+import {
+  ATOM_FLAG,
+  BOND_FLAG,
+  BOND_ORDER,
+  ATOM_STEREO_TYPE,
+  ATOM_STEREO_CONFIG,
+  BOND_STEREO_TYPE,
+  BOND_STEREO_CONFIG,
+} from "src/types/packedmol-types";
 
 /**
  * Decode a PackedMol back to a Molecule
@@ -27,17 +35,18 @@ export function decodePackedMol(packed: PackedMol): Molecule {
     const charge = packed.atoms.formalCharge[i] as number;
     const isotope = packed.atoms.isotope[i] as number;
     const flags = packed.atoms.atomFlags[i] as number;
+    const stereoType = packed.stereo.atomType[i] as number;
+    const stereoParity = packed.stereo.atomParity[i] as number;
 
     // Get symbol from atomic number
     const symbol = getElementSymbol(atomicNum);
 
     // Decode flags
     const aromatic = !!(flags & ATOM_FLAG.AROMATIC);
-    const chiral =
-      flags & ATOM_FLAG.CHIRAL
-        ? "chiral" // placeholder
-        : "none";
     const isDummy = !!(flags & ATOM_FLAG.DUMMY);
+
+    // Decode chirality from stereo block
+    const chiral = decodeAtomChirality(stereoType, stereoParity);
 
     const atom: Atom = {
       id: i,
@@ -47,8 +56,8 @@ export function decodePackedMol(packed: PackedMol): Molecule {
       hydrogens: 0, // would need to compute
       isotope: isotope > 0 ? isotope : null,
       aromatic,
-      chiral: chiral === "none" ? null : chiral,
-      isBracket: isotope > 0 || charge !== 0 || aromatic,
+      chiral,
+      isBracket: isotope > 0 || charge !== 0 || aromatic || chiral !== null,
       atomClass: 0,
     };
 
@@ -61,9 +70,11 @@ export function decodePackedMol(packed: PackedMol): Molecule {
     const b = packed.bonds.atomB[i] as number;
     const order = packed.bonds.order[i] as number;
     const flags = packed.bonds.flags[i] as number;
+    const stereoType = packed.stereo.bondType[i] as number;
+    const stereoConfig = packed.stereo.bondConfig[i] as number;
 
     const type = codeToBondType(order);
-    const stereo = decodeBondStereo(flags);
+    const stereo = decodeBondStereoFromBlock(flags, stereoType, stereoConfig);
 
     const bond: Bond = {
       atom1: a,
@@ -200,6 +211,52 @@ function codeToBondType(code: number): BondType {
     default:
       return BondType.SINGLE;
   }
+}
+
+/**
+ * Decode bond stereo from flags (wedge/hash) and stereo block
+ */
+function decodeBondStereoFromBlock(
+  flags: number,
+  stereoType: number,
+  stereoConfig: number,
+): StereoType {
+  // First check explicit wedge/hash flags
+  if (flags & BOND_FLAG.DIRECTION_UP) return StereoType.UP;
+  if (flags & BOND_FLAG.DIRECTION_DOWN) return StereoType.DOWN;
+
+  // For future use: CIS_TRANS stereo configurations
+  if (stereoType === BOND_STEREO_TYPE.CIS_TRANS && stereoConfig !== BOND_STEREO_CONFIG.UNSPECIFIED) {
+    // Could map CIS -> EITHER, TRANS -> EITHER for now
+    // In full implementation, this would track E/Z stereochemistry
+  }
+
+  return StereoType.NONE;
+}
+
+/**
+ * Decode atom chirality from stereo block
+ */
+function decodeAtomChirality(stereoType: number, stereoParity: number): string | null {
+  if (stereoType === ATOM_STEREO_TYPE.NONE) {
+    return null;
+  }
+
+  if (stereoType === ATOM_STEREO_TYPE.TETRAHEDRAL) {
+    if (stereoParity === ATOM_STEREO_CONFIG.AT) return "@";
+    if (stereoParity === ATOM_STEREO_CONFIG.ATAT) return "@@";
+  } else if (stereoType === ATOM_STEREO_TYPE.ALLENIC) {
+    // Allenic chirality - simplified: just return @AL1
+    return stereoParity === ATOM_STEREO_CONFIG.AT ? "@AL1" : "@AL2";
+  } else if (stereoType === ATOM_STEREO_TYPE.SQUARE_PLANAR) {
+    return stereoParity === ATOM_STEREO_CONFIG.AT ? "@SP1" : "@SP3";
+  } else if (stereoType === ATOM_STEREO_TYPE.TRIGONAL_BIPYRAMIDAL) {
+    return stereoParity === ATOM_STEREO_CONFIG.AT ? "@TB1" : "@TB20";
+  } else if (stereoType === ATOM_STEREO_TYPE.OCTAHEDRAL) {
+    return stereoParity === ATOM_STEREO_CONFIG.AT ? "@OH1" : "@OH30";
+  }
+
+  return null;
 }
 
 /**

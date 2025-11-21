@@ -54,6 +54,44 @@ export const BOND_ORDER = {
 } as const;
 
 /**
+ * Stereo type values for atoms (SMILES chirality notation)
+ */
+export const ATOM_STEREO_TYPE = {
+  NONE: 0,              // No stereochemistry
+  TETRAHEDRAL: 1,       // @ or @@ (tetrahedral chirality)
+  ALLENIC: 2,           // @AL1, @AL2 (allenic chirality)
+  SQUARE_PLANAR: 3,     // @SP1-@SP3 (square planar)
+  TRIGONAL_BIPYRAMIDAL: 4, // @TB1-@TB20 (trigonal bipyramidal)
+  OCTAHEDRAL: 5,        // @OH1-@OH30 (octahedral)
+} as const;
+
+/**
+ * Stereo configuration for atoms (parity)
+ */
+export const ATOM_STEREO_CONFIG = {
+  UNKNOWN: 0,    // 0: unknown/unspecified
+  AT: 1,         // 1: @ (counterclockwise, S-like)
+  ATAT: -1,      // -1: @@ (clockwise, R-like)
+} as const;
+
+/**
+ * Stereo type values for bonds
+ */
+export const BOND_STEREO_TYPE = {
+  NONE: 0,       // No stereochemistry
+  CIS_TRANS: 1,  // E/Z stereochemistry on double bonds
+} as const;
+
+/**
+ * Bond stereo configuration (E/Z or geometric)
+ */
+export const BOND_STEREO_CONFIG = {
+  UNSPECIFIED: 0,  // 0: unspecified
+  CIS: 1,          // 1: cis / Z configuration
+  TRANS: -1,       // -1: trans / E configuration
+} as const;
+
+/**
  * Stereo type values
  */
 export const STEREO_TYPE = {

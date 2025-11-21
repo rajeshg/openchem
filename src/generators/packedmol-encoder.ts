@@ -11,7 +11,10 @@ import {
   ATOM_FLAG,
   BOND_FLAG,
   BOND_ORDER,
-  STEREO_TYPE,
+  ATOM_STEREO_TYPE,
+  ATOM_STEREO_CONFIG,
+  BOND_STEREO_TYPE,
+  BOND_STEREO_CONFIG,
 } from "src/types/packedmol-types";
 import { canonicalizeMolecule } from "src/utils/packedmol-canonicalizer";
 import { buildCSRGraph } from "src/utils/csr-graph-builder";
@@ -217,8 +220,47 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   const stereoBondType = new Uint8Array(buffer, offsetStereoBondType, M);
   const stereoBondConfig = new Int8Array(buffer, offsetStereoBondConfig, M);
 
-  // Write stereo (all zero for now - basic support)
-  // TODO: Implement full stereo conversion in Phase 2
+  // Write atom stereochemistry
+  for (let i = 0; i < N; i++) {
+    const atom = canonical.atoms[i];
+    if (!atom) continue;
+
+    // Encode atom stereo type
+    stereoAtomType[i] = encodeAtomStereoType(atom.chiral);
+
+    // Encode atom parity (@ = CCW = -1, @@ = CW = +1)
+    if (atom.chiral === "@") {
+      stereoAtomParity[i] = ATOM_STEREO_CONFIG.AT;
+    } else if (atom.chiral === "@@") {
+      stereoAtomParity[i] = ATOM_STEREO_CONFIG.ATAT;
+    } else {
+      stereoAtomParity[i] = ATOM_STEREO_CONFIG.UNKNOWN;
+    }
+  }
+
+  // Write bond stereochemistry
+  for (let i = 0; i < M; i++) {
+    const bond = canonical.bonds[i];
+    if (!bond) continue;
+
+    // Encode bond stereo type (only for double bonds with stereo)
+    if (bond.type === "double" && bond.stereo && bond.stereo !== "none") {
+      stereoBondType[i] = BOND_STEREO_TYPE.CIS_TRANS;
+
+      // Encode stereo configuration
+      // up/down wedges indicate spatial arrangement
+      if (bond.stereo === "up") {
+        stereoBondConfig[i] = BOND_STEREO_CONFIG.TRANS; // Convention: wedge = E/trans
+      } else if (bond.stereo === "down") {
+        stereoBondConfig[i] = BOND_STEREO_CONFIG.CIS; // Convention: hash = Z/cis
+      } else {
+        stereoBondConfig[i] = BOND_STEREO_CONFIG.UNSPECIFIED;
+      }
+    } else {
+      stereoBondType[i] = BOND_STEREO_TYPE.NONE;
+      stereoBondConfig[i] = BOND_STEREO_CONFIG.UNSPECIFIED;
+    }
+  }
 
   const packed: PackedMol = {
     buffer,
@@ -298,4 +340,25 @@ export function getEncodingInfo(packed: PackedMol): PackedMolEncodingInfo {
     stereoBlockSize,
     compressionRatio: NaN, // Would need original size
   };
+}
+
+/**
+ * Encode atom stereochemistry (chiral notation) to stereo type
+ */
+function encodeAtomStereoType(chiral: string | null): number {
+  if (!chiral) return ATOM_STEREO_TYPE.NONE;
+
+  if (chiral === "@" || chiral === "@@") {
+    return ATOM_STEREO_TYPE.TETRAHEDRAL;
+  } else if (chiral.startsWith("@AL")) {
+    return ATOM_STEREO_TYPE.ALLENIC;
+  } else if (chiral.startsWith("@SP")) {
+    return ATOM_STEREO_TYPE.SQUARE_PLANAR;
+  } else if (chiral.startsWith("@TB")) {
+    return ATOM_STEREO_TYPE.TRIGONAL_BIPYRAMIDAL;
+  } else if (chiral.startsWith("@OH")) {
+    return ATOM_STEREO_TYPE.OCTAHEDRAL;
+  }
+
+  return ATOM_STEREO_TYPE.NONE;
 }

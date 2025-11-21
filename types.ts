@@ -1,6 +1,7 @@
 // Core types for SMILES parsing
 
 import type { StructuralSubstituent } from "src/iupac-engine/types";
+import type { PackedMol } from "src/types/packedmol-types";
 
 export enum BondType {
   SINGLE = "single",
@@ -67,8 +68,8 @@ export interface Molecule {
   readonly bonds: readonly Bond[];
   readonly rings?: readonly (readonly number[])[];
   readonly ringInfo?: Readonly<RingInfo>;
-  /** @internal PackedMol cache - do not access directly */
-  readonly _packedMol?: unknown;
+  /** @internal PackedMol cache - automatically populated by encoding operations */
+  readonly _packedMol?: PackedMol;
 }
 
 export interface RingInfo {
