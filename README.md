@@ -157,7 +157,7 @@ For maintainers: update and run the test suite with `bun test`. Use `RUN_RDKIT_B
 - Isotopes, explicit hydrogens, charges, atom class support, and multi-digit ring closures
 - SMARTS parsing and pattern matching
 - Morgan fingerprints and Tanimoto similarity calculations
-- 2D SVG rendering with v2 coordinate generator (deterministic, 5× faster, zero overlaps)
+- 2D SVG rendering with automatic coordinate generation (deterministic, fast, zero overlaps)
 - Molecular properties and drug-likeness metrics (TPSA, LogP, Lipinski/Veber checks)
 - Immutable molecule objects with enrichment for fast property queries
 
@@ -396,7 +396,7 @@ console.log(output); // "CCO.O"
 
 ### SVG Rendering
 
-Render molecules as 2D SVG structures with automatic coordinate generation. openchem v2 coordinate generator is the default, providing deterministic layouts, 5× faster performance, and excellent handling of rings, branches, and terminal atoms.
+Render molecules as 2D SVG structures with automatic coordinate generation. openchem provides deterministic layouts, fast performance, and excellent handling of rings, branches, and terminal atoms.
 
 #### Basic SVG Rendering
 
@@ -471,7 +471,6 @@ const options: SVGRendererOptions = {
   showStereoBonds: true,
   
   // Layout & coordinate generation
-  useV2Coordinates: true, // Use v2 coordinate generator (default: true, 5× faster)
   kekulize: true, // Convert aromatic to alternating single/double bonds (default: true)
   moleculeSpacing: 60 // Spacing between molecules in grid layouts
 };
@@ -504,11 +503,11 @@ const result = renderSVG(mol, {
 console.log(result.svg);
 ```
 
-#### Coordinate Generation V2 (Default)
+#### Coordinate Generation Features
 
-openchem v2 coordinate generator provides:
+openchem's coordinate generator provides:
 - **Deterministic layouts** — Same molecule always produces same coordinates
-- **5× faster** — Average 5.4× speedup over v1 (up to 11× for polycyclic aromatics)
+- **Fast performance** — Optimized for speed and quality
 - **Perfect terminal atom placement** — OH, NH₂, and other terminal groups extend radially
 - **Ring system detection** — Automatically detects and regularizes 5/6-membered rings, fused rings, spiro, and bridged systems
 - **Zero atom overlaps** — Intelligent substituent placement prevents collisions
@@ -522,21 +521,10 @@ const naphthalene = parseSMILES('c1ccc2ccccc2c1');
 const result = renderSVG(naphthalene.molecules[0], {
   width: 300,
   height: 300,
-  bondLength: 35,
-  useV2Coordinates: true // Default, explicitly set for clarity
+  bondLength: 35
 });
 
 console.log(result.svg);
-```
-
-**V2 Performance Benchmarks:**
-- Benzene: 1.07ms (v1: 10.17ms, **9.5× speedup**)
-- Anthracene: 0.59ms (v1: 6.46ms, **11.0× speedup**)
-- Caffeine: 1.06ms (v1: 2.31ms, **2.2× speedup**)
-
-To use legacy v1 generator:
-```typescript
-const result = renderSVG(molecule, { useV2Coordinates: false });
 ```
 
 #### Error Handling

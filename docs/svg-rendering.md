@@ -37,28 +37,41 @@ const svg = renderSVG(molecule);
 ### With Options
 
 ```typescript
-import { renderSVG } from 'index';
+import { parseSMILES, renderSVG } from 'index';
 
-const svg = renderSVG(molecule, {
+const molecule = parseSMILES('c1ccccc1').molecules[0];
+
+const svgResult = renderSVG(molecule, {
   width: 400,
   height: 300,
   bondLength: 50,
-  showAtomLabels: true,
   colorScheme: 'default', // or 'monochrome'
   fontSize: 14,
   strokeWidth: 1.5,
 });
+
+console.log(svgResult.svg);     // SVG markup
+console.log(svgResult.width);   // 400
+console.log(svgResult.height);  // 300
 ```
 
 ### Usage in Web Applications
 
 ```typescript
-// React/JSX
-<div dangerouslySetInnerHTML={{ __html: svg }} />
+import { parseSMILES, renderSVG } from 'openchem';
 
-// Save to file
+const molecule = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
+const result = renderSVG(molecule);
+
+// React/JSX
+<div dangerouslySetInnerHTML={{ __html: result.svg }} />
+
+// Vanilla JS
+document.getElementById('molecule').innerHTML = result.svg;
+
+// Save to file (Node.js)
 import fs from 'fs';
-fs.writeFileSync('molecule.svg', svg);
+fs.writeFileSync('aspirin.svg', result.svg);
 ```
 
 ---
@@ -75,106 +88,145 @@ fs.writeFileSync('molecule.svg', svg);
 
 **Options:**
 ```typescript
-interface SVGRenderOptions {
+interface SVGRendererOptions {
   width?: number;              // SVG width (default: 400)
   height?: number;             // SVG height (default: 300)
   bondLength?: number;         // Bond length in pixels (default: 40)
-  showAtomLabels?: boolean;    // Show all atom labels (default: false)
   colorScheme?: 'default' | 'monochrome';  // Color scheme (default: 'default')
   fontSize?: number;           // Font size for labels (default: 12)
   strokeWidth?: number;        // Bond thickness (default: 1.5)
-  atomRadius?: number;         // Atom circle radius (default: 6)
+  margin?: number;             // Margin around molecule (default: 20)
+}
+```
+
+**Returns:**
+```typescript
+interface SVGRenderResult {
+  svg: string;                 // Complete SVG markup
+  width: number;               // Canvas width
+  height: number;              // Canvas height
+  errors: string[];            // Any rendering errors
 }
 ```
 
 ---
 
-## 2D Layout Algorithm
+## Architecture
 
-### Pipeline Overview
+openchem uses a specialized coordinate generation system focused on overlap-aware placement and perfect geometry:
+
+**Key features:**
+- ✅ **Overlap-aware fused ring placement** — Detects and resolves atom/bond collisions
+- ✅ **Perfect regular polygons** — Mathematically precise ring geometry
+- ✅ **Radial terminal atom placement** — Clean geometry for OH, NH2, etc.
+- ✅ **Modular architecture** — 7 specialized modules (1,900+ lines)
+- ✅ **Clean separation** — Coordinate generator and renderer have distinct responsibilities
+
+### 2D Layout Algorithm
 
 The coordinate generation follows a multi-stage pipeline:
 
 ```
-1. Ring Detection
+1. Ring System Detection
    ↓
-2. Ring Placement (regular polygons)
+2. Fused Ring Placement (overlap-aware)
    ↓
-3. Inter-Ring Connections
+3. Substituent Placement (radial extension)
    ↓
-4. Chain/Branch Expansion
+4. Constrained Relaxation (preserves perfect geometry)
    ↓
-5. Geometric Optimization
+5. Overlap Resolution
    ↓
-6. Annotation (labels, stereo)
+6. SVG Rendering (no geometry changes)
 ```
 
-### Stage 1: Ring Detection
+### Stage 1: Ring System Detection
 
-- Identify all rings using SSSR (Smallest Set of Smallest Rings)
-- Group fused rings into composite systems
-- Detect aromatic rings for special handling
+**Purpose:** Identify all ring systems and classify their relationships
 
-**Implementation:** `src/utils/ring-finder.ts`, `src/utils/ring-analysis.ts`
+**Algorithm:**
+- Detect rings using graph cycle detection
+- Group rings into fused systems (rings sharing edges)
+- Classify as isolated, fused, spiro, or bridged
+- Compute ring connectivity graph
 
-### Stage 2: Ring Placement
+**Implementation:** `src/generators/coordinate-generator/ring-system-detector.ts`
 
-**Regular polygon templates:**
-- 3-membered: equilateral triangle
-- 4-membered: square
-- 5-membered: regular pentagon
-- 6-membered: regular hexagon (default for aromatics)
+### Stage 2: Fused Ring Placement (Overlap-Aware)
 
-**Fused rings:**
-- Align shared bonds perfectly between polygons
-- Merge adjacent ring coordinates into single geometry
-- Maintain planarity across fused clusters
+**Purpose:** Place fused ring systems with perfect geometry and no overlaps
 
-### Stage 3: Inter-Ring Connections
+**Algorithm:**
+- Generate perfect regular polygons for each ring size
+- For fused systems, place rings sequentially:
+  - Align shared bonds exactly
+  - Detect atom/bond overlaps
+  - Rotate/flip fused rings to minimize collisions
+  - Try multiple orientations (0°, 60°, 120°, 180°)
+- Use rigid group constraints to maintain perfect ring geometry
 
-- Identify bonds connecting distinct ring systems
-- Arrange to minimize edge crossings
-- Maintain equal distances between ring clusters
-- Prefer 30°, 45°, 60°, 90°, 120° bond angles
+**Key feature:** This stage **prevents overlaps during placement** rather than requiring post-processing fixes.
 
-### Stage 4: Chain/Branch Expansion
+**Implementation:** `src/generators/coordinate-generator/fused-ring-placer.ts`
 
-**Chain placement:**
-- Traverse outwards from ring cores
-- Use idealized geometry:
-  - sp³ centers: ~109.5° (simplified to 90°/120° in 2D)
-  - sp² centers: 120° planar separation
-- Grow branches recursively to terminal atoms
+### Stage 3: Substituent Placement (Radial Extension)
 
-**Branch spacing:**
-- Avoid collisions with rings and other branches
-- Prefer outward/diagonal orientation from core
-- Rotate branches (±15°) to prevent overlap
+**Purpose:** Attach substituents and terminal atoms with clean geometry
 
-### Stage 5: Geometric Optimization
+**Algorithm:**
+- Identify attachment points on rings
+- For terminal atoms (OH, NH2, etc.):
+  - Extend radially from parent atom
+  - Use ideal bond angles (120° for sp², 109.5° for sp³)
+  - Avoid collisions with existing atoms
+- For substituent chains:
+  - Grow recursively from attachment point
+  - Maintain staggered conformations
+  - Prefer anti/gauche orientations
 
-**Force relaxation:**
-- Equalize bond lengths
-- Minimize atom-atom overlap
-- Preserve ring planarity
-- Treat fused rings as rigid units
+**Key feature:** **Radial extension** ensures terminal atoms don't overlap with ring systems.
 
-**Angle regularization:**
-- Snap bond angles to preferred values: 30°, 45°, 60°, 90°, 120°, 150°, 180°
-- Recheck ring closure accuracy
+**Implementation:** `src/generators/coordinate-generator/substituent-placer.ts`
 
-**Aesthetic rotation:**
-- Compute principal moment of inertia
-- Rotate molecule so long axis is horizontal
-- Center molecule in coordinate system
+### Stage 4: Constrained Relaxation
 
-### Stage 6: Annotation
+**Purpose:** Fine-tune coordinates while preserving perfect ring geometry
 
-- Add atom labels after geometry is finalized
-- Position labels to avoid crossing bonds
-- Orient wedge/hash bonds consistently
+**Algorithm:**
+- Apply spring forces to equalize bond lengths
+- Use distance constraints to prevent distortion
+- **Lock ring atoms as rigid groups** — no regularization needed!
+- Allow only non-ring atoms to move
+- Iterate until forces converge (typically 5-10 iterations)
 
-**Implementation:** `src/utils/coordinate-generator-webcola.ts`
+**Key feature:** By treating rings as **rigid groups**, we preserve the perfect polygons from Stage 2.
+
+**Implementation:** `src/generators/coordinate-generator/constrained-relaxer.ts`
+
+### Stage 5: Overlap Resolution
+
+**Purpose:** Detect and resolve any remaining atom overlaps
+
+**Algorithm:**
+- Compute pairwise atom distances
+- Identify overlaps (distance < threshold)
+- Apply repulsive forces to separate atoms
+- Re-run constrained relaxation if needed
+
+**Implementation:** `src/generators/coordinate-generator/overlap-resolver.ts`
+
+### Stage 6: SVG Rendering
+
+**Purpose:** Convert coordinates to visual SVG elements
+
+**Algorithm:**
+- Draw bonds as lines (single/double/triple/aromatic)
+- Render wedge/hash bonds for stereochemistry
+- Add atom labels (heteroatoms, charges, isotopes)
+- Apply color scheme (default or monochrome)
+- **No geometry changes** — renderer trusts coordinate generator
+
+**Implementation:** `src/generators/svg-renderer.ts` (single consolidated file, ~1,800 lines)
 
 ---
 
@@ -289,18 +341,23 @@ quality_score = Σ(rule_score × weight) / Σ(weight)
 ### Custom Coordinate Generation
 
 ```typescript
-import { generateCoordinates, renderSVG } from 'index';
+import { parseSMILES, renderSVG } from 'index';
 
-// Generate coordinates separately
+// Render molecule (coordinates generated automatically)
 const molecule = parseSMILES('CC(C)C').molecules[0];
-const withCoords = generateCoordinates(molecule, { bondLength: 50 });
-
-// Render with custom options
-const svg = renderSVG(withCoords, {
+const svg = renderSVG(molecule, {
+  width: 300,
+  height: 200,
+  bondLength: 50,
   colorScheme: 'monochrome',
   strokeWidth: 2.0,
 });
+
+console.log(svg.svg); // SVG markup
+console.log(svg.width, svg.height); // Canvas dimensions
 ```
+
+**Note:** Coordinate generation is fully integrated into `renderSVG()`. You don't need to generate coordinates separately unless you're doing advanced coordinate manipulation.
 
 ### Batch Rendering
 
@@ -356,10 +413,11 @@ svgs.forEach((svg, i) => {
 
 ### Performance Guidelines
 
-- **< 30 atoms**: Instant (< 10ms)
-- **30-60 atoms**: Fast (10-50ms)
-- **60-100 atoms**: Acceptable (50-200ms)
-- **> 100 atoms**: May be slow (200ms-1s)
+- **< 30 atoms**: Instant (< 5ms)
+- **30-60 atoms**: Very fast (5-20ms)
+- **60-100 atoms**: Fast (20-50ms)
+- **100-200 atoms**: Acceptable (50-150ms)
+- **> 200 atoms**: May be slow (150ms-1s)
 
 ### Optimization Tips
 
@@ -412,20 +470,33 @@ renderSVG(parseSMILES('C[C@@H](N)C(=O)O').molecules[0]);
 
 ## Implementation Files
 
-### Core Renderer
-- **Entry point:** `src/generators/svg-renderer.ts`
-- **Main function:** `renderSVG(molecule, options)`
+### Coordinate Generator
 
-### Coordinate Generation
-- **WebCoLa layout:** `src/utils/coordinate-generator-webcola.ts`
-- **Ring analysis:** `src/utils/ring-analysis.ts`
-- **Ring finding:** `src/utils/ring-finder.ts`
+**Location:** `src/generators/coordinate-generator/`
 
-### Rendering Support
-- **Coordinate utils:** `src/generators/svg-renderer/coordinate-utils.ts`
-- **Stereo bonds:** `src/generators/svg-renderer/stereo-bonds.ts`
-- **Double bonds:** `src/generators/svg-renderer/double-bond-renderer.ts`
-- **Atom labels:** `src/generators/svg-renderer/atom-labels.ts`
+| Module | Lines | Purpose |
+|--------|-------|---------|
+| `index.ts` | 322 | Entry point, pipeline orchestration |
+| `ring-system-detector.ts` | 323 | Ring detection and classification |
+| `fused-ring-placer.ts` | 277 | Overlap-aware fused ring placement |
+| `substituent-placer.ts` | 220 | Terminal atom and chain placement |
+| `constrained-relaxer.ts` | 336 | Force-based optimization with rigid groups |
+| `overlap-resolver.ts` | 167 | Collision detection and resolution |
+| `geometry-utils.ts` | 321 | Vector math, rotations, distance checks |
+| `types.ts` | 113 | Type definitions |
+
+**Total:** ~2,000 lines of clean, modular code
+
+### SVG Renderer
+
+**Location:** `src/generators/svg-renderer.ts` (single consolidated file, ~1,800 lines)
+
+**Architecture:** All rendering logic consolidated into a single file for simplicity and maintainability.
+
+### Supporting Utilities
+
+- **Ring analysis:** `src/utils/ring-analysis.ts` — SSSR, ring classification
+- **Ring finding:** `src/utils/ring-finder.ts` — Cycle detection
 
 ---
 
@@ -479,7 +550,7 @@ bun run scripts/save-rendered-svgs.mjs
 
 ### Improving Layout Algorithm
 
-1. Modify coordinate generation in `coordinate-generator-webcola.ts`
+1. Modify coordinate generation in `src/generators/coordinate-generator/`
 2. Update force relaxation parameters
 3. Test with diverse molecule set
 4. Validate visual quality
@@ -500,5 +571,5 @@ bun run scripts/save-rendered-svgs.mjs
 
 ---
 
-**Last Updated:** 2025-11-20  
+**Last Updated:** 2025-11-22  
 **Maintainer:** openchem team
