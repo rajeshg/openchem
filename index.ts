@@ -4,7 +4,10 @@ export {
   getBitsSet,
 } from "src/utils/morgan-fingerprint";
 export { PackedMolecule } from "src/utils/packed-molecule";
-export type { PackedMolecule as PackedMoleculeType } from "src/utils/packed-molecule";
+export type {
+  PackedMolecule as PackedMoleculeType,
+  PackedMoleculeQuery,
+} from "src/utils/packed-molecule";
 export { parseSMILES } from "src/parsers/smiles-parser";
 export { parseIUPACName } from "src/parsers/iupac-parser/iupac-parser";
 export { IUPACTokenizer } from "src/parsers/iupac-parser/iupac-tokenizer";

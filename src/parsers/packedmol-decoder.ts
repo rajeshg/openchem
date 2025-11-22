@@ -16,6 +16,7 @@ import {
   ATOM_STEREO_CONFIG,
   BOND_STEREO_TYPE,
   BOND_STEREO_CONFIG,
+  HEADER_INDEX,
 } from "src/types/packedmol-types";
 
 /**
@@ -23,8 +24,8 @@ import {
  */
 export function decodePackedMol(packed: PackedMol): Molecule {
   const header = packed.header;
-  const N = header[1] as number;
-  const M = header[2] as number;
+  const N = header[HEADER_INDEX.ATOM_COUNT] as number;
+  const M = header[HEADER_INDEX.BOND_COUNT] as number;
 
   const atoms: Atom[] = [];
   const bonds: Bond[] = [];
@@ -53,7 +54,8 @@ export function decodePackedMol(packed: PackedMol): Molecule {
       symbol: isDummy ? "*" : symbol,
       atomicNumber: atomicNum,
       charge,
-      hydrogens: 0, // would need to compute
+      hydrogens: packed.atoms.hydrogens[i] as number,
+      degree: packed.atoms.degree[i] as number,
       isotope: isotope > 0 ? isotope : null,
       aromatic,
       chiral,
@@ -86,12 +88,7 @@ export function decodePackedMol(packed: PackedMol): Molecule {
     bonds.push(bond);
   }
 
-  const molecule: Molecule = {
-    atoms,
-    bonds,
-  };
-
-  return molecule;
+  return { atoms: atoms as Atom[], bonds: bonds as Bond[] };
 }
 
 /**

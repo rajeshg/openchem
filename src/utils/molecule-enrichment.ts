@@ -1,4 +1,5 @@
-import type { Atom, Bond, Molecule } from "types";
+import type { Atom, Bond, Molecule, RingInfo as RingInfoType } from "types";
+import type { RingInfo } from "src/utils/ring-analysis";
 import { analyzeRings } from "./ring-analysis";
 import {
   bondKey,
@@ -11,8 +12,29 @@ import {
 import { MoleculeGraph } from "./molecular-graph";
 import { findAllRings } from "./sssr-kekule";
 
-export function enrichMolecule(mol: Molecule, mg?: MoleculeGraph): Molecule {
+/**
+ * Get or compute RingInfo for a molecule, with lazy caching
+ */
+export function getRingInfo(mol: Molecule, mg?: MoleculeGraph): RingInfo {
+  // Return cached value if available
+  if (mol._ringInfoCache) {
+    return mol._ringInfoCache as unknown as RingInfo;
+  }
+
   const ringInfo = analyzeRings(mol, mg);
+
+  // Cache it on the molecule object (using type assertion since we need to mutate)
+  (mol as unknown as { _ringInfoCache: RingInfo })._ringInfoCache = ringInfo;
+
+  return ringInfo;
+}
+
+/**
+ * Enrich molecule by computing and adding properties to atoms and bonds
+ * Returns a new Molecule with enriched atoms/bonds that have computed properties
+ */
+export function enrichMolecule(mol: Molecule, mg?: MoleculeGraph): Molecule {
+  const ringInfo = getRingInfo(mol, mg);
 
   // For SMARTS [R] primitive, use all cycles (not just SSSR) to match RDKit behavior
   const allCycles = findAllRings(mol.atoms as Atom[], mol.bonds as Bond[]);
@@ -20,21 +42,24 @@ export function enrichMolecule(mol: Molecule, mg?: MoleculeGraph): Molecule {
   const atomRings = buildAtomRingsMap(allCycles);
   const bondRings = buildBondRingsMap(allCycles, mol.bonds);
 
-  const enrichedRingInfo = {
+  const enrichedAtoms = enrichAtoms(mol, ringInfo, atomRings);
+  const enrichedBonds = enrichBonds(mol, ringInfo, bondRings);
+
+  // Build RingInfo in the format expected by Molecule interface
+  const rings: ReadonlyArray<readonly number[]> = allCycles;
+  const enrichedRingInfo: RingInfoType = {
     atomRings,
     bondRings,
-    rings: ringInfo.rings, // Keep SSSR for other purposes
-  };
-
-  const enrichedAtoms = enrichAtoms(mol, ringInfo, enrichedRingInfo);
-  const enrichedBonds = enrichBonds(mol, ringInfo, enrichedRingInfo);
+    rings,
+  } as unknown as RingInfoType;
 
   return {
+    ...mol,
     atoms: enrichedAtoms,
     bonds: enrichedBonds,
-    rings: ringInfo.rings,
+    rings,
     ringInfo: enrichedRingInfo,
-  };
+  } as Molecule;
 }
 
 function buildAtomRingsMap(rings: number[][]): Map<number, Set<number>> {
@@ -75,15 +100,13 @@ function buildBondRingsMap(
 
 function enrichAtoms(
   mol: Molecule,
-  ringInfo: ReturnType<typeof analyzeRings>,
-  enrichedRingInfo: { atomRings: Map<number, Set<number>> },
+  ringInfo: RingInfo,
+  atomRings: Map<number, Set<number>>,
 ): Atom[] {
   return mol.atoms.map((atom) => {
     const degree = getHeavyNeighborCount(mol.bonds, atom.id, mol.atoms);
     const isInRing = ringInfo.isAtomInRing(atom.id);
-    const ringIds = isInRing
-      ? [...(enrichedRingInfo.atomRings.get(atom.id) || [])]
-      : [];
+    const ringIds = isInRing ? [...(atomRings.get(atom.id) || [])] : [];
     const hybridization = determineHybridization(atom, mol.bonds, mol.atoms);
 
     return {
@@ -98,15 +121,13 @@ function enrichAtoms(
 
 function enrichBonds(
   mol: Molecule,
-  ringInfo: ReturnType<typeof analyzeRings>,
-  enrichedRingInfo: { bondRings: Map<string, Set<number>> },
+  ringInfo: RingInfo,
+  bondRings: Map<string, Set<number>>,
 ): Bond[] {
   return mol.bonds.map((bond) => {
     const key = bondKey(bond.atom1, bond.atom2);
     const isInRing = ringInfo.isBondInRing(bond.atom1, bond.atom2);
-    const ringIds = isInRing
-      ? [...(enrichedRingInfo.bondRings.get(key) || [])]
-      : [];
+    const ringIds = isInRing ? [...(bondRings.get(key) || [])] : [];
     const isRotatable = isRotatableBond(bond, mol, ringInfo);
 
     return {
@@ -143,7 +164,7 @@ function determineHybridization(
 function isRotatableBond(
   bond: Bond,
   mol: Molecule,
-  ringInfo: ReturnType<typeof analyzeRings>,
+  ringInfo: RingInfo,
 ): boolean {
   if (bond.type !== "single") return false;
 

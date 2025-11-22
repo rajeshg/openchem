@@ -57,18 +57,34 @@ export interface Bond {
 
 /**
  * Molecule representation.
- * After parsing, all molecules are enriched with ring analysis.
+ * Can have PackedMol backing (efficient binary graph) with optional lazy-computed ring information.
  * Molecules are immutable post-parse - create new molecules instead of mutating.
  *
- * PackedMol caching: molecules automatically cache their binary representation
- * on first encode, enabling O(1) access for subsequent operations.
+ * PackedMol fields: buffer, header, atoms, bonds, graph, stereo (optional - only when encoded)
+ * RingInfo: computed on-demand and cached for repeated access
  */
 export interface Molecule {
   readonly atoms: readonly Atom[];
   readonly bonds: readonly Bond[];
   readonly rings?: readonly (readonly number[])[];
   readonly ringInfo?: Readonly<RingInfo>;
-  /** @internal PackedMol cache - automatically populated by encoding operations */
+  /** @internal Ring info cache - lazily computed and cached */
+  readonly _ringInfoCache?: RingInfo;
+  /** PackedMol backing - optional, only populated when encoded */
+  readonly buffer?: ArrayBuffer;
+  readonly header?: Uint32Array;
+  readonly graph?: {
+    degreeOffset: Uint32Array;
+    bondTargets: Uint32Array;
+    bondAdj: Uint16Array;
+  };
+  readonly stereo?: {
+    atomType: Uint8Array;
+    atomParity: Int8Array;
+    bondType: Uint8Array;
+    bondConfig: Int8Array;
+  };
+  /** @internal Alternate PackedMol structure for full details */
   readonly _packedMol?: PackedMol;
 }
 

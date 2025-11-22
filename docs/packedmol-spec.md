@@ -93,6 +93,8 @@ Atom block consists of fixed-width per-atom typed arrays.
 | -------------- | ----------- | ------ | ------------------------------------------- |
 | `atomicNumber` | Uint8Array  | N      | Element (1–118)                             |
 | `formalCharge` | Int8Array   | N      | Integer charge                              |
+| `hydrogens`    | Uint8Array  | N      | Explicit hydrogen count                     |
+| `degree`       | Uint8Array  | N      | Number of bonds (bond count)                |
 | `isotope`      | Uint16Array | N      | Isotope mass number (0 = natural abundance) |
 | `atomFlags`    | Uint16Array | N      | Bitfield (aromatic, chiral, query flags)    |
 
@@ -253,7 +255,7 @@ PackedMol is ideal for:
 
 For typical organic molecules:
 
-* **Atom block:** 6–8 bytes/atom
+* **Atom block:** 8–10 bytes/atom (includes degree field)
 * **Bond block:** ~7–10 bytes/bond
 * **CSR adjacency:** 8 bytes/bond
 * **Stereochemistry:** 1–2 bytes per stereo element
@@ -262,9 +264,9 @@ Real-world examples:
 
 | Molecule  | Atoms | Bonds | Size (PackedMol) | RDKit ROMol | Savings         |
 | --------- | ----- | ----- | ---------------- | ----------- | --------------- |
-| Ethanol   | 9     | 8     | ~64 bytes        | ~2–4 KB     | 40–60× smaller  |
-| Ibuprofen | 33    | 34    | ~350–450 bytes   | ~8–15 KB    | ~20–40× smaller |
-| Caffeine  | 24    | 25    | ~250–300 bytes   | ~6–10 KB    | ~20–40× smaller |
+| Ethanol   | 9     | 8     | ~80 bytes        | ~2–4 KB     | 40–60× smaller  |
+| Ibuprofen | 33    | 34    | ~400–500 bytes   | ~8–15 KB    | ~20–40× smaller |
+| Caffeine  | 24    | 25    | ~280–350 bytes   | ~6–10 KB    | ~20–40× smaller |
 
 ---
 
@@ -328,6 +330,8 @@ PackedMol is the underlying canonical graph structure.
 +----------------------+
 | atomicNumber[]       |
 | formalCharge[]       |
+| hydrogens[]          |
+| degree[]             |
 | isotope[]            |
 | atomFlags[]          |
 +----------------------+

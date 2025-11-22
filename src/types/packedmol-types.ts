@@ -11,7 +11,24 @@
  */
 
 /**
+ * Header field indices for Uint32Array overlay
+ * Use these constants instead of magic numbers to access header[index]
+ */
+export const HEADER_INDEX = {
+  VERSION: 0, // Format version
+  ATOM_COUNT: 1, // Number of atoms (N)
+  BOND_COUNT: 2, // Number of bonds (M)
+  OFFSET_ATOM_BLOCK: 3, // Byte offset to atom block
+  OFFSET_BOND_BLOCK: 4, // Byte offset to bond block
+  OFFSET_GRAPH_BLOCK: 5, // Byte offset to graph block
+  OFFSET_STEREO_BLOCK: 6, // Byte offset to stereo block
+  TOTAL_SIZE: 7, // Total buffer size in bytes
+} as const;
+
+/**
  * Header contains metadata and offsets to all data sections
+ * Stored as Uint32Array with 8 fields: [version, atomCount, bondCount, offsetAtomBlock, offsetBondBlock, offsetGraphBlock, offsetStereoBlock, totalSize]
+ * Future versions can extend with additional fields at indices 8+
  */
 export interface PackedMolHeader {
   version: number; // Format version (currently 1)
@@ -21,6 +38,7 @@ export interface PackedMolHeader {
   offsetBondBlock: number; // Byte offset to bond fields
   offsetGraphBlock: number; // Byte offset to CSR adjacency
   offsetStereoBlock: number; // Byte offset to stereochemistry
+  totalSize: number; // Total buffer size in bytes
 }
 
 /**
@@ -106,6 +124,8 @@ export const STEREO_TYPE = {
 export interface PackedAtomBlock {
   atomicNumber: Uint8Array; // Element (1-118), length N
   formalCharge: Int8Array; // Integer charge, length N
+  hydrogens: Uint8Array; // Explicit hydrogen count, length N
+  degree: Uint8Array; // Heavy neighbor count, length N
   isotope: Uint16Array; // Isotope mass number (0 = natural), length N
   atomFlags: Uint16Array; // Bitfield (aromatic, chiral, etc), length N
 }

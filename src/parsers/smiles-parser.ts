@@ -645,10 +645,11 @@ function parseSingleSMILES(
   // Enrich molecule using aromaticity-perceived atoms/bonds - reuse MoleculeGraph
   const tEnrichStart =
     typeof performance !== "undefined" ? performance.now() : Date.now();
-  const molecule = enrichMolecule(
-    { atoms: aromaticAtoms, bonds: aromaticBonds },
-    mg,
-  );
+  const enrichedMol = {
+    atoms: aromaticAtoms as Atom[],
+    bonds: aromaticBonds as Bond[],
+  };
+  const molecule = enrichMolecule(enrichedMol, mg);
   const tEnrichEnd =
     typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.enrichMolecule += tEnrichEnd - tEnrichStart;

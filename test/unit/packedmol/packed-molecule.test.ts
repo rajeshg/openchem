@@ -133,6 +133,8 @@ describe("PackedMolecule Wrapper Class", () => {
         atoms: {
           atomicNumber: new Uint8Array(buffer),
           formalCharge: new Int8Array(buffer),
+          hydrogens: new Uint8Array(buffer),
+          degree: new Uint8Array(buffer),
           isotope: new Uint16Array(buffer),
           atomFlags: new Uint16Array(buffer),
         },

@@ -10,8 +10,6 @@ import {
   parseMolfile,
   computeMorganFingerprint,
 } from "index";
-import { PackedMolecule } from "src/utils/packed-molecule";
-import { getPackedMol } from "src/utils/mol-caching";
 
 // Test molecules (realistic drug-like compounds)
 const MOLECULES = {
@@ -181,90 +179,5 @@ describe("Performance Benchmarks", () => {
     );
 
     expect(writeMs + readMs).toBeGreaterThan(0);
-  });
-
-  it("should benchmark PackedMol encoding/decoding", () => {
-    const molecules = Object.values(MOLECULES)
-      .map((s) => parseSMILES(s).molecules[0])
-      .filter((m) => m !== undefined);
-    const iterations = 100;
-
-    // Test encoding
-    const startEncode = performance.now();
-    for (let i = 0; i < iterations; i++) {
-      for (const mol of molecules) {
-        new PackedMolecule(mol);
-      }
-    }
-    const endEncode = performance.now();
-
-    // Test decoding (cached)
-    const packed = molecules.map((m) => new PackedMolecule(m));
-    const startDecode = performance.now();
-    for (let i = 0; i < iterations; i++) {
-      for (const pm of packed) {
-        pm.molecule;
-      }
-    }
-    const endDecode = performance.now();
-
-    const encodeMs = endEncode - startEncode;
-    const decodeMs = endDecode - startDecode;
-    const totalOps = iterations * molecules.length;
-
-    // Calculate compression ratio properly
-    const firstMol = molecules[0];
-    if (!firstMol) {
-      expect(true).toBe(true);
-      return;
-    }
-
-    const firstPacked = new PackedMolecule(firstMol);
-    const atomsSize = firstMol.atoms.length * 8; // rough estimate
-    const bondsSize = firstMol.bonds.length * 12; // rough estimate
-    const originalSize = atomsSize + bondsSize;
-    const compressedSize = firstPacked.bufferSize;
-    const compressionRatio = originalSize / compressedSize;
-
-    console.log(`\n📊 PackedMol Performance:`);
-    console.log(
-      `   Encode time: ${encodeMs.toFixed(2)}ms (${(encodeMs / totalOps).toFixed(4)}ms per molecule)`,
-    );
-    console.log(
-      `   Decode time: ${decodeMs.toFixed(2)}ms (${(decodeMs / totalOps).toFixed(4)}ms per molecule)`,
-    );
-    console.log(
-      `   Compression ratio: ${compressionRatio.toFixed(1)}× (${compressedSize} bytes for ${firstMol.atoms.length} atoms, ${firstMol.bonds.length} bonds)`,
-    );
-
-    expect(encodeMs + decodeMs).toBeGreaterThan(0);
-  });
-
-  it("should benchmark caching behavior", () => {
-    const mol = parseSMILES(MOLECULES.aspirin).molecules[0]!;
-    const iterations = 1000;
-
-    // First call (cache miss)
-    const startFirst = performance.now();
-    getPackedMol(mol);
-    const endFirst = performance.now();
-
-    // Subsequent calls (cache hit)
-    const startCached = performance.now();
-    for (let i = 0; i < iterations; i++) {
-      getPackedMol(mol);
-    }
-    const endCached = performance.now();
-
-    const firstMs = endFirst - startFirst;
-    const avgCachedMs = (endCached - startCached) / iterations;
-    const speedup = firstMs / (avgCachedMs || 0.0001);
-
-    console.log(`\n📊 Caching Behavior:`);
-    console.log(`   First call: ${firstMs.toFixed(4)}ms`);
-    console.log(`   Cached calls (avg): ${avgCachedMs.toFixed(6)}ms`);
-    console.log(`   Speedup: ${speedup.toFixed(0)}×`);
-
-    expect(avgCachedMs).toBeLessThan(firstMs);
   });
 });

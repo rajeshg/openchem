@@ -18,6 +18,7 @@ import {
   ATOM_STEREO_CONFIG,
   BOND_STEREO_TYPE,
   BOND_STEREO_CONFIG,
+  HEADER_INDEX,
 } from "src/types/packedmol-types";
 import { canonicalizeMolecule } from "src/utils/packedmol-canonicalizer";
 import { buildCSRGraph } from "src/utils/csr-graph-builder";
@@ -27,6 +28,124 @@ import {
 } from "src/utils/packedmol-cache";
 
 const PACKEDMOL_VERSION = 1;
+
+interface MemoryLayout {
+  headerSize: number;
+  offsetAtomicNumber: number;
+  offsetFormalCharge: number;
+  offsetHydrogens: number;
+  offsetDegree: number;
+  offsetIsotope: number;
+  offsetAtomFlags: number;
+  offsetBondBlock: number;
+  offsetBondAtomA: number;
+  offsetBondAtomB: number;
+  offsetBondOrder: number;
+  offsetBondFlags: number;
+  offsetGraphBlock: number;
+  offsetDegreeOffset: number;
+  offsetBondTargets: number;
+  offsetBondAdj: number;
+  offsetStereoBlock: number;
+  offsetStereoAtomType: number;
+  offsetStereoAtomParity: number;
+  offsetStereoBondType: number;
+  offsetStereoBondConfig: number;
+  totalSize: number;
+}
+
+/**
+ * Calculate memory layout for PackedMol encoding
+ * Computes aligned offsets for all data blocks (atom, bond, graph, stereo)
+ */
+function calculateMemoryLayout(N: number, M: number): MemoryLayout {
+  const align = (offset: number, alignment: number): number => {
+    return Math.ceil(offset / alignment) * alignment;
+  };
+
+  const headerSize = 8 * 4;
+  let atomOffset = headerSize;
+
+  const offsetAtomicNumber = atomOffset;
+  atomOffset += N;
+
+  const offsetFormalCharge = atomOffset;
+  atomOffset += N;
+
+  const offsetHydrogens = atomOffset;
+  atomOffset += N;
+
+  const offsetDegree = atomOffset;
+  atomOffset += N;
+
+  atomOffset = align(atomOffset, 2);
+  const offsetIsotope = atomOffset;
+  atomOffset += N * 2;
+
+  const offsetAtomFlags = atomOffset;
+  atomOffset += N * 2;
+
+  let bondOffset = align(atomOffset, 4);
+  const offsetBondBlock = bondOffset;
+
+  const offsetBondAtomA = bondOffset;
+  bondOffset += M * 4;
+
+  const offsetBondAtomB = bondOffset;
+  bondOffset += M * 4;
+
+  const offsetBondOrder = bondOffset;
+  bondOffset += M;
+
+  const offsetBondFlags = bondOffset;
+  bondOffset += M;
+
+  let graphOffset = align(bondOffset, 4);
+  const offsetGraphBlock = graphOffset;
+
+  const offsetDegreeOffset = graphOffset;
+  graphOffset += (N + 1) * 4;
+
+  const offsetBondTargets = graphOffset;
+  graphOffset += 2 * M * 4;
+
+  graphOffset = align(graphOffset, 2);
+  const offsetBondAdj = graphOffset;
+  graphOffset += 2 * M * 2;
+
+  const offsetStereoBlock = graphOffset;
+  const offsetStereoAtomType = offsetStereoBlock;
+  const offsetStereoAtomParity = offsetStereoBlock + N;
+  const offsetStereoBondType = offsetStereoBlock + 2 * N;
+  const offsetStereoBondConfig = offsetStereoBlock + 2 * N + M;
+
+  const totalSize = offsetStereoBlock + N + N + M + M;
+
+  return {
+    headerSize,
+    offsetAtomicNumber,
+    offsetFormalCharge,
+    offsetHydrogens,
+    offsetDegree,
+    offsetIsotope,
+    offsetAtomFlags,
+    offsetBondBlock,
+    offsetBondAtomA,
+    offsetBondAtomB,
+    offsetBondOrder,
+    offsetBondFlags,
+    offsetGraphBlock,
+    offsetDegreeOffset,
+    offsetBondTargets,
+    offsetBondAdj,
+    offsetStereoBlock,
+    offsetStereoAtomType,
+    offsetStereoAtomParity,
+    offsetStereoBondType,
+    offsetStereoBondConfig,
+    totalSize,
+  };
+}
 
 /**
  * Encode a molecule into PackedMol binary format
@@ -47,95 +166,53 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
   const N = canonical.atoms.length;
   const M = canonical.bonds.length;
 
-  // Helper function for alignment
-  const align = (offset: number, alignment: number): number => {
-    return Math.ceil(offset / alignment) * alignment;
-  };
+  // Calculate memory layout with proper alignment
+  const layout = calculateMemoryLayout(N, M);
 
-  // Calculate section sizes with proper alignment
-  const headerSize = 8 * 4; // 8 Uint32 fields
-
-  // Atom block layout:
-  // - Uint8Array (atomicNumber): N bytes, starts at headerSize
-  // - Int8Array (formalCharge): N bytes, starts at +N
-  // - Uint16Array (isotope): N * 2 bytes, needs 2-byte alignment
-  // - Uint16Array (atomFlags): N * 2 bytes, needs 2-byte alignment
-  const atomBlockStartSize = headerSize; // Where atom block starts
-  let atomOffset = atomBlockStartSize;
-
-  const offsetAtomicNumber = atomOffset;
-  atomOffset += N; // Uint8Array
-
-  const offsetFormalCharge = atomOffset;
-  atomOffset += N; // Int8Array (no alignment needed after Uint8)
-
-  // Uint16Array needs 2-byte alignment
-  atomOffset = align(atomOffset, 2);
-  const offsetIsotope = atomOffset;
-  atomOffset += N * 2; // Uint16Array
-
-  const offsetAtomFlags = atomOffset;
-  atomOffset += N * 2; // Uint16Array
-
-  // Bond block needs 4-byte alignment for Uint32Array
-  let bondOffset = align(atomOffset, 4);
-  const offsetBondBlock = bondOffset;
-
-  const offsetBondAtomA = bondOffset;
-  bondOffset += M * 4; // Uint32Array
-
-  const offsetBondAtomB = bondOffset;
-  bondOffset += M * 4; // Uint32Array
-
-  const offsetBondOrder = bondOffset;
-  bondOffset += M; // Uint8Array
-
-  const offsetBondFlags = bondOffset;
-  bondOffset += M; // Uint8Array
-
-  // Graph block needs 4-byte alignment for Uint32Array
-  let graphOffset = align(bondOffset, 4);
-  const offsetGraphBlock = graphOffset;
-
-  const offsetDegreeOffset = graphOffset;
-  graphOffset += (N + 1) * 4; // Uint32Array
-
-  const offsetBondTargets = graphOffset;
-  graphOffset += 2 * M * 4; // Uint32Array
-
-  // Uint16Array needs 2-byte alignment
-  graphOffset = align(graphOffset, 2);
-  const offsetBondAdj = graphOffset;
-  graphOffset += 2 * M * 2; // Uint16Array
-
-  // Stereo block (all Uint8 and Int8, no alignment needed)
-  const offsetStereoBlock = graphOffset;
-  const offsetStereoAtomType = offsetStereoBlock;
-  const offsetStereoAtomParity = offsetStereoBlock + N;
-  const offsetStereoBondType = offsetStereoBlock + 2 * N;
-  const offsetStereoBondConfig = offsetStereoBlock + 2 * N + M;
-
-  const stereoBlockSize = N + N + M + M;
-
-  const totalSize = offsetStereoBlock + stereoBlockSize;
+  // Destructure for clarity
+  const {
+    offsetAtomicNumber,
+    offsetFormalCharge,
+    offsetHydrogens,
+    offsetDegree,
+    offsetIsotope,
+    offsetAtomFlags,
+    offsetBondBlock,
+    offsetBondAtomA,
+    offsetBondAtomB,
+    offsetBondOrder,
+    offsetBondFlags,
+    offsetGraphBlock,
+    offsetDegreeOffset,
+    offsetBondTargets,
+    offsetBondAdj,
+    offsetStereoBlock,
+    offsetStereoAtomType,
+    offsetStereoAtomParity,
+    offsetStereoBondType,
+    offsetStereoBondConfig,
+    totalSize,
+  } = layout;
 
   // Create single buffer
   const buffer = new ArrayBuffer(totalSize);
 
   // Create header view and write header
   const header = new Uint32Array(buffer, 0, 8);
-  header[0] = PACKEDMOL_VERSION;
-  header[1] = N;
-  header[2] = M;
-  header[3] = offsetAtomicNumber; // Store actual offset for atom block start
-  header[4] = offsetBondBlock;
-  header[5] = offsetGraphBlock;
-  header[6] = offsetStereoBlock;
-  header[7] = totalSize;
+  header[HEADER_INDEX.VERSION] = PACKEDMOL_VERSION;
+  header[HEADER_INDEX.ATOM_COUNT] = N;
+  header[HEADER_INDEX.BOND_COUNT] = M;
+  header[HEADER_INDEX.OFFSET_ATOM_BLOCK] = offsetAtomicNumber;
+  header[HEADER_INDEX.OFFSET_BOND_BLOCK] = offsetBondBlock;
+  header[HEADER_INDEX.OFFSET_GRAPH_BLOCK] = offsetGraphBlock;
+  header[HEADER_INDEX.OFFSET_STEREO_BLOCK] = offsetStereoBlock;
+  header[HEADER_INDEX.TOTAL_SIZE] = totalSize;
 
   // Create atom block views
   const atomicNumber = new Uint8Array(buffer, offsetAtomicNumber, N);
   const formalCharge = new Int8Array(buffer, offsetFormalCharge, N);
+  const hydrogens = new Uint8Array(buffer, offsetHydrogens, N);
+  const degree = new Uint8Array(buffer, offsetDegree, N);
   const isotope = new Uint16Array(buffer, offsetIsotope, N);
   const atomFlags = new Uint16Array(buffer, offsetAtomFlags, N);
 
@@ -146,9 +223,10 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
 
     atomicNumber[i] = atom.atomicNumber;
     formalCharge[i] = atom.charge;
+    hydrogens[i] = atom.hydrogens;
+    degree[i] = atom.degree ?? 0;
     isotope[i] = atom.isotope ?? 0;
 
-    // Build flags
     let flags = 0;
     if (atom.aromatic) flags |= ATOM_FLAG.AROMATIC;
     if (atom.chiral !== null && atom.chiral !== "none")
@@ -172,7 +250,6 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     bondAtomB[i] = bond.atom2;
     bondOrder[i] = bondTypeToCode(bond.type);
 
-    // Build bond flags
     let flags = 0;
     if (bond.stereo === "up") flags |= BOND_FLAG.DIRECTION_UP;
     if (bond.stereo === "down") flags |= BOND_FLAG.DIRECTION_DOWN;
@@ -211,10 +288,8 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     const atom = canonical.atoms[i];
     if (!atom) continue;
 
-    // Encode atom stereo type
     stereoAtomType[i] = encodeAtomStereoType(atom.chiral);
 
-    // Encode atom parity (@ = CCW = -1, @@ = CW = +1)
     if (atom.chiral === "@") {
       stereoAtomParity[i] = ATOM_STEREO_CONFIG.AT;
     } else if (atom.chiral === "@@") {
@@ -229,16 +304,13 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     const bond = canonical.bonds[i];
     if (!bond) continue;
 
-    // Encode bond stereo type (only for double bonds with stereo)
     if (bond.type === "double" && bond.stereo && bond.stereo !== "none") {
       stereoBondType[i] = BOND_STEREO_TYPE.CIS_TRANS;
 
-      // Encode stereo configuration
-      // up/down wedges indicate spatial arrangement
       if (bond.stereo === "up") {
-        stereoBondConfig[i] = BOND_STEREO_CONFIG.TRANS; // Convention: wedge = E/trans
+        stereoBondConfig[i] = BOND_STEREO_CONFIG.TRANS;
       } else if (bond.stereo === "down") {
-        stereoBondConfig[i] = BOND_STEREO_CONFIG.CIS; // Convention: hash = Z/cis
+        stereoBondConfig[i] = BOND_STEREO_CONFIG.CIS;
       } else {
         stereoBondConfig[i] = BOND_STEREO_CONFIG.UNSPECIFIED;
       }
@@ -254,6 +326,8 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
     atoms: {
       atomicNumber: new Uint8Array(buffer, offsetAtomicNumber, N),
       formalCharge: new Int8Array(buffer, offsetFormalCharge, N),
+      hydrogens: new Uint8Array(buffer, offsetHydrogens, N),
+      degree: new Uint8Array(buffer, offsetDegree, N),
       isotope: new Uint16Array(buffer, offsetIsotope, N),
       atomFlags: new Uint16Array(buffer, offsetAtomFlags, N),
     },
@@ -305,9 +379,9 @@ function bondTypeToCode(type: BondType): number {
  */
 export function getEncodingInfo(packed: PackedMol): PackedMolEncodingInfo {
   const header = packed.header;
-  const N = header[1] as number;
-  const M = header[2] as number;
-  const totalSize = header[7] as number;
+  const N = header[HEADER_INDEX.ATOM_COUNT] as number;
+  const M = header[HEADER_INDEX.BOND_COUNT] as number;
+  const totalSize = header[HEADER_INDEX.TOTAL_SIZE] as number;
 
   const atomBlockSize = N * 6;
   const bondBlockSize = M * 9;
@@ -320,7 +394,7 @@ export function getEncodingInfo(packed: PackedMol): PackedMolEncodingInfo {
     bondBlockSize,
     graphBlockSize,
     stereoBlockSize,
-    compressionRatio: NaN, // Would need original size
+    compressionRatio: NaN,
   };
 }
 

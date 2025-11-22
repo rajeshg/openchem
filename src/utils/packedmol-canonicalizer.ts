@@ -19,14 +19,31 @@ export interface CanonicalOrdering {
 export function computeCanonicalOrdering(mol: Molecule): CanonicalOrdering {
   const N = mol.atoms.length;
 
+  // Precompute adjacency list for O(1) neighbor lookups
+  const adjacencyList = new Map<
+    number,
+    Array<{ otherId: number; bondType: number }>
+  >();
+  for (const atom of mol.atoms) {
+    adjacencyList.set(atom.id, []);
+  }
+  for (const bond of mol.bonds) {
+    const bondCode = bond.type.charCodeAt(0) ?? 0;
+    adjacencyList
+      .get(bond.atom1)
+      ?.push({ otherId: bond.atom2, bondType: bondCode });
+    adjacencyList
+      .get(bond.atom2)
+      ?.push({ otherId: bond.atom1, bondType: bondCode });
+  }
+
   // Compute iterative refinement labels (WL-like algorithm)
   const labels = new Map<number, number>();
 
   // Initialize with atom properties
   for (const atom of mol.atoms) {
-    const deg = mol.bonds.filter(
-      (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-    ).length;
+    const neighbors = adjacencyList.get(atom.id) ?? [];
+    const deg = neighbors.length;
     const key =
       (atom.atomicNumber << 24) |
       ((atom.charge + 128) << 16) |
@@ -36,26 +53,29 @@ export function computeCanonicalOrdering(mol: Molecule): CanonicalOrdering {
   }
 
   // Refine labels using neighbor information
-  for (let iter = 0; iter < 5; iter++) {
+  let converged = false;
+  for (let iter = 0; iter < 5 && !converged; iter++) {
     const newLabels = new Map<number, number>();
+    converged = true;
 
     for (const atom of mol.atoms) {
       let hash = labels.get(atom.id) ?? 0;
+      const neighbors = adjacencyList.get(atom.id) ?? [];
 
       // Include neighbor labels
-      const neighbors = mol.bonds
-        .filter((b) => b.atom1 === atom.id || b.atom2 === atom.id)
-        .map((b) => {
-          const otherId = b.atom1 === atom.id ? b.atom2 : atom.id;
-          return (labels.get(otherId) ?? 0) ^ (b.type.charCodeAt(0) ?? 0);
-        })
+      const neighborLabels = neighbors
+        .map((n) => (labels.get(n.otherId) ?? 0) ^ n.bondType)
         .sort((a, b) => a - b);
 
-      for (const nbLabel of neighbors) {
+      for (const nbLabel of neighborLabels) {
         hash = (hash << 5) - hash + nbLabel; // DJB2 hash
       }
 
-      newLabels.set(atom.id, hash >>> 0); // Convert to unsigned 32-bit
+      const newHash = hash >>> 0; // Convert to unsigned 32-bit
+      newLabels.set(atom.id, newHash);
+      if (newHash !== (labels.get(atom.id) ?? 0)) {
+        converged = false;
+      }
     }
 
     labels.clear();
