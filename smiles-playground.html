@@ -24,6 +24,9 @@
     .status{color:var(--muted);font-size:13px;margin-top:8px}
     .table{width:100%;border-collapse:collapse}
     .table td{padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .example-group{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:8px;margin-bottom:10px}
+    .example-group-title{color:var(--accent);font-size:13px;font-weight:600;margin-bottom:8px;display:block}
+    .example-buttons{display:flex;gap:6px;flex-wrap:wrap}
   </style>
 </head>
 <body>
@@ -64,45 +67,71 @@
             </div>
           </div>
 
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-           <span style="color:var(--muted);font-size:13px">Simple:</span>
-           <button class="example" data-smiles="c1ccccc1">Benzene</button>
-           <button class="example" data-smiles="c1ccc2ccccc2c1">Naphthalene</button>
-           <button class="example" data-smiles="CCO">Ethanol</button>
-           <button class="example" data-smiles="CC(C)C">Isobutane</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Drugs:</span>
-           <button class="example" data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
-           <button class="example" data-smiles="Cn1cnc2c1c(=O)n(C)c(=O)n2C">Caffeine</button>
-           <button class="example" data-smiles="CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O">Ibuprofen</button>
-           <button class="example" data-smiles="CN1CCC23C4C1CC5=C2C(=C(C=C5)O)OC3C(C=C4)O">Morphine</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Polycyclic:</span>
-           <button class="example" data-smiles="c1ccc2cc3ccccc3cc2c1">Anthracene</button>
-           <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Phenanthrene</button>
-           <button class="example" data-smiles="c1ccc(cc1)c2ccccc2">Biphenyl</button>
-           <button class="example" data-smiles="C1CCC2(C1)CCCCC2">Spiro[4.5]decane</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Complex:</span>
-           <button class="example" data-smiles="C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@H]34">Testosterone</button>
-           <button class="example" data-smiles="C(C1C(C(C(C(O1)O)O)O)O)O">Glucose</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Bridged/Caged:</span>
-           <button class="example" data-smiles="C1C2CC3CC1CC(C2)C3">Adamantane</button>
-           <button class="example" data-smiles="C12C3C4C1C5C4C3C25">Cubane</button>
-           <button class="example" data-smiles="C1CC2CCC1C2">Norbornane</button>
-           <button class="example" data-smiles="C1CCC2(C1)CCCCC2">Spiro[4.5]decane</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Polycyclic Aromatics:</span>
-           <button class="example" data-smiles="C1=CC=C2C(=C1)C=CC3=C2C4=C(C=C3)C=CC=C4">Pyrene</button>
-           <button class="example" data-smiles="c1ccc2c(c1)c3ccccc3c4ccccc24">Triphenylene</button>
-           <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Tetracene</button>
-           
-           <span style="color:var(--muted);font-size:13px;margin-left:8px">Heterocycles:</span>
-           <button class="example" data-smiles="c1ccccc1">Benzene</button>
-           <button class="example" data-smiles="c1ccncc1">Pyridine</button>
-           <button class="example" data-smiles="c1ccc2ncccc2c1">Quinoline</button>
-           <button class="example" data-smiles="c1coc2ccccc12">Benzofuran</button>
+          <div style="margin-top:12px">
+           <div class="example-group">
+             <span class="example-group-title">Simple Molecules</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="c1ccccc1">Benzene</button>
+               <button class="example" data-smiles="c1ccc2ccccc2c1">Naphthalene</button>
+               <button class="example" data-smiles="CCO">Ethanol</button>
+               <button class="example" data-smiles="CC(C)C">Isobutane</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Drug Molecules</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
+               <button class="example" data-smiles="Cn1cnc2c1c(=O)n(C)c(=O)n2C">Caffeine</button>
+               <button class="example" data-smiles="CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O">Ibuprofen</button>
+               <button class="example" data-smiles="CN1CCC23C4C1CC5=C2C(=C(C=C5)O)OC3C(C=C4)O">Morphine</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Polycyclic Hydrocarbons</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="c1ccc2cc3ccccc3cc2c1">Anthracene</button>
+               <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Phenanthrene</button>
+               <button class="example" data-smiles="c1ccc(cc1)c2ccccc2">Biphenyl</button>
+               <button class="example" data-smiles="C1CCC2(C1)CCCCC2">Spiro[4.5]decane</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Complex Natural Products</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@H]34">Testosterone</button>
+               <button class="example" data-smiles="C(C1C(C(C(C(O1)O)O)O)O)O">Glucose</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Bridged & Caged Molecules</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="C1C2CC3CC1CC(C2)C3">Adamantane</button>
+               <button class="example" data-smiles="C12C3C4C1C5C4C3C25">Cubane</button>
+               <button class="example" data-smiles="C1CC2CCC1C2">Norbornane</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Polycyclic Aromatics</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="C1=CC=C2C(=C1)C=CC3=C2C4=C(C=C3)C=CC=C4">Pyrene</button>
+               <button class="example" data-smiles="c1ccc2c(c1)c3ccccc3c4ccccc24">Triphenylene</button>
+               <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Tetracene</button>
+             </div>
+           </div>
+
+           <div class="example-group">
+             <span class="example-group-title">Heterocycles</span>
+             <div class="example-buttons">
+               <button class="example" data-smiles="c1ccncc1">Pyridine</button>
+               <button class="example" data-smiles="c1ccc2ncccc2c1">Quinoline</button>
+               <button class="example" data-smiles="c1coc2ccccc12">Benzofuran</button>
+             </div>
+           </div>
          </div>
        </div>
 
