@@ -1,3 +1,18 @@
+/**
+ * LogP Calculation using Wildman-Crippen Method
+ * 
+ * Derived from RDKit's Crippen LogP implementation
+ * Original C++ source: rdkit/Code/GraphMol/Descriptors/Crippen.cpp
+ * Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and others
+ * 
+ * This TypeScript implementation uses the published Wildman-Crippen atom-type
+ * contribution parameters and is distributed under the BSD 3-Clause License (same as RDKit).
+ * 
+ * Reference:
+ * - RDKit: https://github.com/rdkit/rdkit
+ * - Wildman, S.A. & Crippen, G.M., J. Chem. Inf. Comput. Sci. 39:868-873 (1999)
+ */
+
 import type { Molecule } from "types";
 import type { SMARTSPattern } from "src/types/smarts-types";
 import { parseSMARTS } from "src/parsers/smarts-parser";

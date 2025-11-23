@@ -474,6 +474,20 @@ export function getHBondDonorCount(mol: Molecule): number {
   return count;
 }
 
+/**
+ * Calculate Topological Polar Surface Area (TPSA)
+ * 
+ * Implementation based on published parameters from:
+ * Ertl, P.; Rohde, B.; Selzer, P. "Fast Calculation of Molecular Polar Surface Area 
+ * as a Sum of Fragment-Based Contributions and Its Application to the Prediction of 
+ * Drug Transport Properties" J. Med. Chem. 2000, 43, 3714-3717.
+ * 
+ * Also validated against RDKit's TPSA implementation (RDKit uses the same Ertl parameters).
+ * 
+ * @param mol - Molecule to analyze
+ * @param includeSandP - Include sulfur and phosphorus contributions (default: false)
+ * @returns TPSA value in Ų (square Angstroms)
+ */
 export function getTPSA(mol: Molecule, includeSandP: boolean = false): number {
   let tpsa = 0;
 
