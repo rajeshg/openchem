@@ -24,6 +24,15 @@
     .status{color:var(--muted);font-size:13px;margin-top:8px}
     .table{width:100%;border-collapse:collapse}
     .table td{padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .examples-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:8px;margin-top:12px}
+    .examples-toggle{background:transparent;color:var(--accent);border:none;padding:4px 8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;width:100%}
+    .examples-toggle:hover{background:rgba(255,255,255,0.03)}
+    .examples-content{display:none;margin-top:12px;max-height:200px;overflow-y:auto;padding-right:8px}
+    .examples-content.open{display:block}
+    .examples-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+    .example{font-size:12px;padding:6px 10px;text-align:left}
+    .chevron{transition:transform 0.2s}
+    .chevron.open{transform:rotate(180deg)}
   </style>
 </head>
 <body>
@@ -64,15 +73,40 @@
             </div>
           </div>
 
-         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-           <span style="color:var(--muted);font-size:13px">Examples:</span>
-           <button class="example" data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
-           <button class="example" data-smiles="Cn1cnc2c1c(=O)n(C)c(=O)n2C">Caffeine</button>
-           <button class="example" data-smiles="CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O">Ibuprofen</button>
-           <button class="example" data-smiles="c1ccccc1">Benzene</button>
-           <button class="example" data-smiles="CCO">Ethanol</button>
-           <button class="example" data-smiles="C(C1C(C(C(C(O1)O)O)O)O)O">Glucose</button>
-         </div>
+          <div class="examples-section">
+            <button class="examples-toggle" id="examples-toggle">
+              <span class="chevron">▼</span>
+              <span>Example Molecules</span>
+              <span style="color:var(--muted);font-weight:400;margin-left:auto">(click to expand)</span>
+            </button>
+            <div class="examples-content" id="examples-content">
+              <div class="examples-grid">
+                <button class="example" data-smiles="c1ccccc1">Benzene</button>
+                <button class="example" data-smiles="c1ccc2ccccc2c1">Naphthalene</button>
+                <button class="example" data-smiles="CCO">Ethanol</button>
+                <button class="example" data-smiles="CC(C)C">Isobutane</button>
+                <button class="example" data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
+                <button class="example" data-smiles="Cn1cnc2c1c(=O)n(C)c(=O)n2C">Caffeine</button>
+                <button class="example" data-smiles="CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O">Ibuprofen</button>
+                <button class="example" data-smiles="CN1CCC23C4C1CC5=C2C(=C(C=C5)O)OC3C(C=C4)O">Morphine</button>
+                <button class="example" data-smiles="c1ccc2cc3ccccc3cc2c1">Anthracene</button>
+                <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Phenanthrene</button>
+                <button class="example" data-smiles="c1ccc(cc1)c2ccccc2">Biphenyl</button>
+                <button class="example" data-smiles="C1CCC2(C1)CCCCC2">Spiro[4.5]decane</button>
+                <button class="example" data-smiles="C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@H]34">Testosterone</button>
+                <button class="example" data-smiles="C(C1C(C(C(C(O1)O)O)O)O)O">Glucose</button>
+                <button class="example" data-smiles="C1C2CC3CC1CC(C2)C3">Adamantane</button>
+                <button class="example" data-smiles="C12C3C4C1C5C4C3C25">Cubane</button>
+                <button class="example" data-smiles="C1CC2CCC1C2">Norbornane</button>
+                <button class="example" data-smiles="C1=CC=C2C(=C1)C=CC3=C2C4=C(C=C3)C=CC=C4">Pyrene</button>
+                <button class="example" data-smiles="c1ccc2c(c1)c3ccccc3c4ccccc24">Triphenylene</button>
+                <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Tetracene</button>
+                <button class="example" data-smiles="c1ccncc1">Pyridine</button>
+                <button class="example" data-smiles="c1ccc2ncccc2c1">Quinoline</button>
+                <button class="example" data-smiles="c1coc2ccccc12">Benzofuran</button>
+              </div>
+            </div>
+          </div>
        </div>
 
        <div class="grid">
@@ -408,6 +442,16 @@
           smilesInput.value = btn.dataset.smiles;
           computeFromSmiles(btn.dataset.smiles);
         });
+      });
+
+      // Toggle examples section
+      const examplesToggle = document.getElementById('examples-toggle');
+      const examplesContent = document.getElementById('examples-content');
+      const chevron = examplesToggle.querySelector('.chevron');
+      
+      examplesToggle.addEventListener('click', () => {
+        examplesContent.classList.toggle('open');
+        chevron.classList.toggle('open');
       });
 
       // quick demo

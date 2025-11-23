@@ -83,7 +83,10 @@ describe("Tetrahedral Geometry Rendering", () => {
   it("should have roughly equal bond lengths in tetrahedral N+", () => {
     const parseResult = parseSMILES("C[N+](C)(C)C");
     const molecule = parseResult.molecules[0]!;
-    const result = renderSVG(molecule, { width: 250, height: 200 });
+    const result = renderSVG(molecule, {
+      width: 250,
+      height: 200,
+    });
 
     const atoms = extractAtomPositions(result.svg);
     const nPlus = atoms.find((a) => a.label === "N");
@@ -125,7 +128,10 @@ describe("Tetrahedral Geometry Rendering", () => {
   it("should have 90-degree angular spacing in tetrahedral geometry", () => {
     const parseResult = parseSMILES("C[N+](C)(C)C");
     const molecule = parseResult.molecules[0]!;
-    const result = renderSVG(molecule, { width: 250, height: 200 });
+    const result = renderSVG(molecule, {
+      width: 250,
+      height: 200,
+    });
 
     const atoms = extractAtomPositions(result.svg);
     const nPlus = atoms.find((a) => a.label === "N");
@@ -179,7 +185,6 @@ describe("Tetrahedral Geometry Rendering", () => {
     const webcolaResult = renderSVG(molecule, {
       width: 250,
       height: 200,
-      webcolaIterations: 100,
     });
 
     const defaultAtoms = extractAtomPositions(defaultResult.svg);

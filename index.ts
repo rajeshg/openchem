@@ -3,6 +3,11 @@ export {
   tanimotoSimilarity,
   getBitsSet,
 } from "src/utils/morgan-fingerprint";
+export { PackedMolecule } from "src/utils/packed-molecule";
+export type {
+  PackedMolecule as PackedMoleculeType,
+  PackedMoleculeQuery,
+} from "src/utils/packed-molecule";
 export { parseSMILES } from "src/parsers/smiles-parser";
 export { parseIUPACName } from "src/parsers/iupac-parser/iupac-parser";
 export { IUPACTokenizer } from "src/parsers/iupac-parser/iupac-tokenizer";
@@ -47,6 +52,18 @@ export {
   generateInChI,
   generateInChIKey,
 } from "src/generators/inchi-generator";
+export {
+  bulkMatchSMARTS,
+  bulkComputeProperties,
+  bulkComputeSimilarities,
+  bulkFindSimilar,
+  bulkFilterDrugLike,
+} from "src/utils/bulk-operations";
+export type {
+  BulkSMARTSResult,
+  BulkPropertiesResult,
+  BulkFingerprintResult,
+} from "src/utils/bulk-operations";
 // IUPAC naming using the new rule engine
 import { IUPACNamer } from "src/iupac-engine";
 import { parseMolfile } from "src/parsers/molfile-parser";

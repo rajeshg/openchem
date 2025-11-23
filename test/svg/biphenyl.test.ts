@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
 import { renderSVG } from "src/generators/svg-renderer";
-import { generateCoordinates } from "src/utils/coordinate-generator";
+import { generateCoordinates } from "src/generators/coordinate-generator";
 import { BondType } from "types";
 
 describe("Biphenyl Rendering", () => {

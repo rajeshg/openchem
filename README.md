@@ -157,7 +157,7 @@ For maintainers: update and run the test suite with `bun test`. Use `RUN_RDKIT_B
 - Isotopes, explicit hydrogens, charges, atom class support, and multi-digit ring closures
 - SMARTS parsing and pattern matching
 - Morgan fingerprints and Tanimoto similarity calculations
-- 2D SVG rendering with automatic coordinate generation (webcola-based layout)
+- 2D SVG rendering with automatic coordinate generation (deterministic, fast, zero overlaps)
 - Molecular properties and drug-likeness metrics (TPSA, LogP, Lipinski/Veber checks)
 - Immutable molecule objects with enrichment for fast property queries
 
@@ -396,7 +396,7 @@ console.log(output); // "CCO.O"
 
 ### SVG Rendering
 
-Render molecules as 2D SVG structures with automatic coordinate generation and layout optimization using webcola collision prevention.
+Render molecules as 2D SVG structures with automatic coordinate generation. openchem provides deterministic layouts, fast performance, and excellent handling of rings, branches, and terminal atoms.
 
 #### Basic SVG Rendering
 
@@ -470,14 +470,9 @@ const options: SVGRendererOptions = {
   // Stereochemistry display
   showStereoBonds: true,
   
-  // Layout optimization
-  webcolaIterations: 100, // More iterations = better layout (default: 100)
+  // Layout & coordinate generation
   kekulize: true, // Convert aromatic to alternating single/double bonds (default: true)
-  
-  // Chain placement (for deterministic layouts)
-  deterministicChainPlacement: false,
-  deterministicChainLength: 3,
-  moleculeSpacing: 60
+  moleculeSpacing: 60 // Spacing between molecules in grid layouts
 };
 
 const result = renderSVG(mol, options);
@@ -508,13 +503,15 @@ const result = renderSVG(mol, {
 console.log(result.svg);
 ```
 
-#### Webcola Coordinate Generation
+#### Coordinate Generation Features
 
-openchem uses **webcola** for collision prevention and layout optimization. This algorithm:
-- Automatically detects and regularizes rings (5 and 6-membered rings)
-- Handles fused ring systems with intelligent spacing
-- Prevents atom/bond overlap
-- Produces publication-quality 2D structures
+openchem's coordinate generator provides:
+- **Deterministic layouts** — Same molecule always produces same coordinates
+- **Fast performance** — Optimized for speed and quality
+- **Perfect terminal atom placement** — OH, NH₂, and other terminal groups extend radially
+- **Ring system detection** — Automatically detects and regularizes 5/6-membered rings, fused rings, spiro, and bridged systems
+- **Zero atom overlaps** — Intelligent substituent placement prevents collisions
+- **Publication-quality output** — Clean, chemically accurate 2D structures
 
 ```typescript
 import { parseSMILES, renderSVG } from 'openchem';
@@ -524,7 +521,6 @@ const naphthalene = parseSMILES('c1ccc2ccccc2c1');
 const result = renderSVG(naphthalene.molecules[0], {
   width: 300,
   height: 300,
-  webcolaIterations: 150, // More iterations for complex molecules
   bondLength: 35
 });
 

@@ -219,9 +219,26 @@ export function getCrippenAtomContribs(
   const doneAtoms = Array<boolean>(nAtoms).fill(false);
   let nAtomsFound = 0;
 
+  // Pre-compute atom symbols for faster filtering
+  const atomSymbols = molToMatch.atoms.map((a) => a.symbol);
+
   for (const cha of _patternOrder) {
     const pattVect = cachedParams[cha];
     if (!pattVect) continue;
+
+    // Quick symbol pre-filter: skip pattern group if no atoms of that type exist
+    if (cha === "C" && !atomSymbols.includes("C")) continue;
+    if (cha === "H" && !atomSymbols.includes("H")) continue;
+    if (cha === "N" && !atomSymbols.includes("N")) continue;
+    if (cha === "O" && !atomSymbols.includes("O")) continue;
+    if (cha === "S" && !atomSymbols.includes("S")) continue;
+    if (cha === "P" && !atomSymbols.includes("P")) continue;
+    if (cha === "X" && !atomSymbols.includes("X")) continue;
+    if (cha === "F" && !atomSymbols.includes("F")) continue;
+    if (cha === "Cl" && !atomSymbols.includes("Cl")) continue;
+    if (cha === "Br" && !atomSymbols.includes("Br")) continue;
+    if (cha === "I" && !atomSymbols.includes("I")) continue;
+
     for (const param of pattVect) {
       if (!param.pattern) continue;
       const matchRes = matchSMARTS(param.pattern, molToMatch, {
@@ -284,6 +301,12 @@ export function calcCrippenDescriptors(
   return { logp, mr };
 }
 
+/**
+ * Compute the octanol-water partition coefficient (LogP) using the Wildman-Crippen method.
+ * @param mol - Molecule to analyze
+ * @param includeHs - Include explicit hydrogens in calculation (default: true)
+ * @returns LogP value
+ */
 export function computeLogP(mol: Molecule, includeHs = true): number {
   // For very large molecules, LogP calculation can be slow
   // Skip calculation if molecule has more than 30 heavy atoms
