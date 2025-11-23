@@ -160,8 +160,9 @@ function countPiElectronsRDKit(
   ringAtoms: Set<number>,
   atomBonds: Bond[],
   originalAromaticFlags: Record<number, boolean>,
-  _allAtomsWereAromatic: boolean,
+  allAtomsWereAromatic: boolean,
   atomMap?: Map<number, Atom>,
+  originalBondTypes?: Record<string, BondType>,
 ): number {
   const bondCount = atomBonds.length;
 
@@ -193,18 +194,46 @@ function countPiElectronsRDKit(
     });
   };
 
+  // Helper to check if exocyclic double bond is specifically to oxygen (carbonyl/amide)
+  const hasExocyclicCarbonylDouble = (): boolean => {
+    const exocyclicBonds = atomBonds.filter((b) => {
+      const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
+      return !ringAtoms.has(otherId) && b.type === BondType.DOUBLE;
+    });
+    return exocyclicBonds.some((b) => {
+      const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
+      const otherAtom = atomMap?.get(otherId);
+      return otherAtom && otherAtom.symbol === "O";
+    });
+  };
+
   switch (atom.symbol) {
     case "C":
-      const hasDoubleBondInRingC = ringBonds.some(
-        (b) => b.type === BondType.DOUBLE || b.type === BondType.AROMATIC,
-      );
+      // Check if carbon has a DOUBLE bond in the ring (not aromatic - that's from previous detection)
+      const hasDoubleBondInRingC = ringBonds.some((b) => {
+        if (originalBondTypes) {
+          const key = bondKey(b.atom1, b.atom2);
+          const origType = originalBondTypes[key];
+          // Only count actual double bonds, not aromatic bonds from previous detection
+          return origType === BondType.DOUBLE;
+        }
+        return b.type === BondType.DOUBLE;
+      });
       if (hasDoubleBondInRingC) return 1;
 
-      if (hasExocyclicDouble) return 0;
+      // Allow aromatic carbonyl carbons (C=O in ring system) to contribute
+      // This is important for amides, imidazolones, etc.
+      if (hasExocyclicDouble && !hasExocyclicCarbonylDouble()) return 0;
+      if (hasExocyclicDouble && hasExocyclicCarbonylDouble()) {
+        // Carbonyl carbon in aromatic system (e.g., amide, imidazolone)
+        // Still contributes 1 π electron
+        return 1;
+      }
 
       // If carbon was marked aromatic in SMILES input and has 2 ring bonds,
       // it should contribute 1 π electron (e.g., tetrazole: n1nncn1)
-      if (originalAromaticFlags[atom.id] && ringBonds.length === 2) {
+      // NOTE: Only apply this in fully aromatic context to avoid mixing aromatic/non-aromatic rings
+      if (allAtomsWereAromatic && originalAromaticFlags[atom.id] && ringBonds.length === 2) {
         return 1;
       }
 
@@ -366,38 +395,31 @@ function isRingHuckelAromatic(
     (atomId) => originalAromaticFlags[atomId],
   );
 
-  let totalPiElectrons = 0;
+   let totalPiElectrons = 0;
+   let debugLog = [];
+   for (const atomId of ring) {
+     const atom = map.get(atomId);
+     if (!atom) continue;
 
-  for (const atomId of ring) {
-    const atom = map.get(atomId);
-    if (!atom) continue;
+     const atomBonds = bondsMap.get(atomId);
+     if (!atomBonds) continue;
 
-    const atomBonds = bondsMap.get(atomId);
-    if (!atomBonds) continue;
+     const piElectrons = countPiElectronsRDKit(
+       atom,
+       ringSet,
+       atomBonds,
+       originalAromaticFlags,
+       allAtomsWereAromatic,
+       atomMap,
+       originalBondTypes,
+     );
+     if (ring.includes(14) && atom.symbol !== "H") {
+       debugLog.push(`${atomId}(${atom.symbol}):${piElectrons}`);
+     }
+     totalPiElectrons += piElectrons;
+   }
 
-    const piElectrons = countPiElectronsRDKit(
-      atom,
-      ringSet,
-      atomBonds,
-      originalAromaticFlags,
-      allAtomsWereAromatic,
-      atomMap,
-    );
-    if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
-      console.log(
-        `[AROM DEBUG] Atom ${atomId} (${atom.symbol}) contributes ${piElectrons} e- (aromatic=${originalAromaticFlags[atomId]}, H=${atom.hydrogens})`,
-      );
-    }
-    totalPiElectrons += piElectrons;
-  }
-
-  const isAromatic = totalPiElectrons >= 6 && (totalPiElectrons - 2) % 4 === 0;
-
-  if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
-    console.log(
-      `[AROM DEBUG] Total pi electrons: ${totalPiElectrons}. isAromatic=${isAromatic}`,
-    );
-  }
+   const isAromatic = totalPiElectrons >= 6 && (totalPiElectrons - 2) % 4 === 0;
 
   return isAromatic;
 }
@@ -418,9 +440,11 @@ function isFusedSystemAromatic(
     atomBondsMap ||
     new Map(atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]));
 
-  if (
-    !hasConjugatedSystem(systemAtomSet, atoms, bonds, originalBondTypes, map)
-  ) {
+  const hasConj = hasConjugatedSystem(systemAtomSet, atoms, bonds, originalBondTypes, map);
+  if (process.env.VERBOSE && systemAtomSet.has(14)) {
+    console.log(`[AROM DEBUG] Fused system has conjugation: ${hasConj}`);
+  }
+  if (!hasConj) {
     return false;
   }
 
@@ -429,6 +453,7 @@ function isFusedSystemAromatic(
   );
 
   let totalPiElectrons = 0;
+  let debugLog = [];
   for (const atomId of systemAtoms) {
     const atom = map.get(atomId);
     if (!atom) continue;
@@ -443,11 +468,21 @@ function isFusedSystemAromatic(
       originalAromaticFlags,
       allAtomsWereAromatic,
       map,
+      originalBondTypes,
     );
+    if (atom.symbol !== "H" && systemAtomSet.has(14)) {
+      debugLog.push(`${atomId}(${atom.symbol}):${piElectrons}`);
+    }
     totalPiElectrons += piElectrons;
   }
 
   const isAromatic = totalPiElectrons >= 6 && (totalPiElectrons - 2) % 4 === 0;
+  if (process.env.VERBOSE && systemAtomSet.has(14)) {
+    console.log(`[AROM DEBUG] Fused π electrons: ${totalPiElectrons}, aromatic: ${isAromatic}`);
+    if (debugLog.length > 0) {
+      console.log(`[AROM DEBUG] Atom contributions: ${debugLog.join(", ")}`);
+    }
+  }
 
   return isAromatic;
 }
@@ -538,18 +573,28 @@ function perceiveAromaticityMutable(
         atomMap,
         atomBondsMap,
       );
-      // DEBUG: Log thiazole ring check
-      if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
-        console.log(
-          `[AROM DEBUG] Ring [${ring.join(",")}] Hückel check: ${isAromatic}`,
-        );
-      }
-      if (isAromatic) {
-        aromaticRings.push(ring);
-      }
-    } else {
-      if (
-        isFusedSystemAromatic(
+       // DEBUG: Log thiazole ring check
+       if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
+         console.log(
+           `[AROM DEBUG] Ring [${ring.join(",")}] Hückel check: ${isAromatic}`,
+         );
+       }
+       if (process.env.VERBOSE && (ring.includes(12) || ring.includes(14))) {
+         console.log(
+           `[AROM DEBUG] Single ring [${ring.join(",")}] Hückel check: ${isAromatic}`,
+         );
+       }
+       if (isAromatic) {
+         aromaticRings.push(ring);
+       }
+     } else {
+       if (process.env.VERBOSE && system.atoms.has(14)) {
+         console.log(
+           `[AROM DEBUG] Fused system [${Array.from(system.atoms).sort((a, b) => a - b).join(",")}] checking...`,
+         );
+       }
+       if (
+         isFusedSystemAromatic(
           system,
           atoms,
           bonds,
@@ -563,23 +608,29 @@ function perceiveAromaticityMutable(
           aromaticRings.push(ring);
           ringsInFusedSystems.add(ring);
         }
-      } else {
-        for (const ring of system.rings) {
-          const isAromatic = isRingHuckelAromatic(
-            ring,
-            atoms,
-            bonds,
-            originalAromaticFlags,
-            originalBondTypes,
-            atomMap,
-            atomBondsMap,
-          );
-          if (isAromatic) {
-            aromaticRings.push(ring);
-            ringsInFusedSystems.add(ring);
-          }
-        }
-      }
+       } else {
+         if (process.env.VERBOSE && system.atoms.has(14)) {
+           console.log(`[AROM DEBUG] Fused system not aromatic, checking individual rings...`);
+         }
+         for (const ring of system.rings) {
+           const isAromatic = isRingHuckelAromatic(
+             ring,
+             atoms,
+             bonds,
+             originalAromaticFlags,
+             originalBondTypes,
+             atomMap,
+             atomBondsMap,
+           );
+           if (process.env.VERBOSE && system.atoms.has(14) && ring.includes(14)) {
+             console.log(`[AROM DEBUG] Ring [${ring.join(",")}] individual check: ${isAromatic}`);
+           }
+           if (isAromatic) {
+             aromaticRings.push(ring);
+             ringsInFusedSystems.add(ring);
+           }
+         }
+       }
     }
   }
 

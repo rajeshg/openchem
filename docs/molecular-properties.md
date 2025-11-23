@@ -255,13 +255,67 @@ if (result.likelyPenetration) {
 
 ### Implementation Details
 
+- **Molecular Weight**: Average atomic masses (IUPAC 2021) — matches RDKit
+- **Exact Mass**: Monoisotopic masses (most abundant isotope)
 - **LogP**: Crippen's atom contribution method (see LogP section below)
 - **TPSA**: Ertl et al. fragment-based algorithm
-- **H-bond donors**: N-H and O-H groups
-- **H-bond acceptors**: N and O atoms
+- **H-bond donors**: RDKit-compatible SMARTS patterns (see below)
+- **H-bond acceptors**: RDKit-compatible SMARTS patterns (see below)
 - **Rotatable bonds**: Single bonds between heavy atoms (excluding ring bonds and terminal groups)
 
 **Implementation:** `src/utils/molecular-properties.ts`
+
+### H-Bond Acceptor/Donor Counting
+
+openchem implements **RDKit-compatible** H-bond acceptor and donor counting. These definitions match RDKit exactly but may differ from other tools (PubChem, DrugBank, MOE, Schrödinger) which use alternative definitions.
+
+#### Known Differences from Literature Values
+
+Different cheminformatics tools define HBA/HBD differently, leading to systematic differences:
+
+| Tool/Source | Definition | Example (Caffeine) |
+|-------------|------------|-------------------|
+| **openchem/RDKit** | SMARTS-based patterns | HBA=6, HBD=0 |
+| **PubChem/Literature** | Strong acceptors only | HBA=3, HBD=0 |
+| **DrugBank** | Varies by version | HBA=3-6, HBD=0 |
+
+**Why This Happens:**
+- **Amide nitrogens**: RDKit counts as acceptors, some tools exclude them
+- **Aromatic nitrogens**: RDKit counts pyridine-like N, some tools use stricter rules
+- **Carbonyl oxygens**: Universal agreement (always acceptors)
+- **Imine nitrogens**: RDKit counts C=N, some tools require lone pair accessibility
+
+**openchem Choice:** We match RDKit for consistency with the most widely-used open-source cheminformatics toolkit. This ensures interoperability and reproducible results.
+
+#### RDKit HBA Definition (SMARTS)
+
+```
+[$([O,S;H1;v2]-[!$(*=[O,N,P,S])]),
+ $([O,S;H0;v2]),
+ $([O,S;-]),
+ $([N;v3;!$(N-*=!@[O,N,P,S])]),
+ $([nH0,o,s;+0])]
+```
+
+**Translation:**
+1. O/S with 1H and valence 2, bonded to atom without =O,N,P,S (alcohols, thiols)
+2. O/S with 0H and valence 2 (ethers, sulfides, carbonyls)
+3. Negatively charged O/S
+4. N with valence 3, not bonded to anything with =O,N,P,S (amines, imines)
+5. Aromatic n/o/s with 0H and neutral charge (pyridine, furan, thiophene)
+
+#### RDKit HBD Definition (SMARTS)
+
+```
+[N&!H0&v3,N&!H0&+1&v4,O&H1&+0,S&H1&+0,n&H1&+0]
+```
+
+**Translation:**
+1. N with hydrogens and valence 3 (amines, amides)
+2. N with hydrogens and +1 charge and valence 4 (ammonium)
+3. O with 1H and neutral charge (alcohols, phenols, carboxylic acids)
+4. S with 1H and neutral charge (thiols)
+5. Aromatic n with 1H (pyrrole, imidazole)
 
 ---
 

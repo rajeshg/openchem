@@ -8,6 +8,7 @@ import {
   hasDoubleBond,
   hasTripleBond,
   hasCarbonylBond,
+  hasImineBond,
 } from "./bond-utils";
 import { MoleculeGraph } from "./molecular-graph";
 import { findAllRings } from "./sssr-kekule";
@@ -201,11 +202,45 @@ function isRotatableBond(
 
   const hasCarbonyl1 = hasCarbonylBond(mol.bonds, atom1.id, mol.atoms);
   const hasCarbonyl2 = hasCarbonylBond(mol.bonds, atom2.id, mol.atoms);
+  const hasImine1 = hasImineBond(mol.bonds, atom1.id, mol.atoms);
+  const hasImine2 = hasImineBond(mol.bonds, atom2.id, mol.atoms);
 
   const isHeteroatom1 = atom1.symbol !== "C" && atom1.symbol !== "H";
   const isHeteroatom2 = atom2.symbol !== "C" && atom2.symbol !== "H";
 
-  if ((hasCarbonyl1 && isHeteroatom2) || (hasCarbonyl2 && isHeteroatom1))
+  // Check direct conjugation (atom has C=O or C=N and other is heteroatom)
+  if (
+    (hasCarbonyl1 && isHeteroatom2) ||
+    (hasCarbonyl2 && isHeteroatom1) ||
+    (hasImine1 && isHeteroatom2) ||
+    (hasImine2 && isHeteroatom1)
+  )
+    return false;
+
+  // Check if heteroatom is bonded to another atom with conjugation
+  const neighborHasConjugation = (atomId: number) => {
+    const neighborBonds = mol.bonds.filter(
+      (b) =>
+        b.type === "single" &&
+        (b.atom1 === atomId || b.atom2 === atomId) &&
+        !(
+          (b.atom1 === bond.atom1 && b.atom2 === bond.atom2) ||
+          (b.atom1 === bond.atom2 && b.atom2 === bond.atom1)
+        ),
+    );
+    return neighborBonds.some((nb) => {
+      const neighborId = nb.atom1 === atomId ? nb.atom2 : nb.atom1;
+      return (
+        hasCarbonylBond(mol.bonds, neighborId, mol.atoms) ||
+        hasImineBond(mol.bonds, neighborId, mol.atoms)
+      );
+    });
+  };
+
+  if (
+    (isHeteroatom1 && neighborHasConjugation(atom1.id)) ||
+    (isHeteroatom2 && neighborHasConjugation(atom2.id))
+  )
     return false;
 
   return true;

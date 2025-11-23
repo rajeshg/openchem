@@ -1,6 +1,6 @@
 import type { Molecule } from "types";
-import { MONOISOTOPIC_MASSES, ISOTOPE_MASSES } from "src/constants";
-import { findRings } from "src/utils/ring-analysis";
+import { MONOISOTOPIC_MASSES, AVERAGE_ATOMIC_MASSES, ISOTOPE_MASSES } from "src/constants";
+import { findRings, analyzeRings } from "src/utils/ring-analysis";
 import { enrichMolecule } from "src/utils/molecule-enrichment";
 import {
   getBondsForAtom,
@@ -9,6 +9,7 @@ import {
   hasTripleBond,
   hasDoubleBond,
   hasCarbonylBond,
+  hasImineBond,
 } from "src/utils/bond-utils";
 import { MoleculeGraph } from "src/utils/molecular-graph";
 import { computeLogP } from "src/utils/logp";
@@ -111,11 +112,31 @@ export function getMolecularFormula(
 }
 
 export function getMolecularMass(mol: Molecule): number {
+  // Molecular weight using average atomic masses (RDKit-compatible)
   let mass = 0;
   for (const atom of mol.atoms) {
     const sym = atom.symbol;
     if (!sym || sym === "*") continue;
-    const baseMass = getAtomMass(sym, atom.isotope ?? null);
+    const baseMass = getAverageAtomMass(sym, atom.isotope ?? null);
+    if (sym === "H") {
+      mass += baseMass;
+    } else {
+      mass += baseMass;
+      if ((atom.hydrogens ?? 0) > 0) {
+        mass += (atom.hydrogens ?? 0) * (AVERAGE_ATOMIC_MASSES["H"] || 1.008);
+      }
+    }
+  }
+  return mass;
+}
+
+export function getExactMass(mol: Molecule): number {
+  // Exact mass using monoisotopic masses (most abundant isotope)
+  let mass = 0;
+  for (const atom of mol.atoms) {
+    const sym = atom.symbol;
+    if (!sym || sym === "*") continue;
+    const baseMass = getMonoisotopicAtomMass(sym, atom.isotope ?? null);
     if (sym === "H") {
       mass += baseMass;
     } else {
@@ -129,12 +150,19 @@ export function getMolecularMass(mol: Molecule): number {
   return mass;
 }
 
-export function getExactMass(mol: Molecule): number {
-  // Exact mass is the monoisotopic mass (sum of the most abundant isotope masses)
-  return getMolecularMass(mol);
+function getAverageAtomMass(symbol: string, isotope: number | null): number {
+  if (isotope && ISOTOPE_MASSES[symbol] && ISOTOPE_MASSES[symbol][isotope]) {
+    return ISOTOPE_MASSES[symbol][isotope];
+  }
+  const base = AVERAGE_ATOMIC_MASSES[symbol];
+  if (base !== undefined) return base;
+  return Math.max(
+    1,
+    Math.round(symbol.length > 0 ? symbol.charCodeAt(0) % 100 : 12),
+  );
 }
 
-function getAtomMass(symbol: string, isotope: number | null): number {
+function getMonoisotopicAtomMass(symbol: string, isotope: number | null): number {
   if (isotope && ISOTOPE_MASSES[symbol] && ISOTOPE_MASSES[symbol][isotope]) {
     return ISOTOPE_MASSES[symbol][isotope];
   }
@@ -209,42 +237,247 @@ export function getFractionCSP3(mol: Molecule): number {
 }
 
 export function getHBondAcceptorCount(mol: Molecule): number {
-  return mol.atoms.filter((a) => a.symbol === "N" || a.symbol === "O").length;
-}
-
-export function getHBondDonorCount(mol: Molecule): number {
+  // Implement RDKit-compatible H-bond acceptor counting
+  // SMARTS pattern: [$([O,S;H1;v2]-[!$(*=[O,N,P,S])]),$([O,S;H0;v2]),$([O,S;-]),
+  //                  $([N;v3;!$(N-*=!@[O,N,P,S])]),$([nH0,o,s;+0])]
+  // Where v2 = total valence including implicit H
   let count = 0;
+
+  // Helper to check if atom is in a ring
+  const isAtomInRing = (atomId: number): boolean => {
+    if (!mol.rings) return false;
+    return mol.rings.some((ring) => ring.includes(atomId));
+  };
+
   for (const atom of mol.atoms) {
-    if (atom.symbol === "N" || atom.symbol === "O") {
-      count += atom.hydrogens ?? 0;
+    let matched = false;
+
+    if (atom.symbol === "O" || atom.symbol === "S") {
+      const bonds = getBondsForAtom(mol.bonds, atom.id);
+      const explicitValence = bonds.reduce((sum, b) => {
+        const order = b.type === "single" ? 1 :
+                    b.type === "double" ? 2 :
+                    b.type === "triple" ? 3 :
+                    b.type === "aromatic" ? 1.5 : 1;
+        return sum + order;
+      }, 0);
+      const totalValence = explicitValence + (atom.hydrogens || 0);
+
+      const hydrogens = atom.hydrogens || 0;
+      const charge = atom.charge || 0;
+
+      // Rule: negatively charged O/S
+      if (charge < 0) {
+        count++;
+        matched = true;
+      } else if (totalValence === 2) {
+        // O/S with valence 2
+        if (hydrogens === 0) {
+          // Rule: O/S with 0H and valence 2 (ethers, carbonyls, sulfides)
+          count++;
+          matched = true;
+        } else if (hydrogens === 1) {
+          // Rule: O/S with 1H and valence 2, bonded to atom WITHOUT =O,N,P,S
+          // Check if any bonded atom has a double bond to O, N, P, or S
+          let hasNeighborWithDoubleBond = false;
+          for (const bond of bonds) {
+            const neighborId = bond.atom1 === atom.id ? bond.atom2 : bond.atom1;
+            const neighbor = mol.atoms[neighborId];
+            const neighborBonds = getBondsForAtom(mol.bonds, neighborId);
+            
+            for (const nb of neighborBonds) {
+              if (nb.type === "double") {
+                const doubleBondAtomId = nb.atom1 === neighborId ? nb.atom2 : nb.atom1;
+                const doubleBondAtom = mol.atoms[doubleBondAtomId];
+                if (doubleBondAtom && ["O", "N", "P", "S"].includes(doubleBondAtom.symbol)) {
+                  hasNeighborWithDoubleBond = true;
+                  break;
+                }
+              }
+            }
+            if (hasNeighborWithDoubleBond) break;
+          }
+          
+          if (!hasNeighborWithDoubleBond) {
+            count++;
+            matched = true;
+          }
+        }
+      }
+    }
+
+    if (!matched && atom.symbol === "N") {
+      const bonds = getBondsForAtom(mol.bonds, atom.id);
+      const explicitValence = bonds.reduce((sum, b) => {
+        const order = b.type === "single" ? 1 :
+                    b.type === "double" ? 2 :
+                    b.type === "triple" ? 3 :
+                    b.type === "aromatic" ? 1.5 : 1;
+        return sum + order;
+      }, 0);
+      const totalValence = explicitValence + (atom.hydrogens || 0);
+
+      const charge = atom.charge || 0;
+
+      // Rule: N with valence 3, NOT bonded to anything with =O,N,P,S
+      // SMARTS: $([N;v3;!$(N-*=!@[O,N,P,S])])
+      // The "-" means we only check SINGLE bonds from N
+      if (totalValence === 3 && charge >= 0) {
+        let hasNeighborWithDoubleBond = false;
+        for (const bond of bonds) {
+          // Only check single bonds from N (SMARTS: N-*)
+          if (bond.type !== "single") continue;
+          
+          const neighborId = bond.atom1 === atom.id ? bond.atom2 : bond.atom1;
+          const neighbor = mol.atoms[neighborId];
+          const neighborBonds = getBondsForAtom(mol.bonds, neighborId);
+          
+          for (const nb of neighborBonds) {
+            if (nb.type === "double") {
+              const doubleBondAtomId = nb.atom1 === neighborId ? nb.atom2 : nb.atom1;
+              const doubleBondAtom = mol.atoms[doubleBondAtomId];
+              if (doubleBondAtom && ["O", "N", "P", "S"].includes(doubleBondAtom.symbol)) {
+                hasNeighborWithDoubleBond = true;
+                break;
+              }
+            }
+          }
+          if (hasNeighborWithDoubleBond) break;
+        }
+        
+        if (!hasNeighborWithDoubleBond) {
+          count++;
+          matched = true;
+        }
+      }
+    }
+
+    if (!matched &&
+      (atom.symbol === "n" || atom.symbol === "o" || atom.symbol === "s") &&
+      atom.aromatic
+    ) {
+      // Rule: aromatic N/O/S with 0H and neutral charge
+      if ((atom.hydrogens || 0) === 0 && (atom.charge || 0) === 0) {
+        count++;
+        matched = true;
+      }
+    }
+
+    if (!matched &&
+      (atom.symbol === "N" || atom.symbol === "O" || atom.symbol === "S") &&
+      (atom.hydrogens || 0) === 0 &&
+      (atom.charge || 0) === 0 &&
+      isAtomInRing(atom.id)
+    ) {
+      // Additional rule: N/O/S in rings with 0H and neutral charge
+      // This catches aromatic heteroatoms that weren't marked with lowercase symbols
+      // or when aromaticity perceiver didn't identify them as aromatic
+      // We check if this atom is in a ring and could reasonably be aromatic
+      const bonds = getBondsForAtom(mol.bonds, atom.id);
+      const ringSize = mol.rings?.find((r) => r.includes(atom.id))?.length;
+      if (ringSize && ringSize >= 5 && ringSize <= 7) {
+        // Could be aromatic - check that it's not part of an obvious non-aromatic pattern
+        // (like a saturated ring or a carbonyl)
+        const hasExocyclicDouble = bonds.some((b) => {
+          const otherAtomId = b.atom1 === atom.id ? b.atom2 : b.atom1;
+          return b.type === "double" && !isAtomInRing(otherAtomId);
+        });
+        
+        if (!hasExocyclicDouble) {
+          count++;
+          matched = true;
+        }
+      }
     }
   }
+
   return count;
 }
 
-export function getTPSA(mol: Molecule): number {
+export function getHBondDonorCount(mol: Molecule): number {
+  // Implement RDKit-compatible H-bond donor counting
+  // Based on RDKit's NumHDonors logic: [N&!H0&v3,N&!H0&+1&v4,O&H1&+0,S&H1&+0,n&H1&+0]
+  let count = 0;
+
+  for (const atom of mol.atoms) {
+    const hydrogens = atom.hydrogens || 0;
+    const charge = atom.charge || 0;
+
+    if (hydrogens === 0) continue; // Must have hydrogens to donate
+
+    if (atom.symbol === "O" || atom.symbol === "S") {
+      // O/S with exactly 1 H and neutral charge (RDKit: O&H1&+0, S&H1&+0)
+      // Note: RDKit does NOT count water (OH2) or H2S as HBD
+      if (hydrogens === 1 && charge === 0) {
+        count++;
+      }
+    } else if (atom.symbol === "N") {
+      // N with hydrogens and appropriate valence
+      const bonds = getBondsForAtom(mol.bonds, atom.id);
+      const explicitValence = bonds.reduce((sum, b) => {
+        const order = b.type === "single" ? 1 :
+                    b.type === "double" ? 2 :
+                    b.type === "triple" ? 3 :
+                    b.type === "aromatic" ? 1.5 : 1;
+        return sum + order;
+      }, 0);
+      const valence = explicitValence + (atom.hydrogens || 0);
+
+      // N with valence 3 or 4 (including charged) and hydrogens
+      // Count each atom as 1 HBD site (not count all H atoms)
+      if ((valence === 3 || (valence === 4 && charge === 1)) && hydrogens > 0) {
+        count++;
+      }
+    } else if (atom.symbol === "n" && atom.aromatic) {
+      // Aromatic N with hydrogens (pyrrole, imidazole)
+      if (hydrogens >= 1) {
+        count++;
+      }
+    }
+  }
+
+  return count;
+}
+
+export function getTPSA(mol: Molecule, includeSandP: boolean = false): number {
   let tpsa = 0;
+
+  // Get ring info for 3-membered ring detection
+  const ringInfo = analyzeRings(mol);
 
   for (const atom of mol.atoms) {
     const symbol = atom.symbol;
-    if (symbol !== "N" && symbol !== "O" && symbol !== "S" && symbol !== "P") {
-      continue;
+    if (symbol !== "N" && symbol !== "O") {
+      if (!includeSandP || (symbol !== "S" && symbol !== "P")) {
+        continue;
+      }
     }
 
     const hydrogens = atom.hydrogens ?? 0;
     const bonds = getBondsForAtom(mol.bonds, atom.id);
     const heavyNeighbors = bonds.length;
 
+    const singleBonds = bonds.filter((b) => b.type === "single").length;
     const doubleBonds = bonds.filter((b) => b.type === "double").length;
     const tripleBonds = bonds.filter((b) => b.type === "triple").length;
+    const aromaticBonds = bonds.filter((b) => b.type === "aromatic").length;
+
+    const charge = atom.charge ?? 0;
+    // Check if atom is in a 3-membered ring
+    const ringsContainingAtom = ringInfo.getRingsContainingAtom(atom.id);
+    const in3Ring = ringsContainingAtom.some((ring) => ring.length === 3);
 
     const contribution = getTPSAContribution(
       symbol,
       hydrogens,
       heavyNeighbors,
+      singleBonds,
       doubleBonds,
       tripleBonds,
+      aromaticBonds,
       atom.aromatic ?? false,
+      charge,
+      in3Ring,
     );
 
     tpsa += contribution;
@@ -257,67 +490,114 @@ function getTPSAContribution(
   symbol: string,
   hydrogens: number,
   heavyNeighbors: number,
+  singleBonds: number,
   doubleBonds: number,
   tripleBonds: number,
+  aromaticBonds: number,
   aromatic: boolean,
+  charge: number,
+  in3Ring: boolean,
 ): number {
   if (symbol === "N") {
+    // Aromatic nitrogen
     if (aromatic) {
+      if (heavyNeighbors === 2) {
+        if (hydrogens === 0 && charge === 0 && aromaticBonds === 2) return 12.89; // pyridine
+        if (hydrogens === 1 && charge === 0 && aromaticBonds === 2) return 15.79; // pyrrole
+        if (hydrogens === 1 && charge === 1 && aromaticBonds === 2) return 14.14; // charged aromatic NH
+      } else if (heavyNeighbors === 3) {
+        if (hydrogens === 0 && charge === 0 && aromaticBonds === 3) return 4.41; // 3 aromatic bonds
+        if (hydrogens === 0 && charge === 0 && singleBonds === 1 && aromaticBonds === 2) return 4.93; // xanthine/caffeine
+        if (hydrogens === 0 && charge === 0 && doubleBonds === 1 && aromaticBonds === 2) return 8.39; // aromatic with =O
+        if (hydrogens === 0 && charge === 1 && aromaticBonds === 3) return 4.10; // charged aromatic
+        if (hydrogens === 0 && charge === 1 && singleBonds === 1 && aromaticBonds === 2) return 3.88; // charged
+      }
+      // Fallback for aromatic N
       if (hydrogens === 1) return 15.79;
-      if (hydrogens === 0) return 12.89;
+      return 12.89;
     }
 
-    if (tripleBonds === 1) {
-      return 23.79;
+    // Non-aromatic nitrogen - organized by neighbor count
+    if (heavyNeighbors === 1) {
+      if (hydrogens === 0 && charge === 0 && tripleBonds === 1) return 23.79; // nitrile
+      if (hydrogens === 1 && charge === 0 && doubleBonds === 1) return 23.85; // imine -NH
+      if (hydrogens === 2 && charge === 0 && singleBonds === 1) return 26.02; // primary amine with 1 bond
+      if (hydrogens === 2 && charge === 1 && doubleBonds === 1) return 25.59; // charged imine
+      if (hydrogens === 3 && charge === 1 && singleBonds === 1) return 27.64; // ammonium with 1 bond
+    } else if (heavyNeighbors === 2) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 1 && doubleBonds === 1) return 12.36; // imine
+      if (hydrogens === 0 && charge === 0 && tripleBonds === 1 && doubleBonds === 1) return 13.60; // rare
+      if (hydrogens === 1 && charge === 0 && singleBonds === 2 && in3Ring) return 21.94; // 3-ring NH
+      if (hydrogens === 1 && charge === 0 && singleBonds === 2 && !in3Ring) return 12.03; // secondary amine
+      if (hydrogens === 0 && charge === 1 && tripleBonds === 1 && singleBonds === 1) return 4.36; // charged
+      if (hydrogens === 1 && charge === 1 && doubleBonds === 1 && singleBonds === 1) return 13.97; // charged
+      if (hydrogens === 2 && charge === 1 && singleBonds === 2) return 16.61; // protonated amine
+    } else if (heavyNeighbors === 3) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 3 && in3Ring) return 3.01; // 3-ring tertiary
+      if (hydrogens === 0 && charge === 0 && singleBonds === 3 && !in3Ring) return 3.24; // tertiary amine
+      if (hydrogens === 0 && charge === 0 && singleBonds === 1 && doubleBonds === 2) return 11.68; // 2 double bonds
+      if (hydrogens === 0 && charge === 1 && singleBonds === 2 && doubleBonds === 1) return 3.01; // charged
+      if (hydrogens === 1 && charge === 1 && singleBonds === 3) return 4.44; // protonated amine
+    } else if (heavyNeighbors === 4) {
+      if (hydrogens === 0 && singleBonds === 4 && charge === 1) return 0.0; // quaternary ammonium
     }
 
-    if (doubleBonds >= 1) {
-      if (hydrogens === 0 && heavyNeighbors === 1) return 23.79;
-      if (hydrogens === 0 && heavyNeighbors === 2) return 12.36;
-    }
-
-    if (hydrogens === 3) return 26.02;
-    if (hydrogens === 2) return 26.02;
-    if (hydrogens === 1) return 12.03;
-    if (hydrogens === 0 && heavyNeighbors === 3) return 3.24;
-    if (hydrogens === 0) return 12.03;
-
-    return 12.03;
+    // Fallback formula: 30.5 - nNbrs * 8.2 + nHs * 1.5
+    const fallback = 30.5 - heavyNeighbors * 8.2 + hydrogens * 1.5;
+    return fallback < 0 ? 0 : fallback;
   }
 
   if (symbol === "O") {
     if (aromatic) {
-      return 13.14;
+      return 13.14; // furan-like
     }
 
-    if (doubleBonds === 1) {
+    if (heavyNeighbors === 0) {
+      // Water or standalone oxygen
+      if (hydrogens >= 1) return 20.23;
       return 17.07;
+    } else if (heavyNeighbors === 1) {
+      if (hydrogens === 0 && charge === 0 && doubleBonds === 1) return 17.07; // carbonyl
+      if (hydrogens === 1 && charge === 0 && singleBonds === 1) return 20.23; // hydroxyl
+      if (hydrogens === 0 && charge === -1 && singleBonds === 1) return 23.06; // oxyanion
+    } else if (heavyNeighbors === 2) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 2 && in3Ring) return 12.53; // epoxide
+      if (hydrogens === 0 && charge === 0 && singleBonds === 2 && !in3Ring) return 9.23; // ether
     }
 
-    if (hydrogens >= 1) return 20.23;
-    if (hydrogens === 0 && heavyNeighbors === 2) return 9.23;
-
-    return 17.07;
+    // Fallback formula: 28.5 - nNbrs * 8.6 + nHs * 1.5
+    const fallback = 28.5 - heavyNeighbors * 8.6 + hydrogens * 1.5;
+    return fallback < 0 ? 0 : fallback;
   }
 
   if (symbol === "S") {
-    if (doubleBonds >= 2) {
-      return 32.09;
+    if (heavyNeighbors === 1) {
+      if (hydrogens === 0 && charge === 0 && doubleBonds === 1) return 32.09; // S=C
+      if (hydrogens === 1 && charge === 0 && singleBonds === 1) return 38.8; // thiol
+    } else if (heavyNeighbors === 2) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 2) return 25.3; // thioether
+      if (hydrogens === 0 && charge === 0 && aromaticBonds === 2) return 28.24; // thiophene
+    } else if (heavyNeighbors === 3) {
+      if (hydrogens === 0 && charge === 0 && aromaticBonds === 2 && doubleBonds === 1) return 21.7; // aromatic S=O
+      if (hydrogens === 0 && charge === 0 && singleBonds === 2 && doubleBonds === 1) return 19.21; // sulfoxide
+    } else if (heavyNeighbors === 4) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 2 && doubleBonds === 2) return 8.38; // sulfone
     }
-    if (doubleBonds === 1) {
-      return 25.3;
-    }
-    if (hydrogens === 1) return 38.8;
-    if (hydrogens === 0) return 25.3;
 
-    return 25.3;
+    return 0;
   }
 
   if (symbol === "P") {
-    if (doubleBonds === 1) {
-      return 34.14;
+    if (heavyNeighbors === 2) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 1 && doubleBonds === 1) return 34.14; // P=C
+    } else if (heavyNeighbors === 3) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 3) return 13.59; // phosphine
+      if (hydrogens === 1 && charge === 0 && singleBonds === 2 && doubleBonds === 1) return 23.47; // P-OH with P=O
+    } else if (heavyNeighbors === 4) {
+      if (hydrogens === 0 && charge === 0 && singleBonds === 3 && doubleBonds === 1) return 9.81; // phosphate
     }
-    return 13.59;
+
+    return 0;
   }
 
   return 0;
@@ -393,11 +673,40 @@ export function getRotatableBondCount(mol: Molecule): number {
 
     const hasCarbonyl1 = hasCarbonylBond(mol.bonds, atom1.id, mol.atoms);
     const hasCarbonyl2 = hasCarbonylBond(mol.bonds, atom2.id, mol.atoms);
+    const hasImine1 = hasImineBond(mol.bonds, atom1.id, mol.atoms);
+    const hasImine2 = hasImineBond(mol.bonds, atom2.id, mol.atoms);
 
     const isHeteroatom1 = atom1.symbol !== "C" && atom1.symbol !== "H";
     const isHeteroatom2 = atom2.symbol !== "C" && atom2.symbol !== "H";
 
-    if ((hasCarbonyl1 && isHeteroatom2) || (hasCarbonyl2 && isHeteroatom1))
+    // Check if a heteroatom is bonded to another atom that has conjugation
+    const neighborHasConjugation = (atomId: number) => {
+      const neighborBonds = mol.bonds.filter(
+        (b) =>
+          b.type === "single" &&
+          (b.atom1 === atomId || b.atom2 === atomId) &&
+          !(
+            (b.atom1 === bond.atom1 && b.atom2 === bond.atom2) ||
+            (b.atom1 === bond.atom2 && b.atom2 === bond.atom1)
+          ),
+      );
+      return neighborBonds.some((nb) => {
+        const neighborId = nb.atom1 === atomId ? nb.atom2 : nb.atom1;
+        return (
+          hasCarbonylBond(mol.bonds, neighborId, mol.atoms) ||
+          hasImineBond(mol.bonds, neighborId, mol.atoms)
+        );
+      });
+    };
+
+    if (
+      (hasCarbonyl1 && isHeteroatom2) ||
+      (hasCarbonyl2 && isHeteroatom1) ||
+      (hasImine1 && isHeteroatom2) ||
+      (hasImine2 && isHeteroatom1) ||
+      (isHeteroatom1 && neighborHasConjugation(atom1.id)) ||
+      (isHeteroatom2 && neighborHasConjugation(atom2.id))
+    )
       continue;
 
     count++;

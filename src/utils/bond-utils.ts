@@ -84,6 +84,25 @@ export function hasCarbonylBond(
   });
 }
 
+export function hasImineBond(
+  bonds: readonly Bond[],
+  atomId: number,
+  atoms: readonly Atom[],
+): boolean {
+  const atom = atoms.find((a) => a.id === atomId);
+  if (!atom || atom.aromatic) return false;
+
+  return getBondsForAtom(bonds, atomId).some((b) => {
+    if (b.type !== "double") return false;
+    const other = getOtherAtom(b, atomId, atoms);
+    if (!other) return false;
+    return (
+      (atom.symbol === "C" && other.symbol === "N") ||
+      (atom.symbol === "N" && other.symbol === "C")
+    );
+  });
+}
+
 export function bondKey(atom1: number, atom2: number): string {
   return `${Math.min(atom1, atom2)}-${Math.max(atom1, atom2)}`;
 }
