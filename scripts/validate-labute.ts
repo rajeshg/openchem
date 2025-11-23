@@ -26,7 +26,12 @@ let matches = 0;
 
 for (const test of testMolecules) {
   const result = parseSMILES(test.smiles);
-  const asa = getLabuteASA(result.molecules[0]);
+  const mol = result.molecules[0];
+  if (!mol) {
+    console.log(`${test.name.padEnd(20)} ERROR: Failed to parse SMILES`);
+    continue;
+  }
+  const asa = getLabuteASA(mol);
   const diff = asa - test.rdkit;
   const match = Math.abs(diff) < 0.5 ? "✓" : "✗";
 
