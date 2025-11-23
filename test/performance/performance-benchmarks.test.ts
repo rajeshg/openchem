@@ -71,33 +71,37 @@ describe("Performance Benchmarks", () => {
     expect(avgMs).toBeGreaterThan(0);
   });
 
-  it("should benchmark molecular properties calculation", () => {
-    const molecules = Object.values(MOLECULES).map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
-    const iterations = 50;
+  it(
+    "should benchmark molecular properties calculation",
+    () => {
+      const molecules = Object.values(MOLECULES).map(
+        (s) => parseSMILES(s).molecules[0]!,
+      );
+      const iterations = 50;
 
-    const start = performance.now();
-    for (let i = 0; i < iterations; i++) {
-      for (const mol of molecules) {
-        checkLipinskiRuleOfFive(mol);
-        getRingInfo(mol);
-        computeMorganFingerprint(mol);
+      const start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        for (const mol of molecules) {
+          checkLipinskiRuleOfFive(mol);
+          getRingInfo(mol);
+          computeMorganFingerprint(mol);
+        }
       }
-    }
-    const end = performance.now();
+      const end = performance.now();
 
-    const totalMs = end - start;
-    const avgMs = totalMs / (iterations * molecules.length * 3);
+      const totalMs = end - start;
+      const avgMs = totalMs / (iterations * molecules.length * 3);
 
-    console.log(`\n📊 Molecular Properties Performance:`);
-    console.log(
-      `   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules × 3 operations)`,
-    );
-    console.log(`   Average: ${avgMs.toFixed(4)}ms per operation`);
+      console.log(`\n📊 Molecular Properties Performance:`);
+      console.log(
+        `   Total time: ${totalMs.toFixed(2)}ms (${iterations} iterations × ${molecules.length} molecules × 3 operations)`,
+      );
+      console.log(`   Average: ${avgMs.toFixed(4)}ms per operation`);
 
-    expect(avgMs).toBeGreaterThan(0);
-  });
+      expect(avgMs).toBeGreaterThan(0);
+    },
+    { timeout: 30000 }, // 30s timeout for CI environments
+  );
 
   it("should benchmark SMARTS matching", () => {
     const molecules = Object.values(MOLECULES).map(
