@@ -403,10 +403,77 @@
           propsEl.innerHTML = '';
           for(const [k,v] of summary){ const d=document.createElement('div'); d.className='prop'; d.innerHTML=`<b>${k}</b><div>${v}</div>`; propsEl.appendChild(d) }
 
-          const desc = computeDescriptors(mol);
+          // Compute all new descriptors if library is loaded
+          const allDescriptors = {};
+          
+          if (lib) {
+            // Basic descriptors (always available)
+            allDescriptors['Formula'] = formula;
+            allDescriptors['Molecular Mass'] = mw.toFixed(2);
+            allDescriptors['Exact Mass'] = lib.getExactMass ? lib.getExactMass(mol).toFixed(4) : mw.toFixed(4);
+            allDescriptors['Heavy Atoms'] = heavy;
+            allDescriptors['Heteroatoms'] = hetero;
+            
+            // Structural descriptors
+            if (lib.getNumValenceElectrons) allDescriptors['Valence Electrons'] = lib.getNumValenceElectrons(mol);
+            if (lib.getNumAmideBonds) allDescriptors['Amide Bonds'] = lib.getNumAmideBonds(mol);
+            if (lib.getNumSpiroAtoms) allDescriptors['Spiro Atoms'] = lib.getNumSpiroAtoms(mol);
+            if (lib.getNumBridgeheadAtoms) allDescriptors['Bridgehead Atoms'] = lib.getNumBridgeheadAtoms(mol);
+            
+            // Ring descriptors
+            allDescriptors['Total Rings'] = rings;
+            allDescriptors['Aromatic Rings'] = arom;
+            if (lib.getNumSaturatedRings) allDescriptors['Saturated Rings'] = lib.getNumSaturatedRings(mol);
+            if (lib.getNumAliphaticRings) allDescriptors['Aliphatic Rings'] = lib.getNumAliphaticRings(mol);
+            if (lib.getNumHeterocycles) allDescriptors['Heterocycles'] = lib.getNumHeterocycles(mol);
+            if (lib.getNumAromaticHeterocycles) allDescriptors['Aromatic Heterocycles'] = lib.getNumAromaticHeterocycles(mol);
+            
+            // Stereochemistry
+            if (lib.getNumAtomStereoCenters) allDescriptors['Stereocenters'] = lib.getNumAtomStereoCenters(mol);
+            if (lib.getNumUnspecifiedAtomStereoCenters) allDescriptors['Unspecified Stereocenters'] = lib.getNumUnspecifiedAtomStereoCenters(mol);
+            
+            // Drug-likeness descriptors
+            allDescriptors['Fraction CSP3'] = fraction.toFixed(3);
+            allDescriptors['H-bond Donors'] = don;
+            allDescriptors['H-bond Acceptors'] = acc;
+            allDescriptors['TPSA'] = tpsa.toFixed(2);
+            allDescriptors['Rotatable Bonds'] = rot;
+            if (lib.computeLogP) allDescriptors['LogP (Wildman-Crippen)'] = lib.computeLogP(mol).toFixed(2);
+            
+            // Surface area
+            if (lib.getLabuteASA) allDescriptors['LabuteASA (Ų)'] = lib.getLabuteASA(mol).toFixed(2);
+            
+            // Topology descriptors
+            if (lib.getKappa1) allDescriptors['Kappa1'] = lib.getKappa1(mol).toFixed(3);
+            if (lib.getKappa2) allDescriptors['Kappa2'] = lib.getKappa2(mol).toFixed(3);
+            if (lib.getKappa3) allDescriptors['Kappa3'] = lib.getKappa3(mol).toFixed(3);
+            if (lib.getHallKierAlpha) allDescriptors['Hall-Kier Alpha'] = lib.getHallKierAlpha(mol).toFixed(3);
+            if (lib.getBertzCT) allDescriptors['Bertz CT'] = lib.getBertzCT(mol).toFixed(2);
+            
+            // Chi indices
+            if (lib.getChi0) allDescriptors['Chi0'] = lib.getChi0(mol).toFixed(3);
+            if (lib.getChi1) allDescriptors['Chi1'] = lib.getChi1(mol).toFixed(3);
+            if (lib.getChi0v) allDescriptors['Chi0v'] = lib.getChi0v(mol).toFixed(3);
+            if (lib.getChi1v) allDescriptors['Chi1v'] = lib.getChi1v(mol).toFixed(3);
+            if (lib.getChi2v) allDescriptors['Chi2v'] = lib.getChi2v(mol).toFixed(3);
+            if (lib.getChi3v) allDescriptors['Chi3v'] = lib.getChi3v(mol).toFixed(3);
+            if (lib.getChi4v) allDescriptors['Chi4v'] = lib.getChi4v(mol).toFixed(3);
+            
+            // Partial charges (min/max)
+            if (lib.getMaxPartialCharge) allDescriptors['Max Partial Charge'] = lib.getMaxPartialCharge(mol).toFixed(4);
+            if (lib.getMinPartialCharge) allDescriptors['Min Partial Charge'] = lib.getMinPartialCharge(mol).toFixed(4);
+          } else {
+            // Fallback mode - basic descriptors only
+            const desc = computeDescriptors(mol);
+            Object.assign(allDescriptors, desc);
+          }
+          
+          // Render descriptors table
           descTable.innerHTML = '';
-          for(const k of Object.keys(desc)){
-            const row = document.createElement('tr'); row.innerHTML = `<td><b>${k}</b></td><td>${JSON.stringify(desc[k])}</td>`; descTable.appendChild(row);
+          for(const [k, v] of Object.entries(allDescriptors)){
+            const row = document.createElement('tr'); 
+            row.innerHTML = `<td><b>${k}</b></td><td>${v}</td>`; 
+            descTable.appendChild(row);
           }
 
           const checks = computeChecks(mol);
