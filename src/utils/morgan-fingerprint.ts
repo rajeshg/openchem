@@ -1,13 +1,13 @@
 /**
  * Morgan Fingerprints (Extended-Connectivity Fingerprints)
- * 
+ *
  * Derived from RDKit's Morgan fingerprint implementation
  * Original C++ source: rdkit/Code/GraphMol/Fingerprints/MorganFingerprints.cpp
  * Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and others
- * 
+ *
  * This TypeScript implementation is based on RDKit's algorithms and is
  * distributed under the BSD 3-Clause License (same as RDKit).
- * 
+ *
  * Reference:
  * - RDKit: https://github.com/rdkit/rdkit
  * - Rogers, D. & Hahn, M., J. Chem. Inf. Model. 50:742-754 (2010)

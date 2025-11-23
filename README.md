@@ -1800,6 +1800,14 @@ MIT
 
 ## Acknowledgments
 
-- Validated against [RDKit](https://www.rdkit.org/) — the leading open-source cheminformatics toolkit
-- SMILES specification: [Daylight Theory Manual](https://www.daylight.com/dayhtml/doc/theory/)
-- Inspired by the need for production-ready cheminformatics in JavaScript/TypeScript
+openchem builds on the work of several excellent open-source projects:
+
+- **[RDKit](https://www.rdkit.org/)** — Validated against RDKit for accuracy. Several molecular descriptor algorithms (LabuteASA, LogP, Morgan fingerprints, etc.) are derived from RDKit's C++ implementation. See [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) for details.
+
+- **[OPSIN](https://github.com/dan2097/opsin)** by Daniel Lowe — IUPAC nomenclature data (XML lexicon files in `opsin-iupac-data/` and compiled rules in `opsin-rules.json`) used for parsing and generating IUPAC chemical names. Licensed under MIT.
+
+- **[InChI Trust](https://www.inchi-trust.org/)** — InChI identifier generation via WebAssembly build of the official InChI library.
+
+- **[Daylight SMILES & SMARTS](https://www.daylight.com/dayhtml/doc/theory/)** — Specification for molecular line notation and pattern matching.
+
+For complete license information and attribution requirements, see [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
