@@ -16,6 +16,7 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 ### Structure Analysis
 - **Pattern matching** — SMARTS substructure search
 - **Fingerprints** — Morgan (ECFP) fingerprints with Tanimoto similarity
+- **Murcko scaffolds** — Extract core scaffolds, generic frameworks, scaffold trees
 - **Ring systems** — SSSR detection, fused/spiro/bridged classification
 - **Aromaticity** — Hückel rule perception and kekulization
 - **Symmetry** — Canonical ordering via modified Morgan algorithm
@@ -180,6 +181,34 @@ const similarity = tanimotoSimilarity(fp1, fp2);
 console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`); // ~45.2%
 ```
 
+### Murcko Scaffolds
+
+Extract core molecular scaffolds for drug discovery and compound classification:
+
+```typescript
+import { parseSMILES, getMurckoScaffold, getBemisMurckoFramework, generateSMILES } from 'openchem';
+
+// Extract scaffold (rings + linkers, remove side chains)
+const ibuprofen = parseSMILES('CC(C)Cc1ccc(cc1)C(C)C(=O)O').molecules[0];
+const scaffold = getMurckoScaffold(ibuprofen);
+console.log(generateSMILES(scaffold)); // "c1ccc(cc1)" - benzene core
+
+// Get generic framework (all atoms → carbon, all bonds → single)
+const framework = getBemisMurckoFramework(ibuprofen);
+console.log(generateSMILES(framework)); // "C1CCCCC1" - cyclohexane
+
+// Compare scaffolds of similar drugs
+import { haveSameScaffold } from 'openchem';
+const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
+console.log(haveSameScaffold(ibuprofen, aspirin)); // true - both have benzene scaffold
+```
+
+**Applications:**
+- Compound library classification
+- Lead series identification
+- Scaffold hopping strategies
+- Fragment-based drug design
+
 ### SVG Rendering
 
 ```typescript
@@ -232,6 +261,7 @@ For comprehensive working examples, see:
 - [`docs/examples/example-iupac.ts`](docs/examples/example-iupac.ts) — IUPAC name generation and parsing (both directions)
 - [`docs/examples/example-aromaticity.ts`](docs/examples/example-aromaticity.ts) — Aromaticity perception using Hückel's rule
 - [`docs/examples/example-drug-likeness.ts`](docs/examples/example-drug-likeness.ts) — Drug-likeness assessment (Lipinski, Veber, BBB)
+- [`docs/examples/example-murcko-scaffolds.ts`](docs/examples/example-murcko-scaffolds.ts) — Murcko scaffold extraction and analysis
 - [`docs/examples/example-sdf-export.ts`](docs/examples/example-sdf-export.ts) — SDF file generation
 
 Run any example:
@@ -730,7 +760,7 @@ bun test test/parser.test.ts
 
 ### Quick Reference
 
-openchem provides **31 functions** organized into 6 categories:
+openchem provides **36 functions** organized into 7 categories:
 
 **Parsing & Generation (8)**
 - `parseSMILES` - Parse SMILES strings
@@ -749,6 +779,13 @@ openchem provides **31 functions** organized into 6 categories:
 - `kekulize` - Convert aromatic to Kekulé structures
 - `computeMorganFingerprint` - Generate Morgan fingerprints from molecules
 - `tanimotoSimilarity` - Calculate Tanimoto similarity between fingerprints
+
+**Scaffold Analysis (5)**
+- `getMurckoScaffold` - Extract Murcko scaffold (rings + linkers)
+- `getBemisMurckoFramework` - Generic scaffold (all C, single bonds)
+- `getScaffoldTree` - Hierarchical scaffold decomposition
+- `getGraphFramework` - Pure topology (all atoms → wildcard)
+- `haveSameScaffold` - Compare two molecules' scaffolds
 
 **Basic Properties (3)**
 - `getMolecularFormula` - Hill notation formula
@@ -1295,6 +1332,92 @@ Calculates the Tanimoto similarity coefficient between two Morgan fingerprints. 
 ```typescript
 const similarity = tanimotoSimilarity(fingerprint1, fingerprint2);
 console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
+```
+
+---
+
+#### Scaffold Analysis (5 functions)
+
+##### `getMurckoScaffold(molecule: Molecule, options?: MurckoOptions): Molecule`
+
+Extracts the Murcko scaffold from a molecule — the core ring systems and linkers connecting them, with all terminal side chains removed. This is the standard scaffold used in medicinal chemistry for compound classification.
+
+**Parameters**:
+- `molecule` — Molecule to analyze
+- `options.includeLinkers` — Include linker atoms between rings (default: `true`)
+
+**Returns**: New `Molecule` containing only the scaffold
+
+**Example**:
+```typescript
+import { parseSMILES, getMurckoScaffold, generateSMILES } from 'openchem';
+
+const ibuprofen = parseSMILES('CC(C)Cc1ccc(cc1)C(C)C(=O)O').molecules[0];
+const scaffold = getMurckoScaffold(ibuprofen);
+console.log(generateSMILES(scaffold)); // "c1ccccc1" - benzene core
+```
+
+##### `getBemisMurckoFramework(molecule: Molecule): Molecule`
+
+Generates a generic Bemis-Murcko framework — the scaffold with all atoms converted to carbon and all bonds converted to single bonds. Useful for identifying compounds with similar topology but different heteroatom patterns.
+
+**Returns**: New `Molecule` with generic framework
+
+**Example**:
+```typescript
+import { parseSMILES, getBemisMurckoFramework, generateSMILES } from 'openchem';
+
+const pyridine = parseSMILES('c1ccncc1').molecules[0];
+const framework = getBemisMurckoFramework(pyridine);
+console.log(generateSMILES(framework)); // "C1CCCCC1" - cyclohexane
+```
+
+##### `getScaffoldTree(molecule: Molecule): Molecule[]`
+
+Generates a hierarchical scaffold tree by iteratively removing rings from the Murcko scaffold. Returns scaffolds ordered from most specific (full scaffold) to least specific (single ring).
+
+**Returns**: Array of `Molecule` objects representing scaffolds at different levels
+
+**Example**:
+```typescript
+import { parseSMILES, getScaffoldTree, generateSMILES } from 'openchem';
+
+const mol = parseSMILES('c1ccc2ccccc2c1').molecules[0]; // Naphthalene
+const tree = getScaffoldTree(mol);
+console.log(tree.length); // 2 levels: full naphthalene, then single benzene
+tree.forEach((scaffold, idx) => {
+  console.log(`Level ${idx}: ${generateSMILES(scaffold)}`);
+});
+```
+
+##### `getGraphFramework(molecule: Molecule): Molecule`
+
+Generates a pure topological framework with all atoms converted to wildcard atoms (`*`). This represents the molecular graph structure without any atom type information.
+
+**Returns**: New `Molecule` with graph framework
+
+**Example**:
+```typescript
+import { parseSMILES, getGraphFramework, generateSMILES } from 'openchem';
+
+const caffeine = parseSMILES('CN1C=NC2=C1C(=O)N(C(=O)N2C)C').molecules[0];
+const graph = getGraphFramework(caffeine);
+console.log(generateSMILES(graph)); // "*1*=**2=*1*(*)*(*)*2*" - pure topology
+```
+
+##### `haveSameScaffold(mol1: Molecule, mol2: Molecule): boolean`
+
+Compares two molecules to determine if they share the same Murcko scaffold. Useful for compound series analysis and lead identification.
+
+**Returns**: `true` if scaffolds match, `false` otherwise
+
+**Example**:
+```typescript
+import { parseSMILES, haveSameScaffold } from 'openchem';
+
+const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
+const ibuprofen = parseSMILES('CC(C)Cc1ccc(cc1)C(C)C(=O)O').molecules[0];
+console.log(haveSameScaffold(aspirin, ibuprofen)); // true - both benzene scaffold
 ```
 
 ---

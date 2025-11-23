@@ -47,6 +47,16 @@ export type {
   BBBResult,
 } from "src/descriptors";
 
+// Murcko Scaffolds
+export {
+  getMurckoScaffold,
+  getBemisMurckoFramework,
+  getScaffoldTree,
+  getGraphFramework,
+  haveSameScaffold,
+} from "src/utils/murcko-scaffold";
+export type { MurckoOptions, ScaffoldResult } from "src/utils/murcko-scaffold";
+
 // Specialized utility functions (not part of Descriptors namespace)
 export {
   getMaxPartialCharge,

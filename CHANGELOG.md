@@ -5,6 +5,30 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-11-23
+
+### Added
+- **Murcko Scaffold Analysis** - Extract core molecular scaffolds for drug discovery
+  - `getMurckoScaffold()` - Extract rings + linkers (remove side chains)
+  - `getBemisMurckoFramework()` - Generic scaffold (all C, single bonds)
+  - `getScaffoldTree()` - Hierarchical scaffold decomposition
+  - `getGraphFramework()` - Pure topology (all atoms → wildcard)
+  - `haveSameScaffold()` - Compare scaffolds between molecules
+- Comprehensive test suite with 43 passing tests covering:
+  - Basic scaffolds (benzene, toluene, naphthalene, pyridine)
+  - Drug-like molecules (aspirin, ibuprofen, caffeine)
+  - Linker handling (biphenyl, multi-atom linkers)
+  - Edge cases (spiro, bridged systems, adamantane)
+  - Scaffold trees and generic frameworks
+- Updated API documentation with scaffold analysis examples
+- Added scaffold analysis section to README with usage examples
+
+### Documentation
+- Added Murcko scaffolds to Feature list
+- Added "Scaffold Analysis (5)" category to API Reference
+- Detailed API documentation for all 5 scaffold functions
+- Added usage example in README showing drug discovery workflow
+
 ## [0.2.4] - 2025-11-23
 
 ### Fixed
