@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { parseSMILES, getRotatableBondCount } from "index";
+import { parseSMILES, Descriptors } from "index";
 
 describe("Metformin rotatable bonds", () => {
   it("should count 0 rotatable bonds in metformin (guanidine conjugation)", () => {
@@ -8,7 +8,7 @@ describe("Metformin rotatable bonds", () => {
     expect(result.molecules).toHaveLength(1);
 
     const metformin = result.molecules[0]!;
-    const rotatableBonds = getRotatableBondCount(metformin);
+    const rotatableBonds = Descriptors.rotatableBonds(metformin);
 
     expect(rotatableBonds).toBe(0);
   });

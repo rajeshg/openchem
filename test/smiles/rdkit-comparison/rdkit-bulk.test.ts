@@ -1,15 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import {
-  parseSMILES,
-  generateSMILES,
-  getMolecularFormula,
-  getMolecularMass,
-  getExactMass,
-  getHBondDonorCount,
-  getHBondAcceptorCount,
-  getRotatableBondCount,
-  getTPSA,
-} from "index";
+import { parseSMILES, generateSMILES, Descriptors } from "index";
 import { enrichMolecule } from "src/utils/molecule-enrichment";
 
 // Programmatically build a diverse list of 300 SMILES
@@ -290,7 +280,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
           const parsed = parseSMILES(smiles);
           if (parsed && parsed.molecules && parsed.molecules.length > 0) {
             return parsed.molecules
-              .map((m) => getMolecularFormula(m))
+              .map((m) => Descriptors.formula(m))
               .sort()
               .join(".");
           }
@@ -363,15 +353,15 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
 
       // compute our properties (combine all molecules for multi-component systems like salts)
       const ourFormulas = parsed.molecules
-        .map((m) => getMolecularFormula(m))
+        .map((m) => Descriptors.formula(m))
         .sort()
         .join(".");
       const ourMass = parsed.molecules.reduce(
-        (sum, m) => sum + getMolecularMass(m),
+        (sum, m) => sum + Descriptors.mass(m),
         0,
       );
       const ourExact = parsed.molecules.reduce(
-        (sum, m) => sum + getExactMass(m),
+        (sum, m) => sum + Descriptors.basic(m).exactMass,
         0,
       );
 
@@ -453,7 +443,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
 
         // H-bond donors
         if (typeof descriptors.NumHDonors === "number") {
-          const ourDonors = getHBondDonorCount(enriched);
+          const ourDonors = Descriptors.hbondDonors(enriched);
           if (descriptors.NumHDonors !== ourDonors) {
             generationFailures.push(
               `${smiles} (HBD mismatch) our:${ourDonors} rdkit:${descriptors.NumHDonors}`,
@@ -463,7 +453,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
 
         // H-bond acceptors
         if (typeof descriptors.NumHAcceptors === "number") {
-          const ourAcceptors = getHBondAcceptorCount(enriched);
+          const ourAcceptors = Descriptors.hbondAcceptors(enriched);
           if (descriptors.NumHAcceptors !== ourAcceptors) {
             generationFailures.push(
               `${smiles} (HBA mismatch) our:${ourAcceptors} rdkit:${descriptors.NumHAcceptors}`,
@@ -473,7 +463,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
 
         // Rotatable bonds
         if (typeof descriptors.NumRotatableBonds === "number") {
-          const ourRotBonds = getRotatableBondCount(enriched);
+          const ourRotBonds = Descriptors.rotatableBonds(enriched);
           if (descriptors.NumRotatableBonds !== ourRotBonds) {
             generationFailures.push(
               `${smiles} (RotBonds mismatch) our:${ourRotBonds} rdkit:${descriptors.NumRotatableBonds}`,
@@ -483,7 +473,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
 
         // TPSA (allow small tolerance for floating point)
         if (typeof descriptors.TPSA === "number") {
-          const ourTPSA = getTPSA(enriched);
+          const ourTPSA = Descriptors.tpsa(enriched);
           const tpsaTol = 0.1;
           if (Math.abs(descriptors.TPSA - ourTPSA) > tpsaTol) {
             generationFailures.push(

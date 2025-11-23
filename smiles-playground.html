@@ -3,527 +3,1109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>SMILES Playground — openchem molecular visualization</title>
+  <title>SMILES Playground — openchem</title>
   <style>
-    :root{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;--bg:#0f1720;--card:#0b1220;--muted:#9aa4b2;--accent:#60a5fa}
-    body{margin:0;background:linear-gradient(180deg,#071028 0%,#071724 100%);color:#e6eef6;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px}
-    .container{max-width:1100px;width:100%}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:18px;border-radius:10px}
-    .input-row{display:flex;gap:8px;margin-top:12px}
-    input.smiles{flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px}
-    button{background:var(--accent);color:#05233a;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:16px}
-    .props{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .prop{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px}
-    .prop b{display:block;color:#cfe8ff}
-    pre{white-space:pre-wrap;word-break:break-word;margin:0;font-size:13px}
-    .right{position:sticky;top:24px}
-    footer{margin-top:12px;color:var(--muted);font-size:13px}
-    .status{color:var(--muted);font-size:13px;margin-top:8px}
-    .table{width:100%;border-collapse:collapse}
-    .table td{padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
-    .examples-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:8px;margin-top:12px}
-    .examples-toggle{background:transparent;color:var(--accent);border:none;padding:4px 8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;width:100%}
-    .examples-toggle:hover{background:rgba(255,255,255,0.03)}
-    .examples-content{display:none;margin-top:12px;max-height:200px;overflow-y:auto;padding-right:8px}
-    .examples-content.open{display:block}
-    .examples-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
-    .example{font-size:12px;padding:6px 10px;text-align:left}
-    .chevron{transition:transform 0.2s}
-    .chevron.open{transform:rotate(180deg)}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #0a0e1a;
+      --bg-card: #1a1f2e;
+      --border: rgba(255, 255, 255, 0.1);
+      --text-primary: #e6eef6;
+      --text-muted: #9aa4b2;
+      --accent: #60a5fa;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #040814 0%, var(--bg-dark) 100%);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Examples Section */
+    .examples-section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .examples-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .example-btn {
+      background: rgba(96, 165, 250, 0.08);
+      border: 1px solid rgba(96, 165, 250, 0.15);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.15s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .example-btn:hover {
+      background: rgba(96, 165, 250, 0.15);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .example-btn.active {
+      background: var(--accent);
+      color: #0a0e1a;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Main Content */
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card-header {
+      margin-bottom: 20px;
+    }
+
+    .card-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    /* Input Section */
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .input-row input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: "Menlo", "Monaco", monospace;
+    }
+
+    .input-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    .input-row button {
+      background: var(--accent);
+      color: #0a0e1a;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .input-row button:hover {
+      background: #7bb3ff;
+      transform: translateY(-1px);
+    }
+
+    /* Output Grid */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .output-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .output-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .output-value {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-family: "Menlo", "Monaco", monospace;
+      max-height: 80px;
+      overflow-y: auto;
+      word-break: break-all;
+    }
+
+    .output-value.smiles {
+      color: var(--text-primary);
+    }
+
+    .output-value.inchi {
+      color: var(--accent);
+    }
+
+    .output-value.iupac {
+      color: #34d399;
+    }
+
+    /* Content Grid: Structure + Info */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Structure Display */
+    .structure-display {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      min-height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+    }
+
+    /* Summary Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .summary-item {
+      background: rgba(96, 165, 250, 0.05);
+      border: 1px solid rgba(96, 165, 250, 0.15);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .summary-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Descriptors */
+    .descriptors-section {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 8px;
+    }
+
+    .descriptors-section:first-child {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .descriptor-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      user-select: none;
+    }
+
+    .descriptor-header h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+    }
+
+    .toggle-icon {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .descriptors-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .descriptors-grid.collapsed {
+      display: none;
+    }
+
+    .descriptor-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .descriptor-item label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .descriptor-item value {
+      color: var(--text-primary);
+      font-family: "Menlo", "Monaco", monospace;
+      font-weight: 600;
+    }
+
+    /* Right Sidebar - Checks */
+    .sidebar-right {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .check-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .check-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .check-name {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .check-badge {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .check-badge.pass {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .check-badge.fail {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .check-props {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .check-prop {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .check-prop strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .check-violations {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--error);
+      line-height: 1.5;
+    }
+
+    .diagnostics {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+      font-family: "Menlo", "Monaco", monospace;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(96, 165, 250, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(96, 165, 250, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 1400px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .structure-display {
+        min-height: 350px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 13px;
+      }
+
+      .layout {
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .card-header h1 {
+        font-size: 22px;
+      }
+
+      .output-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .descriptors-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .structure-display {
+        min-height: 280px;
+      }
+
+      .examples-grid {
+        gap: 6px;
+      }
+
+      .example-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card-header h1 {
+        font-size: 18px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .input-row button {
+        width: 100%;
+      }
+
+      .structure-display {
+        min-height: 240px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-      <header>
-        <div>
-          <h1>SMILES Playground — molecular visualization, descriptors, InChI & IUPAC names</h1>
-          <div class="status">Type a SMILES string and see the 2D structure, InChI representation, IUPAC name, compute descriptors, and check drug-likeness rules.</div>
+  <div class="layout">
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Header -->
+      <div class="card">
+        <div class="card-header">
+          <h1>SMILES Playground</h1>
+          <p>Visualize molecular structures, compute descriptors, and check drug-likeness rules</p>
         </div>
-      </header>
 
-    <div class="card">
-      <div>
-         <label for="smiles">SMILES</label>
-         <div class="input-row">
-           <input id="smiles" class="smiles" placeholder="e.g. CC(=O)Oc1ccccc1C(=O)O" />
-           <button id="go">Compute</button>
-         </div>
+        <!-- Examples -->
+        <div class="examples-section">
+          <h2 class="section-title">Quick Examples</h2>
+          <div class="examples-grid" id="examples"></div>
+        </div>
 
-          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-            <div>
-              <label style="font-size:12px;color:var(--muted)">SMILES</label>
-              <div class="card" style="background:rgba(255,255,255,0.02);margin-top:4px">
-                <pre id="smiles-output" style="margin:0;font-size:12px;word-break:break-all"></pre>
-              </div>
-            </div>
-            <div>
-              <label style="font-size:12px;color:var(--muted)">InChI</label>
-              <div class="card" style="background:rgba(255,255,255,0.02);margin-top:4px">
-                <pre id="inchi-output" style="margin:0;font-size:12px;word-break:break-all;color:#60a5fa"></pre>
-              </div>
-            </div>
-            <div>
-              <label style="font-size:12px;color:var(--muted)">IUPAC Name</label>
-              <div class="card" style="background:rgba(255,255,255,0.02);margin-top:4px">
-                <pre id="iupac-output" style="margin:0;font-size:12px;word-break:break-word;color:#34d399"></pre>
-              </div>
-            </div>
+        <!-- Input -->
+        <div class="input-row">
+          <input id="smiles-input" type="text" placeholder="Enter SMILES (e.g., CC(=O)Oc1ccccc1C(=O)O)" />
+          <button id="compute-btn">Compute</button>
+        </div>
+
+        <!-- Output -->
+        <div class="output-grid">
+          <div class="output-item">
+            <div class="output-label">SMILES</div>
+            <div id="smiles-output" class="output-value smiles"></div>
           </div>
-
-          <div class="examples-section">
-            <button class="examples-toggle" id="examples-toggle">
-              <span class="chevron">▼</span>
-              <span>Example Molecules</span>
-              <span style="color:var(--muted);font-weight:400;margin-left:auto">(click to expand)</span>
-            </button>
-            <div class="examples-content" id="examples-content">
-              <div class="examples-grid">
-                <button class="example" data-smiles="c1ccccc1">Benzene</button>
-                <button class="example" data-smiles="c1ccc2ccccc2c1">Naphthalene</button>
-                <button class="example" data-smiles="CCO">Ethanol</button>
-                <button class="example" data-smiles="CC(C)C">Isobutane</button>
-                <button class="example" data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
-                <button class="example" data-smiles="Cn1cnc2c1c(=O)n(C)c(=O)n2C">Caffeine</button>
-                <button class="example" data-smiles="CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O">Ibuprofen</button>
-                <button class="example" data-smiles="CN1CCC23C4C1CC5=C2C(=C(C=C5)O)OC3C(C=C4)O">Morphine</button>
-                <button class="example" data-smiles="c1ccc2cc3ccccc3cc2c1">Anthracene</button>
-                <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Phenanthrene</button>
-                <button class="example" data-smiles="c1ccc(cc1)c2ccccc2">Biphenyl</button>
-                <button class="example" data-smiles="C1CCC2(C1)CCCCC2">Spiro[4.5]decane</button>
-                <button class="example" data-smiles="C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@H]34">Testosterone</button>
-                <button class="example" data-smiles="C(C1C(C(C(C(O1)O)O)O)O)O">Glucose</button>
-                <button class="example" data-smiles="C1C2CC3CC1CC(C2)C3">Adamantane</button>
-                <button class="example" data-smiles="C12C3C4C1C5C4C3C25">Cubane</button>
-                <button class="example" data-smiles="C1CC2CCC1C2">Norbornane</button>
-                <button class="example" data-smiles="C1=CC=C2C(=C1)C=CC3=C2C4=C(C=C3)C=CC=C4">Pyrene</button>
-                <button class="example" data-smiles="c1ccc2c(c1)c3ccccc3c4ccccc24">Triphenylene</button>
-                <button class="example" data-smiles="c1ccc2c(c1)ccc3c2ccc4c3cccc4">Tetracene</button>
-                <button class="example" data-smiles="c1ccncc1">Pyridine</button>
-                <button class="example" data-smiles="c1ccc2ncccc2c1">Quinoline</button>
-                <button class="example" data-smiles="c1coc2ccccc12">Benzofuran</button>
-              </div>
-            </div>
+          <div class="output-item">
+            <div class="output-label">InChI</div>
+            <div id="inchi-output" class="output-value inchi"></div>
           </div>
-       </div>
-
-       <div class="grid">
-         <div>
-           <h3>Structure</h3>
-           <div class="card" style="margin-bottom:16px;text-align:center;background:#ffffff;border:1px solid #e5e7eb;">
-             <div id="structure-svg" style="min-height:200px;display:flex;align-items:center;justify-content:center;color:#666;font-size:14px">
-               Enter a SMILES string to see the 2D structure
-             </div>
-           </div>
-
-           <h3>Summary</h3>
-           <div class="props" id="props"></div>
-
-           <h3 style="margin-top:12px">Descriptors</h3>
-           <div class="card" style="margin-top:8px">
-             <table class="table" id="desc-table"></table>
-           </div>
-         </div>
-
-        <div class="right">
-          <div class="card">
-            <h3>Diagnostics</h3>
-            <pre id="diagnostics">Library auto-detection: attempting to load local library exports...
-            </pre>
-          </div>
-          <div style="height:12px"></div>
-          <div class="card">
-            <h3>Checks</h3>
-            <div id="checks-container">
-              <div id="lipinski" style="margin-bottom:10px"></div>
-              <div id="veber" style="margin-bottom:10px"></div>
-              <div id="bbb" style="margin-bottom:2px"></div>
-            </div>
+          <div class="output-item">
+            <div class="output-label">IUPAC Name</div>
+            <div id="iupac-output" class="output-value iupac"></div>
           </div>
         </div>
       </div>
 
-       <footer>
-         <strong>Full library mode:</strong> Run <code>bun run serve</code> and open at <code>http://localhost:3000/smiles-playground.html</code> for SVG rendering, InChI generation, and IUPAC names.
-         <br>
-         <strong>Fallback mode:</strong> Basic SMILES parsing and descriptor calculations work without a server (approximate for complex molecules).
-       </footer>
-    </div>
+      <!-- Content Grid: Structure + Summary/Descriptors -->
+      <div class="content-grid">
+        <!-- Structure - Left Column -->
+        <div class="structure-column">
+          <div class="card structure-card">
+            <h3 class="card-title">2D Structure</h3>
+            <div id="structure" class="structure-display">
+              Enter a SMILES to visualize
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary/Descriptors - Right Column -->
+        <div class="info-column">
+          <!-- Summary -->
+          <div class="card">
+            <h3 class="card-title">Summary</h3>
+            <div id="summary" class="summary-grid"></div>
+          </div>
+
+          <!-- Descriptors -->
+          <div class="card">
+            <h3 class="card-title">Descriptors</h3>
+            <div id="descriptors"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Checks -->
+    <aside class="sidebar-right">
+      <div class="check-card" id="lipinski"></div>
+      <div class="check-card" id="veber"></div>
+      <div class="check-card" id="bbb"></div>
+      <div class="diagnostics" id="diagnostics">Loading library...</div>
+    </aside>
   </div>
 
   <script type="module">
-    // Provide a tiny browser shim for `process` so the bundled ESM can run
-    // (some builds reference `process.env` at module-eval time).
-    if (typeof globalThis.process === 'undefined') {
+    if (typeof globalThis.process === "undefined") {
       globalThis.process = { env: {} };
     }
-    // Lightweight fallback implementation derived from the project's utilities.
-    (function(){
-      const monoMass = {H:1.007825032, C:12.0, N:14.003074, O:15.994915, S:31.972071, P:30.973762, F:18.998403, Cl:34.968853, Br:78.918337, I:126.90447};
+
+    (function () {
+      const EXAMPLES = [
+        { name: "Benzene", smiles: "c1ccccc1" },
+        { name: "Naphthalene", smiles: "c1ccc2ccccc2c1" },
+        { name: "Ethanol", smiles: "CCO" },
+        { name: "Aspirin", smiles: "CC(=O)Oc1ccccc1C(=O)O" },
+        { name: "Caffeine", smiles: "Cn1cnc2c1c(=O)n(C)c(=O)n2C" },
+        { name: "Ibuprofen", smiles: "CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O" },
+        { name: "Morphine", smiles: "CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)O)O[C@H]3[C@H](C=C4)O" },
+        { name: "Glucose", smiles: "C(C1C(C(C(C(O1)O)O)O)O)O" },
+        { name: "Testosterone", smiles: "C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@H]34" },
+        { name: "Adamantane", smiles: "C1C2CC3CC1CC(C2)C3" },
+        { name: "Cubane", smiles: "C12C3C4C1C5C4C3C25" },
+        { name: "Pyrene", smiles: "C1=CC=C2C(=C1)C=CC3=C2C4=C(C=C3)C=CC=C4" },
+        { name: "Anthracene", smiles: "c1ccc2cc3ccccc3cc2c1" },
+        { name: "Phenanthrene", smiles: "c1ccc2c(c1)ccc3c2ccc4c3cccc4" },
+        { name: "Pyridine", smiles: "c1ccncc1" },
+        { name: "Quinoline", smiles: "c1ccc2ncccc2c1" },
+        { name: "Benzofuran", smiles: "c1coc2ccccc12" },
+        { name: "Biphenyl", smiles: "c1ccc(cc1)c2ccccc2" },
+        { name: "Norbornane", smiles: "C1CC2CCC1C2" },
+        { name: "Isobutane", smiles: "CC(C)C" },
+        { name: "Spiro[4.5]decane", smiles: "C1CCC2(C1)CCCCC2" },
+        { name: "Triphenylene", smiles: "c1ccc2c(c1)c3ccccc3c4ccccc24" },
+        { name: "Tetracene", smiles: "c1ccc2c(c1)ccc3c2ccc4c3cccc4" }
+      ];
+
+      const monoMass = {
+        H: 1.008,
+        C: 12.0,
+        N: 14.007,
+        O: 15.999,
+        S: 32.065,
+        P: 30.974,
+        F: 18.998,
+        Cl: 35.453,
+        Br: 79.904,
+        I: 126.904
+      };
 
       async function tryLoadLibrary() {
-        // Try loading the ESM bundle via dynamic import
         try {
-          const lib = await import('./dist/index.js?v=' + Date.now());
+          const lib = await import("./dist/index.js?v=" + Date.now());
           return lib;
         } catch (err) {
-          throw new Error('Failed to load dist/index.js: ' + err.message);
+          throw new Error("Failed to load library: " + err.message);
         }
       }
 
       function parseSMILESFallback(smiles) {
-        // Very small parser: supports atoms, bracket atoms with Hn, bonds - = #, branches () and simple ring digits
         const atoms = [];
         const bonds = [];
         const ringMap = {};
         const branchStack = [];
-        let i = 0; let lastAtom = null; let pendingBondType = 'single';
+        let i = 0;
+        let lastAtom = null;
+        let pendingBondType = "single";
 
-        function addAtom(symbol, hydrogens, aromatic=false, isotope=null, charge=null){
-          const id = atoms.length+1;
-          const atom = {id, symbol, hydrogens:hydrogens||0, aromatic, isotope, charge};
+        function addAtom(symbol, hydrogens = 0) {
+          const id = atoms.length;
+          const atom = { id, symbol, hydrogens };
           atoms.push(atom);
-          if (lastAtom) {
-            bonds.push({atom1:lastAtom.id, atom2:id, type:pendingBondType, isRotatable: pendingBondType==='single'});
+          if (lastAtom !== null) {
+            bonds.push({ atom1: lastAtom.id, atom2: id, type: pendingBondType });
           }
           lastAtom = atom;
         }
 
         while (i < smiles.length) {
           const ch = smiles[i];
-          if (ch === '(') { branchStack.push(lastAtom); i++; continue; }
-          if (ch === ')') { lastAtom = branchStack.pop()||lastAtom; i++; continue; }
-          if (ch === '-' || ch === '.' ) { pendingBondType='single'; i++; continue; }
-          if (ch === '=') { pendingBondType='double'; i++; continue; }
-          if (ch === '#') { pendingBondType='triple'; i++; continue; }
-          if (ch === ':') { pendingBondType='aromatic'; i++; continue; }
-          if (/[0-9]/.test(ch)) {
-            // ring closure
-            const d = ch;
-            if (ringMap[d]) {
-              bonds.push({atom1:ringMap[d].id, atom2:lastAtom.id, type:pendingBondType});
-              delete ringMap[d];
-            } else {
-              ringMap[d] = lastAtom;
-            }
-            pendingBondType='single';
-            i++; continue;
-          }
-          if (ch === '[') {
-            // bracket atom
-            let j = i+1; let content='';
-            while (j<smiles.length && smiles[j] !== ']') { content += smiles[j++]; }
-            i = j+1;
-            // parse something like NH2, CH3, 13CH3, O-, N+ etc.
-            const m = content.match(/^(\d+)?([A-Z][a-z]?)(H(\d+)?)?([+-]\d?)?/);
-            if (m) {
-              const symbol = m[2];
-              const hcount = m[4]?parseInt(m[4],10): (m[3]?1:0);
-              addAtom(symbol, hcount);
-            } else {
-              // fallback, try first letters
-              const sym = content.slice(0, (content[1] && content[1].toLowerCase()===content[1])?2:1);
-              addAtom(sym,0);
-            }
-            pendingBondType='single';
+          if (ch === "(") {
+            branchStack.push(lastAtom);
+            i++;
             continue;
           }
-
-          // element (one or two letters)
+          if (ch === ")") {
+            lastAtom = branchStack.pop() || lastAtom;
+            i++;
+            continue;
+          }
+          if (ch === "-") {
+            pendingBondType = "single";
+            i++;
+            continue;
+          }
+          if (ch === "=") {
+            pendingBondType = "double";
+            i++;
+            continue;
+          }
+          if (ch === "#") {
+            pendingBondType = "triple";
+            i++;
+            continue;
+          }
+          if (/[0-9]/.test(ch)) {
+            if (ringMap[ch]) {
+              bonds.push({ atom1: ringMap[ch].id, atom2: lastAtom.id, type: pendingBondType });
+              delete ringMap[ch];
+            } else {
+              ringMap[ch] = lastAtom;
+            }
+            pendingBondType = "single";
+            i++;
+            continue;
+          }
+          if (ch === "[") {
+            let j = i + 1;
+            let content = "";
+            while (j < smiles.length && smiles[j] !== "]") {
+              content += smiles[j++];
+            }
+            i = j + 1;
+            const m = content.match(/^(\d+)?([A-Z][a-z]?)(H(\d+)?)?/);
+            if (m) {
+              const symbol = m[2];
+              const hcount = m[4] ? parseInt(m[4], 10) : m[3] ? 1 : 0;
+              addAtom(symbol, hcount);
+            } else {
+              addAtom(content.slice(0, 2), 0);
+            }
+            pendingBondType = "single";
+            continue;
+          }
           if (/[A-Za-z]/.test(ch)) {
             let symbol = ch;
-            if (i+1 < smiles.length && /[a-z]/.test(smiles[i+1])) { symbol += smiles[i+1]; i++; }
-            // treat lowercase aromatic symbols as aromatic (e.g., c, n)
-            const aromatic = /[a-z]/.test(ch);
-            symbol = symbol.charAt(0).toUpperCase()+ (symbol.length>1?symbol.charAt(1).toLowerCase(): '');
-            addAtom(symbol,0,aromatic);
-            pendingBondType='single';
-            i++; continue;
+            if (i + 1 < smiles.length && /[a-z]/.test(smiles[i + 1])) {
+              symbol += smiles[i + 1];
+              i++;
+            }
+            symbol = symbol.charAt(0).toUpperCase() + (symbol.length > 1 ? symbol.charAt(1).toLowerCase() : "");
+            addAtom(symbol, 0);
+            pendingBondType = "single";
+            i++;
+            continue;
           }
-          // unknown char, skip
           i++;
         }
 
-        return {atoms, bonds, smiles};
+        return { atoms, bonds };
       }
 
-      // descriptor helpers
-      function getAtomCount(mol){return mol.atoms.length}
-      function getBondCount(mol){return mol.bonds.length}
-      function getElementCounts(mol, opts={includeImplicitH:false}){
-        const counts={};
-        for(const a of mol.atoms){ if(!a.symbol||a.symbol==='*') continue; counts[a.symbol]=(counts[a.symbol]||0)+1; if(opts.includeImplicitH && (a.hydrogens||0)>0) counts['H']=(counts['H']||0)+a.hydrogens; }
-        return counts;
+      function getMolecularMass(mol) {
+        let mass = 0;
+        for (const a of mol.atoms) {
+          const m = monoMass[a.symbol] || 12.0;
+          mass += m;
+          if (a.hydrogens) mass += a.hydrogens * monoMass["H"];
+        }
+        return Math.round(mass * 100) / 100;
       }
-      function getMolecularFormula(mol, opts={includeImplicitH:true}){
-        const counts = getElementCounts(mol,{includeImplicitH:opts.includeImplicitH});
-        const hasC = counts['C']!==undefined;
-        const parts=[];
-        function fmt(sym){return counts[sym]===1?sym:`${sym}${counts[sym]}`}
-        if(hasC){ if(counts['C']){parts.push(fmt('C')); delete counts['C'];} if(counts['H']){parts.push(fmt('H')); delete counts['H'];} const rest=Object.keys(counts).sort(); for(const k of rest) parts.push(fmt(k)); }
-        else { const rest=Object.keys(counts).sort(); for(const k of rest) parts.push(fmt(k)); }
-        return parts.join('')||'(none)';
+
+      function getMolecularFormula(mol) {
+        const counts = {};
+        for (const a of mol.atoms) {
+          if (!a.symbol) continue;
+          counts[a.symbol] = (counts[a.symbol] || 0) + 1;
+          if (a.hydrogens) counts["H"] = (counts["H"] || 0) + a.hydrogens;
+        }
+        const parts = [];
+        if (counts["C"]) parts.push(counts["C"] === 1 ? "C" : `C${counts["C"]}`);
+        if (counts["H"]) parts.push(counts["H"] === 1 ? "H" : `H${counts["H"]}`);
+        for (const k of Object.keys(counts).sort()) {
+          if (k !== "C" && k !== "H") {
+            parts.push(counts[k] === 1 ? k : `${k}${counts[k]}`);
+          }
+        }
+        return parts.join("") || "(none)";
       }
-      function getMolecularMass(mol){ let mass=0; for(const a of mol.atoms){ const m = monoMass[a.symbol] || 12.0; mass += m; if(a.hydrogens) mass += a.hydrogens*(monoMass['H']||1.007825); } return Math.round(mass*100)/100 }
-      function getHeavyAtomCount(mol){ return mol.atoms.filter(a=>a.symbol!=='H' && a.symbol!=='*').length }
-      function getHeteroAtomCount(mol){ return mol.atoms.filter(a=> a.symbol!=='C' && a.symbol!=='H' && a.symbol!=='*').length }
-      function getRingCount(mol){ // crude: count unique rings via bonds that close a ring (when a bond connects atoms already connected by path)
-        // We'll approximate by counting bond closures (where a bond creates a cycle) using simple union-find
-        const parent = new Map(); function find(x){ if(parent.get(x)!==x) parent.set(x,find(parent.get(x))); return parent.get(x)} function union(a,b){ const pa=find(a), pb=find(b); parent.set(pa,pb); }
-        for(const a of mol.atoms) parent.set(a.id,a.id);
-        let cycles=0;
-        for(const b of mol.bonds){ const a1=b.atom1,a2=b.atom2; if(find(a1)===find(a2)){ cycles++; } else union(a1,a2); }
+
+      function getHeavyAtomCount(mol) {
+        return mol.atoms.filter((a) => a.symbol !== "H").length;
+      }
+
+      function getHeteroAtomCount(mol) {
+        return mol.atoms.filter((a) => a.symbol !== "C" && a.symbol !== "H").length;
+      }
+
+      function getRingCount(mol) {
+        const parent = new Map();
+        function find(x) {
+          if (parent.get(x) !== x) parent.set(x, find(parent.get(x)));
+          return parent.get(x);
+        }
+        function union(a, b) {
+          parent.set(find(a), find(b));
+        }
+        for (const a of mol.atoms) parent.set(a.id, a.id);
+        let cycles = 0;
+        for (const b of mol.bonds) {
+          if (find(b.atom1) === find(b.atom2)) {
+            cycles++;
+          } else {
+            union(b.atom1, b.atom2);
+          }
+        }
         return cycles;
       }
-      function getAromaticRingCount(mol){ return 0 }
-      function getFractionCSP3(mol){ const carbons = mol.atoms.filter(a=>a.symbol==='C'); if(carbons.length===0) return 0; const sp3 = carbons.filter(c=>{ const deg = mol.bonds.filter(b=>b.atom1===c.id||b.atom2===c.id).length; return deg>=4 || deg===3; }).length; return +(sp3/carbons.length).toFixed(3) }
-      function getHBondAcceptorCount(mol){ return mol.atoms.filter(a=>a.symbol==='N'||a.symbol==='O').length }
-      function getHBondDonorCount(mol){ let n=0; for(const a of mol.atoms) if(a.symbol==='N'||a.symbol==='O') n += a.hydrogens||0; return n }
-      function getTPSA(mol){ let tpsa=0; for(const a of mol.atoms){ const s=a.symbol; if(!['N','O','S','P'].includes(s)) continue; const h=a.hydrogens||0; const bonds = mol.bonds.filter(b=>b.atom1===a.id||b.atom2===a.id).length; const dbl = mol.bonds.filter(b=> (b.atom1===a.id||b.atom2===a.id) && b.type==='double').length; const tpl = mol.bonds.filter(b=> (b.atom1===a.id||b.atom2===a.id) && b.type==='triple').length; let contrib=0; if(s==='N'){ if(a.aromatic){ contrib = h===1?15.79:12.89 } else if(tpl===1) contrib=23.79; else if(dbl>=1){ if(h===0 && bonds===1) contrib=23.79; else if(h===0 && bonds===2) contrib=12.36 } else if(h===3||h===2) contrib=26.02; else if(h===1) contrib=12.03; else if(h===0 && bonds===3) contrib=3.24; else contrib=12.03 } if(s==='O'){ if(a.aromatic) contrib=13.14; else if(dbl===1) contrib=17.07; else if(h>=1) contrib=20.23; else if(h===0 && bonds===2) contrib=9.23; else contrib=17.07 } if(s==='S'){ if(dbl>=2) contrib=32.09; else if(dbl===1) contrib=25.3; else if(h===1) contrib=38.8; else contrib=25.3 } if(s==='P'){ if(dbl===1) contrib=34.14; else contrib=13.59 } tpsa += contrib } return Math.round(tpsa*100)/100 }
-      function getRotatableBondCount(mol){ return mol.bonds.filter(b=>b.type==='single').length }
 
-      function computeDescriptors(mol){ return { atomCount:getAtomCount(mol), bondCount:getBondCount(mol), formalCharge:0, elementCounts:getElementCounts(mol,{includeImplicitH:false}), heavyAtomFraction: +(getHeavyAtomCount(mol)/(mol.atoms.length + (mol.atoms.reduce((s,a)=>s+(a.hydrogens||0),0)||0)) ).toFixed(3) } }
-
-      function computeChecks(mol){ const mw=getMolecularMass(mol); const donors=getHBondDonorCount(mol); const acceptors=getHBondAcceptorCount(mol); const logP = ( (mol.atoms.filter(a=>a.symbol==='C').length*0.5) - ((mol.atoms.filter(a=>a.symbol==='O'||a.symbol==='N').length)*0.5) ); const violations=[]; if(mw>500) violations.push(`Molecular weight ${mw.toFixed(2)} > 500`); if(donors>5) violations.push(`H-bond donors ${donors} > 5`); if(acceptors>10) violations.push(`H-bond acceptors ${acceptors} > 10`); if(logP>5) violations.push(`LogP ${logP.toFixed(2)} > 5`); const lip = {passes:violations.length===0, violations, properties:{molecularWeight:mw,hbondDonors:donors,hbondAcceptors:acceptors,logP}};
-        const rot = getRotatableBondCount(mol); const tpsa = getTPSA(mol); const verViol = []; if(rot>10) verViol.push(`Rotatable bonds ${rot} > 10`); if(tpsa>140) verViol.push(`TPSA ${tpsa.toFixed(2)} > 140`); const veber={passes:verViol.length===0,violations:verViol,properties:{rotatableBonds:rot,tpsa}}; const bbb = {likelyPenetration: tpsa < 90, tpsa}; return {lip,veber,bbb}
+      function getHBondAcceptorCount(mol) {
+        return mol.atoms.filter((a) => a.symbol === "N" || a.symbol === "O").length;
       }
 
-      // UI wiring
-        const smilesInput = document.getElementById('smiles');
-        const go = document.getElementById('go');
-        const propsEl = document.getElementById('props');
-        const descTable = document.getElementById('desc-table');
-        const diag = document.getElementById('diagnostics');
-        const checksContainer = document.getElementById('checks-container');
-        const smilesOutput = document.getElementById('smiles-output');
-        const inchiOutput = document.getElementById('inchi-output');
-        const iupacOutput = document.getElementById('iupac-output');
+      function getHBondDonorCount(mol) {
+        let n = 0;
+        for (const a of mol.atoms) {
+          if (a.symbol === "N" || a.symbol === "O") n += a.hydrogens || 0;
+        }
+        return n;
+      }
+
+      function getRotatableBondCount(mol) {
+        return mol.bonds.filter((b) => b.type === "single").length;
+      }
+
+      function renderCheck(name, check, props) {
+        const html = `
+          <div class="check-header">
+            <div class="check-name">${name}</div>
+            <div class="check-badge ${check.passes ? "pass" : "fail"}">
+              ${check.passes ? "PASS" : "FAIL"}
+            </div>
+          </div>
+          <div class="check-props">
+            ${Object.entries(props)
+              .map(([k, v]) => `<div class="check-prop"><span>${k}</span><strong>${v}</strong></div>`)
+              .join("")}
+          </div>
+          ${
+            check.violations && check.violations.length
+              ? `<div class="check-violations">${check.violations.join("; ")}</div>`
+              : ""
+          }
+        `;
+        return html;
+      }
+
+      function renderDescriptors(descriptors) {
+        const basicKeys = ["Formula", "Molecular Mass", "Exact Mass", "Heavy Atoms", "Heteroatoms"];
+        const drugKeys = ["H-bond Donors", "H-bond Acceptors", "TPSA", "Rotatable Bonds", "LogP (Wildman-Crippen)", "Fraction CSP3"];
+        const structKeys = ["Total Rings", "Aromatic Rings", "Saturated Rings", "Aliphatic Rings", "Heterocycles", "Stereocenters"];
+        const allKeys = [...basicKeys, ...drugKeys, ...structKeys];
+        const advancedKeys = Object.keys(descriptors).filter((k) => !allKeys.includes(k));
+
+        const categories = {
+          Basic: basicKeys,
+          "Drug-likeness": drugKeys,
+          Structural: structKeys,
+          Advanced: advancedKeys
+        };
+
+        let html = "";
+        for (const [category, keys] of Object.entries(categories)) {
+          const items = keys.filter((k) => descriptors[k] !== undefined);
+          if (items.length === 0) continue;
+
+          html += `
+            <div class="descriptors-section">
+              <div class="descriptor-header" onclick="this.nextElementSibling.classList.toggle('collapsed'); this.querySelector('.toggle-icon').style.transform = this.nextElementSibling.classList.contains('collapsed') ? '' : 'rotate(90deg)'">
+                <span class="toggle-icon" style="transform: rotate(90deg)">▶</span>
+                <h3>${category}</h3>
+              </div>
+              <div class="descriptors-grid">
+                ${items
+                  .map(
+                    (k) => `
+                  <div class="descriptor-item">
+                    <label>${k}</label>
+                    <value>${descriptors[k]}</value>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+        }
+        return html;
+      }
+
+      // Setup
+      const smilesInput = document.getElementById("smiles-input");
+      const computeBtn = document.getElementById("compute-btn");
+      const examplesEl = document.getElementById("examples");
+      const smilesOutput = document.getElementById("smiles-output");
+      const inchiOutput = document.getElementById("inchi-output");
+      const iupacOutput = document.getElementById("iupac-output");
+      const structureEl = document.getElementById("structure");
+      const summaryEl = document.getElementById("summary");
+      const descriptorsEl = document.getElementById("descriptors");
+      const diagnosticsEl = document.getElementById("diagnostics");
+
+      // Populate examples
+      EXAMPLES.forEach(({ name, smiles }) => {
+        const btn = document.createElement("button");
+        btn.className = "example-btn";
+        btn.textContent = name;
+        btn.onclick = () => {
+          smilesInput.value = smiles;
+          computeFromSmiles(smiles);
+          document.querySelectorAll(".example-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        };
+        examplesEl.appendChild(btn);
+      });
 
       let lib = null;
-      diag.textContent = 'Library auto-detection: attempting dynamic import of common bundle locations...';
-       tryLoadLibrary().then(mod=>{ 
-          lib = mod; 
-          diag.textContent = '✅ Full library loaded — SVG rendering, InChI, and IUPAC names available.';
-          // Re-run the current SMILES calculation so the full library output (SVG, InChI, IUPAC) appears on first load
-          try { if (smilesInput && smilesInput.value) computeFromSmiles(smilesInput.value); } catch(e) { console.warn('Recompute after lib load failed', e); }
-        }).catch(err=>{ 
-          diag.textContent = '⚠️ Fallback mode — ' + err.message; 
-          lib = null; 
-          try{ fetch('/__import_error',{method:'POST',headers:{'Content-Type':'text/plain'}, body: (err.stack||err.message) + '\nUA: '+(navigator?.userAgent||'') }).catch(()=>{}); }catch(e){}
+
+      tryLoadLibrary()
+        .then((mod) => {
+          lib = mod;
+          diagnosticsEl.textContent = "✅ Full library loaded";
+          if (smilesInput.value) computeFromSmiles(smilesInput.value);
+        })
+        .catch((err) => {
+          diagnosticsEl.textContent = "⚠️ Fallback mode: " + err.message;
         });
 
-      function renderChecks(checks){
-        function renderCheck(name, check, props) {
-          const el = document.getElementById(name.toLowerCase());
-          el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><b>${name}</b><span style="background:${check.passes?'#10b981':'#ef4444'};color:white;padding:2px 6px;border-radius:4px;font-size:12px">${check.passes?'PASS':'FAIL'}</span></div>`;
-          if (props) {
-            el.innerHTML += `<div style="font-size:13px;color:var(--muted);margin-bottom:4px">${Object.entries(props).map(([k,v])=>`${k}: ${v}`).join(', ')}</div>`;
-          }
-          if (check.violations?.length) {
-            el.innerHTML += `<div style="font-size:13px;color:#ef4444">Violations: ${check.violations.join('; ')}</div>`;
-          }
+      function computeFromSmiles(smiles) {
+        if (!smiles || !smiles.trim()) {
+          structureEl.innerHTML = "Enter a SMILES to visualize";
+          summaryEl.innerHTML = "";
+          descriptorsEl.innerHTML = "";
+          return;
         }
-        renderCheck('Lipinski', checks.lip, checks.lip.properties);
-        renderCheck('Veber', checks.veber, checks.veber.properties);
-        renderCheck('BBB', checks.bbb, {tpsa: checks.bbb.tpsa});
+
+        let parseResult;
+        if (lib && lib.parseSMILES) {
+          try {
+            parseResult = lib.parseSMILES(smiles);
+          } catch (e) {
+            diagnosticsEl.textContent = "Parse error: " + e.message;
+            return;
+          }
+        } else {
+          parseResult = { molecules: [parseSMILESFallback(smiles)] };
+        }
+
+        if (parseResult.errors && parseResult.errors.length) {
+          structureEl.innerHTML = `<div style="color: #ef4444">${parseResult.errors.map((e) => e.message).join("; ")}</div>`;
+          return;
+        }
+
+        const mol = parseResult.molecules?.[0];
+        if (!mol) return;
+
+        // Render structure
+        if (lib && lib.renderSVG) {
+          try {
+            const result = lib.renderSVG(mol, { width: 500, height: 320 });
+            structureEl.innerHTML = result.svg;
+          } catch (e) {
+            structureEl.innerHTML = `<div style="color: #ef4444">${e.message}</div>`;
+          }
+        } else {
+          structureEl.innerHTML = "<div>SVG requires full library</div>";
+        }
+
+        // Outputs
+        if (lib && lib.generateSMILES) {
+          try {
+            smilesOutput.textContent = lib.generateSMILES(mol);
+          } catch (e) {
+            smilesOutput.textContent = "Error";
+          }
+        } else {
+          smilesOutput.textContent = "(requires library)";
+        }
+
+        if (lib && lib.generateInChI) {
+          lib.generateInChI(mol).then((s) => {
+            inchiOutput.textContent = s;
+          });
+        } else {
+          inchiOutput.textContent = "(requires library)";
+        }
+
+        if (lib && lib.generateIUPACName) {
+          try {
+            const iupac = lib.generateIUPACName(mol);
+            iupacOutput.textContent = iupac.name || iupac;
+          } catch (e) {
+            iupacOutput.textContent = "Error";
+          }
+        } else {
+          iupacOutput.textContent = "(requires library)";
+        }
+
+        // Summary
+        const formula = getMolecularFormula(mol);
+        const mw = getMolecularMass(mol);
+        const heavy = getHeavyAtomCount(mol);
+        const hetero = getHeteroAtomCount(mol);
+        const rings = getRingCount(mol);
+        const acc = getHBondAcceptorCount(mol);
+        const don = getHBondDonorCount(mol);
+        const rot = getRotatableBondCount(mol);
+
+        summaryEl.innerHTML = [
+          { label: "Formula", value: formula },
+          { label: "Mol. Weight", value: mw.toFixed(2) },
+          { label: "Heavy Atoms", value: heavy },
+          { label: "Heteroatoms", value: hetero },
+          { label: "Rings", value: rings },
+          { label: "H-Donors", value: don },
+          { label: "H-Acceptors", value: acc },
+          { label: "Rot. Bonds", value: rot }
+        ]
+          .map(
+            ({ label, value }) => `
+          <div class="summary-item">
+            <div class="summary-label">${label}</div>
+            <div class="summary-value">${value}</div>
+          </div>
+        `
+          )
+          .join("");
+
+        // Descriptors - use new API
+        const descriptors = {
+          Formula: formula,
+          "Molecular Mass": mw.toFixed(2),
+          "Heavy Atoms": heavy,
+          Heteroatoms: hetero,
+          "H-bond Donors": don,
+          "H-bond Acceptors": acc,
+          "Total Rings": rings,
+          "Rotatable Bonds": rot
+        };
+
+        if (lib && lib.Descriptors) {
+          const all = lib.Descriptors.all(mol);
+          const struct = lib.Descriptors.structural(mol);
+          const topo = lib.Descriptors.topology(mol);
+          const chi = lib.Descriptors.chi(mol);
+          
+          descriptors["Exact Mass"] = all.exactMass.toFixed(4);
+          descriptors["LogP (Wildman-Crippen)"] = all.logP.toFixed(2);
+          descriptors["TPSA"] = all.tpsa.toFixed(2);
+          descriptors["Saturated Rings"] = struct.saturatedRings;
+          descriptors["Aliphatic Rings"] = struct.aliphaticRings;
+          descriptors["Heterocycles"] = struct.heterocycles;
+          descriptors["Aromatic Rings"] = struct.aromaticRings;
+          descriptors["Stereocenters"] = struct.stereocenters;
+          descriptors["Fraction CSP3"] = all.fractionCsp3.toFixed(3);
+          descriptors["LabuteASA (Ų)"] = all.labuteASA.toFixed(2);
+          descriptors["Kappa1"] = topo.kappa1.toFixed(3);
+          descriptors["Kappa2"] = topo.kappa2.toFixed(3);
+          descriptors["Kappa3"] = topo.kappa3.toFixed(3);
+          descriptors["Bertz CT"] = topo.bertzCT.toFixed(2);
+          descriptors["Chi0"] = chi.chi0.toFixed(3);
+          descriptors["Chi1"] = chi.chi1.toFixed(3);
+        }
+
+        descriptorsEl.innerHTML = renderDescriptors(descriptors);
+
+        // Checks - use new API
+        if (lib && lib.Descriptors) {
+          const drugLike = lib.Descriptors.drugLikeness(mol);
+          
+          document.getElementById("lipinski").innerHTML = renderCheck(
+            "Lipinski Rule of Five",
+            { passes: drugLike.lipinski.passes, violations: drugLike.lipinski.violations },
+            {
+              "Mol. Weight": drugLike.lipinski.properties.mw.toFixed(2),
+              HBD: drugLike.lipinski.properties.hbondDonors,
+              HBA: drugLike.lipinski.properties.hbondAcceptors,
+              LogP: drugLike.lipinski.properties.logP.toFixed(2)
+            }
+          );
+
+          document.getElementById("veber").innerHTML = renderCheck("Veber Rules", 
+            { passes: drugLike.veber.passes, violations: drugLike.veber.violations },
+            {
+              "Rot. Bonds": drugLike.veber.properties.rotatableBonds,
+              TPSA: drugLike.veber.properties.tpsa.toFixed(2)
+            }
+          );
+
+          document.getElementById("bbb").innerHTML = renderCheck(
+            "BBB Penetration",
+            { passes: drugLike.bbb.penetrates },
+            {
+              TPSA: drugLike.bbb.properties.tpsa.toFixed(2),
+              Prediction: drugLike.bbb.penetrates ? "Likely" : "Unlikely"
+            }
+          );
+        }
       }
 
-        async function renderResult(parseResult){
-          // Render SVG structure
-          const svgEl = document.getElementById('structure-svg');
-          if(lib && lib.renderSVG){
-            try{
-              const result = lib.renderSVG(parseResult, { width: 250, height: 200 });
-              svgEl.innerHTML = result.svg;
-            }catch(e){
-              svgEl.innerHTML = `<div style="color:#ef4444">SVG rendering error: ${e.message}</div>`;
-            }
-          } else {
-               svgEl.innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center">SVG rendering requires full library<br><small>Run <code>bun run serve</code> to enable</small></div>';
-          }
-
-          // Extract molecule for descriptor calculations
-          const mol = parseResult.molecules ? parseResult.molecules[0] : (parseResult.molecule || parseResult);
-
-          // Display SMILES
-          if (lib && lib.generateSMILES) {
-            try {
-              const smilesStr = lib.generateSMILES(mol);
-              smilesOutput.textContent = smilesStr;
-            } catch (e) {
-              smilesOutput.textContent = `Error: ${e.message}`;
-            }
-          } else {
-            smilesOutput.textContent = '(requires full library)';
-          }
-
-           // Display InChI
-           if (lib && lib.generateInChI) {
-             try {
-               const inchiStr = await lib.generateInChI(mol);
-               inchiOutput.textContent = inchiStr;
-             } catch (e) {
-               inchiOutput.textContent = `Error: ${e.message}`;
-             }
-           } else {
-             inchiOutput.textContent = '(requires full library)';
-           }
-
-           // Display IUPAC Name
-           if (lib && lib.generateIUPACName) {
-             try {
-               const iupacResult = lib.generateIUPACName(mol);
-               const iupacName = iupacResult.name || iupacResult;
-               iupacOutput.textContent = iupacName;
-             } catch (e) {
-               iupacOutput.textContent = `(IUPAC: ${e.message})`;
-             }
-           } else {
-             iupacOutput.textContent = '(requires full library)';
-           }
-
-          const formula = getMolecularFormula(mol,{includeImplicitH:true});
-          const mw = getMolecularMass(mol);
-          const em = mw; // fallback
-          const heavy = getHeavyAtomCount(mol);
-          const hetero = getHeteroAtomCount(mol);
-          const rings = getRingCount(mol);
-          const arom = getAromaticRingCount(mol);
-          const fraction = getFractionCSP3(mol);
-          const acc = getHBondAcceptorCount(mol);
-          const don = getHBondDonorCount(mol);
-          const tpsa = getTPSA(mol);
-          const rot = getRotatableBondCount(mol);
-
-          const summary = [
-            ['Formula',formula],['Molecular mass',mw],["Exact mass",em],['Atoms',mol.atoms.length],['Bonds',mol.bonds.length],['Heavy atoms',heavy],['Heteroatoms',hetero],['Ring count',rings],['Aromatic rings',arom],['Frac cSP3',fraction],['H-bond acceptors',acc],['H-bond donors',don],['TPSA',tpsa],['Rotatable bonds',rot]
-          ];
-          propsEl.innerHTML = '';
-          for(const [k,v] of summary){ const d=document.createElement('div'); d.className='prop'; d.innerHTML=`<b>${k}</b><div>${v}</div>`; propsEl.appendChild(d) }
-
-          // Compute all new descriptors if library is loaded
-          const allDescriptors = {};
-          
-          if (lib) {
-            // Basic descriptors (always available)
-            allDescriptors['Formula'] = formula;
-            allDescriptors['Molecular Mass'] = mw.toFixed(2);
-            allDescriptors['Exact Mass'] = lib.getExactMass ? lib.getExactMass(mol).toFixed(4) : mw.toFixed(4);
-            allDescriptors['Heavy Atoms'] = heavy;
-            allDescriptors['Heteroatoms'] = hetero;
-            
-            // Structural descriptors
-            if (lib.getNumValenceElectrons) allDescriptors['Valence Electrons'] = lib.getNumValenceElectrons(mol);
-            if (lib.getNumAmideBonds) allDescriptors['Amide Bonds'] = lib.getNumAmideBonds(mol);
-            if (lib.getNumSpiroAtoms) allDescriptors['Spiro Atoms'] = lib.getNumSpiroAtoms(mol);
-            if (lib.getNumBridgeheadAtoms) allDescriptors['Bridgehead Atoms'] = lib.getNumBridgeheadAtoms(mol);
-            
-            // Ring descriptors
-            allDescriptors['Total Rings'] = rings;
-            allDescriptors['Aromatic Rings'] = arom;
-            if (lib.getNumSaturatedRings) allDescriptors['Saturated Rings'] = lib.getNumSaturatedRings(mol);
-            if (lib.getNumAliphaticRings) allDescriptors['Aliphatic Rings'] = lib.getNumAliphaticRings(mol);
-            if (lib.getNumHeterocycles) allDescriptors['Heterocycles'] = lib.getNumHeterocycles(mol);
-            if (lib.getNumAromaticHeterocycles) allDescriptors['Aromatic Heterocycles'] = lib.getNumAromaticHeterocycles(mol);
-            
-            // Stereochemistry
-            if (lib.getNumAtomStereoCenters) allDescriptors['Stereocenters'] = lib.getNumAtomStereoCenters(mol);
-            if (lib.getNumUnspecifiedAtomStereoCenters) allDescriptors['Unspecified Stereocenters'] = lib.getNumUnspecifiedAtomStereoCenters(mol);
-            
-            // Drug-likeness descriptors
-            allDescriptors['Fraction CSP3'] = fraction.toFixed(3);
-            allDescriptors['H-bond Donors'] = don;
-            allDescriptors['H-bond Acceptors'] = acc;
-            allDescriptors['TPSA'] = tpsa.toFixed(2);
-            allDescriptors['Rotatable Bonds'] = rot;
-            if (lib.computeLogP) allDescriptors['LogP (Wildman-Crippen)'] = lib.computeLogP(mol).toFixed(2);
-            
-            // Surface area
-            if (lib.getLabuteASA) allDescriptors['LabuteASA (Ų)'] = lib.getLabuteASA(mol).toFixed(2);
-            
-            // Topology descriptors
-            if (lib.getKappa1) allDescriptors['Kappa1'] = lib.getKappa1(mol).toFixed(3);
-            if (lib.getKappa2) allDescriptors['Kappa2'] = lib.getKappa2(mol).toFixed(3);
-            if (lib.getKappa3) allDescriptors['Kappa3'] = lib.getKappa3(mol).toFixed(3);
-            if (lib.getHallKierAlpha) allDescriptors['Hall-Kier Alpha'] = lib.getHallKierAlpha(mol).toFixed(3);
-            if (lib.getBertzCT) allDescriptors['Bertz CT'] = lib.getBertzCT(mol).toFixed(2);
-            
-            // Chi indices
-            if (lib.getChi0) allDescriptors['Chi0'] = lib.getChi0(mol).toFixed(3);
-            if (lib.getChi1) allDescriptors['Chi1'] = lib.getChi1(mol).toFixed(3);
-            if (lib.getChi0v) allDescriptors['Chi0v'] = lib.getChi0v(mol).toFixed(3);
-            if (lib.getChi1v) allDescriptors['Chi1v'] = lib.getChi1v(mol).toFixed(3);
-            if (lib.getChi2v) allDescriptors['Chi2v'] = lib.getChi2v(mol).toFixed(3);
-            if (lib.getChi3v) allDescriptors['Chi3v'] = lib.getChi3v(mol).toFixed(3);
-            if (lib.getChi4v) allDescriptors['Chi4v'] = lib.getChi4v(mol).toFixed(3);
-            
-            // Partial charges (min/max)
-            if (lib.getMaxPartialCharge) allDescriptors['Max Partial Charge'] = lib.getMaxPartialCharge(mol).toFixed(4);
-            if (lib.getMinPartialCharge) allDescriptors['Min Partial Charge'] = lib.getMinPartialCharge(mol).toFixed(4);
-          } else {
-            // Fallback mode - basic descriptors only
-            const desc = computeDescriptors(mol);
-            Object.assign(allDescriptors, desc);
-          }
-          
-          // Render descriptors table
-          descTable.innerHTML = '';
-          for(const [k, v] of Object.entries(allDescriptors)){
-            const row = document.createElement('tr'); 
-            row.innerHTML = `<td><b>${k}</b></td><td>${v}</td>`; 
-            descTable.appendChild(row);
-          }
-
-          const checks = computeChecks(mol);
-          renderChecks(checks);
-        }
-
-       function computeFromSmiles(smiles){
-         if(!smiles||!smiles.trim()){ 
-           document.getElementById('structure-svg').innerHTML = 'Enter a SMILES string to see the 2D structure';
-           propsEl.innerHTML=''; 
-           descTable.innerHTML=''; 
-           checksContainer.innerHTML='<div id="lipinski"></div><div id="veber"></div><div id="bbb"></div>'; 
-           return 
-         }
-          if(lib && lib.parseSMILES){
-            try{
-              const parseResult = lib.parseSMILES(smiles);
-              renderResult(parseResult);
-              diag.textContent = 'Used project parseSMILES + descriptor functions when available.';
-              return;
-            }catch(e){ diag.textContent = 'Project parse failed, falling back: '+e.message }
-          }
-         const mol = parseSMILESFallback(smiles);
-         renderResult({ molecules: [mol] });
-       }
-
-      go.addEventListener('click', ()=> computeFromSmiles(smilesInput.value));
-      smilesInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') computeFromSmiles(smilesInput.value) });
-
-      // Wire example buttons
-      document.querySelectorAll('.example').forEach(btn => {
-        btn.addEventListener('click', () => {
-          smilesInput.value = btn.dataset.smiles;
-          computeFromSmiles(btn.dataset.smiles);
-        });
+      computeBtn.addEventListener("click", () => computeFromSmiles(smilesInput.value));
+      smilesInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") computeFromSmiles(smilesInput.value);
       });
 
-      // Toggle examples section
-      const examplesToggle = document.getElementById('examples-toggle');
-      const examplesContent = document.getElementById('examples-content');
-      const chevron = examplesToggle.querySelector('.chevron');
-      
-      examplesToggle.addEventListener('click', () => {
-        examplesContent.classList.toggle('open');
-        chevron.classList.toggle('open');
-      });
-
-      // quick demo
-      smilesInput.value = 'CC(=O)Oc1ccccc1C(=O)O';
+      // Load demo
+      smilesInput.value = "CC(=O)Oc1ccccc1C(=O)O";
       computeFromSmiles(smilesInput.value);
+      document.querySelector(".example-btn").classList.add("active");
     })();
   </script>
 </body>

@@ -1,4 +1,4 @@
-import { parseSMILES, getLabuteASA } from "../index.ts";
+import { parseSMILES, Descriptors } from "../index.ts";
 
 const testMolecules = [
   // Simple alkanes
@@ -60,7 +60,7 @@ for (const test of testMolecules) {
     console.log(`${test.name.padEnd(20)} ERROR: Failed to parse SMILES`);
     continue;
   }
-  const asa = getLabuteASA(mol);
+  const asa = Descriptors.all(mol).labuteASA;
   const diff = asa - test.rdkit;
   const match = Math.abs(diff) < 0.5 ? "✓" : Math.abs(diff) < 1.0 ? "~" : "✗";
 

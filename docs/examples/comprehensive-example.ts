@@ -6,21 +6,8 @@ import {
   parseSMARTS,
   matchSMARTS,
   renderSVG,
-  getMolecularFormula,
-  getMolecularMass,
-  computeLogP,
-  checkLipinskiRuleOfFive,
-  checkVeberRules,
-  checkBBBPenetration,
-  getHBondDonorCount,
-  getHBondAcceptorCount,
-  getTPSA,
-  getRotatableBondCount,
-  getHeavyAtomCount,
-  getRingCount,
-  getAromaticRingCount,
+  Descriptors,
   getRingInfo,
-  getFractionCSP3,
   computeMorganFingerprint,
   tanimotoSimilarity,
   generateInChI,
@@ -62,43 +49,38 @@ console.log("--------------------------------------");
 
 if (parseResult.molecules.length > 0) {
   const molecule = parseResult.molecules[0]!;
-  const formula = getMolecularFormula(molecule);
-  const mass = getMolecularMass(molecule);
-  const logP = computeLogP(molecule);
-  const lipinski = checkLipinskiRuleOfFive(molecule);
-  const veber = checkVeberRules(molecule);
-  const bbb = checkBBBPenetration(molecule);
-  const hBondDonors = getHBondDonorCount(molecule);
-  const hBondAcceptors = getHBondAcceptorCount(molecule);
-  const tpsa = getTPSA(molecule);
-  const rotatableBonds = getRotatableBondCount(molecule);
-  const ringCount = getRingCount(molecule);
-  const aromaticRingCount = getAromaticRingCount(molecule);
-  const ringInfo = getRingInfo(molecule);
-  const fractionCSP3 = getFractionCSP3(molecule);
 
-  console.log(`✓ Molecular Formula: ${formula}`);
-  console.log(`  Molecular Mass: ${mass.toFixed(3)} Da`);
-  console.log(`  LogP: ${logP.toFixed(3)}`);
-  console.log(`  Heavy Atoms: ${getHeavyAtomCount(molecule)}`);
-  console.log(`  Rings: ${ringCount} (Aromatic: ${aromaticRingCount})`);
+  // Get all properties at once
+  const props = Descriptors.all(molecule);
+  const drugLike = Descriptors.drugLikeness(molecule);
+  const ringInfo = getRingInfo(molecule);
+
+  console.log(`✓ Molecular Formula: ${props.formula}`);
+  console.log(`  Molecular Mass: ${props.mass.toFixed(3)} Da`);
+  console.log(`  LogP: ${props.logP.toFixed(3)}`);
+  console.log(`  Heavy Atoms: ${props.heavyAtoms}`);
+  console.log(`  Rings: ${props.rings} (Aromatic: ${props.aromaticRings})`);
   console.log(`  Ring Information:`);
   console.log(`    SSSR Rings: ${ringInfo.numRings()}`);
-  console.log(`  Fraction sp³ carbons: ${(fractionCSP3 * 100).toFixed(1)}%`);
-  console.log(`  H-bond Donors: ${hBondDonors}`);
-  console.log(`  H-bond Acceptors: ${hBondAcceptors}`);
-  console.log(`  Rotatable Bonds: ${rotatableBonds}`);
-  console.log(`  TPSA: ${tpsa.toFixed(2)} Å²`);
-  console.log(`  Lipinski Rule of Five: ${lipinski.passes ? "PASS" : "FAIL"}`);
-  if (!lipinski.passes) {
-    console.log(`    Violations: ${lipinski.violations.join(", ")}`);
+  console.log(
+    `  Fraction sp³ carbons: ${(props.fractionCsp3 * 100).toFixed(1)}%`,
+  );
+  console.log(`  H-bond Donors: ${props.hbondDonors}`);
+  console.log(`  H-bond Acceptors: ${props.hbondAcceptors}`);
+  console.log(`  Rotatable Bonds: ${props.rotatableBonds}`);
+  console.log(`  TPSA: ${props.tpsa.toFixed(2)} Å²`);
+  console.log(
+    `  Lipinski Rule of Five: ${drugLike.lipinski.passes ? "PASS" : "FAIL"}`,
+  );
+  if (!drugLike.lipinski.passes) {
+    console.log(`    Violations: ${drugLike.lipinski.violations.join(", ")}`);
   }
-  console.log(`  Veber Rules: ${veber.passes ? "PASS" : "FAIL"}`);
-  if (!veber.passes) {
-    console.log(`    Violations: ${veber.violations.join(", ")}`);
+  console.log(`  Veber Rules: ${drugLike.veber.passes ? "PASS" : "FAIL"}`);
+  if (!drugLike.veber.passes) {
+    console.log(`    Violations: ${drugLike.veber.violations.join(", ")}`);
   }
   console.log(
-    `  BBB Penetration: ${bbb.likelyPenetration ? "Likely" : "Unlikely"} (TPSA: ${bbb.tpsa.toFixed(2)} Å²)`,
+    `  BBB Penetration: ${drugLike.bbb.penetrates ? "Likely" : "Unlikely"} (TPSA: ${drugLike.bbb.properties.tpsa.toFixed(2)} Å²)`,
   );
 }
 
@@ -136,14 +118,15 @@ const sdfRecords = sampleMolecules
 
     const molecule = result.molecules[0]!;
 
+    const props = Descriptors.basic(molecule);
     return {
       molecule,
       properties: {
         NAME: name,
         SMILES: smiles,
-        FORMULA: getMolecularFormula(molecule),
-        MASS: getMolecularMass(molecule).toFixed(3),
-        LOGP: computeLogP(molecule).toFixed(3),
+        FORMULA: props.formula,
+        MASS: props.mass.toFixed(3),
+        LOGP: Descriptors.logP(molecule).toFixed(3),
       },
     };
   })

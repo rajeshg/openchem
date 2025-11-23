@@ -51,18 +51,26 @@ npm install openchem
 ```
 
 ```typescript
-import { parseSMILES, renderSVG, checkLipinskiRuleOfFive } from 'openchem';
+import { parseSMILES, renderSVG, Descriptors } from 'openchem';
 
 // Parse a molecule
-const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O');
+const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
 
 // Render as SVG
-const svg = renderSVG(aspirin.molecules[0]);
+const svg = renderSVG(aspirin);
 console.log(svg.svg); // SVG markup ready for display
 
-// Check drug-likeness
-const drugLike = checkLipinskiRuleOfFive(aspirin.molecules[0]);
-console.log(drugLike.passes); // true - aspirin is drug-like!
+// Get all molecular properties at once
+const props = Descriptors.all(aspirin);
+console.log(props.formula);        // "C9H8O4"
+console.log(props.mass);           // 180.16
+console.log(props.logP);           // 1.19
+console.log(props.lipinskiPass);   // true - aspirin is drug-like!
+
+// Or get specific categories
+const drugLike = Descriptors.drugLikeness(aspirin);
+console.log(drugLike.lipinski.passes);     // true
+console.log(drugLike.lipinski.violations); // []
 ```
 
 ## HTML Playground

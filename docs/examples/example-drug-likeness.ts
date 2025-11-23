@@ -1,10 +1,4 @@
-import {
-  parseSMILES,
-  checkLipinskiRuleOfFive,
-  checkVeberRules,
-  checkBBBPenetration,
-  computeLogP,
-} from "index";
+import { parseSMILES, Descriptors, computeLogP } from "index";
 
 console.log("openchem Drug-Likeness Assessment Examples");
 console.log("=========================================\n");
@@ -61,21 +55,21 @@ for (const testMol of testMolecules) {
 
   const molecule = result.molecules[0]!;
   const logP = computeLogP(molecule);
-  const lipinski = checkLipinskiRuleOfFive(molecule);
-  const veber = checkVeberRules(molecule);
-  const bbb = checkBBBPenetration(molecule);
+  const drugLike = Descriptors.drugLikeness(molecule);
 
   console.log(`   LogP: ${logP.toFixed(3)}`);
-  console.log(`   Lipinski: ${lipinski.passes ? "✅ PASS" : "❌ FAIL"}`);
-  if (!lipinski.passes) {
-    console.log(`     Violations: ${lipinski.violations.join(", ")}`);
+  console.log(
+    `   Lipinski: ${drugLike.lipinski.passes ? "✅ PASS" : "❌ FAIL"}`,
+  );
+  if (!drugLike.lipinski.passes) {
+    console.log(`     Violations: ${drugLike.lipinski.violations.join(", ")}`);
   }
-  console.log(`   Veber: ${veber.passes ? "✅ PASS" : "❌ FAIL"}`);
-  if (!veber.passes) {
-    console.log(`     Violations: ${veber.violations.join(", ")}`);
+  console.log(`   Veber: ${drugLike.veber.passes ? "✅ PASS" : "❌ FAIL"}`);
+  if (!drugLike.veber.passes) {
+    console.log(`     Violations: ${drugLike.veber.violations.join(", ")}`);
   }
   console.log(
-    `   BBB Penetration: ${bbb.likelyPenetration ? "✅ Likely" : "❌ Unlikely"} (TPSA: ${bbb.tpsa.toFixed(2)} Å²)`,
+    `   BBB Penetration: ${drugLike.bbb.penetrates ? "✅ Likely" : "❌ Unlikely"} (TPSA: ${drugLike.bbb.properties.tpsa.toFixed(2)} Å²)`,
   );
   console.log();
 }

@@ -3,7 +3,7 @@ import {
   parseSMILES,
   generateSMILES,
   computeLogP,
-  checkLipinskiRuleOfFive,
+  Descriptors,
   matchSMARTS,
   computeMorganFingerprint,
   bulkMatchSMARTS,
@@ -190,7 +190,7 @@ describe("Performance Regression Tests", () => {
 
     const start = performance.now();
     for (let i = 0; i < 100; i++) {
-      checkLipinskiRuleOfFive(mol);
+      Descriptors.drugLikeness(mol);
     }
     const total = performance.now() - start;
     const avgTime = total / 100;

@@ -1,9 +1,4 @@
-import {
-  parseSMILES,
-  generateSMILES,
-  getAromaticRingCount,
-  getRingCount,
-} from "index";
+import { parseSMILES, generateSMILES, Descriptors } from "index";
 
 console.log("openchem Aromaticity Perception Examples");
 console.log("========================================\n");
@@ -36,8 +31,8 @@ for (const example of examples) {
   }
 
   const molecule = result.molecules[0]!;
-  const ringCount = getRingCount(molecule);
-  const aromaticRingCount = getAromaticRingCount(molecule);
+  const ringCount = Descriptors.rings(molecule);
+  const aromaticRingCount = Descriptors.aromaticRings(molecule);
   const isAromatic = aromaticRingCount > 0;
 
   // Count aromatic atoms
@@ -71,7 +66,7 @@ for (const example of huckelExamples) {
   const result = parseSMILES(example.smiles);
   if (result.errors.length === 0 && result.molecules[0]) {
     const molecule = result.molecules[0];
-    const aromaticRings = getAromaticRingCount(molecule);
+    const aromaticRings = Descriptors.aromaticRings(molecule);
 
     console.log(`✓ ${example.name}`);
     console.log(
@@ -109,7 +104,7 @@ for (const example of nOxideExamples) {
   const result = parseSMILES(example.smiles);
   if (result.errors.length === 0 && result.molecules[0]) {
     const molecule = result.molecules[0];
-    const aromaticRings = getAromaticRingCount(molecule);
+    const aromaticRings = Descriptors.aromaticRings(molecule);
     const isAromatic = aromaticRings > 0;
 
     const status = isAromatic === example.aromatic ? "✓" : "✗";

@@ -2,7 +2,7 @@ import { describe, it, expect } from "bun:test";
 import {
   parseSMILES,
   generateSMILES,
-  checkLipinskiRuleOfFive,
+  Descriptors,
   getRingInfo,
   matchSMARTS,
   parseSMARTS,
@@ -82,7 +82,7 @@ describe("Performance Benchmarks", () => {
       const start = performance.now();
       for (let i = 0; i < iterations; i++) {
         for (const mol of molecules) {
-          checkLipinskiRuleOfFive(mol);
+          Descriptors.drugLikeness(mol);
           getRingInfo(mol);
           computeMorganFingerprint(mol);
         }

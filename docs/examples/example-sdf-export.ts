@@ -1,12 +1,4 @@
-import {
-  parseSMILES,
-  writeSDF,
-  computeLogP,
-  checkLipinskiRuleOfFive,
-  getExactMass,
-  getHeavyAtomCount,
-  getMolecularFormula,
-} from "index";
+import { parseSMILES, writeSDF, computeLogP, Descriptors } from "index";
 import type { SDFRecord } from "src/generators/sdf-writer";
 
 const drugMolecules = [
@@ -34,11 +26,9 @@ for (const drug of drugMolecules) {
     continue;
   }
 
-  const exactMass = getExactMass(molecule);
-  const heavyAtomCount = getHeavyAtomCount(molecule);
-  const formula = getMolecularFormula(molecule);
+  const basic = Descriptors.basic(molecule);
   const logP = computeLogP(molecule);
-  const lipinski = checkLipinskiRuleOfFive(molecule);
+  const drugLike = Descriptors.drugLikeness(molecule);
 
   records.push({
     molecule,
@@ -48,12 +38,12 @@ for (const drug of drugMolecules) {
       MW: drug.mw.toString(),
       ATOMS: molecule.atoms.length.toString(),
       BONDS: molecule.bonds.length.toString(),
-      FORMAL_CHARGE: "0",
-      HEAVY_ATOM_FRACTION: (heavyAtomCount / molecule.atoms.length).toFixed(2),
-      ELEMENT_COUNTS: formula,
+      FORMULA: basic.formula,
+      EXACT_MASS: basic.exactMass.toFixed(3),
+      HEAVY_ATOMS: basic.heavyAtoms.toString(),
       LOGP: logP.toFixed(3),
-      LIPINSKI_PASSES: lipinski.passes.toString(),
-      LIPINSKI_VIOLATIONS: lipinski.violations.join("; ") || "None",
+      LIPINSKI_PASSES: drugLike.lipinski.passes.toString(),
+      LIPINSKI_VIOLATIONS: drugLike.lipinski.violations.join("; ") || "None",
     },
   });
 
@@ -61,12 +51,12 @@ for (const drug of drugMolecules) {
     `✓ Parsed ${drug.name}: ${molecule.atoms.length} atoms, ${molecule.bonds.length} bonds`,
   );
   console.log(
-    `  Heavy atom fraction: ${((heavyAtomCount / molecule.atoms.length) * 100).toFixed(1)}%`,
+    `  Heavy atom fraction: ${((basic.heavyAtoms / molecule.atoms.length) * 100).toFixed(1)}%`,
   );
-  console.log(`  Exact mass: ${exactMass.toFixed(3)}`);
+  console.log(`  Exact mass: ${basic.exactMass.toFixed(3)}`);
   console.log(`  LogP: ${logP.toFixed(3)}`);
   console.log(
-    `  Lipinski: ${lipinski.passes ? "PASS" : "FAIL"} (${lipinski.violations.length} violations)`,
+    `  Lipinski: ${drugLike.lipinski.passes ? "PASS" : "FAIL"} (${drugLike.lipinski.violations.length} violations)`,
   );
 }
 

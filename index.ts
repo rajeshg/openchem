@@ -29,22 +29,30 @@ export type {
 } from "src/generators/svg-renderer";
 export { kekulize } from "src/utils/kekulize";
 export { computeLogP, logP, crippenLogP } from "src/utils/logp";
+export { getRingInfo } from "src/utils/ring-information";
+export type { RingInformation } from "src/utils/ring-information";
+
+// Descriptors API - Clean, organized namespace for molecular properties
+export { Descriptors } from "src/descriptors";
+export type {
+  BasicProperties,
+  PhysicochemicalProperties,
+  StructuralProperties,
+  DrugLikenessProperties,
+  TopologyProperties,
+  ChiProperties,
+  MolecularProperties,
+  LipinskiResult,
+  VeberResult,
+  BBBResult,
+} from "src/descriptors";
+
+// Specialized utility functions (not part of Descriptors namespace)
 export {
-  getMolecularFormula,
-  getMolecularMass,
-  getExactMass,
-  getHeavyAtomCount,
-  getHeteroAtomCount,
-  getRingCount,
-  getAromaticRingCount,
-  getFractionCSP3,
-  getHBondAcceptorCount,
-  getHBondDonorCount,
-  getTPSA,
-  getRotatableBondCount,
-  checkLipinskiRuleOfFive,
-  checkVeberRules,
-  checkBBBPenetration,
+  getMaxPartialCharge,
+  getMinPartialCharge,
+  getMaxAbsPartialCharge,
+  getMinAbsPartialCharge,
   getNumValenceElectrons,
   getNumRadicalElectrons,
   getNumAmideBonds,
@@ -59,35 +67,7 @@ export {
   getNumAliphaticHeterocycles,
   getNumAtomStereoCenters,
   getNumUnspecifiedAtomStereoCenters,
-  getMaxPartialCharge,
-  getMinPartialCharge,
-  getMaxAbsPartialCharge,
-  getMinAbsPartialCharge,
 } from "src/utils/molecular-properties";
-export {
-  getKappa1,
-  getKappa2,
-  getKappa3,
-  getHallKierAlpha,
-  getBertzCT,
-} from "src/utils/topology-descriptors";
-export {
-  getChi0,
-  getChi0n,
-  getChi0v,
-  getChi1,
-  getChi1n,
-  getChi1v,
-  getChi2n,
-  getChi2v,
-  getChi3n,
-  getChi3v,
-  getChi4n,
-  getChi4v,
-} from "src/utils/chi-indices";
-export { getLabuteASA } from "src/utils/surface-descriptors";
-export { getRingInfo } from "src/utils/ring-information";
-export type { RingInformation } from "src/utils/ring-information";
 export {
   generateInChI,
   generateInChIKey,

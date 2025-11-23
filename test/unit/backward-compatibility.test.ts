@@ -2,22 +2,13 @@ import { describe, it, expect } from "bun:test";
 import {
   parseSMILES,
   generateSMILES,
-  checkLipinskiRuleOfFive,
+  Descriptors,
   getRingInfo,
   matchSMARTS,
   parseSMARTS,
   generateMolfile,
   parseMolfile,
   computeMorganFingerprint,
-  computeLogP,
-  getMolecularFormula,
-  getMolecularMass,
-  getHBondDonorCount,
-  getHBondAcceptorCount,
-  getRotatableBondCount,
-  getTPSA,
-  getHeavyAtomCount,
-  getRingCount,
 } from "index";
 import { PackedMolecule } from "src/utils/packed-molecule";
 
@@ -61,32 +52,32 @@ describe("Backward Compatibility", () => {
     }
   });
 
-  it("should get molecular properties using existing API", () => {
+  it("should get molecular properties using Descriptors API", () => {
     const mol = parseSMILES("CC(=O)Oc1ccccc1C(=O)O").molecules[0];
     if (!mol) return;
 
     // These should not throw and should return valid values
-    expect(getMolecularFormula(mol)).toBeDefined();
-    expect(getMolecularMass(mol)).toBeGreaterThan(0);
-    expect(getHBondDonorCount(mol)).toBeGreaterThanOrEqual(0);
-    expect(getHBondAcceptorCount(mol)).toBeGreaterThanOrEqual(0);
-    expect(getRotatableBondCount(mol)).toBeGreaterThanOrEqual(0);
-    expect(getTPSA(mol)).toBeGreaterThanOrEqual(0);
-    expect(getHeavyAtomCount(mol)).toBeGreaterThan(0);
-    expect(getRingCount(mol)).toBeGreaterThanOrEqual(0);
-    expect(computeLogP(mol)).toBeDefined();
+    expect(Descriptors.formula(mol)).toBeDefined();
+    expect(Descriptors.mass(mol)).toBeGreaterThan(0);
+    expect(Descriptors.hbondDonors(mol)).toBeGreaterThanOrEqual(0);
+    expect(Descriptors.hbondAcceptors(mol)).toBeGreaterThanOrEqual(0);
+    expect(Descriptors.rotatableBonds(mol)).toBeGreaterThanOrEqual(0);
+    expect(Descriptors.tpsa(mol)).toBeGreaterThanOrEqual(0);
+    expect(Descriptors.basic(mol).heavyAtoms).toBeGreaterThan(0);
+    expect(Descriptors.rings(mol)).toBeGreaterThanOrEqual(0);
+    expect(Descriptors.logP(mol)).toBeDefined();
   });
 
-  it("should check Lipinski's Rule of Five using existing API", () => {
+  it("should check Lipinski's Rule of Five using Descriptors API", () => {
     const aspirin = parseSMILES("CC(=O)Oc1ccccc1C(=O)O").molecules[0];
     if (!aspirin) return;
 
-    const result = checkLipinskiRuleOfFive(aspirin);
+    const result = Descriptors.drugLikeness(aspirin);
 
     expect(result).toBeDefined();
-    expect(typeof result.passes).toBe("boolean");
-    expect(typeof result.violations).toBe("object");
-    expect(typeof result.properties).toBe("object");
+    expect(typeof result.lipinski.passes).toBe("boolean");
+    expect(typeof result.lipinski.violations).toBe("object");
+    expect(typeof result.lipinski.properties).toBe("object");
   });
 
   it("should get ring info using existing API", () => {
@@ -175,7 +166,7 @@ describe("Backward Compatibility", () => {
     // Perform various operations
     generateSMILES(mol);
     generateMolfile(mol);
-    checkLipinskiRuleOfFive(mol);
+    Descriptors.drugLikeness(mol);
     getRingInfo(mol);
     computeMorganFingerprint(mol);
     new PackedMolecule(mol);
