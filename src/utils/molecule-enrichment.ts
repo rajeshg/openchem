@@ -108,7 +108,7 @@ function enrichAtoms(
     const degree = getHeavyNeighborCount(mol.bonds, atom.id, mol.atoms);
     const isInRing = ringInfo.isAtomInRing(atom.id);
     const ringIds = isInRing ? [...(atomRings.get(atom.id) || [])] : [];
-    const hybridization = determineHybridization(atom, mol.bonds, mol.atoms);
+    const hybridization = determineHybridization(atom, mol.bonds);
 
     return {
       ...atom,
@@ -143,7 +143,6 @@ function enrichBonds(
 function determineHybridization(
   atom: Atom,
   bonds: readonly Bond[],
-  atoms: readonly Atom[],
 ): "sp" | "sp2" | "sp3" | "other" {
   if (atom.aromatic) return "sp2";
 
@@ -206,6 +205,8 @@ function isRotatableBond(
   const isHeteroatom2 = atom2.symbol !== "C" && atom2.symbol !== "H";
 
   // Check direct conjugation (atom has C=O or C=N and other is heteroatom)
+  // Amide bonds (C(=O)-N) and ester C-O bonds (C(=O)-O) are not rotatable due to resonance
+  // However, for esters, the O-C bond after the ester oxygen IS rotatable if that C has 2+ heavy neighbors
   if (
     (hasCarbonyl1 && isHeteroatom2) ||
     (hasCarbonyl2 && isHeteroatom1) ||
@@ -214,31 +215,11 @@ function isRotatableBond(
   )
     return false;
 
-  // Check if heteroatom is bonded to another atom with conjugation
-  const neighborHasConjugation = (atomId: number) => {
-    const neighborBonds = mol.bonds.filter(
-      (b) =>
-        b.type === "single" &&
-        (b.atom1 === atomId || b.atom2 === atomId) &&
-        !(
-          (b.atom1 === bond.atom1 && b.atom2 === bond.atom2) ||
-          (b.atom1 === bond.atom2 && b.atom2 === bond.atom1)
-        ),
-    );
-    return neighborBonds.some((nb) => {
-      const neighborId = nb.atom1 === atomId ? nb.atom2 : nb.atom1;
-      return (
-        hasCarbonylBond(mol.bonds, neighborId, mol.atoms) ||
-        hasImineBond(mol.bonds, neighborId, mol.atoms)
-      );
-    });
-  };
-
-  if (
-    (isHeteroatom1 && neighborHasConjugation(atom1.id)) ||
-    (isHeteroatom2 && neighborHasConjugation(atom2.id))
-  )
-    return false;
+  // NOTE: Removed neighborHasConjugation check to match RDKit behavior
+  // RDKit only excludes the direct C(=O)-X bond, not subsequent X-C bonds
+  // For example, in CC(=O)NC1=CC=CC=C1:
+  //   - C(=O)-N is not rotatable (amide resonance)
+  //   - N-C(phenyl) IS rotatable (RDKit counts this)
 
   return true;
 }

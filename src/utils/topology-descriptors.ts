@@ -206,10 +206,9 @@ export function getHallKierAlpha(mol: Molecule): number {
  * Matches RDKit's BertzCT descriptor.
  *
  * @param mol - Molecule to analyze
- * @param cutoff - Distance cutoff for complexity calculation (default 100)
  * @returns Complexity index
  */
-export function getBertzCT(mol: Molecule, cutoff = 100): number {
+export function getBertzCT(mol: Molecule): number {
   const enriched = enrichMolecule(mol);
   const N = enriched.atoms.length;
 

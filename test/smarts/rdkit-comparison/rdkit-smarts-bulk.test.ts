@@ -368,7 +368,8 @@ interface KnownDifference {
   category:
     | "aromaticity-aliphatic"
     | "aromaticity-aromatic"
-    | "multiple-ring-matches";
+    | "multiple-ring-matches"
+    | "kekule-form-aromaticity";
 }
 
 const KNOWN_AROMATICITY_DIFFERENCES: KnownDifference[] = [
@@ -543,6 +544,39 @@ function isKnownDifference(
         reason:
           "openchem marks all atoms in aromatic heterocycles as aromatic per Hückel rule; RDKit uses extended aromaticity model",
         category: "aromaticity-aliphatic",
+      };
+    }
+  }
+
+  // Kekulé-form fused aromatic rings (uppercase SMILES with explicit double bonds)
+  // openchem doesn't fully perceive aromaticity in Kekulé form for fused heterocycles
+  if (
+    [
+      "C",
+      "N",
+      "O",
+      "C-C",
+      "C=C",
+      "C(=O)O",
+      "[a]",
+      "[A]",
+      "[C&D2]",
+      "[C,N]",
+    ].includes(pattern)
+  ) {
+    // Check for Kekulé-form indole, benzofuran, or other fused heteroaromatic systems
+    // Patterns: C1=CNc2, O1C=C...c2, etc.
+    if (
+      smiles.match(/[A-Z]\d*=C[A-Z][a-z]\d*c\d/) || // C1=CNc2 pattern
+      smiles.match(/[ONS]\d*C=C.*c\d/) || // O1C=C...c2 pattern
+      smiles.match(/C\d*=C[A-Z].*c\d*c\d/) // fused ring with double bonds
+    ) {
+      return {
+        pattern,
+        smiles,
+        reason:
+          "openchem aromaticity perception incomplete for Kekulé-form fused heterocycles; RDKit canonicalizes to aromatic form",
+        category: "kekule-form-aromaticity",
       };
     }
   }

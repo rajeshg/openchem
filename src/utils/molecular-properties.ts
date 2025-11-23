@@ -295,7 +295,6 @@ export function getHBondAcceptorCount(mol: Molecule): number {
           let hasNeighborWithDoubleBond = false;
           for (const bond of bonds) {
             const neighborId = bond.atom1 === atom.id ? bond.atom2 : bond.atom1;
-            const neighbor = mol.atoms[neighborId];
             const neighborBonds = getBondsForAtom(mol.bonds, neighborId);
 
             for (const nb of neighborBonds) {
@@ -352,7 +351,6 @@ export function getHBondAcceptorCount(mol: Molecule): number {
           if (bond.type !== "single") continue;
 
           const neighborId = bond.atom1 === atom.id ? bond.atom2 : bond.atom1;
-          const neighbor = mol.atoms[neighborId];
           const neighborBonds = getBondsForAtom(mol.bonds, neighborId);
 
           for (const nb of neighborBonds) {
@@ -995,7 +993,7 @@ export function getNumValenceElectrons(mol: Molecule): number {
  * Currently returns 0 as radical support is not yet implemented in the parser.
  * Matches RDKit's NumRadicalElectrons descriptor.
  */
-export function getNumRadicalElectrons(mol: Molecule): number {
+export function getNumRadicalElectrons(_mol: Molecule): number {
   return 0;
 }
 

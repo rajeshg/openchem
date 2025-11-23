@@ -13,8 +13,7 @@
  * - Gasteiger & Marsili, Tetrahedron 36:3219-3228 (1980)
  */
 
-import type { Atom, Bond, Molecule } from "types";
-import { getBondsForAtom } from "./bond-utils";
+import type { Atom, Molecule } from "types";
 
 /**
  * Gasteiger-Marsili partial charge parameters
@@ -118,8 +117,8 @@ function getGasteigerParams(atom: Atom): GasteigerParams {
  * @returns Array of partial charges indexed by atom id
  */
 export function computeGasteigerCharges(mol: Molecule, nIter = 12): number[] {
-  const charges: number[] = new Array(mol.atoms.length).fill(0);
-  const params: GasteigerParams[] = new Array(mol.atoms.length);
+  const charges: number[] = Array.from({ length: mol.atoms.length }, () => 0);
+  const params: GasteigerParams[] = Array.from({ length: mol.atoms.length });
 
   for (let i = 0; i < mol.atoms.length; i++) {
     const atom = mol.atoms[i]!;
@@ -134,7 +133,10 @@ export function computeGasteigerCharges(mol: Molecule, nIter = 12): number[] {
   const processedBonds = new Set<string>();
 
   for (let iter = 0; iter < nIter; iter++) {
-    const deltaCharges: number[] = new Array(mol.atoms.length).fill(0);
+    const deltaCharges: number[] = Array.from(
+      { length: mol.atoms.length },
+      () => 0,
+    );
     processedBonds.clear();
 
     // Process each bond once
@@ -182,20 +184,4 @@ export function computeGasteigerCharges(mol: Molecule, nIter = 12): number[] {
   return charges;
 }
 
-/**
- * Get bond order as a number (for Gasteiger charge calculation)
- */
-function getBondOrder(bond: Bond): number {
-  switch (bond.type) {
-    case "single":
-      return 1;
-    case "double":
-      return 2;
-    case "triple":
-      return 3;
-    case "aromatic":
-      return 1.5;
-    default:
-      return 1;
-  }
-}
+// Removed unused getBondOrder function
