@@ -2,7 +2,7 @@
 
 A fast TypeScript / JavaScript chemistry toolkit for working with molecular structures: parsing & generation (SMILES, MOL, SDF), canonicalization, pattern matching (SMARTS), 2D rendering, molecular descriptors, and structural analysis.
 
-Production-ready, TypeScript-first library for cheminformatics — works in both browser and Node.js. openchem keeps a small runtime footprint and relies on a couple of lightweight, well-audited libraries (for example `es-toolkit` utility helpers and `webcola` for layout) rather than a large dependency surface.
+Production-ready, TypeScript-first library for cheminformatics — works in both browser and Node.js. openchem keeps a small runtime footprint.
 
 ## Features
 
@@ -23,9 +23,11 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 
 ### Molecular Properties
 - **Basic** — Formula, mass, atom/bond counts
+- **Structural** — Valence electrons, amide bonds, spiro/bridgehead atoms, ring classifications
+- **Stereochemistry** — Specified and unspecified stereocenter counting
 - **Drug-likeness** — Lipinski's Rule of Five, Veber rules, BBB penetration
 - **Descriptors** — TPSA, LogP, rotatable bonds, H-bond donors/acceptors
-- **Structure** — Ring count, sp³ fraction, heteroatom count
+- **Ring analysis** — Saturated/aliphatic/heterocyclic ring counts
 
 ### Visualization
 - **2D rendering** — Publication-quality SVG with automatic layout

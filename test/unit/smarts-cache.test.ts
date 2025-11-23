@@ -131,7 +131,8 @@ describe("SMARTS Pattern Cache", () => {
       parseSMARTSCached(pattern);
       hitTimings.push(performance.now() - start);
     }
-    const avgHitTime = hitTimings.reduce((a, b) => a + b, 0) / hitTimings.length;
+    const avgHitTime =
+      hitTimings.reduce((a, b) => a + b, 0) / hitTimings.length;
 
     // Cache hits should be faster (very lenient threshold for CI environments)
     // We just verify that caching doesn't make it slower

@@ -45,7 +45,47 @@ export {
   checkLipinskiRuleOfFive,
   checkVeberRules,
   checkBBBPenetration,
+  getNumValenceElectrons,
+  getNumRadicalElectrons,
+  getNumAmideBonds,
+  getNumSpiroAtoms,
+  getNumBridgeheadAtoms,
+  getNumSaturatedRings,
+  getNumAliphaticRings,
+  getNumSaturatedAliphaticRings,
+  getNumHeterocycles,
+  getNumAromaticHeterocycles,
+  getNumSaturatedHeterocycles,
+  getNumAliphaticHeterocycles,
+  getNumAtomStereoCenters,
+  getNumUnspecifiedAtomStereoCenters,
+  getMaxPartialCharge,
+  getMinPartialCharge,
+  getMaxAbsPartialCharge,
+  getMinAbsPartialCharge,
 } from "src/utils/molecular-properties";
+export {
+  getKappa1,
+  getKappa2,
+  getKappa3,
+  getHallKierAlpha,
+  getBertzCT,
+} from "src/utils/topology-descriptors";
+export {
+  getChi0,
+  getChi0n,
+  getChi0v,
+  getChi1,
+  getChi1n,
+  getChi1v,
+  getChi2n,
+  getChi2v,
+  getChi3n,
+  getChi3v,
+  getChi4n,
+  getChi4v,
+} from "src/utils/chi-indices";
+export { getLabuteASA } from "src/utils/surface-descriptors";
 export { getRingInfo } from "src/utils/ring-information";
 export type { RingInformation } from "src/utils/ring-information";
 export {

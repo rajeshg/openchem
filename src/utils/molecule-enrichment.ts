@@ -155,11 +155,8 @@ function determineHybridization(
   const hasDouble = atomBonds.some((b) => b.type === "double");
   if (hasDouble) return "sp2";
 
-  const heavyNeighbors = getHeavyNeighborCount(bonds, atom.id, atoms);
-
-  if (heavyNeighbors <= 3) return "sp3";
-
-  return "other";
+  // All single bonds → sp3 hybridization
+  return "sp3";
 }
 
 function isRotatableBond(

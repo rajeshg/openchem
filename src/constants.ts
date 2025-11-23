@@ -120,6 +120,82 @@ export const ATOMIC_NUMBERS: Record<string, number> = {
   "*": 0,
 };
 
+// Number of outer shell (valence) electrons per element
+// Used for NumValenceElectrons descriptor (RDKit-compatible)
+export const VALENCE_ELECTRONS: Record<number, number> = {
+  1: 1, // H
+  2: 2, // He
+  3: 1, // Li
+  4: 2, // Be
+  5: 3, // B
+  6: 4, // C
+  7: 5, // N
+  8: 6, // O
+  9: 7, // F
+  10: 8, // Ne
+  11: 1, // Na
+  12: 2, // Mg
+  13: 3, // Al
+  14: 4, // Si
+  15: 5, // P
+  16: 6, // S
+  17: 7, // Cl
+  18: 8, // Ar
+  19: 1, // K
+  20: 2, // Ca
+  21: 3, // Sc
+  22: 4, // Ti
+  23: 5, // V
+  24: 6, // Cr
+  25: 7, // Mn
+  26: 8, // Fe
+  27: 9, // Co
+  28: 10, // Ni
+  29: 11, // Cu
+  30: 12, // Zn
+  31: 3, // Ga
+  32: 4, // Ge
+  33: 5, // As
+  34: 6, // Se
+  35: 7, // Br
+  36: 8, // Kr
+  37: 1, // Rb
+  38: 2, // Sr
+  39: 3, // Y
+  40: 4, // Zr
+  41: 5, // Nb
+  42: 6, // Mo
+  43: 7, // Tc
+  44: 8, // Ru
+  45: 9, // Rh
+  46: 10, // Pd
+  47: 11, // Ag
+  48: 12, // Cd
+  49: 3, // In
+  50: 4, // Sn
+  51: 5, // Sb
+  52: 6, // Te
+  53: 7, // I
+  54: 8, // Xe
+  55: 1, // Cs
+  56: 2, // Ba
+  57: 3, // La
+  58: 4, // Ce
+  72: 4, // Hf
+  73: 5, // Ta
+  74: 6, // W
+  75: 7, // Re
+  76: 8, // Os
+  77: 9, // Ir
+  78: 10, // Pt
+  79: 11, // Au
+  80: 12, // Hg
+  81: 3, // Tl
+  82: 4, // Pb
+  83: 5, // Bi
+  // For other lanthanides/actinides, use 3 as default
+};
+
 // Default valences for elements (OpenSMILES specification)
 export const DEFAULT_VALENCES: Record<string, number[]> = {
   // Organic subset
@@ -270,8 +346,8 @@ export const AVERAGE_ATOMIC_MASSES: Record<string, number> = {
   N: 14.007,
   O: 15.999,
   F: 18.998,
-  Ne: 20.180,
-  Na: 22.990,
+  Ne: 20.18,
+  Na: 22.99,
   Mg: 24.305,
   Al: 26.982,
   Si: 28.085,
@@ -292,7 +368,7 @@ export const AVERAGE_ATOMIC_MASSES: Record<string, number> = {
   Cu: 63.546,
   Zn: 65.38,
   Ga: 69.723,
-  Ge: 72.630,
+  Ge: 72.63,
   As: 74.922,
   Se: 78.971,
   Br: 79.904,
@@ -311,8 +387,8 @@ export const AVERAGE_ATOMIC_MASSES: Record<string, number> = {
   In: 114.82,
   Sn: 118.71,
   Sb: 121.76,
-  Te: 127.60,
-  I: 126.90,
+  Te: 127.6,
+  I: 126.9,
   Xe: 131.29,
   Cs: 132.91,
   Ba: 137.33,
@@ -324,7 +400,7 @@ export const AVERAGE_ATOMIC_MASSES: Record<string, number> = {
   Eu: 151.96,
   Gd: 157.25,
   Tb: 158.93,
-  Dy: 162.50,
+  Dy: 162.5,
   Ho: 164.93,
   Er: 167.26,
   Tm: 168.93,

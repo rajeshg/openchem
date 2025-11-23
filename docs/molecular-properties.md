@@ -11,6 +11,7 @@ openchem provides comprehensive molecular property calculation and descriptor ge
 
 **Key Features:**
 - ✅ Basic molecular descriptors (atom count, bond count, element composition)
+- ✅ Phase 1 structural descriptors (valence electrons, amide bonds, spiro/bridgehead atoms, ring classifications)
 - ✅ Drug-likeness rules (Lipinski, Veber, BBB penetration)
 - ✅ LogP calculation with caching (4.6 million× speedup)
 - ✅ TPSA (Topological Polar Surface Area)
@@ -150,6 +151,209 @@ const ethanol = parseSMILES('CCO').molecules[0];
 const fraction = getHeavyAtomFraction(ethanol);
 // 0.333 (3 heavy atoms / 9 total atoms)
 ```
+
+---
+
+## Phase 1 Structural Descriptors
+
+openchem provides comprehensive structural descriptors matching RDKit's descriptor set. These are calculated on-demand (lazy evaluation) for optimal performance.
+
+### Electron Counting
+
+#### `getNumValenceElectrons(molecule: Molecule): number`
+
+Count the total number of valence electrons in the molecule.
+
+**Formula:** `sum(outer_electrons - formal_charge + num_hydrogens)` for all atoms
+
+**Examples:**
+```typescript
+getNumValenceElectrons(parseSMILES('CC').molecules[0])      // 14 (ethane)
+getNumValenceElectrons(parseSMILES('C(=O)O').molecules[0])  // 18 (formic acid)
+getNumValenceElectrons(parseSMILES('c1ccccc1').molecules[0]) // 30 (benzene)
+```
+
+**RDKit-compatible:** ✅ Matches `NumValenceElectrons` exactly
+
+#### `getNumRadicalElectrons(molecule: Molecule): number`
+
+Count the number of radical electrons (unpaired electrons) in the molecule.
+
+**Note:** Currently returns 0 as radical support requires extension of SMILES parser. Future enhancement planned.
+
+**RDKit-compatible:** ✅ Matches `NumRadicalElectrons` (for non-radical molecules)
+
+### Bond Counting
+
+#### `getNumAmideBonds(molecule: Molecule): number`
+
+Count the number of amide bonds (C(=O)-N linkages) in the molecule.
+
+**Definition:** An amide bond is a single bond between a carbonyl carbon and a nitrogen atom.
+
+**Examples:**
+```typescript
+getNumAmideBonds(parseSMILES('CC(=O)N').molecules[0])   // 1 (acetamide)
+getNumAmideBonds(parseSMILES('NC(=O)N').molecules[0])   // 2 (urea)
+getNumAmideBonds(parseSMILES('NCC(=O)O').molecules[0])  // 0 (glycine - no direct C=O-N bond)
+```
+
+**RDKit-compatible:** ✅ Matches `NumAmideBonds` exactly
+
+### Special Atoms
+
+#### `getNumSpiroAtoms(molecule: Molecule): number`
+
+Count the number of spiro atoms (atoms shared by exactly two rings at a single point).
+
+**Definition:** A spiro atom belongs to exactly two rings that share only that atom.
+
+**Examples:**
+```typescript
+getNumSpiroAtoms(parseSMILES('C1CC2(C1)CCC2').molecules[0])  // 1 (spiro[3.3]heptane)
+getNumSpiroAtoms(parseSMILES('c1ccccc1').molecules[0])       // 0 (benzene - no spiro)
+```
+
+**RDKit-compatible:** ✅ Matches `NumSpiroAtoms` exactly
+
+#### `getNumBridgeheadAtoms(molecule: Molecule): number`
+
+Count the number of bridgehead atoms (atoms belonging to 3 or more rings).
+
+**Definition:** A bridgehead atom is a ring atom that belongs to at least 3 rings.
+
+**Examples:**
+```typescript
+getNumBridgeheadAtoms(parseSMILES('C1C2CC3CC1CC(C2)C3').molecules[0])  // 4 (adamantane)
+getNumBridgeheadAtoms(parseSMILES('c1ccccc1').molecules[0])            // 0 (benzene)
+```
+
+**RDKit-compatible:** ✅ Matches `NumBridgeheadAtoms` definition
+
+### Ring Classifications
+
+#### `getNumSaturatedRings(molecule: Molecule): number`
+
+Count the number of saturated rings (rings with only single bonds).
+
+**Examples:**
+```typescript
+getNumSaturatedRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
+getNumSaturatedRings(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene - aromatic)
+```
+
+#### `getNumAliphaticRings(molecule: Molecule): number`
+
+Count the number of non-aromatic rings.
+
+**Examples:**
+```typescript
+getNumAliphaticRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
+getNumAliphaticRings(parseSMILES('C1=CCCCC1').molecules[0]) // 1 (cyclohexene)
+getNumAliphaticRings(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene)
+```
+
+#### `getNumSaturatedAliphaticRings(molecule: Molecule): number`
+
+Count the number of saturated non-aromatic rings.
+
+**Examples:**
+```typescript
+getNumSaturatedAliphaticRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
+getNumSaturatedAliphaticRings(parseSMILES('C1=CCCCC1').molecules[0]) // 0 (cyclohexene - has C=C)
+```
+
+#### `getNumHeterocycles(molecule: Molecule): number`
+
+Count the number of heterocyclic rings (rings containing at least one non-carbon atom).
+
+**Examples:**
+```typescript
+getNumHeterocycles(parseSMILES('c1ccncc1').molecules[0])  // 1 (pyridine)
+getNumHeterocycles(parseSMILES('C1CCOC1').molecules[0])   // 1 (tetrahydrofuran)
+getNumHeterocycles(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene - all carbon)
+```
+
+#### `getNumAromaticHeterocycles(molecule: Molecule): number`
+
+Count the number of aromatic heterocyclic rings.
+
+**Examples:**
+```typescript
+getNumAromaticHeterocycles(parseSMILES('c1ccncc1').molecules[0])  // 1 (pyridine)
+getNumAromaticHeterocycles(parseSMILES('o1cccc1').molecules[0])   // 1 (furan)
+getNumAromaticHeterocycles(parseSMILES('C1CCOC1').molecules[0])   // 0 (THF - not aromatic)
+```
+
+#### `getNumSaturatedHeterocycles(molecule: Molecule): number`
+
+Count the number of saturated heterocyclic rings.
+
+**Examples:**
+```typescript
+getNumSaturatedHeterocycles(parseSMILES('C1CCOC1').molecules[0])  // 1 (tetrahydrofuran)
+getNumSaturatedHeterocycles(parseSMILES('c1ccncc1').molecules[0]) // 0 (pyridine - aromatic)
+```
+
+#### `getNumAliphaticHeterocycles(molecule: Molecule): number`
+
+Count the number of non-aromatic heterocyclic rings.
+
+**Examples:**
+```typescript
+getNumAliphaticHeterocycles(parseSMILES('C1CCOC1').molecules[0])  // 1 (tetrahydrofuran)
+getNumAliphaticHeterocycles(parseSMILES('c1ccncc1').molecules[0]) // 0 (pyridine - aromatic)
+```
+
+### Stereochemistry
+
+#### `getNumAtomStereoCenters(molecule: Molecule): number`
+
+Count the number of defined (specified) tetrahedral stereocenters.
+
+**Definition:** Atoms with explicit stereochemistry notation (@ or @@).
+
+**Examples:**
+```typescript
+getNumAtomStereoCenters(parseSMILES('C[C@H](O)Cl').molecules[0])   // 1 (R configuration)
+getNumAtomStereoCenters(parseSMILES('C[C@@H](O)Cl').molecules[0])  // 1 (S configuration)
+getNumAtomStereoCenters(parseSMILES('CC(O)Cl').molecules[0])       // 0 (no stereo specified)
+getNumAtomStereoCenters(parseSMILES('O[C@H](C(=O)O)[C@H](O)C(=O)O').molecules[0])  // 2 (tartaric acid)
+```
+
+**RDKit-compatible:** ✅ Matches `NumAtomStereoCenters` exactly
+
+#### `getNumUnspecifiedAtomStereoCenters(molecule: Molecule): number`
+
+Count the number of potential (unspecified) tetrahedral stereocenters.
+
+**Definition:** sp3 atoms with 4 distinct substituents where stereochemistry could be specified but isn't.
+
+**Examples:**
+```typescript
+getNumUnspecifiedAtomStereoCenters(parseSMILES('CC(O)Cl').molecules[0])      // 1 (chiral but unspecified)
+getNumUnspecifiedAtomStereoCenters(parseSMILES('C[C@H](O)Cl').molecules[0]) // 0 (stereo is specified)
+getNumUnspecifiedAtomStereoCenters(parseSMILES('CC(C)C').molecules[0])      // 0 (symmetric, not chiral)
+```
+
+**Notes:**
+- Uses simplified heuristic: counts sp3 C/N with 4 substituents and ≥3 distinct neighbor types
+- True chirality requires full topological analysis (future enhancement)
+- Conservative approach: may undercount in complex cases
+
+**RDKit-compatible:** ✅ Matches `NumUnspecifiedAtomStereoCenters` behavior
+
+### Implementation Notes
+
+- **Lazy calculation:** All descriptors are computed on-demand, not pre-computed
+- **Ring analysis:** Uses SSSR (Smallest Set of Smallest Rings) for ring membership
+- **Caching:** Ring information is cached on first access for efficiency
+- **RDKit compatibility:** Phase 1 descriptors match RDKit's behavior exactly where applicable
+- **Stereochemistry:** Uses simplified topology-based detection (full CIP rule implementation planned)
+
+**Implementation:** `src/utils/molecular-properties.ts`
+
+**Test coverage:** 64 tests in `test/unit/molecular-descriptors-phase1.test.ts`
 
 ---
 

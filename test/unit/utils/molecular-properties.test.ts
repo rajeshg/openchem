@@ -450,7 +450,9 @@ describe("molecular properties", () => {
     it("should fail for molecule with too many H-bond acceptors", () => {
       // Molecule with many carbonyl groups (violates HBA ≤ 10)
       // Acrolein-like polymer with many ketone groups: 11 carbonyl oxygens
-      const result = parseSMILES("CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)");
+      const result = parseSMILES(
+        "CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)CC(=O)",
+      );
       expect(result.errors).toEqual([]);
       const lipinski = checkLipinskiRuleOfFive(result.molecules[0]!);
       expect(lipinski.passes).toBe(false);
