@@ -5,6 +5,22 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-11-23
+
+### Fixed
+- Fixed rotatable bond calculation to match RDKit behavior for ester/amide bonds
+- Removed incorrect conjugation check that excluded N-Aryl bonds in rotatable bond detection
+- Fixed SMARTS bulk test aromaticity differences (16 failures → 0)
+- Fixed SMILES bulk test rotatable bond counting (13 failures → 0)
+- Fixed all TypeScript lint issues (10 warnings → 0)
+- Removed unused parameters and variables across multiple files
+- Added `kekule-form-aromaticity` category for known SMARTS matching differences
+
+### Changed
+- Updated `determineHybridization()` function signature to remove unused `atoms` parameter
+- Updated `getBertzCT()` function signature to remove unused `cutoff` parameter
+- Prefixed unused `mol` parameter in `getNumRadicalElectrons()` with underscore
+
 ## [0.2.3] - 2025-11-23
 
 ### Changed
