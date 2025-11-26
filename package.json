@@ -49,6 +49,8 @@
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
     "build": "bun build index.ts --outdir ./dist --format esm",
     "serve": "bun run build && bun ./serve-playground.js",
+    "mcp:remote": "bun run src/mcp-server-remote.ts",
+    "mcp:dev": "bun --watch src/mcp-server-remote.ts",
     "prepublishOnly": "bun run build && bun run test",
     "lint": "npx oxlint@latest .",
     "fmt": "npx oxfmt@latest ."
@@ -56,12 +58,16 @@
   "devDependencies": {
     "@rdkit/rdkit": "latest",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^24.10.1"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.23.0",
+    "zod": "^4.1.13"
+  },
   "publishConfig": {
     "access": "public"
   }
