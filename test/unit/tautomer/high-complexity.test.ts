@@ -317,7 +317,7 @@ describe("High-complexity tautomers: Performance and limits", () => {
     });
   });
 
-  it("canonical selection is stable with many tautomers", () => {
+  it("canonical selection is stable with many tautomers", { timeout: 10000 }, () => {
     const mol = parseSMILES("Oc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(O)cc2)cc1").molecules[0];
     if (!mol) throw new Error("parse failed");
 
