@@ -17,7 +17,7 @@ import { registerTools } from "./mcp-tools.js";
 // Version - hardcoded to maintain runtime-agnostic compatibility
 // (Cloudflare Workers don't support node:fs)
 // Update this when bumping package.json version
-const VERSION = "0.2.7";
+const VERSION = "0.2.8";
 
 const PORT = Number.parseInt(process.env.PORT || "3000", 10);
 

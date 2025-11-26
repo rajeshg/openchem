@@ -5,6 +5,20 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] - 2025-11-26
+
+### Added
+- **Model Context Protocol (MCP) Server** - Remote HTTP + SSE server for AI agents
+  - Lightweight Node.js/Bun HTTP server (87 lines)
+  - 5 composite tools: analyze, compare, search, render, convert
+  - Dual endpoints: `/mcp` and `/mcp/sse` with StreamableHTTPServerTransport
+  - Health check endpoint: `/health`
+  - CORS enabled for remote access
+  - New dependencies: @modelcontextprotocol/sdk ^1.23.0, zod ^4.1.13
+  - New npm scripts: `mcp:remote` and `mcp:dev`
+  - Comprehensive documentation: `docs/mcp-server-remote.md` and `MCP_QUICKSTART.md`
+  - Runtime-agnostic design compatible with Cloudflare Workers
+
 ## [0.2.7] - 2025-11-26
 
 ### Fixed
