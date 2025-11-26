@@ -56,13 +56,7 @@ export function relaxCoordinates(
     applyBondForces(molecule, coords, forces, bondLength, opts.springConstant);
 
     // Apply repulsion forces (non-bonded atoms)
-    applyRepulsionForces(
-      molecule,
-      coords,
-      forces,
-      bondLength,
-      opts.repulsionConstant,
-    );
+    applyRepulsionForces(molecule, coords, forces, bondLength, opts.repulsionConstant);
 
     // Apply angle forces (maintain bond angles)
     applyAngleForces(molecule, coords, forces, opts.angleConstant);
@@ -271,10 +265,7 @@ function applyAngleForces(
 /**
  * Get ideal bond length for bond type.
  */
-function getIdealBondLength(
-  bondType: BondType,
-  baseBondLength: number,
-): number {
+function getIdealBondLength(bondType: BondType, baseBondLength: number): number {
   switch (bondType) {
     case "single":
       return baseBondLength;

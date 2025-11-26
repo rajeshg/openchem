@@ -44,12 +44,10 @@ async function main() {
         uniqueMatches: true,
       });
 
-      const rdkitMol =
-        typeof RDKit.get_mol === "function" ? RDKit.get_mol(smiles) : null;
+      const rdkitMol = typeof RDKit.get_mol === "function" ? RDKit.get_mol(smiles) : null;
       if (!rdkitMol) continue;
 
-      const rdkitQuery =
-        typeof RDKit.get_qmol === "function" ? RDKit.get_qmol(pattern) : null;
+      const rdkitQuery = typeof RDKit.get_qmol === "function" ? RDKit.get_qmol(pattern) : null;
       if (!rdkitQuery) {
         rdkitMol.delete();
         continue;
@@ -68,9 +66,7 @@ async function main() {
           openchemCount: openchemResult.matches.length,
           rdkitCount: rdkitMatches.length,
           openchemMatches: JSON.stringify(
-            openchemResult.matches.map((m: any) =>
-              m.map((am: any) => am.moleculeAtomIndex),
-            ),
+            openchemResult.matches.map((m: any) => m.map((am: any) => am.moleculeAtomIndex)),
           ),
           rdkitMatches: JSON.stringify(rdkitMatches),
         });

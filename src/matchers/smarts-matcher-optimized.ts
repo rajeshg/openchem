@@ -5,11 +5,7 @@
  * offering better performance for bulk operations and molecular similarity searches.
  */
 
-import type {
-  SMARTSPattern,
-  MatchResult,
-  SMARTSMatchOptions,
-} from "src/types/smarts-types";
+import type { SMARTSPattern, MatchResult, SMARTSMatchOptions } from "src/types/smarts-types";
 import { matchSMARTS as matchSMARTSBase } from "src/matchers/smarts-matcher";
 import type { MoleculeOrPacked } from "src/utils/molecule-adapter";
 import { getMolecule } from "src/utils/molecule-adapter";

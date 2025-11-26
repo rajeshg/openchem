@@ -1,9 +1,6 @@
 import type { IUPACRule, StructuralSubstituent } from "../../types";
 import { BLUE_BOOK_RULES, RulePriority } from "../../types";
-import type {
-  ImmutableNamingContext,
-  ContextState,
-} from "../../immutable-context";
+import type { ImmutableNamingContext, ContextState } from "../../immutable-context";
 import { ExecutionPhase } from "../../immutable-context";
 import type { NamingSubstituent } from "../../naming/iupac-types";
 
@@ -25,8 +22,7 @@ const {
 export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
   id: "P-44.4.chain-analysis",
   name: "Ring vs Chain Selection (chain-analysis)",
-  description:
-    "Prefer ring system as parent when both ring and chain candidates exist (P-44.4)",
+  description: "Prefer ring system as parent when both ring and chain candidates exist (P-44.4)",
   blueBookReference: BLUE_BOOK_RULES.P44_4,
   priority: RulePriority.TEN,
   conditions: (context: ImmutableNamingContext) => {
@@ -65,12 +61,8 @@ export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
       if (ring.atoms && ring.atoms.length > 0) {
         ringSize = ring.atoms.length;
         if (process.env.VERBOSE) {
-          console.log(
-            `[P-44.4] Detected fused ring system with ${ring.rings?.length || 0} rings`,
-          );
-          console.log(
-            `[P-44.4] Total unique atoms in fused system: ${ringSize}`,
-          );
+          console.log(`[P-44.4] Detected fused ring system with ${ring.rings?.length || 0} rings`);
+          console.log(`[P-44.4] Total unique atoms in fused system: ${ringSize}`);
         }
       }
     }
@@ -84,12 +76,9 @@ export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
     let ringAtomCount = 0;
     if (longestChain.atoms && ring.atoms) {
       const ringAtomIds = new Set(ring.atoms.map((a) => a.id));
-      ringAtomCount = longestChain.atoms.filter((a) =>
-        ringAtomIds.has(a.id),
-      ).length;
+      ringAtomCount = longestChain.atoms.filter((a) => ringAtomIds.has(a.id)).length;
     }
-    const ringAtomPercentage =
-      chainLength > 0 ? ringAtomCount / chainLength : 0;
+    const ringAtomPercentage = chainLength > 0 ? ringAtomCount / chainLength : 0;
 
     if (process.env.VERBOSE) {
       console.log(`[P-44.4] candidateRings.length: ${candidateRings.length}`);
@@ -134,10 +123,7 @@ export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
 
     // Generate a simple ring name (aromatic vs aliphatic)
     const type =
-      ring.type ||
-      (ring.atoms && ring.atoms.some((a) => a.aromatic)
-        ? "aromatic"
-        : "aliphatic");
+      ring.type || (ring.atoms && ring.atoms.some((a) => a.aromatic) ? "aromatic" : "aliphatic");
 
     // Check for heterocyclic name first
     let name = "";
@@ -174,8 +160,7 @@ export const P44_4_RING_VS_CHAIN_IN_CHAIN_ANALYSIS_RULE: IUPACRule = {
         name = ringNames[ringSize] || `cyclo${ringSize}ane`;
       }
     }
-    const locants =
-      ring && ring.atoms ? ring.atoms.map((_, idx: number) => idx + 1) : [];
+    const locants = ring && ring.atoms ? ring.atoms.map((_, idx: number) => idx + 1) : [];
     // Try to find substituents on the ring atoms so substituted ring names can be produced
     let substituents: (StructuralSubstituent | NamingSubstituent)[] = [];
     try {

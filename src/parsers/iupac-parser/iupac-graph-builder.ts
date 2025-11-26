@@ -6,10 +6,7 @@ import {
   IUPACNestedSubstituentBuilder,
   type IUPACBuilderContext,
 } from "./iupac-nested-substituent-builder";
-import {
-  IUPACSuffixApplicator,
-  type IUPACSuffixContext,
-} from "./iupac-suffix-applicator";
+import { IUPACSuffixApplicator, type IUPACSuffixContext } from "./iupac-suffix-applicator";
 import {
   IUPACSubstituentApplicator,
   type IUPACSubstituentContext,
@@ -70,9 +67,7 @@ export class IUPACGraphBuilder
     const _stereoTokens = tokens.filter((t) => t.type === "STEREO");
 
     // Detect hydrogen notation (e.g., "4H-1,3-thiazole" → saturated form)
-    const hydrogenNotationToken = locantTokens.find(
-      (t) => t.metadata?.isHydrogenNotation === true,
-    );
+    const hydrogenNotationToken = locantTokens.find((t) => t.metadata?.isHydrogenNotation === true);
     const isSaturatedForm = !!hydrogenNotationToken;
 
     if (process.env.VERBOSE && isSaturatedForm) {
@@ -115,8 +110,7 @@ export class IUPACGraphBuilder
     if (bicycloPrefix) {
       // Extract bridge notation and heteroatom info from the PREFIX value
       // E.g., "oxabicyclo[3.3.1]" or "bicyclo[3.3.1]"
-      const bicycloRegex =
-        /^(\d+-)?([a-z]*)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i;
+      const bicycloRegex = /^(\d+-)?([a-z]*)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i;
       const match = bicycloPrefix.value?.match(bicycloRegex);
 
       if (match) {
@@ -170,17 +164,13 @@ export class IUPACGraphBuilder
 
       for (const ylSuffix of ylBeforeLastParent) {
         // Look backwards to find: locant, "an" suffix, parent
-        const locantBeforeYl = locantTokens
-          .filter((l) => l.position < ylSuffix.position)
-          .pop();
+        const locantBeforeYl = locantTokens.filter((l) => l.position < ylSuffix.position).pop();
         if (locantBeforeYl) {
           const anSuffix = suffixTokens.find(
             (s) => s.value === "an" && s.position < locantBeforeYl.position,
           );
           if (anSuffix) {
-            const parentBeforeAn = parentTokens.find(
-              (p) => p.position < anSuffix.position,
-            );
+            const parentBeforeAn = parentTokens.find((p) => p.position < anSuffix.position);
             if (parentBeforeAn && parentBeforeAn !== lastParent) {
               // Found the pattern: parent+an+locant+yl
               // Create a nested alkyl substituent
@@ -189,14 +179,8 @@ export class IUPACGraphBuilder
                 type: "SUBSTITUENT",
                 value: substName,
                 position: parentBeforeAn.position,
-                length:
-                  ylSuffix.position + ylSuffix.length - parentBeforeAn.position,
-                nestedTokens: [
-                  parentBeforeAn,
-                  anSuffix,
-                  locantBeforeYl,
-                  ylSuffix,
-                ],
+                length: ylSuffix.position + ylSuffix.length - parentBeforeAn.position,
+                nestedTokens: [parentBeforeAn, anSuffix, locantBeforeYl, ylSuffix],
               };
 
               nestedAlkylSubsts.push(nestedSubst);
@@ -207,9 +191,7 @@ export class IUPACGraphBuilder
               );
 
               if (process.env.VERBOSE) {
-                console.log(
-                  `[graph-builder] Detected nested alkyl substituent: ${substName}`,
-                );
+                console.log(`[graph-builder] Detected nested alkyl substituent: ${substName}`);
               }
             }
           }
@@ -222,9 +204,7 @@ export class IUPACGraphBuilder
 
     if (process.env.VERBOSE && nestedAlkylSubsts.length > 0) {
       console.log(`[graph-builder] After nested alkyl extraction:`);
-      console.log(
-        `  finalSuffixTokens: ${finalSuffixTokens.map((t) => t.value).join(", ")}`,
-      );
+      console.log(`  finalSuffixTokens: ${finalSuffixTokens.map((t) => t.value).join(", ")}`);
       console.log(
         `  finalSubstituentTokens: ${finalSubstituentTokens.map((t) => t.value).join(", ")}`,
       );
@@ -248,9 +228,7 @@ export class IUPACGraphBuilder
         // Check if there are any substituents between the multiplier and parent
         // If there are, the multiplier belongs to the substituent, not the ring
         const hasSubstituentsBetween = substituentTokens.some(
-          (s) =>
-            s.position > muliplierBeforeParent.position &&
-            s.position < firstParent.position,
+          (s) => s.position > muliplierBeforeParent.position && s.position < firstParent.position,
         );
 
         if (!hasSubstituentsBetween) {
@@ -291,9 +269,7 @@ export class IUPACGraphBuilder
     // Check for composite alkane stems (e.g., "tetr" + "dec" = tetradec = 14)
     // These are represented as multiple PARENT tokens with metadata numPart property
     if (adjustedParentTokens.length > 1) {
-      const stemComparts = adjustedParentTokens.filter(
-        (t) => t.metadata?.numPart,
-      );
+      const stemComparts = adjustedParentTokens.filter((t) => t.metadata?.numPart);
       if (stemComparts.length > 1) {
         // Sort by position to ensure correct order (hundreds, tens, units)
         stemComparts.sort((a, b) => a.position - b.position);
@@ -339,14 +315,8 @@ export class IUPACGraphBuilder
 
     if (process.env.VERBOSE) {
       console.log("[graph-builder] Starting build");
-      console.log(
-        "[graph-builder] Parent tokens:",
-        parentTokens.map((t) => t.value).join(", "),
-      );
-      console.log(
-        "[graph-builder] Suffix tokens:",
-        suffixTokens.map((t) => t.value).join(", "),
-      );
+      console.log("[graph-builder] Parent tokens:", parentTokens.map((t) => t.value).join(", "));
+      console.log("[graph-builder] Suffix tokens:", suffixTokens.map((t) => t.value).join(", "));
       console.log(
         "[graph-builder] Substituents:",
         substituentTokens.map((t) => t.value).join(", "),
@@ -363,12 +333,8 @@ export class IUPACGraphBuilder
       // Check if this looks like a real ether linkage
       // (has alkyl parent before oxy and main parent after oxy)
       const oxyToken = suffixTokens[oxyConnectorIdx]!;
-      const alkylParent = parentTokens.find(
-        (p) => p.position < oxyToken.position,
-      );
-      const mainParent = parentTokens.find(
-        (p) => p.position > oxyToken.position,
-      );
+      const alkylParent = parentTokens.find((p) => p.position < oxyToken.position);
+      const mainParent = parentTokens.find((p) => p.position > oxyToken.position);
 
       if (alkylParent && mainParent) {
         // Handle ether linkage separately
@@ -416,10 +382,7 @@ export class IUPACGraphBuilder
         if (esterSuffix.value === "formate") {
           implicitParentSmiles = "C";
           implicitParentName = "methanoate";
-        } else if (
-          esterSuffix.value === "benzoate" ||
-          esterSuffix.value === "benzenecarboxylate"
-        ) {
+        } else if (esterSuffix.value === "benzoate" || esterSuffix.value === "benzenecarboxylate") {
           implicitParentSmiles = "c1ccccc1C"; // Benzoate = benzene-carboxylate
           implicitParentName = "benzoate";
         }
@@ -497,11 +460,7 @@ export class IUPACGraphBuilder
         s.value === "formate" ||
         s.value === "acetate",
     );
-    if (
-      hasEsterSuffix &&
-      substituentTokens.length > 0 &&
-      adjustedParentTokens.length > 0
-    ) {
+    if (hasEsterSuffix && substituentTokens.length > 0 && adjustedParentTokens.length > 0) {
       // Check if first substituent comes before parent (indicates ester alkyl group)
       const firstSubst = substituentTokens[0]!;
       const firstParent = adjustedParentTokens[0]!;
@@ -510,9 +469,7 @@ export class IUPACGraphBuilder
         // Special case: parent with "yl" suffix + formate means parent is a substituent shape
         // e.g., "methyl prop-1-ynylsulfanylformate"
         // The parent "prop" should not be the acyl chain, but part of the substituent definition
-        const hasYlSuffix = suffixTokens.some(
-          (s) => s.value === "yl" || s.value?.endsWith("yl"),
-        );
+        const hasYlSuffix = suffixTokens.some((s) => s.value === "yl" || s.value?.endsWith("yl"));
         const hasFormate = suffixTokens.some((s) => s.value === "formate");
 
         if (hasYlSuffix && hasFormate) {
@@ -533,9 +490,7 @@ export class IUPACGraphBuilder
           builder.addBond(cIdx, o2Idx); // C-O (ester)
 
           // Add ester alkyl (methyl): -OCH3
-          const methoxyTokens = substituentTokens.filter(
-            (s) => s.value === "methyl",
-          );
+          const methoxyTokens = substituentTokens.filter((s) => s.value === "methyl");
           if (methoxyTokens.length > 0) {
             const meIdx = builder.addCarbon();
             builder.addBond(o2Idx, meIdx); // O-Me
@@ -575,15 +530,9 @@ export class IUPACGraphBuilder
     }
 
     // Detect N-substituted amides and amines (N- or N,N- prefix)
-    const hasAmideSuffix = suffixTokens.some(
-      (s) => s.value === "amide" || s.value === "amid",
-    );
-    const hasAmineSuffix = suffixTokens.some(
-      (s) => s.value === "amine" || s.value === "amin",
-    );
-    const nPrefixToken = prefixTokens.find((p) =>
-      this.isNSubstitutionPrefix(p),
-    );
+    const hasAmideSuffix = suffixTokens.some((s) => s.value === "amide" || s.value === "amid");
+    const hasAmineSuffix = suffixTokens.some((s) => s.value === "amine" || s.value === "amin");
+    const nPrefixToken = prefixTokens.find((p) => this.isNSubstitutionPrefix(p));
 
     // Check if parent is likely a ring system (where N-substituted amide logic might fail)
     const isRingParent = adjustedParentTokens.some(
@@ -684,14 +633,10 @@ export class IUPACGraphBuilder
     let hasCycloPrefix = false;
     if (adjustedParentTokens.length > 0) {
       const parentToken = adjustedParentTokens[0]!;
-      const cycloPrefix = prefixTokens.find(
-        (p) => p.metadata?.isCyclic === true,
-      );
+      const cycloPrefix = prefixTokens.find((p) => p.metadata?.isCyclic === true);
       if (cycloPrefix) {
         const substBetween = substituentTokens.find(
-          (s) =>
-            cycloPrefix.position < s.position &&
-            s.position < parentToken.position,
+          (s) => cycloPrefix.position < s.position && s.position < parentToken.position,
         );
         if (!substBetween) {
           hasCycloPrefix = true;
@@ -771,8 +716,7 @@ export class IUPACGraphBuilder
       );
 
       if (bicycloPrefix) {
-        const bicycloRegex =
-          /^(\d+-)?([a-z]*)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i;
+        const bicycloRegex = /^(\d+-)?([a-z]*)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i;
         const match = bicycloPrefix.value?.match(bicycloRegex);
 
         if (match) {
@@ -872,9 +816,7 @@ export class IUPACGraphBuilder
         }
         hasBicyclicOrTricyclicStructure = true;
         if (process.env.VERBOSE) {
-          console.log(
-            `[graph-builder] Set hasBicyclicOrTricyclicStructure = true`,
-          );
+          console.log(`[graph-builder] Set hasBicyclicOrTricyclicStructure = true`);
         }
       }
 
@@ -892,10 +834,7 @@ export class IUPACGraphBuilder
         if (match) {
           const bridgeNotation = match[2] || "";
           let heteroType = match[1] || "";
-          heteroType = heteroType.replace(
-            /^(di|tri|tetra|penta|hexa|hepta|octa|nona)/,
-            "",
-          );
+          heteroType = heteroType.replace(/^(di|tri|tetra|penta|hexa|hepta|octa|nona)/, "");
 
           const bridgeParts = bridgeNotation.split(/\.(?=\d)/);
           const mainBridges: number[] = [];
@@ -935,12 +874,8 @@ export class IUPACGraphBuilder
             console.log(
               `[graph-builder] Detected tricyclic PREFIX: [${bridgeNotation}]${heteroType ? ` with ${heteroType}` : ""}`,
             );
-            console.log(
-              `[graph-builder] Main bridges: ${mainBridges.join(", ")}`,
-            );
-            console.log(
-              `[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`,
-            );
+            console.log(`[graph-builder] Main bridges: ${mainBridges.join(", ")}`);
+            console.log(`[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`);
           }
 
           let heteroPositions = new Map<number, string>();
@@ -949,10 +884,7 @@ export class IUPACGraphBuilder
               .filter((l) => l.position < tricycloPrefix.position)
               .sort((a, b) => b.position - a.position)[0];
 
-            if (
-              locantBeforePrefix &&
-              Array.isArray(locantBeforePrefix.metadata?.positions)
-            ) {
+            if (locantBeforePrefix && Array.isArray(locantBeforePrefix.metadata?.positions)) {
               const heteroSymbol =
                 heteroType === "oxa"
                   ? "O"
@@ -962,8 +894,7 @@ export class IUPACGraphBuilder
                       ? "S"
                       : "C";
 
-              for (const locant of locantBeforePrefix.metadata
-                .positions as number[]) {
+              for (const locant of locantBeforePrefix.metadata.positions as number[]) {
                 heteroPositions.set(locant, heteroSymbol);
               }
             }
@@ -987,8 +918,7 @@ export class IUPACGraphBuilder
       // Detect pentacyclic notation in PREFIX (e.g., "trioxapentacyclo[12.3.2.0^1,13.0^2,10.0^6,10]")
       const pentacycloPrefix = prefixTokens.find(
         (p) =>
-          (p.value?.includes("pentacyclo") ||
-            p.value?.includes("pentacyclic")) &&
+          (p.value?.includes("pentacyclo") || p.value?.includes("pentacyclic")) &&
           p.metadata?.hasBridgeNotation,
       );
 
@@ -1003,10 +933,7 @@ export class IUPACGraphBuilder
           let heteroType = match[1] || "";
 
           // Strip numeric multiplier prefix from heteroType
-          heteroType = heteroType.replace(
-            /^(di|tri|tetra|penta|hexa|hepta|octa|nona)/,
-            "",
-          );
+          heteroType = heteroType.replace(/^(di|tri|tetra|penta|hexa|hepta|octa|nona)/, "");
 
           // Parse bridge notation into main bridges and secondary bridges
           const bridgeParts = bridgeNotation.split(/\.(?=\d)/);
@@ -1051,12 +978,8 @@ export class IUPACGraphBuilder
             console.log(
               `[graph-builder] Detected pentacyclic PREFIX: [${bridgeNotation}]${heteroType ? ` with ${heteroType}` : ""}`,
             );
-            console.log(
-              `[graph-builder] Main bridges: ${mainBridges.join(", ")}`,
-            );
-            console.log(
-              `[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`,
-            );
+            console.log(`[graph-builder] Main bridges: ${mainBridges.join(", ")}`);
+            console.log(`[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`);
           }
 
           // Extract heteroatom locants from the LOCANT token that precedes this PREFIX
@@ -1066,10 +989,7 @@ export class IUPACGraphBuilder
               .filter((l) => l.position < pentacycloPrefix.position)
               .sort((a, b) => b.position - a.position)[0];
 
-            if (
-              locantBeforePrefix &&
-              Array.isArray(locantBeforePrefix.metadata?.positions)
-            ) {
+            if (locantBeforePrefix && Array.isArray(locantBeforePrefix.metadata?.positions)) {
               const heteroSymbol =
                 heteroType === "oxa"
                   ? "O"
@@ -1079,8 +999,7 @@ export class IUPACGraphBuilder
                       ? "S"
                       : "C";
 
-              for (const locant of locantBeforePrefix.metadata
-                .positions as number[]) {
+              for (const locant of locantBeforePrefix.metadata.positions as number[]) {
                 heteroPositions.set(locant, heteroSymbol);
                 if (process.env.VERBOSE) {
                   console.log(
@@ -1110,8 +1029,7 @@ export class IUPACGraphBuilder
       // Detect heptacyclic notation in PREFIX
       const heptacycloPrefix = prefixTokens.find(
         (p) =>
-          (p.value?.includes("heptacyclo") ||
-            p.value?.includes("heptacyclic")) &&
+          (p.value?.includes("heptacyclo") || p.value?.includes("heptacyclic")) &&
           p.metadata?.hasBridgeNotation,
       );
 
@@ -1122,10 +1040,7 @@ export class IUPACGraphBuilder
         if (match) {
           const bridgeNotation = match[2] || "";
           let heteroType = match[1] || "";
-          heteroType = heteroType.replace(
-            /^(di|tri|tetra|penta|hexa|hepta|octa|nona)/,
-            "",
-          );
+          heteroType = heteroType.replace(/^(di|tri|tetra|penta|hexa|hepta|octa|nona)/, "");
 
           const bridgeParts = bridgeNotation.split(/\.(?=\d)/);
           const mainBridges: number[] = [];
@@ -1164,23 +1079,15 @@ export class IUPACGraphBuilder
             console.log(
               `[graph-builder] Detected heptacyclic PREFIX: [${bridgeNotation}]${heteroType ? ` with ${heteroType}` : ""}`,
             );
-            console.log(
-              `[graph-builder] Main bridges: ${mainBridges.join(", ")}`,
-            );
-            console.log(
-              `[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`,
-            );
+            console.log(`[graph-builder] Main bridges: ${mainBridges.join(", ")}`);
+            console.log(`[graph-builder] Secondary bridges: ${JSON.stringify(secondaryBridges)}`);
           }
 
           let heteroPositions = new Map<number, string>();
 
           // Collect replacement prefixes (oxa, aza, thia, etc.) preceding the heptacyclo token
           // Check prefixTokens, substituentTokens AND suffixTokens (sometimes replacement prefixes are categorized as suffixes or substituents)
-          const potentialReplacements = [
-            ...prefixTokens,
-            ...substituentTokens,
-            ...suffixTokens,
-          ];
+          const potentialReplacements = [...prefixTokens, ...substituentTokens, ...suffixTokens];
           const replacementPrefixes = potentialReplacements
             .filter(
               (p) =>
@@ -1192,19 +1099,13 @@ export class IUPACGraphBuilder
             )
             .sort((a, b) => a.position - b.position);
 
-          if (
-            heteroType &&
-            !replacementPrefixes.some((p) => p.value.includes(heteroType))
-          ) {
+          if (heteroType && !replacementPrefixes.some((p) => p.value.includes(heteroType))) {
             // If the embedded heteroType isn't in the replacement list (or is the only one), handle it
             const locantBeforePrefix = locantTokens
               .filter((l) => l.position < heptacycloPrefix.position)
               .sort((a, b) => b.position - a.position)[0];
 
-            if (
-              locantBeforePrefix &&
-              Array.isArray(locantBeforePrefix.metadata?.positions)
-            ) {
+            if (locantBeforePrefix && Array.isArray(locantBeforePrefix.metadata?.positions)) {
               const heteroSymbol =
                 heteroType === "oxa"
                   ? "O"
@@ -1214,8 +1115,7 @@ export class IUPACGraphBuilder
                       ? "S"
                       : "C";
 
-              for (const locant of locantBeforePrefix.metadata
-                .positions as number[]) {
+              for (const locant of locantBeforePrefix.metadata.positions as number[]) {
                 heteroPositions.set(locant, heteroSymbol);
               }
             }
@@ -1242,14 +1142,8 @@ export class IUPACGraphBuilder
 
             // Use substituent locant logic to find associated locants
             // Also check for multipliers! "trioxa" means 3 oxygens.
-            const multiplier = this.getMultiplierBeforeSubstituent(
-              prefix,
-              multiplierTokens,
-            );
-            let locants = this.getLocantsBeforeSubstituent(
-              prefix,
-              locantTokens,
-            );
+            const multiplier = this.getMultiplierBeforeSubstituent(prefix, multiplierTokens);
+            let locants = this.getLocantsBeforeSubstituent(prefix, locantTokens);
 
             if (multiplier) {
               const count = (multiplier.metadata?.count as number) || 1;
@@ -1266,9 +1160,7 @@ export class IUPACGraphBuilder
                 // Flatten locants
                 const flattened: number[] = [];
                 for (const l of relevantLocants.reverse()) {
-                  const positions = l.metadata?.positions as
-                    | number[]
-                    | undefined;
+                  const positions = l.metadata?.positions as number[] | undefined;
                   if (positions) flattened.push(...positions);
                   else flattened.push(parseInt(l.value));
                 }
@@ -1338,11 +1230,7 @@ export class IUPACGraphBuilder
         }
       }
 
-      if (
-        parentValue === "benzene" ||
-        parentValue === "benz" ||
-        parentSmiles === "c1ccccc1"
-      ) {
+      if (parentValue === "benzene" || parentValue === "benz" || parentSmiles === "c1ccccc1") {
         mainChainAtoms = builder.createBenzeneRing();
       } else if (parentValue === "pyridine" || parentSmiles === "c1ccncc1") {
         mainChainAtoms = builder.createPyridineRing();
@@ -1419,15 +1307,9 @@ export class IUPACGraphBuilder
         parentSmiles === "c1ccc2c(c1)[nH]cn2"
       ) {
         mainChainAtoms = builder.createIsoindolRing();
-      } else if (
-        parentValue === "naphthalene" ||
-        parentSmiles === "c1ccc2ccccc2c1"
-      ) {
+      } else if (parentValue === "naphthalene" || parentSmiles === "c1ccc2ccccc2c1") {
         mainChainAtoms = builder.createNaphthaleneRing();
-      } else if (
-        parentValue === "quinoline" ||
-        parentSmiles === "c1ccc2ncccc2c1"
-      ) {
+      } else if (parentValue === "quinoline" || parentSmiles === "c1ccc2ncccc2c1") {
         mainChainAtoms = builder.createQuinolineRing();
       } else if (parentValue === "piperidine" || parentSmiles === "C1CCNCC1") {
         mainChainAtoms = builder.createPiperidineRing();
@@ -1458,8 +1340,7 @@ export class IUPACGraphBuilder
       } else if (
         parentValue === "diaziridine" ||
         parentValue === "diaziridin" ||
-        (parentValue === "aziridin" &&
-          prefixTokens.some((p) => p.value === "di"))
+        (parentValue === "aziridin" && prefixTokens.some((p) => p.value === "di"))
       ) {
         mainChainAtoms = builder.createDiaziridineRing();
       } else if (
@@ -1473,8 +1354,7 @@ export class IUPACGraphBuilder
         parentValue === "imidazolidin" ||
         parentValue === "imidazole" ||
         parentValue === "imidazol" ||
-        (parentValue === "azol" &&
-          prefixTokens.some((p) => p.value === "imidazo"))
+        (parentValue === "azol" && prefixTokens.some((p) => p.value === "imidazo"))
       ) {
         // Use aromatic imidazole ring for "imidazole", saturated for "imidazolidine"
         if (parentValue === "imidazole" || parentValue === "imidazol") {
@@ -1490,10 +1370,7 @@ export class IUPACGraphBuilder
         mainChainAtoms = builder.createTetrazoleRing();
       } else if (parentValue === "isoxazole" || parentValue === "isoxazol") {
         mainChainAtoms = builder.createIsoxazoleRing();
-      } else if (
-        parentValue === "isothiazole" ||
-        parentValue === "isothiazol"
-      ) {
+      } else if (parentValue === "isothiazole" || parentValue === "isothiazol") {
         mainChainAtoms = builder.createIsothiazoleRing();
       } else if (parentValue === "pyrimidine" || parentValue === "pyrimidin") {
         mainChainAtoms = builder.createPyrimidineRing();
@@ -1510,9 +1387,7 @@ export class IUPACGraphBuilder
         builder.addBond(mainChainAtoms[0]!, carboxylC);
         mainChainAtoms.push(carboxylC);
         if (process.env.VERBOSE) {
-          console.log(
-            "[graph-builder] Built benzoate: benzene ring + carboxyl carbon",
-          );
+          console.log("[graph-builder] Built benzoate: benzene ring + carboxyl carbon");
         }
       } else if (hasCycloPrefix && !hasBicyclicOrTricyclicStructure) {
         // Build cyclic chain (only if we haven't already built bicyclic/tricyclic)
@@ -1539,21 +1414,12 @@ export class IUPACGraphBuilder
     }
 
     // Step 2: Apply unsaturation (ene, yne)
-    this.applyUnsaturation(
-      builder,
-      mainChainAtoms,
-      suffixTokens,
-      locantTokens,
-      hasCycloPrefix,
-    );
+    this.applyUnsaturation(builder, mainChainAtoms, suffixTokens, locantTokens, hasCycloPrefix);
 
     // Detect if this is a carboxylic acid or thiocyanate (numbering goes from functional group end)
     const isAcid = suffixTokens.some(
       (s) =>
-        s.value === "oic acid" ||
-        s.value === "ic acid" ||
-        s.value === "oic" ||
-        s.value === "anoic",
+        s.value === "oic acid" || s.value === "ic acid" || s.value === "oic" || s.value === "anoic",
     );
     const isThiocyanate = suffixTokens.some((s) => s.value === "thiocyanate");
     const reverseNumbering = isAcid || isThiocyanate;
@@ -1593,18 +1459,14 @@ export class IUPACGraphBuilder
     );
 
     // Apply hydrogen notation (e.g. 1H, 2H) from locants to saturate specific atoms
-    const hydrogenLocants = locantTokens.filter(
-      (t) => t.metadata?.isHydrogenNotation === true,
-    );
+    const hydrogenLocants = locantTokens.filter((t) => t.metadata?.isHydrogenNotation === true);
     for (const hToken of hydrogenLocants) {
       const loc = parseInt(hToken.value);
       if (!isNaN(loc)) {
         const atomIdx = this.locantToAtomIndex(loc, mainChainAtoms);
         if (atomIdx !== null) {
           if (process.env.VERBOSE) {
-            console.log(
-              `[graph-builder] Applying hydrogen notation (saturation) at locant ${loc}`,
-            );
+            console.log(`[graph-builder] Applying hydrogen notation (saturation) at locant ${loc}`);
           }
           builder.saturateAtom(atomIdx);
         }
@@ -1612,13 +1474,7 @@ export class IUPACGraphBuilder
     }
 
     // Apply stereo descriptors (E/Z, R/S)
-    this.applyStereo(
-      builder,
-      mainChainAtoms,
-      stereoTokens,
-      suffixTokens,
-      locantTokens,
-    );
+    this.applyStereo(builder, mainChainAtoms, stereoTokens, suffixTokens, locantTokens);
 
     return builder.build();
   }
@@ -1741,9 +1597,7 @@ export class IUPACGraphBuilder
     if (stereoTokens.length === 0) return;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[graph-builder] Applying stereochemistry with ${stereoTokens.length} tokens`,
-      );
+      console.log(`[graph-builder] Applying stereochemistry with ${stereoTokens.length} tokens`);
     }
 
     for (const token of stereoTokens) {
@@ -1753,10 +1607,7 @@ export class IUPACGraphBuilder
 
       // Handle explicit citation (e.g., "2R", "2Z")
       if (citationNumber !== undefined && citationNumber !== null) {
-        const atomIdx = this.locantToAtomIndex(
-          citationNumber as number,
-          mainChainAtoms,
-        );
+        const atomIdx = this.locantToAtomIndex(citationNumber as number, mainChainAtoms);
 
         if (atomIdx !== null) {
           if (type === "stereocenter" && config) {
@@ -1775,22 +1626,16 @@ export class IUPACGraphBuilder
             const bonds = builder
               .getBonds()
               .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
-            const doubleBond = bonds.find(
-              (b) => b.type === BondTypeEnum.DOUBLE,
-            );
+            const doubleBond = bonds.find((b) => b.type === BondTypeEnum.DOUBLE);
 
             if (doubleBond) {
-              const otherAtom =
-                doubleBond.atom1 === atomIdx
-                  ? doubleBond.atom2
-                  : doubleBond.atom1;
+              const otherAtom = doubleBond.atom1 === atomIdx ? doubleBond.atom2 : doubleBond.atom1;
 
               // Find adjacent single/aromatic bonds to set stereo markers
               // Note: Ring bonds might be aromatic, but they still define direction
               const singleBond1 = bonds.find(
                 (b) =>
-                  (b.type === BondTypeEnum.SINGLE ||
-                    b.type === BondTypeEnum.AROMATIC) &&
+                  (b.type === BondTypeEnum.SINGLE || b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
               const otherBonds = builder
@@ -1798,8 +1643,7 @@ export class IUPACGraphBuilder
                 .filter((b) => b.atom1 === otherAtom || b.atom2 === otherAtom);
               const singleBond2 = otherBonds.find(
                 (b) =>
-                  (b.type === BondTypeEnum.SINGLE ||
-                    b.type === BondTypeEnum.AROMATIC) &&
+                  (b.type === BondTypeEnum.SINGLE || b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
 
@@ -1829,22 +1673,16 @@ export class IUPACGraphBuilder
             const bonds = builder
               .getBonds()
               .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
-            const doubleBond = bonds.find(
-              (b) => b.type === BondTypeEnum.DOUBLE,
-            );
+            const doubleBond = bonds.find((b) => b.type === BondTypeEnum.DOUBLE);
             if (doubleBond) {
               // Found a double bond, apply stereo here
-              const otherAtom =
-                doubleBond.atom1 === atomIdx
-                  ? doubleBond.atom2
-                  : doubleBond.atom1;
+              const otherAtom = doubleBond.atom1 === atomIdx ? doubleBond.atom2 : doubleBond.atom1;
               // Check if we haven't already set stereo on this bond?
               // Actually, checking if single bonds have stereo is better.
 
               const singleBond1 = bonds.find(
                 (b) =>
-                  (b.type === BondTypeEnum.SINGLE ||
-                    b.type === BondTypeEnum.AROMATIC) &&
+                  (b.type === BondTypeEnum.SINGLE || b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
               const otherBonds = builder
@@ -1852,8 +1690,7 @@ export class IUPACGraphBuilder
                 .filter((b) => b.atom1 === otherAtom || b.atom2 === otherAtom);
               const singleBond2 = otherBonds.find(
                 (b) =>
-                  (b.type === BondTypeEnum.SINGLE ||
-                    b.type === BondTypeEnum.AROMATIC) &&
+                  (b.type === BondTypeEnum.SINGLE || b.type === BondTypeEnum.AROMATIC) &&
                   b !== doubleBond,
               );
 
@@ -1961,10 +1798,7 @@ export class IUPACGraphBuilder
    * Convert a cycloalkyl substituent name to its "-idene" variant if idene suffix is found
    * E.g., "cyclopropyl" with idene → "cyclopropylidene"
    */
-  private convertToCycloalkylIdene(
-    substValue: string,
-    hasIdeneSuffix: boolean,
-  ): string {
+  private convertToCycloalkylIdene(substValue: string, hasIdeneSuffix: boolean): string {
     if (!hasIdeneSuffix) return substValue;
 
     const ideneMap: Record<string, string> = {
@@ -2101,11 +1935,7 @@ export class IUPACGraphBuilder
     locantTokens: IUPACToken[],
     substituentTokens?: IUPACToken[],
   ): number[] {
-    return this.suffixApplicator.getLocantsBeforeSuffix(
-      suffix,
-      locantTokens,
-      substituentTokens,
-    );
+    return this.suffixApplicator.getLocantsBeforeSuffix(suffix, locantTokens, substituentTokens);
   }
 
   public applySubstituents(
@@ -2136,20 +1966,14 @@ export class IUPACGraphBuilder
     substituent: IUPACToken,
     locantTokens: IUPACToken[],
   ): number[] {
-    return this.substituentApplicator.getLocantsBeforeSubstituent(
-      substituent,
-      locantTokens,
-    );
+    return this.substituentApplicator.getLocantsBeforeSubstituent(substituent, locantTokens);
   }
 
   public getMultiplierBeforeSubstituent(
     substituent: IUPACToken,
     multiplierTokens: IUPACToken[],
   ): IUPACToken | null {
-    return this.substituentApplicator.getMultiplierBeforeSubstituent(
-      substituent,
-      multiplierTokens,
-    );
+    return this.substituentApplicator.getMultiplierBeforeSubstituent(substituent, multiplierTokens);
   }
 
   public isNSubstitutionPrefix(prefix: IUPACToken | undefined): boolean {

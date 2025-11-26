@@ -47,11 +47,7 @@ export class IUPACSuffixApplicator {
       }
 
       // Get locants and multiplier for this suffix
-      const locants = this.getLocantsBeforeSuffix(
-        suffix,
-        locantTokens,
-        substituentTokens,
-      );
+      const locants = this.getLocantsBeforeSuffix(suffix, locantTokens, substituentTokens);
 
       // For "hydro" suffix, if locants are empty but we have a multiplier "di" or "tri",
       // we might need to look harder for locants (e.g. "3,4-dihydro")
@@ -64,9 +60,7 @@ export class IUPACSuffixApplicator {
       // Multiplier is between locant and suffix.
       // getLocantsBeforeSuffix logic needs to skip multipliers too.
 
-      const _multiplierTokens = substituentTokens.filter(
-        (t) => t.type === "MULTIPLIER",
-      ); // Wait, we don't have all multiplier tokens here?
+      const _multiplierTokens = substituentTokens.filter((t) => t.type === "MULTIPLIER"); // Wait, we don't have all multiplier tokens here?
       // applySuffixes receives substituentTokens but NOT multiplierTokens in argument list?
       // Ah, applySuffixes signature has (builder, mainChainAtoms, suffixTokens, locantTokens, substituentTokens).
       // It is MISSING multiplierTokens!
@@ -82,9 +76,7 @@ export class IUPACSuffixApplicator {
 
       // Let's fix the signature first.
 
-      const multiplierCount = multiplier
-        ? (multiplier.metadata?.count as number) || 1
-        : 1;
+      const multiplierCount = multiplier ? (multiplier.metadata?.count as number) || 1 : 1;
 
       if (process.env.VERBOSE) {
         console.log(
@@ -101,10 +93,7 @@ export class IUPACSuffixApplicator {
           // Add hydrogen(s) to specified positions (saturation)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.saturateAtom(atomIdx);
               }
@@ -116,10 +105,7 @@ export class IUPACSuffixApplicator {
           // Add hydroxyl group(s)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addHydroxyl(atomIdx);
               }
@@ -137,10 +123,7 @@ export class IUPACSuffixApplicator {
           // Add carbonyl group(s)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addCarbonyl(atomIdx);
               }
@@ -178,10 +161,7 @@ export class IUPACSuffixApplicator {
           // Add amine group
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addAmine(atomIdx);
               }
@@ -197,10 +177,7 @@ export class IUPACSuffixApplicator {
         case "carboxylate":
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 const cIdx = builder.addAtom("C");
                 const oDouble = builder.addAtom("O");
@@ -318,10 +295,7 @@ export class IUPACSuffixApplicator {
           // Will be handled specially for N-substituted amides
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addAmide(atomIdx);
               }
@@ -338,10 +312,7 @@ export class IUPACSuffixApplicator {
           // Carboxamide - adds new carbon with C(=O)NH2 (e.g., quinoline-4-carboxamide)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addCarboxamide(atomIdx);
               }
@@ -358,10 +329,7 @@ export class IUPACSuffixApplicator {
           // Multiple carbonyl groups - check for locants
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addCarbonyl(atomIdx);
               }
@@ -373,10 +341,7 @@ export class IUPACSuffixApplicator {
           // Three carbonyl groups - check for locants
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 builder.addCarbonyl(atomIdx);
               }
@@ -412,10 +377,7 @@ export class IUPACSuffixApplicator {
           // Anilino group: -NH-C6H5 (aniline-derived amino group)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 const nIdx = builder.addAtom("N");
                 builder.addBond(atomIdx, nIdx);
@@ -432,10 +394,7 @@ export class IUPACSuffixApplicator {
           // Dimethoxyanilino group: -NH-C6H3(OCH3)2
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 const nIdx = builder.addAtom("N");
                 builder.addBond(atomIdx, nIdx);
@@ -467,10 +426,7 @@ export class IUPACSuffixApplicator {
           // Methoxyanilino group: -NH-C6H4(OCH3)
           if (locants.length > 0) {
             for (const loc of locants) {
-              const atomIdx = this.context.locantToAtomIndex(
-                loc,
-                mainChainAtoms,
-              );
+              const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms);
               if (atomIdx !== null) {
                 const nIdx = builder.addAtom("N");
                 builder.addBond(atomIdx, nIdx);
@@ -514,10 +470,7 @@ export class IUPACSuffixApplicator {
           let hasSubstituentBetween = false;
           if (substituentTokens) {
             for (const subst of substituentTokens) {
-              if (
-                subst.position > locant.position &&
-                subst.position < suffix.position
-              ) {
+              if (subst.position > locant.position && subst.position < suffix.position) {
                 hasSubstituentBetween = true;
                 break;
               }
@@ -534,11 +487,7 @@ export class IUPACSuffixApplicator {
     }
 
     if (closestLocant) {
-      return (
-        (closestLocant.metadata?.positions as number[]) || [
-          parseInt(closestLocant.value),
-        ]
-      );
+      return (closestLocant.metadata?.positions as number[]) || [parseInt(closestLocant.value)];
     }
 
     return [];

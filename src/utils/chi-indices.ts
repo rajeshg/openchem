@@ -22,9 +22,7 @@ import { VALENCE_ELECTRONS } from "src/constants";
  * This is the number of heavy atom neighbors.
  */
 function getSimpleDegree(atom: Atom, mol: Molecule): number {
-  const bonds = mol.bonds.filter(
-    (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-  );
+  const bonds = mol.bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
 
   // Count heavy atom neighbors (excluding hydrogen)
   let degree = 0;
@@ -161,10 +159,7 @@ export function getChi1(mol: Molecule): number {
     const atom2 = enriched.atoms.find((a) => a.id === bond.atom2);
 
     if (!atom1 || !atom2) continue;
-    if (
-      (atom1.symbol === "H" && !atom1.isotope) ||
-      (atom2.symbol === "H" && !atom2.isotope)
-    )
+    if ((atom1.symbol === "H" && !atom1.isotope) || (atom2.symbol === "H" && !atom2.isotope))
       continue;
 
     const degree1 = getSimpleDegree(atom1, enriched);
@@ -193,10 +188,7 @@ export function getChi1n(mol: Molecule): number {
     const atom2 = enriched.atoms.find((a) => a.id === bond.atom2);
 
     if (!atom1 || !atom2) continue;
-    if (
-      (atom1.symbol === "H" && !atom1.isotope) ||
-      (atom2.symbol === "H" && !atom2.isotope)
-    )
+    if ((atom1.symbol === "H" && !atom1.isotope) || (atom2.symbol === "H" && !atom2.isotope))
       continue;
 
     const degree1 = getValenceDegree(atom1, enriched);
@@ -246,10 +238,7 @@ function findPaths(mol: Molecule, length: number): number[][] {
 
       if (neighbor !== null) {
         const neighborAtom = enriched.atoms.find((a) => a.id === neighbor);
-        if (
-          neighborAtom &&
-          (neighborAtom.symbol !== "H" || neighborAtom.isotope)
-        ) {
+        if (neighborAtom && (neighborAtom.symbol !== "H" || neighborAtom.isotope)) {
           dfs(neighbor, [...path, neighbor]);
         }
       }

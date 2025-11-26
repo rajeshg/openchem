@@ -13,13 +13,11 @@ export function normalizeFunctionalGroupLocants(
   if (!parentStructure) return functionalGroups;
 
   // Only handle chain parent structures for now
-  if (parentStructure.type !== "chain" || !parentStructure.chain)
-    return functionalGroups;
+  if (parentStructure.type !== "chain" || !parentStructure.chain) return functionalGroups;
 
   const atomIndexToLocant = new Map<number, number>();
   const chainAtoms = parentStructure.chain.atoms || [];
-  const chainLocants =
-    parentStructure.locants || chainAtoms.map((_, i) => i + 1);
+  const chainLocants = parentStructure.locants || chainAtoms.map((_, i) => i + 1);
 
   for (let i = 0; i < chainAtoms.length; i++) {
     const atom = chainAtoms[i];
@@ -41,9 +39,7 @@ export function normalizeFunctionalGroupLocants(
     });
 
     // Check if any locants were actually converted
-    const locantsChanged = originalLocants.some(
-      (val, i) => val !== mappedLocants[i],
-    );
+    const locantsChanged = originalLocants.some((val, i) => val !== mappedLocants[i]);
 
     if (process.env.VERBOSE) {
       console.log(
@@ -71,40 +67,22 @@ export function optimizeLocantSet(
 
   // Find the set that gives lowest locant to principal group
   let bestLocants = parentStructure.locants;
-  let bestScore = calculateLocantScore(
-    parentStructure,
-    bestLocants,
-    principalGroup,
-  );
+  let bestScore = calculateLocantScore(parentStructure, bestLocants, principalGroup);
 
   if (process.env.VERBOSE) {
     console.log("[optimizeLocantSet] Initial best score:", bestScore);
   }
 
   for (const locantSet of possibleLocants) {
-    const score = calculateLocantScore(
-      parentStructure,
-      locantSet,
-      principalGroup,
-    );
+    const score = calculateLocantScore(parentStructure, locantSet, principalGroup);
     if (process.env.VERBOSE) {
-      console.log(
-        "[optimizeLocantSet] Testing locant set:",
-        locantSet,
-        "score:",
-        score,
-      );
+      console.log("[optimizeLocantSet] Testing locant set:", locantSet, "score:", score);
     }
     if (score < bestScore) {
       bestScore = score;
       bestLocants = locantSet;
       if (process.env.VERBOSE) {
-        console.log(
-          "[optimizeLocantSet] New best locants:",
-          bestLocants,
-          "score:",
-          bestScore,
-        );
+        console.log("[optimizeLocantSet] New best locants:", bestLocants, "score:", bestScore);
       }
     }
   }
@@ -131,10 +109,7 @@ export function getPrincipalGroupLocant(
     }
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[getPrincipalGroupLocant] functionalGroupAtom:",
-        functionalGroupAtom,
-      );
+      console.log("[getPrincipalGroupLocant] functionalGroupAtom:", functionalGroupAtom);
       if (process.env.VERBOSE) {
         console.log(
           "[getPrincipalGroupLocant] functionalGroupAtom type:",
@@ -142,10 +117,7 @@ export function getPrincipalGroupLocant(
         );
       }
       if (process.env.VERBOSE) {
-        console.log(
-          "[getPrincipalGroupLocant] functionalGroupAtom.id:",
-          functionalGroupAtom.id,
-        );
+        console.log("[getPrincipalGroupLocant] functionalGroupAtom.id:", functionalGroupAtom.id);
       }
       if (process.env.VERBOSE) {
         console.log(
@@ -157,33 +129,21 @@ export function getPrincipalGroupLocant(
 
     // Check if functionalGroupAtom is an Atom object or just an ID
     const atomId =
-      typeof functionalGroupAtom === "number"
-        ? functionalGroupAtom
-        : functionalGroupAtom.id;
+      typeof functionalGroupAtom === "number" ? functionalGroupAtom : functionalGroupAtom.id;
 
     // Find where this atom appears in the chain
-    let positionInChain = chain.atoms.findIndex(
-      (atom: Atom) => atom.id === atomId,
-    );
+    let positionInChain = chain.atoms.findIndex((atom: Atom) => atom.id === atomId);
 
     // If the functional group atom is not in the chain (e.g., alcohol O, ether O),
     // find which chain atom it's bonded to
-    if (
-      positionInChain === -1 &&
-      principalGroup.bonds &&
-      principalGroup.bonds.length > 0
-    ) {
+    if (positionInChain === -1 && principalGroup.bonds && principalGroup.bonds.length > 0) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[getPrincipalGroupLocant] Functional group atom not in chain, checking bonds",
-        );
+        console.log("[getPrincipalGroupLocant] Functional group atom not in chain, checking bonds");
       }
       // Look through the bonds to find the chain atom
       for (const bond of principalGroup.bonds) {
         const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
-        const foundPosition = chain.atoms.findIndex(
-          (atom: Atom) => atom.id === otherAtomId,
-        );
+        const foundPosition = chain.atoms.findIndex((atom: Atom) => atom.id === otherAtomId);
         if (foundPosition !== -1) {
           positionInChain = foundPosition;
           if (process.env.VERBOSE) {
@@ -202,10 +162,7 @@ export function getPrincipalGroupLocant(
     if (process.env.VERBOSE) {
       console.log("[getPrincipalGroupLocant] atomId:", atomId);
       if (process.env.VERBOSE) {
-        console.log(
-          "[getPrincipalGroupLocant] positionInChain:",
-          positionInChain,
-        );
+        console.log("[getPrincipalGroupLocant] positionInChain:", positionInChain);
       }
     }
 
@@ -241,9 +198,7 @@ export function getPrincipalGroupLocantFromSet(
 
     // Check if functionalGroupAtom is an Atom object or just an ID
     const atomId =
-      typeof functionalGroupAtom === "number"
-        ? functionalGroupAtom
-        : functionalGroupAtom.id;
+      typeof functionalGroupAtom === "number" ? functionalGroupAtom : functionalGroupAtom.id;
 
     if (process.env.VERBOSE) {
       console.log("[getPrincipalGroupLocantFromSet] atomId:", atomId);
@@ -259,24 +214,15 @@ export function getPrincipalGroupLocantFromSet(
     }
 
     // Find where this atom appears in the chain
-    let positionInChain = chain.atoms.findIndex(
-      (atom: Atom) => atom.id === atomId,
-    );
+    let positionInChain = chain.atoms.findIndex((atom: Atom) => atom.id === atomId);
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[getPrincipalGroupLocantFromSet] initial positionInChain:",
-        positionInChain,
-      );
+      console.log("[getPrincipalGroupLocantFromSet] initial positionInChain:", positionInChain);
     }
 
     // If the functional group atom is not in the chain (e.g., alcohol O, ether O),
     // find which chain atom it's bonded to
-    if (
-      positionInChain === -1 &&
-      principalGroup.bonds &&
-      principalGroup.bonds.length > 0
-    ) {
+    if (positionInChain === -1 && principalGroup.bonds && principalGroup.bonds.length > 0) {
       if (process.env.VERBOSE) {
         console.log(
           "[getPrincipalGroupLocantFromSet] Atom not in chain, checking bonds:",
@@ -286,9 +232,7 @@ export function getPrincipalGroupLocantFromSet(
       // Look through the bonds to find the chain atom
       for (const bond of principalGroup.bonds) {
         const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
-        const foundPosition = chain.atoms.findIndex(
-          (atom: Atom) => atom.id === otherAtomId,
-        );
+        const foundPosition = chain.atoms.findIndex((atom: Atom) => atom.id === otherAtomId);
         if (process.env.VERBOSE) {
           console.log(
             "[getPrincipalGroupLocantFromSet] Checking bond to atom",
@@ -334,9 +278,7 @@ export function getPrincipalGroupLocantFromSet(
 
     const functionalGroupAtom = principalGroup.atoms[0]!;
     const atomId =
-      typeof functionalGroupAtom === "number"
-        ? functionalGroupAtom
-        : functionalGroupAtom.id;
+      typeof functionalGroupAtom === "number" ? functionalGroupAtom : functionalGroupAtom.id;
 
     // For rings with von Baeyer numbering (bicyclo/tricyclo systems),
     // use the numbering map directly instead of ring.atoms positions
@@ -358,9 +300,7 @@ export function getPrincipalGroupLocantFromSet(
     // parentStructure.ring should have the atoms in numbered order
     const ring = parentStructure.ring;
     if (ring && ring.atoms) {
-      let positionInRing = ring.atoms.findIndex(
-        (atom: Atom) => atom.id === atomId,
-      );
+      let positionInRing = ring.atoms.findIndex((atom: Atom) => atom.id === atomId);
 
       if (process.env.VERBOSE) {
         console.log(
@@ -385,11 +325,7 @@ export function getPrincipalGroupLocantFromSet(
 
       // If the functional group atom is not in the ring (e.g., alcohol O stored as C),
       // find which ring atom it's bonded to
-      if (
-        positionInRing === -1 &&
-        principalGroup.bonds &&
-        principalGroup.bonds.length > 0
-      ) {
+      if (positionInRing === -1 && principalGroup.bonds && principalGroup.bonds.length > 0) {
         if (process.env.VERBOSE) {
           console.log(
             "[getPrincipalGroupLocantFromSet] Ring - Atom not in ring, checking bonds:",
@@ -399,9 +335,7 @@ export function getPrincipalGroupLocantFromSet(
         // Look through the bonds to find the ring atom
         for (const bond of principalGroup.bonds) {
           const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
-          const foundPosition = ring.atoms.findIndex(
-            (atom: Atom) => atom.id === otherAtomId,
-          );
+          const foundPosition = ring.atoms.findIndex((atom: Atom) => atom.id === otherAtomId);
           if (process.env.VERBOSE) {
             console.log(
               "[getPrincipalGroupLocantFromSet] Ring - Checking bond to atom",
@@ -444,9 +378,7 @@ export function getPrincipalGroupLocantFromSet(
   }
 }
 
-export function generatePossibleLocantSets(
-  parentStructure: ParentStructure,
-): number[][] {
+export function generatePossibleLocantSets(parentStructure: ParentStructure): number[][] {
   const baseLocants = parentStructure.locants;
   const variations: number[][] = [];
 
@@ -486,17 +418,11 @@ export function calculateLocantScore(
       : (functionalGroupAtom as Atom).id;
 
   // Find where this atom appears in the chain
-  let positionInChain = parentStructure.chain.atoms.findIndex(
-    (atom: Atom) => atom.id === atomId,
-  );
+  let positionInChain = parentStructure.chain.atoms.findIndex((atom: Atom) => atom.id === atomId);
 
   // If the functional group atom is not in the chain (e.g., alcohol O, ether O),
   // find which chain atom it's bonded to
-  if (
-    positionInChain === -1 &&
-    principalGroup.bonds &&
-    principalGroup.bonds.length > 0
-  ) {
+  if (positionInChain === -1 && principalGroup.bonds && principalGroup.bonds.length > 0) {
     // Look through the bonds to find the chain atom
     for (const bond of principalGroup.bonds) {
       const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
@@ -581,9 +507,8 @@ export function findOptimalRingNumbering(
   if (process.env.VERBOSE) {
     console.log(
       `[Ring Numbering] Functional groups available:`,
-      functionalGroups
-        ?.map((g) => `${g.type} at atoms [${g.atoms?.join(",")}]`)
-        .join(", ") || "none",
+      functionalGroups?.map((g) => `${g.type} at atoms [${g.atoms?.join(",")}]`).join(", ") ||
+        "none",
     );
   }
 
@@ -607,8 +532,7 @@ export function findOptimalRingNumbering(
       console.log(
         `[Ring Numbering] Principal groups found:`,
         principalGroups.map(
-          (g) =>
-            `${g.type}(isPrincipal:${g.isPrincipal}, priority:${g.priority})`,
+          (g) => `${g.type}(isPrincipal:${g.isPrincipal}, priority:${g.priority})`,
         ),
       );
     }
@@ -620,8 +544,7 @@ export function findOptimalRingNumbering(
 
         // First pass: Check if any group atoms are ring atoms themselves
         for (const groupAtom of group.atoms) {
-          const groupAtomId =
-            typeof groupAtom === "object" ? groupAtom.id : groupAtom;
+          const groupAtomId = typeof groupAtom === "object" ? groupAtom.id : groupAtom;
 
           for (let i = 0; i < ring.atoms.length; i++) {
             if (ring.atoms[i]?.id === groupAtomId) {
@@ -642,18 +565,15 @@ export function findOptimalRingNumbering(
         // Second pass: If not found as ring atom, check which ring atom this group is attached to
         if (!foundGroupPosition) {
           for (const groupAtom of group.atoms) {
-            const groupAtomId =
-              typeof groupAtom === "object" ? groupAtom.id : groupAtom;
+            const groupAtomId = typeof groupAtom === "object" ? groupAtom.id : groupAtom;
 
             // Find bonds from group atom to ring atoms
             const bonds = molecule.bonds.filter(
-              (bond: Bond) =>
-                bond.atom1 === groupAtomId || bond.atom2 === groupAtomId,
+              (bond: Bond) => bond.atom1 === groupAtomId || bond.atom2 === groupAtomId,
             );
 
             for (const bond of bonds) {
-              const otherAtomId =
-                bond.atom1 === groupAtomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === groupAtomId ? bond.atom2 : bond.atom1;
               // Check if the bonded atom is a ring atom
               for (let i = 0; i < ring.atoms.length; i++) {
                 if (ring.atoms[i]?.id === otherAtomId) {
@@ -717,10 +637,7 @@ export function findOptimalRingNumbering(
     }
   }
 
-  const totalSubstituents = substituentCounts.reduce(
-    (sum, count) => sum + count,
-    0,
-  );
+  const totalSubstituents = substituentCounts.reduce((sum, count) => sum + count, 0);
   if (process.env.VERBOSE) {
     console.log(
       `[Ring Numbering] Substituent counts: [${substituentCounts.join(", ")}], total: ${totalSubstituents}`,
@@ -814,10 +731,7 @@ export function findOptimalRingNumbering(
 
         // If we have principal groups, compare those FIRST
         if (principalLocants.length > 0 && bestPrincipalLocants.length > 0) {
-          const principalComparison = compareLocantSets(
-            principalLocants,
-            bestPrincipalLocants,
-          );
+          const principalComparison = compareLocantSets(principalLocants, bestPrincipalLocants);
           if (principalComparison < 0) {
             shouldUpdate = true;
             updateReason = " (by principal group priority)";
@@ -825,9 +739,7 @@ export function findOptimalRingNumbering(
             // Principal group locants are equal, check all substituent locants
             const locantComparison = compareLocantSets(
               substituentLocants,
-              bestLocants.filter(
-                (locant) => !bestPrincipalLocants.includes(locant),
-              ),
+              bestLocants.filter((locant) => !bestPrincipalLocants.includes(locant)),
             );
             if (locantComparison < 0) {
               shouldUpdate = true;
@@ -900,8 +812,7 @@ export function findOptimalRingNumberingFromHeteroatom(
               (bond: Bond) => bond.atom1 === atomId || bond.atom2 === atomId,
             );
             for (const bond of bonds) {
-              const otherAtomId =
-                bond.atom1 === atomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
               // Only add if it's not a ring atom (we don't want to exclude ring substituents)
               if (!ringAtomIds.has(otherAtomId)) {
                 functionalGroupAtomIds.add(otherAtomId);
@@ -933,8 +844,7 @@ export function findOptimalRingNumberingFromHeteroatom(
       if (fg.atoms && fg.atoms.length > 0) {
         // For each atom in the functional group, find which ring atom it's bonded to
         for (const groupAtom of fg.atoms) {
-          const groupAtomId =
-            typeof groupAtom === "object" ? groupAtom.id : groupAtom;
+          const groupAtomId = typeof groupAtom === "object" ? groupAtom.id : groupAtom;
 
           // Check if this functional group atom is itself in the ring
           const ringIndex = ring.atoms.findIndex((a) => a.id === groupAtomId);
@@ -945,22 +855,15 @@ export function findOptimalRingNumberingFromHeteroatom(
           } else {
             // This functional group atom is NOT in the ring, so find which ring atom it's bonded to
             const bonds = molecule.bonds.filter(
-              (bond: Bond) =>
-                bond.atom1 === groupAtomId || bond.atom2 === groupAtomId,
+              (bond: Bond) => bond.atom1 === groupAtomId || bond.atom2 === groupAtomId,
             );
 
             for (const bond of bonds) {
-              const otherAtomId =
-                bond.atom1 === groupAtomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === groupAtomId ? bond.atom2 : bond.atom1;
               if (ringAtomIds.has(otherAtomId)) {
                 // Found a ring atom bonded to this principal functional group
-                const ringIndex = ring.atoms.findIndex(
-                  (a) => a.id === otherAtomId,
-                );
-                if (
-                  ringIndex >= 0 &&
-                  !principalFGAttachmentIndices.includes(ringIndex)
-                ) {
+                const ringIndex = ring.atoms.findIndex((a) => a.id === otherAtomId);
+                if (ringIndex >= 0 && !principalFGAttachmentIndices.includes(ringIndex)) {
                   principalFGAttachmentIndices.push(ringIndex);
                   if (process.env.VERBOSE) {
                     console.log(
@@ -1098,10 +1001,7 @@ export function findOptimalRingNumberingFromHeteroatom(
     }
 
     // Compare principal FG attachment locants first
-    const principalComparison = compareLocantSets(
-      principalLocants1,
-      principalLocants2,
-    );
+    const principalComparison = compareLocantSets(principalLocants1, principalLocants2);
 
     if (principalComparison < 0) {
       // Direction 1 has better principal FG attachment locants
@@ -1194,10 +1094,7 @@ export function findOptimalRingNumberingFromHeteroatom(
   }
 
   // Calculate substituent locants for both directions
-  const totalSubstituents = substituentCounts.reduce(
-    (sum, count) => sum + count,
-    0,
-  );
+  const totalSubstituents = substituentCounts.reduce((sum, count) => sum + count, 0);
 
   if (totalSubstituents === 0) {
     if (process.env.VERBOSE) {
@@ -1318,10 +1215,7 @@ function detectAndNumberFiveMemberedHeterocycle(
 
   if (nCount === 1 && sCount === 1) {
     for (let startIdx = 0; startIdx < ring.atoms.length; startIdx++) {
-      const cwAtoms = [
-        ...ring.atoms.slice(startIdx),
-        ...ring.atoms.slice(0, startIdx),
-      ] as Atom[];
+      const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
       if (
         cwAtoms[0]?.symbol === "N" &&
@@ -1368,10 +1262,7 @@ function detectAndNumberFiveMemberedHeterocycle(
 
   if (nCount === 1 && oCount === 1) {
     for (let startIdx = 0; startIdx < ring.atoms.length; startIdx++) {
-      const cwAtoms = [
-        ...ring.atoms.slice(startIdx),
-        ...ring.atoms.slice(0, startIdx),
-      ] as Atom[];
+      const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
       if (
         cwAtoms[0]?.symbol === "N" &&
@@ -1425,10 +1316,7 @@ function detectAndNumberFiveMemberedHeterocycle(
     }> = [];
 
     for (let startIdx = 0; startIdx < ring.atoms.length; startIdx++) {
-      const cwAtoms = [
-        ...ring.atoms.slice(startIdx),
-        ...ring.atoms.slice(0, startIdx),
-      ] as Atom[];
+      const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
       if (
         cwAtoms[0]?.symbol === "N" &&
@@ -1478,16 +1366,8 @@ function detectAndNumberFiveMemberedHeterocycle(
 
         if (molecule) {
           const ringAtomSet = new Set(ccwAtoms.map((a) => a.id));
-          n1Subs = countNonRingSubstituents(
-            ccwAtoms[0]!,
-            ringAtomSet,
-            molecule,
-          );
-          n3Subs = countNonRingSubstituents(
-            ccwAtoms[2]!,
-            ringAtomSet,
-            molecule,
-          );
+          n1Subs = countNonRingSubstituents(ccwAtoms[0]!, ringAtomSet, molecule);
+          n3Subs = countNonRingSubstituents(ccwAtoms[2]!, ringAtomSet, molecule);
         }
 
         if (process.env.VERBOSE) {
@@ -1514,11 +1394,7 @@ function detectAndNumberFiveMemberedHeterocycle(
           if (bond.type === "double") {
             const atom1 = molecule.atoms.find((a) => a.id === bond.atom1);
             const atom2 = molecule.atoms.find((a) => a.id === bond.atom2);
-            if (
-              atom1?.symbol === "C" &&
-              atom2?.symbol === "O" &&
-              ringAtomSet.has(bond.atom1)
-            ) {
+            if (atom1?.symbol === "C" && atom2?.symbol === "O" && ringAtomSet.has(bond.atom1)) {
               carbonylCarbonId = bond.atom1;
               break;
             } else if (
@@ -1536,9 +1412,7 @@ function detectAndNumberFiveMemberedHeterocycle(
       let validCandidates = candidates;
       if (carbonylCarbonId !== null) {
         validCandidates = candidates.filter((candidate) => {
-          const position = candidate.atoms.findIndex(
-            (a) => a.id === carbonylCarbonId,
-          );
+          const position = candidate.atoms.findIndex((a) => a.id === carbonylCarbonId);
           const isValid = position === 3;
           if (process.env.VERBOSE && !isValid) {
             console.log(
@@ -1643,10 +1517,7 @@ function detectAndNumberTriazine(
   // Try all starting positions and both directions to find the 1,2,4-triazine pattern
   for (let startIdx = 0; startIdx < ring.atoms.length; startIdx++) {
     // Try clockwise
-    const cwAtoms = [
-      ...ring.atoms.slice(startIdx),
-      ...ring.atoms.slice(0, startIdx),
-    ] as Atom[];
+    const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
     if (
       cwAtoms[0]?.symbol === "N" &&
@@ -1761,23 +1632,11 @@ function detectAndNumberLactam(
   }
 
   if (ringSize === 5 && nCount === 1) {
-    return handleFiveMemberedSingleNitrogenLactam(
-      ring,
-      carbonylCarbonId,
-      molecule,
-    );
+    return handleFiveMemberedSingleNitrogenLactam(ring, carbonylCarbonId, molecule);
   } else if (ringSize === 6 && nCount === 1) {
-    return handleSixMemberedSingleNitrogenLactam(
-      ring,
-      carbonylCarbonId,
-      molecule,
-    );
+    return handleSixMemberedSingleNitrogenLactam(ring, carbonylCarbonId, molecule);
   } else if (ringSize === 6 && nCount === 2) {
-    return handleSixMemberedDualNitrogenLactam(
-      ring,
-      carbonylCarbonId,
-      molecule,
-    );
+    return handleSixMemberedDualNitrogenLactam(ring, carbonylCarbonId, molecule);
   }
 
   return null;
@@ -1858,9 +1717,7 @@ function handleFiveMemberedSingleNitrogenLactam(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[detectAndNumberLactam] 5-membered: Found ${candidates.length} candidates:`,
-    );
+    console.log(`[detectAndNumberLactam] 5-membered: Found ${candidates.length} candidates:`);
     for (let i = 0; i < candidates.length; i++) {
       const c = candidates[i]!;
       console.log(
@@ -1893,10 +1750,7 @@ function handleSixMemberedSingleNitrogenLactam(
   const candidates: Array<{ atoms: Atom[]; locants: number[] }> = [];
 
   for (let startIdx = 0; startIdx < ring.atoms.length; startIdx++) {
-    const cwAtoms = [
-      ...ring.atoms.slice(startIdx),
-      ...ring.atoms.slice(0, startIdx),
-    ] as Atom[];
+    const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
     if (cwAtoms[0]?.symbol === "N") {
       const carbonylPos = cwAtoms.findIndex((a) => a.id === carbonylCarbonId);
@@ -1904,11 +1758,7 @@ function handleSixMemberedSingleNitrogenLactam(
         const ringAtomSet = new Set(cwAtoms.map((a) => a.id));
         const locants: number[] = [];
         for (let i = 0; i < cwAtoms.length; i++) {
-          const subs = countNonRingSubstituents(
-            cwAtoms[i]!,
-            ringAtomSet,
-            molecule,
-          );
+          const subs = countNonRingSubstituents(cwAtoms[i]!, ringAtomSet, molecule);
           for (let j = 0; j < subs; j++) {
             locants.push(i + 1);
           }
@@ -1929,11 +1779,7 @@ function handleSixMemberedSingleNitrogenLactam(
         const ringAtomSet = new Set(ccwAtoms.map((a) => a.id));
         const locants: number[] = [];
         for (let i = 0; i < ccwAtoms.length; i++) {
-          const subs = countNonRingSubstituents(
-            ccwAtoms[i]!,
-            ringAtomSet,
-            molecule,
-          );
+          const subs = countNonRingSubstituents(ccwAtoms[i]!, ringAtomSet, molecule);
           for (let j = 0; j < subs; j++) {
             locants.push(i + 1);
           }
@@ -1983,21 +1829,12 @@ function handleSixMemberedDualNitrogenLactam(
       "[handleSixMemberedDualNitrogenLactam] Ring atoms:",
       ring.atoms.map((a, i) => `${i}:${a.symbol}(id=${a.id})`),
     );
-    console.log(
-      "[handleSixMemberedDualNitrogenLactam] Nitrogen indices:",
-      nitrogenIndices,
-    );
-    console.log(
-      "[handleSixMemberedDualNitrogenLactam] Carbonyl carbon ID:",
-      carbonylCarbonId,
-    );
+    console.log("[handleSixMemberedDualNitrogenLactam] Nitrogen indices:", nitrogenIndices);
+    console.log("[handleSixMemberedDualNitrogenLactam] Carbonyl carbon ID:", carbonylCarbonId);
   }
 
   for (const startIdx of nitrogenIndices) {
-    const cwAtoms = [
-      ...ring.atoms.slice(startIdx),
-      ...ring.atoms.slice(0, startIdx),
-    ] as Atom[];
+    const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
 
     if (process.env.VERBOSE) {
       console.log(
@@ -2009,19 +1846,13 @@ function handleSixMemberedDualNitrogenLactam(
     if (cwAtoms[0]?.symbol === "N") {
       const carbonylPos = cwAtoms.findIndex((a) => a.id === carbonylCarbonId);
       if (process.env.VERBOSE) {
-        console.log(
-          `[handleSixMemberedDualNitrogenLactam] CW carbonylPos=${carbonylPos}`,
-        );
+        console.log(`[handleSixMemberedDualNitrogenLactam] CW carbonylPos=${carbonylPos}`);
       }
       if (carbonylPos === 1) {
         const ringAtomSet = new Set(cwAtoms.map((a) => a.id));
         const locants: number[] = [];
         for (let i = 0; i < cwAtoms.length; i++) {
-          const subs = countNonRingSubstituents(
-            cwAtoms[i]!,
-            ringAtomSet,
-            molecule,
-          );
+          const subs = countNonRingSubstituents(cwAtoms[i]!, ringAtomSet, molecule);
           for (let j = 0; j < subs; j++) {
             locants.push(i + 1);
           }
@@ -2052,19 +1883,13 @@ function handleSixMemberedDualNitrogenLactam(
     if (ccwAtoms[0]?.symbol === "N") {
       const carbonylPos = ccwAtoms.findIndex((a) => a.id === carbonylCarbonId);
       if (process.env.VERBOSE) {
-        console.log(
-          `[handleSixMemberedDualNitrogenLactam] CCW carbonylPos=${carbonylPos}`,
-        );
+        console.log(`[handleSixMemberedDualNitrogenLactam] CCW carbonylPos=${carbonylPos}`);
       }
       if (carbonylPos === 1) {
         const ringAtomSet = new Set(ccwAtoms.map((a) => a.id));
         const locants: number[] = [];
         for (let i = 0; i < ccwAtoms.length; i++) {
-          const subs = countNonRingSubstituents(
-            ccwAtoms[i]!,
-            ringAtomSet,
-            molecule,
-          );
+          const subs = countNonRingSubstituents(ccwAtoms[i]!, ringAtomSet, molecule);
           for (let j = 0; j < subs; j++) {
             locants.push(i + 1);
           }
@@ -2089,9 +1914,7 @@ function handleSixMemberedDualNitrogenLactam(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[handleSixMemberedDualNitrogenLactam] Total candidates: ${candidates.length}`,
-    );
+    console.log(`[handleSixMemberedDualNitrogenLactam] Total candidates: ${candidates.length}`);
     candidates.forEach((c, i) => {
       console.log(
         `  Candidate ${i}: locants=${JSON.stringify(c.locants)}, atoms=${c.atoms.map((a) => `${a.symbol}${a.id}`).join(",")}`,
@@ -2155,10 +1978,7 @@ export function findRingStartingPosition(
     }
 
     // Special case: Triazines have fixed numbering (1,2,4-triazine, etc.)
-    const triazineArrangement = detectAndNumberTriazine(
-      ring,
-      heteroatomIndices,
-    );
+    const triazineArrangement = detectAndNumberTriazine(ring, heteroatomIndices);
     if (triazineArrangement) {
       const oldAtoms = ring.atoms.map((a: Atom) => a.id);
       ring.atoms = triazineArrangement.atoms;
@@ -2247,14 +2067,10 @@ export function findRingStartingPosition(
     // Try each heteroatom as starting position, both clockwise and counterclockwise
     for (const startIdx of heteroatomIndices) {
       // Try clockwise from this heteroatom
-      const cwAtoms = [
-        ...ring.atoms.slice(startIdx),
-        ...ring.atoms.slice(0, startIdx),
-      ] as Atom[];
+      const cwAtoms = [...ring.atoms.slice(startIdx), ...ring.atoms.slice(0, startIdx)] as Atom[];
       const cwHeteroLocants = heteroatomIndices
         .map((idx) => {
-          const offset =
-            (idx - startIdx + ring.atoms.length) % ring.atoms.length;
+          const offset = (idx - startIdx + ring.atoms.length) % ring.atoms.length;
           return offset + 1; // 1-based locant
         })
         .sort((a, b) => a - b);
@@ -2277,10 +2093,7 @@ export function findRingStartingPosition(
         .sort((a, b) => a - b);
 
       // Compare with current best
-      if (
-        !bestArrangement ||
-        compareLocantSets(cwHeteroLocants, bestHeteroatomLocants) < 0
-      ) {
+      if (!bestArrangement || compareLocantSets(cwHeteroLocants, bestHeteroatomLocants) < 0) {
         bestArrangement = { atoms: cwAtoms, start: 1 };
         bestHeteroatomLocants = cwHeteroLocants;
       }
@@ -2562,8 +2375,7 @@ export function findRingStartingPosition(
 
       // Check if adjacent positions (required for valid ring bond)
       const isAdjacent =
-        maxPos - minPos === 1 ||
-        (minPos === 0 && maxPos === ring.atoms.length - 1);
+        maxPos - minPos === 1 || (minPos === 0 && maxPos === ring.atoms.length - 1);
 
       if (!isAdjacent) {
         if (process.env.VERBOSE) {
@@ -2620,20 +2432,15 @@ export function findRingStartingPosition(
 
           for (const b of bonds) {
             const otherAtomId = b.atom1 === ringAtom.id ? b.atom2 : b.atom1;
-            if (
-              !ringAtomIds.has(otherAtomId) &&
-              !functionalGroupAtomIds.has(otherAtomId)
-            ) {
+            if (!ringAtomIds.has(otherAtomId) && !functionalGroupAtomIds.has(otherAtomId)) {
               const substituentAtom = molecule.atoms[otherAtomId];
               if (substituentAtom && substituentAtom.symbol !== "H") {
                 // Calculate locant for this position
                 let locant: number;
                 if (direction === 1) {
-                  locant =
-                    ((i - start + ring.atoms.length) % ring.atoms.length) + 1;
+                  locant = ((i - start + ring.atoms.length) % ring.atoms.length) + 1;
                 } else {
-                  locant =
-                    ((start - i + ring.atoms.length) % ring.atoms.length) + 1;
+                  locant = ((start - i + ring.atoms.length) % ring.atoms.length) + 1;
                 }
                 substituentLocants.push(locant);
               }
@@ -2650,10 +2457,7 @@ export function findRingStartingPosition(
         }
 
         // Compare with best so far
-        if (
-          bestLocants.length === 0 ||
-          compareLocantSets(substituentLocants, bestLocants) < 0
-        ) {
+        if (bestLocants.length === 0 || compareLocantSets(substituentLocants, bestLocants) < 0) {
           bestLocants = substituentLocants;
           bestStart = direction === 1 ? start + 1 : -(start + 1);
           if (process.env.VERBOSE) {
@@ -2672,11 +2476,7 @@ export function findRingStartingPosition(
 
   // If molecule is provided, find the numbering that gives lowest locant set for substituents
   if (molecule) {
-    const optimalStart = findOptimalRingNumbering(
-      ring,
-      molecule,
-      functionalGroups,
-    );
+    const optimalStart = findOptimalRingNumbering(ring, molecule, functionalGroups);
     if (optimalStart !== 0) {
       return optimalStart; // Can be positive (CW) or negative (CCW)
     }
@@ -2686,10 +2486,7 @@ export function findRingStartingPosition(
   return 1;
 }
 
-export function adjustRingLocants(
-  locants: number[],
-  _startingPosition: number,
-): number[] {
+export function adjustRingLocants(locants: number[], _startingPosition: number): number[] {
   // After reorderRingAtoms(), the atoms array is already in the correct order
   // where atoms[0] corresponds to the starting position (e.g., heteroatom).
   // Therefore, locants should just be [1, 2, 3, 4, ...] to match the positions.
@@ -2698,10 +2495,7 @@ export function adjustRingLocants(
   return locants.map((_, i) => i + 1);
 }
 
-export function reorderRingAtoms(
-  atoms: Atom[],
-  startingPosition: number,
-): Atom[] {
+export function reorderRingAtoms(atoms: Atom[], startingPosition: number): Atom[] {
   if (Math.abs(startingPosition) === 1 && startingPosition > 0) {
     // Already starting at position 1 clockwise
     return atoms;
@@ -2744,10 +2538,7 @@ export function assignLowestAvailableLocant(
   let counter = 1;
 
   // Find lowest available locant
-  while (
-    usedLocants.includes(locant) ||
-    (locant === preferredLocant && counter <= index + 1)
-  ) {
+  while (usedLocants.includes(locant) || (locant === preferredLocant && counter <= index + 1)) {
     locant++;
     counter++;
   }
@@ -2775,9 +2566,7 @@ export function assignSubstituentLocants(
 
       if (parentStructure.type === "chain" && parentStructure.chain) {
         const chain = parentStructure.chain;
-        chainPosition = chain.atoms.findIndex(
-          (a: Atom) => a.id === atomIdOrLocant,
-        );
+        chainPosition = chain.atoms.findIndex((a: Atom) => a.id === atomIdOrLocant);
 
         if (chainPosition !== -1) {
           // Found the atom in chain, convert to locant
@@ -2798,9 +2587,7 @@ export function assignSubstituentLocants(
           // Check if this bond connects the substituent atom to a chain atom
           if (bond.atom1 === atomIdOrLocant && atom2InChain) {
             // Substituent is atom1, chain atom is atom2
-            const chainAtomPosition = chain.atoms.findIndex(
-              (a: Atom) => a.id === bond.atom2,
-            );
+            const chainAtomPosition = chain.atoms.findIndex((a: Atom) => a.id === bond.atom2);
             if (chainAtomPosition !== -1) {
               const locant = parentStructure.locants[chainAtomPosition];
               if (locant !== undefined) {
@@ -2810,9 +2597,7 @@ export function assignSubstituentLocants(
             }
           } else if (bond.atom2 === atomIdOrLocant && atom1InChain) {
             // Substituent is atom2, chain atom is atom1
-            const chainAtomPosition = chain.atoms.findIndex(
-              (a: Atom) => a.id === bond.atom1,
-            );
+            const chainAtomPosition = chain.atoms.findIndex((a: Atom) => a.id === bond.atom1);
             if (chainAtomPosition !== -1) {
               const locant = parentStructure.locants[chainAtomPosition];
               if (locant !== undefined) {
@@ -2829,9 +2614,7 @@ export function assignSubstituentLocants(
         }
       } else if (parentStructure.type === "ring" && parentStructure.ring) {
         const ring = parentStructure.ring;
-        chainPosition = ring.atoms.findIndex(
-          (a: Atom) => a.id === atomIdOrLocant,
-        );
+        chainPosition = ring.atoms.findIndex((a: Atom) => a.id === atomIdOrLocant);
 
         if (chainPosition !== -1) {
           // Found the atom in ring, convert to locant
@@ -2852,9 +2635,7 @@ export function assignSubstituentLocants(
           // Check if this bond connects the substituent atom to a ring atom
           if (bond.atom1 === atomIdOrLocant && atom2InRing) {
             // Substituent is atom1, ring atom is atom2
-            const ringAtomPosition = ring.atoms.findIndex(
-              (a: Atom) => a.id === bond.atom2,
-            );
+            const ringAtomPosition = ring.atoms.findIndex((a: Atom) => a.id === bond.atom2);
             if (ringAtomPosition !== -1) {
               const locant = parentStructure.locants[ringAtomPosition];
               if (locant !== undefined) {
@@ -2864,9 +2645,7 @@ export function assignSubstituentLocants(
             }
           } else if (bond.atom2 === atomIdOrLocant && atom1InRing) {
             // Substituent is atom2, ring atom is atom1
-            const ringAtomPosition = ring.atoms.findIndex(
-              (a: Atom) => a.id === bond.atom1,
-            );
+            const ringAtomPosition = ring.atoms.findIndex((a: Atom) => a.id === bond.atom1);
             if (ringAtomPosition !== -1) {
               const locant = parentStructure.locants[ringAtomPosition];
               if (locant !== undefined) {
@@ -2936,9 +2715,7 @@ export function validateNumbering(
   const expectedMax = parentStructure.locants.length;
 
   if (maxLocant > expectedMax) {
-    errors.push(
-      `Locant ${maxLocant} exceeds parent structure size (${expectedMax})`,
-    );
+    errors.push(`Locant ${maxLocant} exceeds parent structure size (${expectedMax})`);
   }
 
   return {

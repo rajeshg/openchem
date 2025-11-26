@@ -24,9 +24,7 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
     const molecule = context.getState().molecule;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.2.2] Starting heteroatom seniority with ${candidateRings?.length} rings`,
-      );
+      console.log(`[P-44.2.2] Starting heteroatom seniority with ${candidateRings?.length} rings`);
     }
 
     if (!candidateRings || candidateRings.length <= 1) {
@@ -35,16 +33,9 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
 
     // Check if rings are connected (bonded to each other but not sharing atoms)
     // If rings are connected, they form a polycyclic parent and should NOT be filtered by heteroatom seniority
-    const areRingsConnected = (
-      ring1: RingSystem,
-      ring2: RingSystem,
-    ): boolean => {
-      const ring1AtomIds = new Set(
-        (ring1 as RingSystem).atoms.map((a: Atom) => a.id),
-      );
-      const ring2AtomIds = new Set(
-        (ring2 as RingSystem).atoms.map((a: Atom) => a.id),
-      );
+    const areRingsConnected = (ring1: RingSystem, ring2: RingSystem): boolean => {
+      const ring1AtomIds = new Set((ring1 as RingSystem).atoms.map((a: Atom) => a.id));
+      const ring2AtomIds = new Set((ring2 as RingSystem).atoms.map((a: Atom) => a.id));
 
       // Check if any atom in ring1 is bonded to any atom in ring2
       for (const bond of molecule.bonds) {
@@ -65,11 +56,7 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
     // Priority: larger ring systems (more rings, more atoms) should be parent
     let hasConnectedRings = false;
     for (let i = 0; i < candidateRings.length && !hasConnectedRings; i++) {
-      for (
-        let j = i + 1;
-        j < candidateRings.length && !hasConnectedRings;
-        j++
-      ) {
+      for (let j = i + 1; j < candidateRings.length && !hasConnectedRings; j++) {
         if (areRingsConnected(candidateRings[i]!, candidateRings[j]!)) {
           hasConnectedRings = true;
         }
@@ -78,9 +65,7 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
 
     if (hasConnectedRings) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.2.2] Rings are connected - selecting largest ring system as parent`,
-        );
+        console.log(`[P-44.2.2] Rings are connected - selecting largest ring system as parent`);
       }
 
       // Select the ring system with the most rings, then most atoms as parent
@@ -133,18 +118,14 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
       for (const atom of ring.atoms) {
         if (atom.symbol !== "C" && atom.symbol !== "H") {
           const atomScore =
-            heteroatomSeniority[
-              atom.symbol as keyof typeof heteroatomSeniority
-            ] || 999;
+            heteroatomSeniority[atom.symbol as keyof typeof heteroatomSeniority] || 999;
           score += 1000 - atomScore; // Lower score = higher priority
         }
       }
 
       if (process.env.VERBOSE) {
         const atomSymbols = ring.atoms.map((a: Atom) => a.symbol).join("");
-        console.log(
-          `[P-44.2.2]   Ring (${atomSymbols}): heteroatom score=${score}`,
-        );
+        console.log(`[P-44.2.2]   Ring (${atomSymbols}): heteroatom score=${score}`);
       }
 
       return score;
@@ -156,9 +137,7 @@ export const P44_2_2_HETEROATOM_SENIORITY_RULE: IUPACRule = {
     );
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.2.2] Selected ${bestRings.length} ring(s) with max score ${maxScore}`,
-      );
+      console.log(`[P-44.2.2] Selected ${bestRings.length} ring(s) with max score ${maxScore}`);
     }
 
     return context.withUpdatedRings(

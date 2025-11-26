@@ -29,9 +29,7 @@ export function findBondedPair(
       const a1 = atomIds[i]!;
       const a2 = atomIds[j]!;
       const isBonded = bonds.some(
-        (b) =>
-          (b.atom1 === a1 && b.atom2 === a2) ||
-          (b.atom1 === a2 && b.atom2 === a1),
+        (b) => (b.atom1 === a1 && b.atom2 === a2) || (b.atom1 === a2 && b.atom2 === a1),
       );
       if (isBonded) {
         return [a1, a2];
@@ -118,10 +116,7 @@ export function classifyRingSystemType(
  * Group rings into connected fused systems using Union-Find.
  * Two rings are in the same system if they share atoms or connect transitively.
  */
-export function detectFusedRingSystems(
-  rings: Ring[],
-  molecule: Molecule,
-): RingSystem[] {
+export function detectFusedRingSystems(rings: Ring[], molecule: Molecule): RingSystem[] {
   if (rings.length === 0) return [];
   if (rings.length === 1) {
     return [

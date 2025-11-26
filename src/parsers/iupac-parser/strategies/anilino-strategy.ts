@@ -41,9 +41,7 @@ export class AnilinoStrategy extends BaseSubstituentStrategy {
       if (anilinoToken.nestedTokens) {
         console.log(
           `[strategy:anilino] Nested token details:`,
-          anilinoToken.nestedTokens
-            .map((t) => `${t.type}:${t.value}`)
-            .join(", "),
+          anilinoToken.nestedTokens.map((t) => `${t.type}:${t.value}`).join(", "),
         );
       }
     }
@@ -57,16 +55,10 @@ export class AnilinoStrategy extends BaseSubstituentStrategy {
     // Case 1: anilino token has nestedTokens (e.g., "2,4-dimethoxyanilino" as compound token)
     if (anilinoToken?.nestedTokens && anilinoToken.nestedTokens.length > 0) {
       const nestedSubsts = anilinoToken.nestedTokens.filter(
-        (t) =>
-          t.type === "SUBSTITUENT" &&
-          !t.value.toLowerCase().endsWith("anilino"),
+        (t) => t.type === "SUBSTITUENT" && !t.value.toLowerCase().endsWith("anilino"),
       );
-      const nestedLocants = anilinoToken.nestedTokens.filter(
-        (t) => t.type === "LOCANT",
-      );
-      const nestedMultipliers = anilinoToken.nestedTokens.filter(
-        (t) => t.type === "MULTIPLIER",
-      );
+      const nestedLocants = anilinoToken.nestedTokens.filter((t) => t.type === "LOCANT");
+      const nestedMultipliers = anilinoToken.nestedTokens.filter((t) => t.type === "MULTIPLIER");
 
       substToApply = nestedSubsts;
       locantsToUse = nestedLocants;

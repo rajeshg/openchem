@@ -47,9 +47,7 @@ export function filterSubstituents(
 
   // Extract principal prefix if exists (e.g., "hydroxy" for alcohols)
   const principalPrefix =
-    principalFG && principalFG.prefix
-      ? principalFG.prefix.toString().toLowerCase()
-      : null;
+    principalFG && principalFG.prefix ? principalFG.prefix.toString().toLowerCase() : null;
 
   // Filter out parts that duplicate the principal functional-group prefix
   let filtered = substituentParts.filter((p) => {
@@ -63,9 +61,7 @@ export function filterSubstituents(
 
   // If principal suffix is an alcohol (ol), also filter out any 'hydroxy' substituents
   const principalSuffix =
-    principalFG && principalFG.suffix
-      ? (principalFG.suffix as string).toLowerCase()
-      : "";
+    principalFG && principalFG.suffix ? (principalFG.suffix as string).toLowerCase() : "";
 
   if (principalSuffix.includes("ol")) {
     const beforeFilter = [...filtered];
@@ -86,17 +82,14 @@ export function filterSubstituents(
       console.log(
         `[filterSubstituents] Hydroxy filter removed: ${beforeFilter.filter((p) => !filtered.includes(p)).join(", ")}`,
       );
-      console.log(
-        `[filterSubstituents] Remaining after hydroxy filter: ${filtered.join(", ")}`,
-      );
+      console.log(`[filterSubstituents] Remaining after hydroxy filter: ${filtered.join(", ")}`);
     }
   }
 
   // Find substituentParts that are not (approximately) present in parent
   const missingParts = filtered.filter((part) => {
     const normalizedPart = normalizeForComparison(part);
-    const isMissing =
-      normalizedPart.length > 0 && !normalizedParent.includes(normalizedPart);
+    const isMissing = normalizedPart.length > 0 && !normalizedParent.includes(normalizedPart);
     if (process.env.VERBOSE) {
       console.log(
         `[filterSubstituents] Checking part "${part}": normalized="${normalizedPart}", parent="${parentAssembled}", normalizedParent="${normalizedParent}", isMissing=${isMissing}`,
@@ -137,10 +130,7 @@ function fixLocantHyphenation(p: string): string {
  * 3. Multiple substituents on chain/ring: join with hyphens → "2,2-dichloro-1-methylcyclohexane"
  * 4. Multiple substituents on heteroatom (no locants): join directly → "ethylmethylsilane"
  */
-export function joinSubstituents(
-  missingParts: string[],
-  isHeteroatomParent: boolean,
-): string {
+export function joinSubstituents(missingParts: string[], isHeteroatomParent: boolean): string {
   if (missingParts.length === 0) {
     return "";
   }

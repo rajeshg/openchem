@@ -6,10 +6,7 @@
  */
 
 import type { Molecule, BondType } from "types";
-import type {
-  PackedMol,
-  PackedMolEncodingInfo,
-} from "src/types/packedmol-types";
+import type { PackedMol, PackedMolEncodingInfo } from "src/types/packedmol-types";
 import {
   ATOM_FLAG,
   BOND_FLAG,
@@ -22,10 +19,7 @@ import {
 } from "src/types/packedmol-types";
 import { canonicalizeMolecule } from "src/utils/packedmol-canonicalizer";
 import { buildCSRGraph } from "src/utils/csr-graph-builder";
-import {
-  getCachedPackedMol,
-  setCachedPackedMol,
-} from "src/utils/packedmol-cache";
+import { getCachedPackedMol, setCachedPackedMol } from "src/utils/packedmol-cache";
 
 const PACKEDMOL_VERSION = 1;
 
@@ -229,8 +223,7 @@ export function encodePackedMol(molecule: Molecule): PackedMol {
 
     let flags = 0;
     if (atom.aromatic) flags |= ATOM_FLAG.AROMATIC;
-    if (atom.chiral !== null && atom.chiral !== "none")
-      flags |= ATOM_FLAG.CHIRAL;
+    if (atom.chiral !== null && atom.chiral !== "none") flags |= ATOM_FLAG.CHIRAL;
     if (atom.symbol === "*") flags |= ATOM_FLAG.DUMMY;
     atomFlags[i] = flags;
   }

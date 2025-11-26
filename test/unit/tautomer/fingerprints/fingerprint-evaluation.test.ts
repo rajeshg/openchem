@@ -1,9 +1,6 @@
 import { parseSMILES } from "index";
 import { enumerateTautomers } from "src/utils/tautomer/tautomer-enumerator";
-import {
-  computeMorganFingerprint,
-  tanimotoSimilarity,
-} from "src/utils/morgan-fingerprint";
+import { computeMorganFingerprint, tanimotoSimilarity } from "src/utils/morgan-fingerprint";
 import { describe, it, expect } from "bun:test";
 
 const molecules = [
@@ -23,7 +20,6 @@ describe("tautomer: fingerprint evaluation", () => {
       const mol = parsed.molecules[0]!;
       const tautomers = enumerateTautomers(mol, {
         maxTautomers: 128,
-        phases: [1, 2, 3],
       });
       const smilesList = tautomers.map((t) => t.smiles);
       const uniqueSmiles = Array.from(new Set(smilesList));
@@ -66,9 +62,7 @@ describe("tautomer: fingerprint evaluation", () => {
       }
       const minSim = sims.length ? Math.min(...sims) : 1.0;
       const maxSim = sims.length ? Math.max(...sims) : 1.0;
-      const avgSim = sims.length
-        ? sims.reduce((a, b) => a + b, 0) / sims.length
-        : 1.0;
+      const avgSim = sims.length ? sims.reduce((a, b) => a + b, 0) / sims.length : 1.0;
       if (process.env.VERBOSE) {
         console.log(
           `  Tanimoto sims: count=${sims.length} min=${minSim.toFixed(3)} avg=${avgSim.toFixed(3)} max=${maxSim.toFixed(3)}`,

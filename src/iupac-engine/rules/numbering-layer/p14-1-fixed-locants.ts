@@ -1,10 +1,6 @@
 import type { IUPACRule } from "../../types";
 import { RulePriority } from "../../types";
-import {
-  ExecutionPhase,
-  ImmutableNamingContext,
-  type ContextState,
-} from "../../immutable-context";
+import { ExecutionPhase, ImmutableNamingContext, type ContextState } from "../../immutable-context";
 import { hasFixedLocants, getFixedLocants } from "./helpers";
 
 export const P14_1_FIXED_LOCANTS_RULE: IUPACRule = {

@@ -133,10 +133,7 @@ function pickFreeAngleForTerminal(occupiedAngles: number[]): number {
  * - Hybridization of the parent atom
  * - Already-occupied angles around parent
  */
-function pickFreeAngle(
-  occupiedAngles: number[],
-  parentHybridization?: string,
-): number {
+function pickFreeAngle(occupiedAngles: number[], parentHybridization?: string): number {
   if (occupiedAngles.length === 0) {
     // First neighbor: default angle (East)
     return 0;

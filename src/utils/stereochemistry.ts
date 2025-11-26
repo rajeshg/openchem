@@ -18,9 +18,7 @@ export interface StereochemistryResult {
 /**
  * Assign stereochemistry (R/S for chiral centers, E/Z for double bonds)
  */
-export function assignStereochemistry(
-  molecule: Molecule,
-): StereochemistryResult {
+export function assignStereochemistry(molecule: Molecule): StereochemistryResult {
   const result: StereochemistryResult = {
     chiralCenters: [],
     doubleBonds: [],
@@ -54,10 +52,7 @@ export function assignStereochemistry(
 /**
  * Determine R/S configuration for a chiral center using CIP rules
  */
-function determineRSConfiguration(
-  molecule: Molecule,
-  atomId: number,
-): "R" | "S" | undefined {
+function determineRSConfiguration(molecule: Molecule, atomId: number): "R" | "S" | undefined {
   const atom = molecule.atoms.find((a) => a.id === atomId);
   if (!atom || !atom.chiral) return undefined;
 
@@ -94,9 +89,7 @@ function determineRSConfiguration(
  */
 function getChiralSubstituents(molecule: Molecule, atomId: number): number[] {
   const substituents: number[] = [];
-  const bonds = molecule.bonds.filter(
-    (b) => b.atom1 === atomId || b.atom2 === atomId,
-  );
+  const bonds = molecule.bonds.filter((b) => b.atom1 === atomId || b.atom2 === atomId);
 
   for (const bond of bonds) {
     const neighborId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
@@ -183,23 +176,12 @@ function getAttachedAtoms(molecule: Molecule, atomId: number): number[] {
 /**
  * Determine E/Z configuration for a double bond
  */
-function determineEZConfiguration(
-  molecule: Molecule,
-  bond: Bond,
-): "E" | "Z" | undefined {
+function determineEZConfiguration(molecule: Molecule, bond: Bond): "E" | "Z" | undefined {
   if (bond.type !== "double") return undefined;
 
   // Get substituents on each side of the double bond
-  const substituents1 = getDoubleBondSubstituents(
-    molecule,
-    bond.atom1,
-    bond.atom2,
-  );
-  const substituents2 = getDoubleBondSubstituents(
-    molecule,
-    bond.atom2,
-    bond.atom1,
-  );
+  const substituents1 = getDoubleBondSubstituents(molecule, bond.atom1, bond.atom2);
+  const substituents2 = getDoubleBondSubstituents(molecule, bond.atom2, bond.atom1);
 
   if (substituents1.length < 2 || substituents2.length < 2) return undefined;
 

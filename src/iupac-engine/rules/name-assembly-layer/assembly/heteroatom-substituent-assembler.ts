@@ -1,18 +1,11 @@
 import type { Molecule } from "types";
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../../types";
 import type { NamingSubstituent } from "../../../naming/iupac-types";
 import type { OPSINService } from "../../../opsin-service";
 import { getMultiplicativePrefix } from "../utils";
 import { nameSpecialSubstituent } from "../naming/special-substituent-namer";
 
-type UnifiedSubstituent =
-  | StructuralSubstituent
-  | NamingSubstituent
-  | FunctionalGroup;
+type UnifiedSubstituent = StructuralSubstituent | NamingSubstituent | FunctionalGroup;
 
 export function assembleHeteroatomSubstituents(
   allStructuralSubstituents: UnifiedSubstituent[],
@@ -53,9 +46,7 @@ export function assembleHeteroatomSubstituents(
 
   for (const [subName, count] of groupedSubs.entries()) {
     const prefix =
-      count > 1
-        ? getMultiplicativePrefix(count, false, opsinService, subName.charAt(0))
-        : "";
+      count > 1 ? getMultiplicativePrefix(count, false, opsinService, subName.charAt(0)) : "";
     substituentParts.push(`${prefix}${subName}`);
   }
 

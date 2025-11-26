@@ -46,8 +46,7 @@ export function mergeNSubstituentsWithName(
   // Find where the parent name starts in the assembled name
   // For heterocycles that were transformed (e.g., "thiazoline" → "4H-1,3-thiazol"),
   // we need to detect the transformed parent portion
-  const fullParentName =
-    parentStructure.assembledName || parentStructure.name || "";
+  const fullParentName = parentStructure.assembledName || parentStructure.name || "";
   let parentName = fullParentName;
   let parentIndex = name.indexOf(parentName);
 
@@ -127,9 +126,7 @@ export function mergeNSubstituentsWithName(
     name = rebuildNameWithSubstituents(groupedParts, parentPortion);
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[mergeNSubstituentsWithName] Rebuilt name with N-substituents: "${name}"`,
-      );
+      console.log(`[mergeNSubstituentsWithName] Rebuilt name with N-substituents: "${name}"`);
     }
   }
 
@@ -174,8 +171,7 @@ function parseSubstituentParts(substituentPortion: string): string[] {
       // But NOT if it's a lowercase letter right after a digit-hyphen (that's part of the name)
       if (nextChar) {
         const isStartOfNewPart =
-          /\d/.test(nextChar) ||
-          (nextChar === "N" && (i === 0 || remaining[i - 1] === "-"));
+          /\d/.test(nextChar) || (nextChar === "N" && (i === 0 || remaining[i - 1] === "-"));
         if (isStartOfNewPart) {
           splitPoints.push(i);
         }
@@ -206,10 +202,7 @@ function parseSubstituentParts(substituentPortion: string): string[] {
  * @param opsinService - Optional OPSIN service for multiplicative prefixes
  * @returns Array of grouped and sorted substituent parts
  */
-function groupAndSortSubstituents(
-  parts: string[],
-  opsinService?: OPSINService,
-): string[] {
+function groupAndSortSubstituents(parts: string[], opsinService?: OPSINService): string[] {
   // Group substituents with the same base name
   // E.g., "3-methyl" and "N,N-dimethyl" should combine to "N,N,3-trimethyl"
   const substituentGroups = new Map<string, string[]>();
@@ -269,14 +262,7 @@ function groupAndSortSubstituents(
 
     // Add multiplicative prefix if count > 1
     const prefix =
-      count > 1
-        ? getMultiplicativePrefix(
-            count,
-            false,
-            opsinService,
-            baseName.charAt(0),
-          )
-        : "";
+      count > 1 ? getMultiplicativePrefix(count, false, opsinService, baseName.charAt(0)) : "";
     const fullName = prefix + baseName;
 
     groupedParts.push(`${locantsStr}-${fullName}`);
@@ -317,10 +303,7 @@ function groupAndSortSubstituents(
  * @param parentPortion - The parent structure name portion
  * @returns Rebuilt name with substituents and parent
  */
-function rebuildNameWithSubstituents(
-  groupedParts: string[],
-  parentPortion: string,
-): string {
+function rebuildNameWithSubstituents(groupedParts: string[], parentPortion: string): string {
   let name: string;
 
   // Check if the last substituent ends with a connector (like -yl) that should attach directly to parent
@@ -328,15 +311,12 @@ function rebuildNameWithSubstituents(
     // Extract the last substituent's name (after locants)
     const lastPart = groupedParts[groupedParts.length - 1]!;
     const lastHyphenIdx = lastPart.lastIndexOf("-");
-    const lastSubstName =
-      lastHyphenIdx >= 0 ? lastPart.substring(lastHyphenIdx + 1) : lastPart;
+    const lastSubstName = lastHyphenIdx >= 0 ? lastPart.substring(lastHyphenIdx + 1) : lastPart;
 
     // If last substituent ends with a connector suffix, attach directly without hyphen
     // UNLESS the parent starts with a locant indicator (digit or special format like "4H-")
     const connectorSuffixes = ["yl", "ylidene", "ylidyne", "ylium"];
-    const endsWithConnector = connectorSuffixes.some((suffix) =>
-      lastSubstName.endsWith(suffix),
-    );
+    const endsWithConnector = connectorSuffixes.some((suffix) => lastSubstName.endsWith(suffix));
 
     // Check if parent starts with a locant or special indicator that needs a hyphen
     const parentNeedsHyphen = /^[\d]/.test(parentPortion);
@@ -344,11 +324,7 @@ function rebuildNameWithSubstituents(
     if (endsWithConnector && groupedParts.length === 1 && !parentNeedsHyphen) {
       // Single substituent ending with connector: attach directly
       name = lastPart + parentPortion;
-    } else if (
-      endsWithConnector &&
-      groupedParts.length > 1 &&
-      !parentNeedsHyphen
-    ) {
+    } else if (endsWithConnector && groupedParts.length > 1 && !parentNeedsHyphen) {
       // Multiple substituents, last one ending with connector
       const allButLast = groupedParts.slice(0, -1).join("-");
       name = allButLast + "-" + lastPart + parentPortion;

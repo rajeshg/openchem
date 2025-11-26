@@ -67,8 +67,7 @@ describe("Blue Book P-44.3.6 Example", () => {
 
     // Step 2: P-44.3.6 - Substituent Count (tie-breaker)
     const selectedChains = context.getState().candidateChains;
-    const chainWithMostSubstituents =
-      selectChainWithMostSubstituents(selectedChains);
+    const chainWithMostSubstituents = selectChainWithMostSubstituents(selectedChains);
 
     context = context.withUpdatedCandidates(
       [chainWithMostSubstituents],
@@ -237,8 +236,6 @@ function getMaxLength(chains: any[]): number {
  */
 function selectChainWithMostSubstituents(chains: any[]): any {
   return chains.reduce((selected, current) =>
-    current.substituents.length > selected.substituents.length
-      ? current
-      : selected,
+    current.substituents.length > selected.substituents.length ? current : selected,
   );
 }

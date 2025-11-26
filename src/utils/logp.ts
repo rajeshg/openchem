@@ -190,8 +190,7 @@ function parseParamData(paramData: string): {
   return { order, patts };
 }
 
-const { order: _patternOrder, patts: _smartsPatterns } =
-  parseParamData(defaultParamData);
+const { order: _patternOrder, patts: _smartsPatterns } = parseParamData(defaultParamData);
 
 const cachedParams = Object.fromEntries(
   Object.entries(_smartsPatterns).map(([cha, params]) => [
@@ -287,10 +286,8 @@ export function getCrippenAtomContribs(
         const mrVal = mrContribs[i];
         const currentLogp = originalLogp[origIdx];
         const currentMr = originalMr[origIdx];
-        if (logpVal != null && currentLogp != null)
-          originalLogp[origIdx] = currentLogp + logpVal;
-        if (mrVal != null && currentMr != null)
-          originalMr[origIdx] = currentMr + mrVal;
+        if (logpVal != null && currentLogp != null) originalLogp[origIdx] = currentLogp + logpVal;
+        if (mrVal != null && currentMr != null) originalMr[origIdx] = currentMr + mrVal;
       }
     }
     return { logpContribs: originalLogp, mrContribs: originalMr };
@@ -325,9 +322,7 @@ export function calcCrippenDescriptors(
 export function computeLogP(mol: Molecule, includeHs = true): number {
   // For very large molecules, LogP calculation can be slow
   // Skip calculation if molecule has more than 30 heavy atoms
-  const heavyAtomCount = mol.atoms.filter(
-    (a) => a.symbol !== "H" && a.symbol !== "*",
-  ).length;
+  const heavyAtomCount = mol.atoms.filter((a) => a.symbol !== "H" && a.symbol !== "*").length;
   if (heavyAtomCount > 30) {
     return 10; // Return a high value that will fail Lipinski
   }

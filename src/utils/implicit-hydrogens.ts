@@ -51,8 +51,7 @@ export function computeImplicitHydrogens(m: Molecule): Molecule {
     }
 
     const defaultValences = atom.aromatic
-      ? AROMATIC_VALENCES[atom.symbol] ||
-        DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]
+      ? AROMATIC_VALENCES[atom.symbol] || DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]
       : DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber];
 
     // For carbons, allow multi-step enolization by not prematurely setting hydrogens to zero
@@ -69,10 +68,7 @@ export function computeImplicitHydrogens(m: Molecule): Molecule {
           break;
         }
       }
-      hydrogens = Math.max(
-        0,
-        targetValence + (atom.charge || 0) - bondOrderSum,
-      );
+      hydrogens = Math.max(0, targetValence + (atom.charge || 0) - bondOrderSum);
     }
 
     // Special case: for non-aromatic carbons adjacent to C=O or C-OH, allow hydrogens if valence permits
@@ -86,11 +82,7 @@ export function computeImplicitHydrogens(m: Molecule): Molecule {
           return otherAtom && otherAtom.symbol === "O" ? otherAtom : null;
         })
         .filter(Boolean);
-      if (
-        oNeighbors.length > 0 &&
-        hydrogens === 0 &&
-        bondOrderSum < maxValence
-      ) {
+      if (oNeighbors.length > 0 && hydrogens === 0 && bondOrderSum < maxValence) {
         // If valence allows, restore one hydrogen for possible further tautomerization
         hydrogens = 1;
       }

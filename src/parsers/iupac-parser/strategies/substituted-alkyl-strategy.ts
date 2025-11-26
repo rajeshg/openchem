@@ -58,9 +58,7 @@ export class SubstitutedAlkylStrategy extends BaseSubstituentStrategy {
     const chainLen = this.getChainLength(alkylBaseToken.value.toLowerCase());
     const chainAtoms = builder.createLinearChain(chainLen);
 
-    const otherSubsts = ctx.substituentTokens.filter(
-      (s) => s !== alkylBaseToken,
-    );
+    const otherSubsts = ctx.substituentTokens.filter((s) => s !== alkylBaseToken);
 
     if (otherSubsts.length > 0) {
       builderContext.applySubstituents(

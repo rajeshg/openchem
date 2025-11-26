@@ -25,9 +25,7 @@ export class SulfamoylStrategy extends BaseSubstituentStrategy {
 
     // Check for sulfamoyl in substituents
     const hasSulfamoylSubst = ctx.substituentTokens.some(
-      (s) =>
-        s.value.toLowerCase().includes("sulfamoyl") ||
-        s.value.toLowerCase() === "sulfam",
+      (s) => s.value.toLowerCase().includes("sulfamoyl") || s.value.toLowerCase() === "sulfam",
     );
 
     // Check for sulfamoyl as suffix
@@ -88,10 +86,7 @@ export class SulfamoylStrategy extends BaseSubstituentStrategy {
           // Use nestedTokens if available, otherwise use substituent tokens
           const firstSubst = prefixSubsts[0]!;
           const tokens = firstSubst.nestedTokens || prefixSubsts;
-          prefixResult = enhancedContext.buildNestedSubstituent(
-            builder,
-            tokens,
-          );
+          prefixResult = enhancedContext.buildNestedSubstituent(builder, tokens);
           if (prefixResult) {
             prefixAtoms = prefixResult.fragmentAtoms;
             this.log(

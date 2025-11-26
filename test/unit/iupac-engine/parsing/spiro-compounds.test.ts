@@ -15,10 +15,7 @@ describe("Spiro Compound Parsing", () => {
       const canonicalReference = generateSMILES(reference, true);
 
       // Both should canonicalize to the same SMILES
-      const smilesCanonical = generateSMILES(
-        parseSMILES(smiles).molecules[0]!,
-        true,
-      );
+      const smilesCanonical = generateSMILES(parseSMILES(smiles).molecules[0]!, true);
       expect(smilesCanonical).toBe(canonicalReference);
       expect(result.molecule.atoms.length).toBe(10);
     }

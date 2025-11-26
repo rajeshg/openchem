@@ -2,9 +2,7 @@
  * Find lexicographically smallest array among a list of number arrays.
  * Shorter array wins if equal up to min length.
  */
-export function lexicographicallySmallest(
-  sets: (number | undefined)[][],
-): number[] | null {
+export function lexicographicallySmallest(sets: (number | undefined)[][]): number[] | null {
   if (!sets || sets.length === 0) return null;
   // Normalize undefined entries to 0 and ensure arrays of numbers
   const normalized: number[][] = sets.map((s) => (s || []).map((v) => v ?? 0));

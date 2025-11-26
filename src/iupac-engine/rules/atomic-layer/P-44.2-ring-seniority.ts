@@ -29,17 +29,13 @@ export const P_44_2_RING_SENIORITY: IUPACRule = {
     if (!molecule || !Array.isArray(molecule.rings)) return context;
     const ringSystems: RingSystem[] = [];
     for (const ringIdxs of molecule.rings) {
-      const atoms = ringIdxs
-        .map((i: number) => molecule.atoms[i])
-        .filter(Boolean);
+      const atoms = ringIdxs.map((i: number) => molecule.atoms[i]).filter(Boolean);
       if (atoms.length < 3) continue;
       const bonds = molecule.bonds.filter(
         (b: Bond) => ringIdxs.includes(b.atom1) && ringIdxs.includes(b.atom2),
       );
       const hasAromatic = atoms.some((a: Atom) => !!a.aromatic);
-      const hasHetero = atoms.some(
-        (a: Atom) => a.symbol !== "C" && a.symbol !== "H",
-      );
+      const hasHetero = atoms.some((a: Atom) => a.symbol !== "C" && a.symbol !== "H");
       const type: RingSystemType = hasAromatic
         ? RingSystemType.AROMATIC
         : hasHetero

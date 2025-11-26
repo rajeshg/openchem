@@ -164,12 +164,7 @@ describe("PackedMolecule Wrapper Class", () => {
 
   describe("Round-trip fidelity", () => {
     it("preserves all data through wrapper round-trip", () => {
-      const testMolecules = [
-        "CCO",
-        "CC(=O)Oc1ccccc1C(=O)O",
-        "C[C@H](F)C",
-        "c1ccccc1",
-      ];
+      const testMolecules = ["CCO", "CC(=O)Oc1ccccc1C(=O)O", "C[C@H](F)C", "c1ccccc1"];
 
       for (const smiles of testMolecules) {
         const original = parseSMILES(smiles).molecules[0]!;

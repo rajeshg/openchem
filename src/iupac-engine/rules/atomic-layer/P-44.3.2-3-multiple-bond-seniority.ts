@@ -16,9 +16,7 @@ export const P_44_3_2_3_MULTIPLE_BOND_SENIORITY: IUPACRule = {
   priority: RulePriority.SIX,
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    return (
-      Array.isArray(state.molecule?.bonds) && state.molecule.bonds.length > 0
-    );
+    return Array.isArray(state.molecule?.bonds) && state.molecule.bonds.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
     const state = context.getState();

@@ -17,10 +17,7 @@ export interface FusedRingSystem {
  * Groups rings that share atoms or bonds into fused systems
  * Also handles cases where SSSR doesn't capture all rings in polycyclic systems
  */
-export function identifyFusedRingSystems(
-  rings: number[][],
-  molecule: Molecule,
-): FusedRingSystem[] {
+export function identifyFusedRingSystems(rings: number[][], molecule: Molecule): FusedRingSystem[] {
   if (rings.length <= 1) return [];
 
   const fusedSystems: FusedRingSystem[] = [];
@@ -144,10 +141,7 @@ function findSharedAtoms(ring1: number[], ring2: number[]): number[] {
 /**
  * Find bonds that connect fusion atoms
  */
-function findFusionBonds(
-  fusionAtoms: Set<number>,
-  molecule: Molecule,
-): number[] {
+function findFusionBonds(fusionAtoms: Set<number>, molecule: Molecule): number[] {
   const fusionBondIndices: number[] = [];
 
   for (let i = 0; i < molecule.bonds.length; i++) {
@@ -255,8 +249,7 @@ export function identifyFusedRingPattern(
 
   // Get all ring atoms
   const allRingAtoms = new Set<number>();
-  for (const ring of rings)
-    for (const atomIdx of ring) allRingAtoms.add(atomIdx);
+  for (const ring of rings) for (const atomIdx of ring) allRingAtoms.add(atomIdx);
   const ringAtoms = Array.from(allRingAtoms)
     .map((idx) => molecule.atoms[idx])
     .filter((a): a is (typeof molecule.atoms)[0] => a !== undefined);
@@ -268,9 +261,7 @@ export function identifyFusedRingPattern(
   if (ringCount === 2 && sortedSizes[0] === 6 && sortedSizes[1] === 6) {
     // Check if all atoms are carbon and rings are aromatic (naphthalene)
     const allCarbon = checkAllCarbonInRings(fusedSystem.rings, molecule);
-    const aromatic = fusedSystem.rings.every((r) =>
-      isRingAromatic(r, molecule),
-    );
+    const aromatic = fusedSystem.rings.every((r) => isRingAromatic(r, molecule));
     if (allCarbon && aromatic) {
       return "naphthalene";
     }
@@ -279,9 +270,7 @@ export function identifyFusedRingPattern(
   // Three 6-membered rings -> distinguish anthracene vs phenanthrene (only when aromatic)
   if (ringCount === 3 && sortedSizes.every((size) => size === 6)) {
     const allCarbon = checkAllCarbonInRings(fusedSystem.rings, molecule);
-    const aromatic = fusedSystem.rings.every((r) =>
-      isRingAromatic(r, molecule),
-    );
+    const aromatic = fusedSystem.rings.every((r) => isRingAromatic(r, molecule));
     if (allCarbon && aromatic) {
       // Check fusion pattern to distinguish linear (anthracene) vs angular (phenanthrene)
       const fusionPattern = analyzeFusionPattern(fusedSystem, molecule);
@@ -296,12 +285,7 @@ export function identifyFusedRingPattern(
   }
 
   // Special case for phenanthrene-like systems (2 SSSR rings + 1 combined)
-  if (
-    ringCount === 3 &&
-    sortedSizes[0] === 6 &&
-    sortedSizes[1] === 6 &&
-    sortedSizes[2] === 10
-  ) {
+  if (ringCount === 3 && sortedSizes[0] === 6 && sortedSizes[1] === 6 && sortedSizes[2] === 10) {
     const allCarbon = checkAllCarbonInRings(fusedSystem.rings, molecule);
     if (allCarbon) {
       return "phenanthrene";
@@ -373,10 +357,7 @@ export function identifyFusedRingPattern(
 
   // Single 5-membered heterocycles
   if (ringCount === 1 && sortedSizes[0] === 5) {
-    const heteroPattern = analyzeHeteroatomsInFusedSystem(
-      fusedSystem,
-      molecule,
-    );
+    const heteroPattern = analyzeHeteroatomsInFusedSystem(fusedSystem, molecule);
 
     if (heteroPattern === "pyrrole") {
       return "pyrrole";
@@ -403,9 +384,7 @@ export function identifyFusedRingPattern(
 
     // Imidazole (5-membered with 2 nitrogens)
     if (ringSize === 5 && heteroAtoms.length === 2) {
-      const nitrogenCount = heteroAtoms.filter(
-        (atom) => atom.symbol === "N",
-      ).length;
+      const nitrogenCount = heteroAtoms.filter((atom) => atom.symbol === "N").length;
       if (nitrogenCount === 2) {
         // Check if one nitrogen has hydrogen (characteristic of imidazole)
         const nitrogensWithH = heteroAtoms.filter(
@@ -498,8 +477,7 @@ function analyzeHeteroatomsInFusedSystem(
   fusedSystem: FusedRingSystem,
   molecule: Molecule,
 ): string | null {
-  const heteroAtoms: { symbol: string; ringIdx: number; atomIdx: number }[] =
-    [];
+  const heteroAtoms: { symbol: string; ringIdx: number; atomIdx: number }[] = [];
 
   for (let i = 0; i < fusedSystem.rings.length; i++) {
     const ring = fusedSystem.rings[i]!;
@@ -518,9 +496,7 @@ function analyzeHeteroatomsInFusedSystem(
 
     // Check if it's a 5-membered heterocycle fused to benzene
     if (ringSize === 5 && fusedSystem.rings.length === 2) {
-      const otherRingSize = fusedSystem.rings.find(
-        (_, idx) => idx !== hetero.ringIdx,
-      )?.length;
+      const otherRingSize = fusedSystem.rings.find((_, idx) => idx !== hetero.ringIdx)?.length;
       if (otherRingSize === 6) {
         // 5-membered heterocycle fused to benzene
         switch (hetero.symbol) {
@@ -556,9 +532,7 @@ function analyzeHeteroatomsInFusedSystem(
       return { idx, heteroCount, size: ring.length };
     });
 
-    const allCarbonRings = ringsWithHeteroatoms.filter(
-      (r) => r.heteroCount === 0,
-    );
+    const allCarbonRings = ringsWithHeteroatoms.filter((r) => r.heteroCount === 0);
     const heteroRings = ringsWithHeteroatoms.filter((r) => r.heteroCount > 0);
 
     if (allCarbonRings.length === 1 && heteroRings.length === 1) {
@@ -566,8 +540,7 @@ function analyzeHeteroatomsInFusedSystem(
       const heteroAtoms = heteroRing
         .map((atomIdx) => molecule.atoms[atomIdx])
         .filter(
-          (atom): atom is (typeof molecule.atoms)[0] =>
-            atom !== undefined && atom.symbol !== "C",
+          (atom): atom is (typeof molecule.atoms)[0] => atom !== undefined && atom.symbol !== "C",
         );
 
       if (heteroAtoms.length === 1) {
@@ -603,11 +576,7 @@ function analyzeHeteroatomsInFusedSystem(
 
     if (ringSize === 5 && heteroAtoms.length === 1) {
       const heteroAtom = heteroAtoms[0]!;
-      if (
-        heteroAtom.symbol === "N" &&
-        heteroAtom.hydrogens &&
-        heteroAtom.hydrogens > 0
-      ) {
+      if (heteroAtom.symbol === "N" && heteroAtom.hydrogens && heteroAtom.hydrogens > 0) {
         return "pyrrole";
       }
       if (heteroAtom.symbol === "O") {
@@ -619,9 +588,7 @@ function analyzeHeteroatomsInFusedSystem(
     }
 
     if (ringSize === 5 && heteroAtoms.length === 2) {
-      const nitrogenCount = heteroAtoms.filter(
-        (atom) => atom.symbol === "N",
-      ).length;
+      const nitrogenCount = heteroAtoms.filter((atom) => atom.symbol === "N").length;
       if (nitrogenCount === 2) {
         return "imidazole";
       }

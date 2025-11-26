@@ -149,9 +149,7 @@ describe("Tetrahedral Geometry Rendering", () => {
     ];
 
     for (let i = 0; i < actualIntervals.length; i++) {
-      expect(
-        Math.abs(actualIntervals[i]! - expectedIntervals[i]!),
-      ).toBeLessThan(30);
+      expect(Math.abs(actualIntervals[i]! - expectedIntervals[i]!)).toBeLessThan(30);
     }
   });
 
@@ -196,17 +194,11 @@ describe("Tetrahedral Geometry Rendering", () => {
     const defaultCarbons = defaultAtoms.filter((a) => a.label === "C");
     const webbcolaCarbons = webcolaAtoms.filter((a) => a.label === "C");
 
-    const defaultDistances = defaultCarbons.map((c) =>
-      getDistance(defaultN, c),
-    );
-    const webcolaDistances = webbcolaCarbons.map((c) =>
-      getDistance(webcolaN, c),
-    );
+    const defaultDistances = defaultCarbons.map((c) => getDistance(defaultN, c));
+    const webcolaDistances = webbcolaCarbons.map((c) => getDistance(webcolaN, c));
 
-    const defaultAvg =
-      defaultDistances.reduce((a, b) => a + b) / defaultDistances.length;
-    const webcolaAvg =
-      webcolaDistances.reduce((a, b) => a + b) / webcolaDistances.length;
+    const defaultAvg = defaultDistances.reduce((a, b) => a + b) / defaultDistances.length;
+    const webcolaAvg = webcolaDistances.reduce((a, b) => a + b) / webcolaDistances.length;
 
     expect(Math.abs(defaultAvg - webcolaAvg) / defaultAvg).toBeLessThan(0.3);
   });

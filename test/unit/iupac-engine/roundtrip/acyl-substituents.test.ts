@@ -26,9 +26,7 @@ describe("Acyl Substituent Detection and Naming", () => {
       const mol = result.molecules[0]!;
       const iupacResult = engine.generateName(mol);
 
-      expect(iupacResult.name).toBe(
-        "7-methyl-5-(2-methylpropanoyl)octane-2,6-dione",
-      );
+      expect(iupacResult.name).toBe("7-methyl-5-(2-methylpropanoyl)octane-2,6-dione");
     });
 
     it("should identify simple acetyl as acyl substituent without parentheses", () => {
@@ -105,9 +103,7 @@ describe("Acyl Substituent Detection and Naming", () => {
       expect(iupacResult.name).toContain("(2-methylpropanoyl)");
 
       // Full expected name
-      expect(iupacResult.name).toBe(
-        "6-acetyl-2,8-dimethyl-4-(2-methylpropanoyl)nonane-3,7-dione",
-      );
+      expect(iupacResult.name).toBe("6-acetyl-2,8-dimethyl-4-(2-methylpropanoyl)nonane-3,7-dione");
     });
   });
 
@@ -163,9 +159,7 @@ describe("Acyl Substituent Detection and Naming", () => {
 
       // Document current behavior
       console.log(`  Current output: ${iupacResult.name}`);
-      console.log(
-        `  Note: Complex branched acyl groups are a known limitation`,
-      );
+      console.log(`  Note: Complex branched acyl groups are a known limitation`);
     });
   });
 });

@@ -1,9 +1,6 @@
 import { readFileSync } from "fs";
 
-const csv = readFileSync(
-  "test/unit/iupac-engine/iupac-to-smiles-detailed-report.csv",
-  "utf-8",
-);
+const csv = readFileSync("test/unit/iupac-engine/iupac-to-smiles-detailed-report.csv", "utf-8");
 const lines = csv.split("\n").slice(1);
 
 console.log("## Parenthetical Cases (first 10):\n");

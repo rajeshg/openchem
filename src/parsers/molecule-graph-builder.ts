@@ -1,23 +1,11 @@
 import type { Atom, Bond, Molecule, BondType } from "types";
 import { BondType as BondTypeEnum } from "types";
-import {
-  RingStructureBuilders,
-  type RingBuilderContext,
-} from "./ring-structure-builders";
-import {
-  SubstituentBuilders,
-  type SubstituentBuilderContext,
-} from "./substituent-builders";
-import {
-  PolycyclicBuilders,
-  type PolycyclicBuilderContext,
-} from "./polycyclic-builders";
+import { RingStructureBuilders, type RingBuilderContext } from "./ring-structure-builders";
+import { SubstituentBuilders, type SubstituentBuilderContext } from "./substituent-builders";
+import { PolycyclicBuilders, type PolycyclicBuilderContext } from "./polycyclic-builders";
 
 export class MoleculeGraphBuilder
-  implements
-    RingBuilderContext,
-    SubstituentBuilderContext,
-    PolycyclicBuilderContext
+  implements RingBuilderContext, SubstituentBuilderContext, PolycyclicBuilderContext
 {
   private atoms: Array<{
     id: number;
@@ -114,9 +102,7 @@ export class MoleculeGraphBuilder
     if (atomIdx >= 0 && atomIdx < this.atoms.length) {
       const atom = this.atoms[atomIdx]!;
       if (process.env.VERBOSE) {
-        console.log(
-          `[builder] Saturating atom ${atomIdx} (${atom.symbol}) - removing aromaticity`,
-        );
+        console.log(`[builder] Saturating atom ${atomIdx} (${atom.symbol}) - removing aromaticity`);
       }
       atom.aromatic = false;
 
@@ -127,9 +113,7 @@ export class MoleculeGraphBuilder
         ) {
           bond.type = BondTypeEnum.SINGLE;
           if (process.env.VERBOSE) {
-            console.log(
-              `[builder] Converted bond ${bond.atom1}-${bond.atom2} to SINGLE`,
-            );
+            console.log(`[builder] Converted bond ${bond.atom1}-${bond.atom2} to SINGLE`);
           }
         }
       });
@@ -149,11 +133,7 @@ export class MoleculeGraphBuilder
     }
   }
 
-  addBond(
-    atom1: number,
-    atom2: number,
-    type: BondType = BondTypeEnum.SINGLE,
-  ): void {
+  addBond(atom1: number, atom2: number, type: BondType = BondTypeEnum.SINGLE): void {
     this.bonds.push({
       atom1,
       atom2,
@@ -213,11 +193,7 @@ export class MoleculeGraphBuilder
 
     if (atomIndices.length > 2) {
       const bondType = aromatic ? BondTypeEnum.AROMATIC : BondTypeEnum.SINGLE;
-      this.addBond(
-        atomIndices[atomIndices.length - 1]!,
-        atomIndices[0]!,
-        bondType,
-      );
+      this.addBond(atomIndices[atomIndices.length - 1]!, atomIndices[0]!, bondType);
     }
 
     return atomIndices;
@@ -417,9 +393,7 @@ export class MoleculeGraphBuilder
           ) {
             bond.type = BondTypeEnum.SINGLE;
             if (process.env.VERBOSE) {
-              console.log(
-                `[builder] Converted bond ${bond.atom1}-${bond.atom2} to SINGLE`,
-              );
+              console.log(`[builder] Converted bond ${bond.atom1}-${bond.atom2} to SINGLE`);
             }
           }
         });
@@ -431,14 +405,10 @@ export class MoleculeGraphBuilder
     this.deAromatizeNitrogensAdjacentToCarbonyls(atomIdx);
   }
 
-  private deAromatizeNitrogensAdjacentToCarbonyls(
-    carbonylCarbonIdx: number,
-  ): void {
+  private deAromatizeNitrogensAdjacentToCarbonyls(carbonylCarbonIdx: number): void {
     // Get all neighbors of this carbonyl carbon
     const neighbors = this.bonds
-      .filter(
-        (b) => b.atom1 === carbonylCarbonIdx || b.atom2 === carbonylCarbonIdx,
-      )
+      .filter((b) => b.atom1 === carbonylCarbonIdx || b.atom2 === carbonylCarbonIdx)
       .map((b) => (b.atom1 === carbonylCarbonIdx ? b.atom2 : b.atom1));
 
     // Check each nitrogen neighbor
@@ -700,9 +670,7 @@ export class MoleculeGraphBuilder
 
   addDoubleBond(atom1: number, atom2: number): void {
     const existingBond = this.bonds.find(
-      (b) =>
-        (b.atom1 === atom1 && b.atom2 === atom2) ||
-        (b.atom1 === atom2 && b.atom2 === atom1),
+      (b) => (b.atom1 === atom1 && b.atom2 === atom2) || (b.atom1 === atom2 && b.atom2 === atom1),
     );
 
     if (existingBond) {
@@ -714,9 +682,7 @@ export class MoleculeGraphBuilder
 
   addTripleBond(atom1: number, atom2: number): void {
     const existingBond = this.bonds.find(
-      (b) =>
-        (b.atom1 === atom1 && b.atom2 === atom2) ||
-        (b.atom1 === atom2 && b.atom2 === atom1),
+      (b) => (b.atom1 === atom1 && b.atom2 === atom2) || (b.atom1 === atom2 && b.atom2 === atom1),
     );
 
     if (existingBond) {
@@ -800,10 +766,7 @@ export class MoleculeGraphBuilder
     bridges: number[],
     heteroPositions: Map<number, string> = new Map(),
   ): number[] {
-    return this.polycyclicBuilder.createHeptacyclicStructure(
-      bridges,
-      heteroPositions,
-    );
+    return this.polycyclicBuilder.createHeptacyclicStructure(bridges, heteroPositions);
   }
 
   getAtomCount(): number {
@@ -826,9 +789,7 @@ export class MoleculeGraphBuilder
     this.amineNitrogenIndices = [];
   }
 
-  private checkAndDeAromatizeNeighboringHeteroatoms(
-    saturatedAtomIdx: number,
-  ): void {
+  private checkAndDeAromatizeNeighboringHeteroatoms(saturatedAtomIdx: number): void {
     // When an atom is saturated in a ring, we need to check if any aromatic heteroatoms
     // in the same ring system should also be de-aromatized because conjugation is broken.
     // E.g., in 3,4-dihydro-2H-quinoline, saturating C2, C3 and C4 breaks the aromatic system,
@@ -856,10 +817,7 @@ export class MoleculeGraphBuilder
 
           // Convert its aromatic bonds to single bonds
           this.bonds.forEach((bond) => {
-            if (
-              (bond.atom1 === i || bond.atom2 === i) &&
-              bond.type === BondTypeEnum.AROMATIC
-            ) {
+            if ((bond.atom1 === i || bond.atom2 === i) && bond.type === BondTypeEnum.AROMATIC) {
               bond.type = BondTypeEnum.SINGLE;
             }
           });

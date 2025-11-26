@@ -19,21 +19,11 @@ export class PhenoxyStrategy extends BaseSubstituentStrategy {
     this.log("Building phenoxy group");
     const baseAtoms = builder.createBenzeneRing();
 
-    for (const subst of ctx.substituentTokens.filter(
-      (s) => s.value !== "phenoxy",
-    )) {
-      const multiplier = builderContext.getMultiplierBeforeSubstituent(
-        subst,
-        ctx.multiplierTokens,
-      );
-      const count = multiplier
-        ? (multiplier.metadata?.count as number) || 1
-        : 1;
+    for (const subst of ctx.substituentTokens.filter((s) => s.value !== "phenoxy")) {
+      const multiplier = builderContext.getMultiplierBeforeSubstituent(subst, ctx.multiplierTokens);
+      const count = multiplier ? (multiplier.metadata?.count as number) || 1 : 1;
 
-      let locants = builderContext.getLocantsBeforeSubstituent(
-        subst,
-        ctx.locantTokens,
-      );
+      let locants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
 
       if (multiplier && locants.length < count) {
         const relevantLocants = ctx.locantTokens

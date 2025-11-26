@@ -44,13 +44,11 @@ export function generateCoordinatesV2(
   molecule: Molecule,
   options: GenerateOptions = {},
 ): Map<number, Vec2> {
-  const bondLength =
-    options.bondLength ?? DEFAULT_COORDINATE_OPTIONS.bondLength;
+  const bondLength = options.bondLength ?? DEFAULT_COORDINATE_OPTIONS.bondLength;
   const relaxIterations = options.relaxIterations ?? 0; // No relaxation to preserve terminal atom placement
   const resolveOverlapsEnabled = options.resolveOverlapsEnabled ?? true;
   const lockRingAtoms = options.lockRingAtoms ?? true;
-  const overlapResolutionIterations =
-    options.overlapResolutionIterations ?? 100;
+  const overlapResolutionIterations = options.overlapResolutionIterations ?? 100;
 
   // Initialize coordinate map
   const coords = new Map<number, Vec2>();
@@ -124,18 +122,12 @@ export function generateCoordinatesV2(
     }
 
     // If connected, position the system relative to the connecting bond
-    if (
-      connectedToPlaced &&
-      connectingBond?.fromCoord &&
-      connectingBond?.toCoord
-    ) {
+    if (connectedToPlaced && connectingBond?.fromCoord && connectingBond?.toCoord) {
       // Calculate angle from 'to' atom in system to center of system
       const centerX =
-        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.x, 0) /
-        systemCoords.size;
+        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.x, 0) / systemCoords.size;
       const centerY =
-        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.y, 0) /
-        systemCoords.size;
+        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.y, 0) / systemCoords.size;
 
       const angle = Math.atan2(
         centerY - connectingBond.toCoord.y,
@@ -314,9 +306,5 @@ export { detectFusedRingSystems } from "./ring-system-detector";
 export { placeFusedRingSystem } from "./fused-ring-placer";
 export { attachSubstituents } from "./substituent-placer";
 export { relaxCoordinates } from "./constrained-relaxer";
-export {
-  resolveOverlaps,
-  hasOverlaps,
-  getOverlapStats,
-} from "./overlap-resolver";
+export { resolveOverlaps, hasOverlaps, getOverlapStats } from "./overlap-resolver";
 export type { Vec2, CoordinateOptions, Ring, RingSystem } from "./types";

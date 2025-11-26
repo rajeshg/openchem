@@ -9,11 +9,7 @@ describe("Unsaturation basic naming", () => {
     // debug output
     console.log(
       "DEBUG ethene result:",
-      JSON.stringify(
-        { name: result.name, parent: result.parentStructure },
-        null,
-        2,
-      ),
+      JSON.stringify({ name: result.name, parent: result.parentStructure }, null, 2),
     );
     expect(result.name.toLowerCase()).toBe("ethene");
   });

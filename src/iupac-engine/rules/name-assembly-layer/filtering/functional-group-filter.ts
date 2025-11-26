@@ -1,8 +1,4 @@
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../../types";
 import type { NamingSubstituent } from "../../../naming/iupac-types";
 
 type FunctionalGroupExtended = FunctionalGroup & {
@@ -119,8 +115,7 @@ export function filterFunctionalGroupsByName(
       // Extract oxygen atom ID from functional group
       const fgAtomIds = new Set<number>();
       for (const atom of fgSub.atoms) {
-        const atomId =
-          atom && typeof atom === "object" && "id" in atom ? atom.id : atom;
+        const atomId = atom && typeof atom === "object" && "id" in atom ? atom.id : atom;
         if (typeof atomId === "number") {
           fgAtomIds.add(atomId);
         }
@@ -130,13 +125,9 @@ export function filterFunctionalGroupsByName(
       for (const parentSub of parentStructuralSubstituents) {
         if (parentSub.atoms && Array.isArray(parentSub.atoms)) {
           const parentSubAtomIds = new Set<number>(
-            parentSub.atoms.map((a) =>
-              typeof a === "object" && a !== null ? a.id : a,
-            ),
+            parentSub.atoms.map((a) => (typeof a === "object" && a !== null ? a.id : a)),
           );
-          const hasOverlap = Array.from(fgAtomIds).some((atomId) =>
-            parentSubAtomIds.has(atomId),
-          );
+          const hasOverlap = Array.from(fgAtomIds).some((atomId) => parentSubAtomIds.has(atomId));
           if (hasOverlap) {
             fgTypesToFilter.add(fgType);
             if (process.env.VERBOSE) {
@@ -166,8 +157,7 @@ export function filterFunctionalGroupsByName(
       // e.g., "oxy" in "hydroxy" vs "oxy" in "2,2-dimethylpropylsulfonylsulfinyl"
       if (
         parentSubName.length > 10 &&
-        (parentSubName.includes(fgType) ||
-          (fgPrefix && parentSubName.includes(fgPrefix)))
+        (parentSubName.includes(fgType) || (fgPrefix && parentSubName.includes(fgPrefix)))
       ) {
         fgTypesToFilter.add(fgType);
         if (process.env.VERBOSE) {

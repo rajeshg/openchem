@@ -56,10 +56,7 @@ export class SMILESTokenizer {
     }
 
     if (c === "%") {
-      if (
-        this.i + 2 < s.length &&
-        /^\d{2}$/.test(s.slice(this.i + 1, this.i + 3))
-      ) {
+      if (this.i + 2 < s.length && /^\d{2}$/.test(s.slice(this.i + 1, this.i + 3))) {
         const value = s.slice(this.i + 1, this.i + 3);
         this.i += 3;
         return { type: "RING", value, position: this.i - 3 };
@@ -71,8 +68,7 @@ export class SMILESTokenizer {
       const start = this.i;
       let j = this.i + 1;
       while (j < s.length && s[j] !== "]") j++;
-      if (j >= s.length)
-        throw new Error(`Unclosed bracket at position ${this.i}`);
+      if (j >= s.length) throw new Error(`Unclosed bracket at position ${this.i}`);
       const value = s.slice(this.i + 1, j);
       this.i = j + 1;
       return { type: "ATOM", value, position: start };
@@ -81,11 +77,7 @@ export class SMILESTokenizer {
     if (/[A-Za-z]/.test(c)) {
       const start = this.i;
       let symbol = c;
-      if (
-        c === c.toUpperCase() &&
-        this.i + 1 < s.length &&
-        /[a-z]/.test(s[this.i + 1]!)
-      ) {
+      if (c === c.toUpperCase() && this.i + 1 < s.length && /[a-z]/.test(s[this.i + 1]!)) {
         symbol = c + s[this.i + 1]!;
         this.i += 2;
       } else {

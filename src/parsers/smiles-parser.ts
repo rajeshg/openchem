@@ -1,10 +1,6 @@
 import type { Atom, Bond, Molecule, ParseResult, ParseError } from "types";
 import { BondType, StereoType } from "types";
-import {
-  ATOMIC_NUMBERS,
-  DEFAULT_VALENCES,
-  AROMATIC_VALENCES,
-} from "src/constants";
+import { ATOMIC_NUMBERS, DEFAULT_VALENCES, AROMATIC_VALENCES } from "src/constants";
 import { createAtom } from "src/utils/atom-utils";
 import { validateAromaticity } from "src/validators/aromaticity-validator";
 import { validateValences } from "src/validators/valence-validator";
@@ -33,10 +29,7 @@ interface TimingMetrics {
   total: number;
 }
 
-export function parseSMILES(
-  smiles: string,
-  timings?: TimingMetrics,
-): ParseResult {
+export function parseSMILES(smiles: string, timings?: TimingMetrics): ParseResult {
   const errors: ParseError[] = [];
   const molecules: Molecule[] = [];
 
@@ -59,8 +52,7 @@ function parseSingleSMILES(
   const errors: ParseError[] = [];
   let atoms: MutableAtom[] = [];
   let bonds: MutableBond[] = [];
-  const t0 =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const t0 = typeof performance !== "undefined" ? performance.now() : Date.now();
   let atomId = 0;
   const explicitBonds = new Set<string>();
 
@@ -85,8 +77,7 @@ function parseSingleSMILES(
     }[]
   >();
 
-  const tTokenizeStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tTokenizeStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   while (i < smiles.length) {
     const ch = smiles[i]!;
 
@@ -124,8 +115,7 @@ function parseSingleSMILES(
           type: pendingBondType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit)
-          explicitBonds.add(bondKey(prevAtomId, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
@@ -155,8 +145,7 @@ function parseSingleSMILES(
           type: pendingBondType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit)
-          explicitBonds.add(bondKey(prevAtomId, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
@@ -179,11 +168,7 @@ function parseSingleSMILES(
     // Organic atoms (handle two-letter like Cl, Br)
     if (/[A-Za-z]/.test(ch)) {
       let symbol = ch;
-      if (
-        ch === ch.toUpperCase() &&
-        i + 1 < smiles.length &&
-        /[a-z]/.test(smiles[i + 1]!)
-      ) {
+      if (ch === ch.toUpperCase() && i + 1 < smiles.length && /[a-z]/.test(smiles[i + 1]!)) {
         const twoLetter = ch + smiles[i + 1]!;
         const nextChar = smiles[i + 1]!;
         const singleLetterUpper = ch.toUpperCase();
@@ -195,8 +180,7 @@ function parseSingleSMILES(
           /^[CNOSPB]$/.test(singleLetterUpper)
         ) {
           const charAfterNext = i + 2 < smiles.length ? smiles[i + 2]! : "";
-          const followedByAtomContext =
-            charAfterNext !== "" && /^[0-9=#/$@(]/.test(charAfterNext);
+          const followedByAtomContext = charAfterNext !== "" && /^[0-9=#/$@(]/.test(charAfterNext);
           shouldSplit = followedByAtomContext;
         }
         if (twoLetterIsValid && !shouldSplit) {
@@ -213,13 +197,7 @@ function parseSingleSMILES(
       }
       const isAromaticOrganic = /^[bcnops]$/.test(symbol);
       const aromatic = isAromaticOrganic;
-      const atom = createAtom(
-        symbol,
-        atomId++,
-        aromatic,
-        false,
-        0,
-      ) as MutableAtom | null;
+      const atom = createAtom(symbol, atomId++, aromatic, false, 0) as MutableAtom | null;
       if (!atom) {
         errors.push({ message: `Unknown atom symbol: ${symbol}`, position: i });
         i++;
@@ -233,8 +211,7 @@ function parseSingleSMILES(
           type: pendingBondType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit)
-          explicitBonds.add(bondKey(prevAtomId, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
@@ -374,8 +351,7 @@ function parseSingleSMILES(
     i++;
   }
 
-  const tTokenizeEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tTokenizeEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.tokenize += tTokenizeEnd - tTokenizeStart;
   // Post-process ring closures
   for (const [digit, entries] of bookmarks) {
@@ -412,10 +388,7 @@ function parseSingleSMILES(
       let bondStereo: StereoType = StereoType.NONE;
       let isExplicit = false;
 
-      if (
-        first.bondType !== BondType.SINGLE &&
-        second.bondType !== BondType.SINGLE
-      ) {
+      if (first.bondType !== BondType.SINGLE && second.bondType !== BondType.SINGLE) {
         if (first.bondType !== second.bondType) {
           errors.push({
             message: `Ring closure ${digit} has conflicting bond types`,
@@ -455,8 +428,7 @@ function parseSingleSMILES(
   if (branchStack.length > 0)
     errors.push({ message: "Unmatched opening parentheses", position: -1 });
 
-  const tBuildGraphStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tBuildGraphStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   // Build O(1) lookup structures for atoms and bonds
   const atomMap = new Map<number, MutableAtom>();
   for (const atom of atoms) {
@@ -485,11 +457,7 @@ function parseSingleSMILES(
     // Find stereo single bond attached to atom a (but not to b)
     const bondsAtA = adjacency.get(a) || [];
     for (const bx of bondsAtA) {
-      if (
-        bx.type === BondType.SINGLE &&
-        bx.stereo &&
-        bx.stereo !== StereoType.NONE
-      ) {
+      if (bx.type === BondType.SINGLE && bx.stereo && bx.stereo !== StereoType.NONE) {
         const other = bx.atom1 === a ? bx.atom2 : bx.atom1;
         if (other !== b) {
           singleA = bx;
@@ -501,11 +469,7 @@ function parseSingleSMILES(
     // Find stereo single bond attached to atom b (but not to a)
     const bondsAtB = adjacency.get(b) || [];
     for (const bx of bondsAtB) {
-      if (
-        bx.type === BondType.SINGLE &&
-        bx.stereo &&
-        bx.stereo !== StereoType.NONE
-      ) {
+      if (bx.type === BondType.SINGLE && bx.stereo && bx.stereo !== StereoType.NONE) {
         const other = bx.atom1 === b ? bx.atom2 : bx.atom1;
         if (other !== a) {
           singleB = bx;
@@ -514,8 +478,7 @@ function parseSingleSMILES(
       }
     }
 
-    if (singleA && singleB && singleA.stereo === singleB.stereo)
-      bd.stereo = singleA.stereo;
+    if (singleA && singleB && singleA.stereo === singleB.stereo) bd.stereo = singleA.stereo;
   }
 
   // Aromatic bond detection: O(N) with O(1) atom lookup
@@ -566,8 +529,7 @@ function parseSingleSMILES(
       } else {
         // Use aromatic valences for aromatic atoms, default valences otherwise
         const defaultValences = atom.aromatic
-          ? AROMATIC_VALENCES[atom.symbol] ||
-            DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]
+          ? AROMATIC_VALENCES[atom.symbol] || DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber]
           : DEFAULT_VALENCES[atom.symbol] || [atom.atomicNumber];
         // Per OpenSMILES spec: if bond sum equals a known valence or exceeds all known valences, H count = 0
         // Otherwise H count = (next highest known valence) - bond sum
@@ -583,81 +545,58 @@ function parseSingleSMILES(
               break;
             }
           }
-          atom.hydrogens = Math.max(
-            0,
-            targetValence + (atom.charge || 0) - bondOrderSum,
-          );
+          atom.hydrogens = Math.max(0, targetValence + (atom.charge || 0) - bondOrderSum);
         }
       }
     }
   }
 
-  const tBuildGraphEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tBuildGraphEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.buildGraph += tBuildGraphEnd - tBuildGraphStart;
 
   const mol: Molecule = { atoms: atoms as Atom[], bonds: bonds as Bond[] };
   const mg = new MoleculeGraph(mol);
 
   // Validate aromaticity
-  const tAromStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
-  const validatedArom = validateAromaticity(
-    atoms,
-    bonds,
-    errors,
-    explicitBonds,
-    mg,
-  );
-  const tAromEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tAromStart = typeof performance !== "undefined" ? performance.now() : Date.now();
+  const validatedArom = validateAromaticity(atoms, bonds, errors, explicitBonds, mg);
+  const tAromEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.validateAromaticity += tAromEnd - tAromStart;
   atoms = validatedArom.atoms;
   bonds = validatedArom.bonds;
 
-  const tValenceStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tValenceStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   validateValences(atoms, bonds, errors);
-  const tValenceEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tValenceEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.validateValences += tValenceEnd - tValenceStart;
 
-  const tStereoStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tStereoStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   validateStereochemistry(atoms, bonds, errors);
-  const tStereoEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tStereoEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.validateStereo += tStereoEnd - tStereoStart;
 
   // Perceive aromaticity (only once, after validation) - reuse MoleculeGraph
-  const tPerceiveAromStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tPerceiveAromStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   const { atoms: aromaticAtoms, bonds: aromaticBonds } = perceiveAromaticity(
     atoms as Atom[],
     bonds as Bond[],
     mg,
   );
-  const tPerceiveAromEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
-  if (timings)
-    timings.perceiveAromaticity += tPerceiveAromEnd - tPerceiveAromStart;
+  const tPerceiveAromEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
+  if (timings) timings.perceiveAromaticity += tPerceiveAromEnd - tPerceiveAromStart;
 
   // Enrich molecule using aromaticity-perceived atoms/bonds - reuse MoleculeGraph
-  const tEnrichStart =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tEnrichStart = typeof performance !== "undefined" ? performance.now() : Date.now();
   const enrichedMol = {
     atoms: aromaticAtoms as Atom[],
     bonds: aromaticBonds as Bond[],
   };
   const molecule = enrichMolecule(enrichedMol, mg);
-  const tEnrichEnd =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const tEnrichEnd = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (timings) timings.enrichMolecule += tEnrichEnd - tEnrichStart;
 
   if (timings)
-    timings.total +=
-      (typeof performance !== "undefined" ? performance.now() : Date.now()) -
-      t0;
+    timings.total += (typeof performance !== "undefined" ? performance.now() : Date.now()) - t0;
 
   return { molecule, errors };
 }

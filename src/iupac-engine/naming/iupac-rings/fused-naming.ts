@@ -3,13 +3,9 @@ import { matchSMARTS } from "src/matchers/smarts-matcher";
 import { isRingAromatic } from "./aromatic-naming";
 import { findHeteroatomsInRing } from "./utils";
 
-export function identifyPolycyclicPattern(
-  rings: number[][],
-  molecule: Molecule,
-): string | null {
+export function identifyPolycyclicPattern(rings: number[][], molecule: Molecule): string | null {
   const allRingAtoms = new Set<number>();
-  for (const ring of rings)
-    for (const atomIdx of ring) allRingAtoms.add(atomIdx);
+  for (const ring of rings) for (const atomIdx of ring) allRingAtoms.add(atomIdx);
 
   let ringBonds = 0;
   for (const bond of molecule.bonds) {
@@ -28,11 +24,7 @@ export function identifyPolycyclicPattern(
 
   // Check for retained PAH names FIRST (before early return for complex systems)
   // These are IUPAC retained names that must be recognized regardless of SSSR rank
-  if (
-    ringCount === 4 &&
-    ringSizes.every((size) => size === 6) &&
-    heteroAtoms.length === 0
-  ) {
+  if (ringCount === 4 && ringSizes.every((size) => size === 6) && heteroAtoms.length === 0) {
     return "pyrene";
   }
 
@@ -52,9 +44,7 @@ export function identifyPolycyclicPattern(
     const strict = isRingAromatic(r, molecule);
     if (strict) return true;
     // fall back: count aromatic atoms
-    const aroCount = r.filter(
-      (idx) => molecule.atoms[idx]?.aromatic === true,
-    ).length;
+    const aroCount = r.filter((idx) => molecule.atoms[idx]?.aromatic === true).length;
     return aroCount >= Math.floor(r.length / 2);
   });
   const _allRingsAromatic = perRingAromatic.every(Boolean);
@@ -68,16 +58,8 @@ export function identifyPolycyclicPattern(
       "c1ccc2[n]cc2c1",
       "n1cc2ccccc2c1",
     ];
-    const benzofuranSmarts = [
-      "c1ccc2oc(c1)c2",
-      "c1ccc2[o]c(c1)c2",
-      "o1ccc2ccccc2c1",
-    ];
-    const benzothioSmarts = [
-      "c1ccc2sc(c1)c2",
-      "c1ccc2[s]c(c1)c2",
-      "s1ccc2ccccc2c1",
-    ];
+    const benzofuranSmarts = ["c1ccc2oc(c1)c2", "c1ccc2[o]c(c1)c2", "o1ccc2ccccc2c1"];
+    const benzothioSmarts = ["c1ccc2sc(c1)c2", "c1ccc2[s]c(c1)c2", "s1ccc2ccccc2c1"];
     if (
       indoleSmarts.some((s) => {
         try {
@@ -124,21 +106,12 @@ export function identifyPolycyclicPattern(
         else if (b.atom2 === atomIdx) acc.push(b.atom1);
         return acc;
       }, []);
-      if (
-        neighbors.length === 2 &&
-        neighbors.every((n) => molecule.atoms[n]?.symbol === "C")
-      ) {
+      if (neighbors.length === 2 && neighbors.every((n) => molecule.atoms[n]?.symbol === "C")) {
         // look for rings that include N or its neighbors
         const ringsWithN = rings.filter((r) => r.includes(atomIdx));
-        const ringsWithNeighbors = rings.filter((r) =>
-          r.some((a) => neighbors.includes(a)),
-        );
+        const ringsWithNeighbors = rings.filter((r) => r.some((a) => neighbors.includes(a)));
         if (ringsWithN.length > 0 && ringsWithNeighbors.length > 0) {
-          const sizes = [
-            ...new Set(
-              ringsWithN.concat(ringsWithNeighbors).map((r) => r.length),
-            ),
-          ];
+          const sizes = [...new Set(ringsWithN.concat(ringsWithNeighbors).map((r) => r.length))];
           if (sizes.includes(5) && sizes.includes(6)) return "indole";
           // fallback: decomposition sometimes yields 4+7 for a 5+6 system
           if (sizes.includes(4) && sizes.includes(7)) return "indole";
@@ -171,12 +144,7 @@ export function identifyPolycyclicPattern(
             const node = p[p.length - 1]!;
             if (node === b && p.length === 4) return "indole";
             for (const bo of molecule.bonds) {
-              const nbr =
-                bo.atom1 === node
-                  ? bo.atom2
-                  : bo.atom2 === node
-                    ? bo.atom1
-                    : -1;
+              const nbr = bo.atom1 === node ? bo.atom2 : bo.atom2 === node ? bo.atom1 : -1;
               if (nbr >= 0 && !seen.has(nbr)) {
                 seen.add(nbr);
                 q.push(p.concat([nbr]));
@@ -202,9 +170,7 @@ export function identifyPolycyclicPattern(
         // it's likely an indole-like 5+6 fusion even if sizes got distorted
         if (shared.length >= 2) {
           const r1HasN = r1.some((idx) => molecule.atoms[idx]?.symbol === "N");
-          const r2Carbons = r2.filter(
-            (idx) => molecule.atoms[idx]?.symbol === "C",
-          ).length;
+          const r2Carbons = r2.filter((idx) => molecule.atoms[idx]?.symbol === "C").length;
           if (r1HasN && r2Carbons >= 5) return "indole";
         }
       }
@@ -219,28 +185,19 @@ export function identifyPolycyclicPattern(
     if (nCount === 1 && oCount === 0 && sCount === 0) {
       // Check if N is in 5-membered ring
       const fiveRing = rings.find((r) => r.length === 5);
-      if (
-        fiveRing &&
-        fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "N")
-      ) {
+      if (fiveRing && fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "N")) {
         return "indole";
       }
     }
     if (oCount === 1 && nCount === 0 && sCount === 0) {
       const fiveRing = rings.find((r) => r.length === 5);
-      if (
-        fiveRing &&
-        fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "O")
-      ) {
+      if (fiveRing && fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "O")) {
         return "benzofuran";
       }
     }
     if (sCount === 1 && nCount === 0 && oCount === 0) {
       const fiveRing = rings.find((r) => r.length === 5);
-      if (
-        fiveRing &&
-        fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "S")
-      ) {
+      if (fiveRing && fiveRing.some((idx) => molecule.atoms[idx]?.symbol === "S")) {
         return "benzothiophene";
       }
     }
@@ -251,11 +208,7 @@ export function identifyPolycyclicPattern(
   const aromaticRingCount = perRingAromatic.filter(Boolean).length;
   if (aromaticRingCount === 0) return null;
 
-  if (
-    ringCount === 2 &&
-    ringSizes.every((s) => s === 6) &&
-    heteroAtoms.length === 0
-  ) {
+  if (ringCount === 2 && ringSizes.every((s) => s === 6) && heteroAtoms.length === 0) {
     // Distinguish fused naphthalene (rings share atoms) from biphenyl
     const r1 = rings[0]!;
     const r2 = rings[1]!;
@@ -277,9 +230,7 @@ export function identifyPolycyclicPattern(
       // Check if there's exactly one non-aromatic carbon in the 5-membered ring (CH2 bridge)
       const fiveRing = rings.find((r) => r.length === 5);
       if (fiveRing) {
-        const nonAromaticInFiveRing = fiveRing.filter(
-          (idx) => !molecule.atoms[idx]?.aromatic,
-        );
+        const nonAromaticInFiveRing = fiveRing.filter((idx) => !molecule.atoms[idx]?.aromatic);
         if (nonAromaticInFiveRing.length === 1 && aromaticRingCount >= 2) {
           return "fluorene";
         }
@@ -287,18 +238,13 @@ export function identifyPolycyclicPattern(
     }
   }
 
-  if (
-    ringCount === 3 &&
-    ringSizes.every((s) => s === 6) &&
-    heteroAtoms.length === 0
-  ) {
+  if (ringCount === 3 && ringSizes.every((s) => s === 6) && heteroAtoms.length === 0) {
     const sharedAtoms = rings.map((ring: number[], i: number) => {
       if (i === rings.length - 1) return [] as number[];
       return ring.filter((idx: number) => (rings[i + 1] ?? []).includes(idx));
     });
     // If at least two rings are aromatic (tolerant) and adjacency matches linear pattern
-    if (aromaticRingCount >= 2 && sharedAtoms.every((arr) => arr.length === 2))
-      return "anthracene";
+    if (aromaticRingCount >= 2 && sharedAtoms.every((arr) => arr.length === 2)) return "anthracene";
     // If most ring atoms are aromatic and counts match phenanthrene-like topology
     if (aromaticRingCount >= 2) return "phenanthrene";
     return null;
@@ -307,21 +253,11 @@ export function identifyPolycyclicPattern(
   if (ringCount === 3 && heteroAtoms.length === 0) {
     const totalRingAtomCount = Array.from(new Set(rings.flat())).length;
     // Phenanthrene has 14 carbons in the fused ring system; allow tolerant aromatic check
-    const aromaticAtomCount = ringAtoms.filter(
-      (a) => a.aromatic === true,
-    ).length;
-    if (
-      totalRingAtomCount === 14 &&
-      aromaticAtomCount >= Math.floor(ringAtoms.length * 0.7)
-    )
+    const aromaticAtomCount = ringAtoms.filter((a) => a.aromatic === true).length;
+    if (totalRingAtomCount === 14 && aromaticAtomCount >= Math.floor(ringAtoms.length * 0.7))
       return "phenanthrene";
   }
-  if (
-    ringCount === 2 &&
-    ringSizes.includes(5) &&
-    ringSizes.includes(7) &&
-    heteroAtoms.length === 0
-  )
+  if (ringCount === 2 && ringSizes.includes(5) && ringSizes.includes(7) && heteroAtoms.length === 0)
     return "azulene";
 
   // Conservative fallback: sometimes SSSR returns non-6 ring sizes for linear/angled
@@ -330,9 +266,7 @@ export function identifyPolycyclicPattern(
   // anthracene/phenanthrene by adjacency topology.
   if (ringCount === 3 && heteroAtoms.length === 0) {
     const distinctAtomCount = Array.from(new Set(rings.flat())).length;
-    const aromaticAtomCount = ringAtoms.filter(
-      (a) => a.aromatic === true,
-    ).length;
+    const aromaticAtomCount = ringAtoms.filter((a) => a.aromatic === true).length;
     if (
       distinctAtomCount >= 12 &&
       distinctAtomCount <= 16 &&
@@ -361,29 +295,20 @@ export function identifyPolycyclicPattern(
   return null;
 }
 
-export function identifyAdvancedFusedPattern(
-  rings: number[][],
-  molecule: Molecule,
-): string | null {
+export function identifyAdvancedFusedPattern(rings: number[][], molecule: Molecule): string | null {
   const allRingAtoms = new Set<number>();
-  for (const ring of rings)
-    for (const atomIdx of ring) allRingAtoms.add(atomIdx);
+  for (const ring of rings) for (const atomIdx of ring) allRingAtoms.add(atomIdx);
   const ringAtoms = Array.from(allRingAtoms)
     .map((idx) => molecule.atoms[idx])
     .filter((a): a is (typeof molecule.atoms)[0] => a !== undefined);
-  const _heteroAtoms = findHeteroatomsInRing(
-    Array.from(allRingAtoms),
-    molecule,
-  );
+  const _heteroAtoms = findHeteroatomsInRing(Array.from(allRingAtoms), molecule);
   const ringCount = rings.length;
   const ringSizes = rings.map((r) => r.length).sort((a, b) => a - b);
 
   // Check if rings are truly fused (share atoms) vs just connected
   const areRingsFused =
     rings.length >= 2 &&
-    rings.some((r1, i) =>
-      rings.slice(i + 1).some((r2) => r1.some((atom) => r2.includes(atom))),
-    );
+    rings.some((r1, i) => rings.slice(i + 1).some((r2) => r1.some((atom) => r2.includes(atom))));
 
   // Heuristic: try to reconstruct a 5-membered cycle around an N atom even if
   // decomposition produced noisy ring sizes. This helps detect indole when
@@ -411,8 +336,7 @@ export function identifyAdvancedFusedPattern(
         const node = p[p.length - 1]!;
         if (node === b && p.length === 4) return "indole";
         for (const bo of molecule.bonds) {
-          const nbr =
-            bo.atom1 === node ? bo.atom2 : bo.atom2 === node ? bo.atom1 : -1;
+          const nbr = bo.atom1 === node ? bo.atom2 : bo.atom2 === node ? bo.atom1 : -1;
           if (nbr >= 0 && !seen.has(nbr)) {
             seen.add(nbr);
             q.push(p.concat([nbr]));
@@ -422,12 +346,7 @@ export function identifyAdvancedFusedPattern(
     }
   }
   // Only apply these heuristics if rings are actually fused (share atoms)
-  if (
-    areRingsFused &&
-    ringCount === 2 &&
-    ringSizes.includes(5) &&
-    ringSizes.includes(6)
-  ) {
+  if (areRingsFused && ringCount === 2 && ringSizes.includes(5) && ringSizes.includes(6)) {
     // More deterministic detection: locate 5- and 6-member rings explicitly
     const fiveRing = rings.find((r: number[]) => r.length === 5);
     const sixRing = rings.find((r: number[]) => r.length === 6);
@@ -438,15 +357,9 @@ export function identifyAdvancedFusedPattern(
     const uniqueAtomCount = allRingAtoms.size;
 
     if (fiveRing) {
-      const nIdx = fiveRing.find(
-        (idx: number) => molecule.atoms[idx]?.symbol === "N",
-      );
-      const oIdx = fiveRing.find(
-        (idx: number) => molecule.atoms[idx]?.symbol === "O",
-      );
-      const sIdx = fiveRing.find(
-        (idx: number) => molecule.atoms[idx]?.symbol === "S",
-      );
+      const nIdx = fiveRing.find((idx: number) => molecule.atoms[idx]?.symbol === "N");
+      const oIdx = fiveRing.find((idx: number) => molecule.atoms[idx]?.symbol === "O");
+      const sIdx = fiveRing.find((idx: number) => molecule.atoms[idx]?.symbol === "S");
       // Only identify as indole if we have exactly 9 unique atoms
       if (nIdx !== undefined && uniqueAtomCount === 9) return "indole";
       if (oIdx !== undefined) return "benzofuran";
@@ -455,9 +368,7 @@ export function identifyAdvancedFusedPattern(
     // If the heteroatom is in the six-membered ring, check for quinoline
     // Quinoline has 10 unique atoms (6-membered pyridine + 6-membered benzene)
     if (sixRing) {
-      const nIdx6 = sixRing.find(
-        (idx: number) => molecule.atoms[idx]?.symbol === "N",
-      );
+      const nIdx6 = sixRing.find((idx: number) => molecule.atoms[idx]?.symbol === "N");
       if (nIdx6 !== undefined && uniqueAtomCount === 10) return "quinoline";
     }
   }

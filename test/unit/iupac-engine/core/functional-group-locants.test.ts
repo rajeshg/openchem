@@ -19,8 +19,7 @@ describe("Functional group locants and trace metadata", () => {
 
     // All locants should be numeric; if parent locants are available, they should map within range
     const parentSize =
-      result.parentStructure?.locants &&
-      result.parentStructure.locants.length > 0
+      result.parentStructure?.locants && result.parentStructure.locants.length > 0
         ? result.parentStructure.locants.length
         : result.parentStructure?.chain?.atoms?.length || 0;
     for (const g of result.functionalGroups) {
@@ -52,9 +51,7 @@ describe("Functional group locants and trace metadata", () => {
     expect(acid?.locants.every((l) => typeof l === "number")).toBeTruthy();
     if ((result.parentStructure?.locants || []).length > 0) {
       expect(
-        acid?.locants.every(
-          (l) => l >= 1 && l <= result.parentStructure!.locants.length,
-        ),
+        acid?.locants.every((l) => l >= 1 && l <= result.parentStructure!.locants.length),
       ).toBeTruthy();
     }
     expect(acid?.suffix).toBeTruthy();
@@ -69,9 +66,7 @@ describe("Functional group locants and trace metadata", () => {
       expect(Array.isArray(result.functionalGroupTrace)).toBeTruthy();
       expect(result.functionalGroupTrace.length).toBeGreaterThan(0);
       for (const t of result.functionalGroupTrace || []) {
-        expect(
-          typeof t.pattern === "string" || typeof t.type === "string",
-        ).toBeTruthy();
+        expect(typeof t.pattern === "string" || typeof t.type === "string").toBeTruthy();
         expect(Array.isArray(t.atomIds)).toBeTruthy();
       }
     }
@@ -85,9 +80,7 @@ describe("Functional group locants and trace metadata", () => {
 
     // Verify that the alkoxy group has the correct locant (4, not 8)
     // Alkoxy groups are stored as substituents in parentStructure.substituents
-    const alkoxy = result.parentStructure?.substituents?.find(
-      (s: any) => s.type === "alkoxy",
-    );
+    const alkoxy = result.parentStructure?.substituents?.find((s: any) => s.type === "alkoxy");
     expect(alkoxy).toBeDefined();
     expect(alkoxy?.position).toBe("4");
     expect(alkoxy?.name).toBe("methoxy");

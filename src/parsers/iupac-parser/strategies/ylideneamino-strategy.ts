@@ -16,12 +16,8 @@ export class YlideneaminoStrategy extends BaseSubstituentStrategy {
       return false;
     }
 
-    const hasYlideneSubst = ctx.substituentTokens.some(
-      (s) => s.value === "ylidene",
-    );
-    const hasAminoSubst = ctx.substituentTokens.some(
-      (s) => s.value === "amino",
-    );
+    const hasYlideneSubst = ctx.substituentTokens.some((s) => s.value === "ylidene");
+    const hasAminoSubst = ctx.substituentTokens.some((s) => s.value === "amino");
     const hasAnSuffix = ctx.suffixTokens.some((s) => s.value === "an");
 
     return hasYlideneSubst && hasAminoSubst && hasAnSuffix;
@@ -36,28 +32,20 @@ export class YlideneaminoStrategy extends BaseSubstituentStrategy {
     const smiles = parentToken.metadata?.smiles as string;
     const chainLength = smiles ? smiles.length : 1;
 
-    this.log(
-      `Building ylideneamino with ${chainLength}-carbon chain from ${parentToken.value}`,
-    );
+    this.log(`Building ylideneamino with ${chainLength}-carbon chain from ${parentToken.value}`);
 
     // Create the main carbon chain
     const chainAtoms = builder.createLinearChain(chainLength);
 
     // Find locant for the ylidene position (where the double bond is)
-    const ylideneSubst = ctx.substituentTokens.find(
-      (s) => s.value === "ylidene",
-    )!;
+    const ylideneSubst = ctx.substituentTokens.find((s) => s.value === "ylidene")!;
     const ylideneLocants = builderContext.getLocantsBeforeSubstituent(
       ylideneSubst,
       ctx.locantTokens,
     );
     const ylidenePosition = ylideneLocants.length > 0 ? ylideneLocants[0]! : 1;
 
-    const ylideneAtomIdx = builderContext.locantToAtomIndex(
-      ylidenePosition,
-      chainAtoms,
-      false,
-    );
+    const ylideneAtomIdx = builderContext.locantToAtomIndex(ylidenePosition, chainAtoms, false);
 
     if (ylideneAtomIdx === null) {
       return null;
@@ -72,9 +60,7 @@ export class YlideneaminoStrategy extends BaseSubstituentStrategy {
     const nh2Idx = builder.addAtom("N");
     builder.addBond(nIdx, nh2Idx);
 
-    this.log(
-      `Created ylideneamino at position ${ylidenePosition}: C=${nIdx}-NH2`,
-    );
+    this.log(`Created ylideneamino at position ${ylidenePosition}: C=${nIdx}-NH2`);
 
     // Return: nh2Idx (the NH2 group) is where this attaches to the main ring
     return {

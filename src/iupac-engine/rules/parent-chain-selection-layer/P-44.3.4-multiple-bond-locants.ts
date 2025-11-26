@@ -24,8 +24,7 @@ export const P44_3_4_MULTIPLE_BOND_LOCANTS_RULE: IUPACRule = {
       !!context.getState().p44_3_3_applied &&
       chains.every(
         (chain) =>
-          chain.multipleBonds.filter((bond) => bond.type === "double")
-            .length === maxDoubleBonds,
+          chain.multipleBonds.filter((bond) => bond.type === "double").length === maxDoubleBonds,
       ) &&
       !context.getState().p44_3_4_applied &&
       !context.getState().parentStructure
@@ -39,8 +38,7 @@ export const P44_3_4_MULTIPLE_BOND_LOCANTS_RULE: IUPACRule = {
         {
           ruleId: "P-44.3.4",
           conflictType: "state_inconsistency",
-          description:
-            "No candidate chains found for multiple bond locant selection",
+          description: "No candidate chains found for multiple bond locant selection",
           context: { chains },
         },
         "P-44.3.4",

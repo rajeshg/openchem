@@ -16,12 +16,10 @@ export function nameAlkylSulfanylSubstituent(
   const oxygenDoubleBonds = molecule.bonds
     .filter(
       (bond) =>
-        (bond.atom1 === sulfurAtomIdx || bond.atom2 === sulfurAtomIdx) &&
-        bond.type === "double",
+        (bond.atom1 === sulfurAtomIdx || bond.atom2 === sulfurAtomIdx) && bond.type === "double",
     )
     .filter((bond) => {
-      const otherAtomId =
-        bond.atom1 === sulfurAtomIdx ? bond.atom2 : bond.atom1;
+      const otherAtomId = bond.atom1 === sulfurAtomIdx ? bond.atom2 : bond.atom1;
       return molecule.atoms[otherAtomId]?.symbol === "O";
     });
 
@@ -45,9 +43,7 @@ export function nameAlkylSulfanylSubstituent(
   );
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameAlkylSulfanylSubstituent] carbonAtoms=${carbonAtoms.join(",")}`,
-    );
+    console.log(`[nameAlkylSulfanylSubstituent] carbonAtoms=${carbonAtoms.join(",")}`);
   }
 
   if (carbonAtoms.length === 0) {
@@ -67,9 +63,7 @@ export function nameAlkylSulfanylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameAlkylSulfanylSubstituent] carbonAttachedToS=${carbonAttachedToS}`,
-    );
+    console.log(`[nameAlkylSulfanylSubstituent] carbonAttachedToS=${carbonAttachedToS}`);
   }
 
   if (carbonAttachedToS === -1) {
@@ -84,9 +78,7 @@ export function nameAlkylSulfanylSubstituent(
       );
     }
 
-    const ringContainingCarbon = molecule.rings?.find((ring) =>
-      ring.includes(carbonAttachedToS),
-    );
+    const ringContainingCarbon = molecule.rings?.find((ring) => ring.includes(carbonAttachedToS));
 
     if (ringContainingCarbon) {
       const ringSize = ringContainingCarbon.length;
@@ -103,16 +95,12 @@ export function nameAlkylSulfanylSubstituent(
         });
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[nameAlkylSulfanylSubstituent] All carbons in ring: ${allCarbons}`,
-          );
+          console.log(`[nameAlkylSulfanylSubstituent] All carbons in ring: ${allCarbons}`);
         }
 
         if (allCarbons) {
           if (process.env.VERBOSE) {
-            console.log(
-              `[nameAlkylSulfanylSubstituent] ✓ RETURNING phenyl${sulfurSuffix}`,
-            );
+            console.log(`[nameAlkylSulfanylSubstituent] ✓ RETURNING phenyl${sulfurSuffix}`);
           }
           return `phenyl${sulfurSuffix}`;
         }
@@ -131,11 +119,7 @@ export function nameAlkylSulfanylSubstituent(
     carbonChain.push(current);
 
     for (const bond of molecule.bonds) {
-      if (
-        bond.atom1 === current &&
-        carbonAtoms.includes(bond.atom2) &&
-        !visited.has(bond.atom2)
-      ) {
+      if (bond.atom1 === current && carbonAtoms.includes(bond.atom2) && !visited.has(bond.atom2)) {
         stack.push(bond.atom2);
       } else if (
         bond.atom2 === current &&
@@ -163,9 +147,7 @@ export function nameAlkylSulfanylSubstituent(
     for (let j = i + 1; j < carbonChain.length; j++) {
       const c2 = carbonChain[j];
       const bond = molecule.bonds.find(
-        (b) =>
-          (b.atom1 === c1 && b.atom2 === c2) ||
-          (b.atom1 === c2 && b.atom2 === c1),
+        (b) => (b.atom1 === c1 && b.atom2 === c2) || (b.atom1 === c2 && b.atom2 === c1),
       );
       if (bond) {
         if (bond.type === "triple") {
@@ -199,10 +181,7 @@ export function nameAlkylSulfanylSubstituent(
   for (const bond of molecule.bonds) {
     if (bond.atom1 === carbonAttachedToS && carbonAtoms.includes(bond.atom2)) {
       carbonNeighbors++;
-    } else if (
-      bond.atom2 === carbonAttachedToS &&
-      carbonAtoms.includes(bond.atom1)
-    ) {
+    } else if (bond.atom2 === carbonAttachedToS && carbonAtoms.includes(bond.atom1)) {
       carbonNeighbors++;
     }
   }

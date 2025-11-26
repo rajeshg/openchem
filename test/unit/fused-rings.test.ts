@@ -46,19 +46,11 @@ function analyzeAngles(molecule: any, coords: any[]): AngleInfo[] {
 
     for (let j = 0; j < neighbors.length - 1; j++) {
       for (let k = j + 1; k < neighbors.length; k++) {
-        const nIdx1 = molecule.atoms.findIndex(
-          (a: any) => a.id === neighbors[j],
-        );
-        const nIdx2 = molecule.atoms.findIndex(
-          (a: any) => a.id === neighbors[k],
-        );
+        const nIdx1 = molecule.atoms.findIndex((a: any) => a.id === neighbors[j]);
+        const nIdx2 = molecule.atoms.findIndex((a: any) => a.id === neighbors[k]);
 
         if (nIdx1 >= 0 && nIdx2 >= 0) {
-          const angle = calculateBondAngle(
-            coord,
-            coords[nIdx1]!,
-            coords[nIdx2]!,
-          );
+          const angle = calculateBondAngle(coord, coords[nIdx1]!, coords[nIdx2]!);
           angles.push({
             atom: atom.id,
             angle,
@@ -89,8 +81,7 @@ describe("Fused Ring Coordinate Generation", () => {
       expect(angles.length).toBeGreaterThan(0);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const avgAngle =
-        angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
+      const avgAngle = angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
       const minAngle = Math.min(...angleDegrees);
       const maxAngle = Math.max(...angleDegrees);
 
@@ -123,9 +114,7 @@ describe("Fused Ring Coordinate Generation", () => {
 
       const coords = generateCoordinates(molecule);
       expect(coords.length).toBe(14);
-      expect(
-        coords.every((c) => typeof c.x === "number" && typeof c.y === "number"),
-      ).toBe(true);
+      expect(coords.every((c) => typeof c.x === "number" && typeof c.y === "number")).toBe(true);
     });
 
     it("should produce valid bond angles for anthracene", () => {
@@ -139,8 +128,7 @@ describe("Fused Ring Coordinate Generation", () => {
       expect(angles.length).toBeGreaterThan(0);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const avgAngle =
-        angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
+      const avgAngle = angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
       const minAngle = Math.min(...angleDegrees);
       const maxAngle = Math.max(...angleDegrees);
 
@@ -159,13 +147,9 @@ describe("Fused Ring Coordinate Generation", () => {
       const angles = analyzeAngles(molecule, coords);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const angleDeviations = angleDegrees.map((angle) =>
-        Math.abs(angle - 120),
-      );
+      const angleDeviations = angleDegrees.map((angle) => Math.abs(angle - 120));
 
-      const severeDistortions = angleDeviations.filter(
-        (dev) => dev > 30,
-      ).length;
+      const severeDistortions = angleDeviations.filter((dev) => dev > 30).length;
       expect(severeDistortions).toBe(0);
     });
 
@@ -188,11 +172,8 @@ describe("Fused Ring Coordinate Generation", () => {
       const angles = analyzeAngles(molecule, coords);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const avgAngle =
-        angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
-      const within5Degrees = angleDegrees.filter(
-        (angle) => Math.abs(angle - 120) <= 5,
-      ).length;
+      const avgAngle = angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
+      const within5Degrees = angleDegrees.filter((angle) => Math.abs(angle - 120) <= 5).length;
 
       expect(avgAngle).toBeGreaterThan(115);
       expect(avgAngle).toBeLessThan(125);
@@ -224,8 +205,7 @@ describe("Fused Ring Coordinate Generation", () => {
       // Just check that we have angles (v2 produces different but valid layouts)
       expect(angles.length).toBeGreaterThan(0);
       const angleDegrees = angles.map((a) => a.angle);
-      const avgAngle =
-        angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
+      const avgAngle = angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
 
       // Average angle should be reasonable (not collapsed or overly stretched)
       expect(avgAngle).toBeGreaterThan(80);
@@ -255,8 +235,7 @@ describe("Fused Ring Coordinate Generation", () => {
       const angles = analyzeAngles(molecule, coords);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const avgAngle =
-        angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
+      const avgAngle = angleDegrees.reduce((a, b) => a + b, 0) / angleDegrees.length;
 
       // v2 produces different but valid geometry
       expect(avgAngle).toBeGreaterThan(80);
@@ -296,9 +275,7 @@ describe("Fused Ring Coordinate Generation", () => {
       const angles = analyzeAngles(molecule, coords);
 
       const angleDegrees = angles.map((a) => a.angle);
-      const allPerfect = angleDegrees.every(
-        (angle) => Math.abs(angle - 120) < 1,
-      );
+      const allPerfect = angleDegrees.every((angle) => Math.abs(angle - 120) < 1);
 
       expect(allPerfect).toBe(true);
     });

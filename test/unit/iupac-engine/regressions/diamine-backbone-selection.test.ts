@@ -14,9 +14,7 @@ describe("Diamine backbone chain selection", () => {
     // Before fix: selected single-carbon hydroxymethyl chains (priority=10, alcohol)
     // After fix: correctly selects 2-carbon ethane backbone (priority=13, amine)
     // via isDiamineBackbone() helper that detects chains connecting two amine nitrogens
-    expect(name).toBe(
-      "N,N'-diformyl-N,N'-bis(hydroxymethyl)ethane-1,2-diamine",
-    );
+    expect(name).toBe("N,N'-diformyl-N,N'-bis(hydroxymethyl)ethane-1,2-diamine");
   });
 
   it("should handle simple diamines correctly", () => {

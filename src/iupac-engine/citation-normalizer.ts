@@ -32,8 +32,7 @@ function buildAliasMap(): Map<string, string> {
     for (const [canonical, data] of Object.entries(r.substituents)) {
       const canonicalToken = normalizeToken(canonical);
       map.set(canonicalToken, canonicalToken);
-      const aliases = ((data as { aliases?: unknown[] }).aliases ||
-        []) as string[];
+      const aliases = ((data as { aliases?: unknown[] }).aliases || []) as string[];
       for (const a of aliases) {
         const t = normalizeToken(a);
         if (t) map.set(t, canonicalToken);
@@ -97,9 +96,7 @@ export function normalizeCitationName(raw: string | undefined): string {
  * Given an array of raw citation names (possibly with multiplicative prefixes/locants),
  * return the canonical tokens in order.
  */
-export function canonicalizeCitationList(
-  raws: (string | undefined)[],
-): string[] {
+export function canonicalizeCitationList(raws: (string | undefined)[]): string[] {
   return raws.map((r) => normalizeCitationName(r)).filter(Boolean);
 }
 

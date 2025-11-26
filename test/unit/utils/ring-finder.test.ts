@@ -20,14 +20,7 @@ describe("Ring finder utilities", () => {
   });
 
   it("finds two disconnected rings", () => {
-    const atoms = [
-      { id: 1 },
-      { id: 2 },
-      { id: 3 },
-      { id: 4 },
-      { id: 5 },
-      { id: 6 },
-    ] as any;
+    const atoms = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }] as any;
     const bonds = [
       { atom1: 1, atom2: 2 },
       { atom1: 2, atom2: 3 },

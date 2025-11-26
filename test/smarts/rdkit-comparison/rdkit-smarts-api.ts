@@ -7,9 +7,7 @@ export async function initializeRDKit(): Promise<any> {
   try {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     rdkitInstance = await (initRDKitModule as any)();
@@ -69,10 +67,7 @@ export function getSubstructMatches(
   }
 }
 
-export function validatePattern(
-  rdkit: any,
-  pattern: string,
-): { valid: boolean; error?: string } {
+export function validatePattern(rdkit: any, pattern: string): { valid: boolean; error?: string } {
   try {
     const qmol = rdkit.get_qmol(pattern);
     if (!qmol || !qmol.is_valid || !qmol.is_valid()) {
@@ -92,10 +87,7 @@ export interface AromaticityResult {
   error?: string;
 }
 
-export function getRDKitAromaticity(
-  rdkit: any,
-  smiles: string,
-): AromaticityResult {
+export function getRDKitAromaticity(rdkit: any, smiles: string): AromaticityResult {
   let mol = null;
 
   try {

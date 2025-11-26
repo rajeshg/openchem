@@ -24,8 +24,7 @@ describe("Pentacyclic ring nomenclature", () => {
   });
 
   it("should generate proper von Baeyer descriptors for pentacyclic systems with 6 bridgeheads", () => {
-    const smiles =
-      "CC1=C(C=C(C=C1)N2C(=O)[C@@H]3[C@H](C2=O)C4(C5=CC=CC=C5C3C6=CC=CC=C64)C)";
+    const smiles = "CC1=C(C=C(C=C1)N2C(=O)[C@@H]3[C@H](C2=O)C4(C5=CC=CC=C5C3C6=CC=CC=C64)C)";
     const result = parseSMILES(smiles);
     expect(result.molecules).toHaveLength(1);
 
@@ -46,8 +45,7 @@ describe("Pentacyclic ring nomenclature", () => {
   });
 
   it("should correctly identify SSSR rank for pentacyclic system", () => {
-    const smiles =
-      "CC1=C(C=C(C=C1)N2C(=O)[C@@H]3[C@H](C2=O)C4(C5=CC=CC=C5C3C6=CC=CC=C64)C)";
+    const smiles = "CC1=C(C=C(C=C1)N2C(=O)[C@@H]3[C@H](C2=O)C4(C5=CC=CC=C5C3C6=CC=CC=C64)C)";
     const result = parseSMILES(smiles);
     const molecule = result.molecules[0]!;
 

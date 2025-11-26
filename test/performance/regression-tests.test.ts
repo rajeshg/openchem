@@ -257,9 +257,7 @@ describe("Performance Regression Tests", () => {
     const avgTime = total / 10;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `Bulk similarities (${molecules.length} mols): ${avgTime.toFixed(3)}ms`,
-      );
+      console.log(`Bulk similarities (${molecules.length} mols): ${avgTime.toFixed(3)}ms`);
     }
 
     // Pairwise comparisons are O(n^2), so budget should be larger
@@ -269,9 +267,7 @@ describe("Performance Regression Tests", () => {
   it("performance test summary", () => {
     if (process.env.VERBOSE) {
       console.log("\n=== Performance Regression Test Summary ===");
-      console.log(
-        "Budgets are 2x the typical performance to allow for CI variance",
-      );
+      console.log("Budgets are 2x the typical performance to allow for CI variance");
       console.log("If tests fail, performance has degraded significantly");
       console.log("==========================================\n");
     }

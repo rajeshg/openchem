@@ -34,9 +34,7 @@ describe("Chain orientation with terminus amine groups", () => {
     // Expected: sulfur at position 2 (counting from amine terminus)
     // Before fix: 1-[cyclooctyloxy(propyl)phosphoryl]sulfanyl-N,N-dimethylethanamine
     // After fix: 2-[cyclooctyloxy(propyl)phosphoryl]sulfanyl-N,N-dimethylethanamine
-    expect(name).toBe(
-      "2-[cyclooctyloxy(propyl)phosphoryl]sulfanyl-N,N-dimethylethanamine",
-    );
+    expect(name).toBe("2-[cyclooctyloxy(propyl)phosphoryl]sulfanyl-N,N-dimethylethanamine");
   });
 
   it("should NOT treat tertiary amines with formyl as simple amine terminus", () => {
@@ -49,8 +47,6 @@ describe("Chain orientation with terminus amine groups", () => {
     // Fixed by diamine backbone detection (isDiamineBackbone helper)
     // The 2-carbon chain connecting the two amine nitrogens is now correctly
     // selected as the parent structure over single-carbon hydroxymethyl chains
-    expect(name).toBe(
-      "N,N'-diformyl-N,N'-bis(hydroxymethyl)ethane-1,2-diamine",
-    );
+    expect(name).toBe("N,N'-diformyl-N,N'-bis(hydroxymethyl)ethane-1,2-diamine");
   });
 });

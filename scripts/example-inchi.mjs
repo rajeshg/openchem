@@ -42,9 +42,7 @@ M  END
   } catch (_error) {
     console.error("Error:", error.message);
     console.error("\nTo use real InChI functionality:");
-    console.error(
-      "1. Add the Emscripten-generated inchi.js file to src/third-party/inchi-wasm/",
-    );
+    console.error("1. Add the Emscripten-generated inchi.js file to src/third-party/inchi-wasm/");
     console.error("2. Rebuild the project: bun run build");
     console.error("3. Run this example again.");
     process.exit(1);

@@ -55,9 +55,7 @@ export class OPSINNameGenerator {
   generateName(input: Molecule | ImmutableNamingContext): string {
     const molecule = this.getMolecule(input);
     const context =
-      input instanceof Object && "getState" in input
-        ? (input as ImmutableNamingContext)
-        : null;
+      input instanceof Object && "getState" in input ? (input as ImmutableNamingContext) : null;
 
     // Detect functional groups using comprehensive OPSIN detector
     const functionalGroups = this.detector.detectFunctionalGroups(molecule);
@@ -141,10 +139,7 @@ export class OPSINNameGenerator {
     }
   }
 
-  private getChainCarbonCount(
-    molecule: Molecule,
-    context: ImmutableNamingContext | null,
-  ): number {
+  private getChainCarbonCount(molecule: Molecule, context: ImmutableNamingContext | null): number {
     if (context) {
       const state = context.getState();
       if (state.candidateChains && state.candidateChains.length > 0) {
@@ -211,10 +206,7 @@ export class OPSINNameGenerator {
     return `${stem}enitrile`;
   }
 
-  private buildAlkaneName(
-    molecule: Molecule,
-    context: ImmutableNamingContext | null,
-  ): string {
+  private buildAlkaneName(molecule: Molecule, context: ImmutableNamingContext | null): string {
     const carbonCount = this.getChainCarbonCount(molecule, context);
 
     if (carbonCount === 1) return "methane";
@@ -264,8 +256,8 @@ export class OPSINNameGenerator {
     // Fallback for larger chains
     if (carbonCount <= 20) {
       const multipliers =
-        (this.rules as Record<string, Record<string, Record<string, string>>>)
-          .multipliers?.basic || {};
+        (this.rules as Record<string, Record<string, Record<string, string>>>).multipliers?.basic ||
+        {};
       const units = Math.floor(carbonCount / 10);
       const remainder = carbonCount % 10;
 

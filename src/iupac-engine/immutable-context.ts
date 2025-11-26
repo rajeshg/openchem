@@ -19,13 +19,7 @@ function generateMoleculeId(molecule: Molecule): string {
 
   return `mol-${atomCount}-${bondCount}-${elementTypes.slice(0, 10)}-${Date.now()}`;
 }
-import type {
-  Chain,
-  RingSystem,
-  FunctionalGroup,
-  ParentStructure,
-  RuleConflict,
-} from "./types";
+import type { Chain, RingSystem, FunctionalGroup, ParentStructure, RuleConflict } from "./types";
 
 /**
  * Services available to the naming context
@@ -183,10 +177,7 @@ export class ImmutableNamingContext {
   /**
    * Create initial context from molecule
    */
-  static create(
-    molecule: Molecule,
-    services: ContextServices,
-  ): ImmutableNamingContext {
+  static create(molecule: Molecule, services: ContextServices): ImmutableNamingContext {
     // Compute ring analysis ONCE and cache it
     const cachedRingInfo = analyzeRings(molecule);
 
@@ -207,29 +198,18 @@ export class ImmutableNamingContext {
     try {
       // Local require to avoid circular import issues
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const {
-        findMainChain,
-        findSubstituents,
-      } = require("./naming/iupac-chains");
-      const main = findMainChain(
-        molecule,
-        undefined,
-        services.detector,
-      ) as number[];
+      const { findMainChain, findSubstituents } = require("./naming/iupac-chains");
+      const main = findMainChain(molecule, undefined, services.detector) as number[];
       const candidates: Chain[] = [];
       if (main && main.length >= 2) {
-        const atoms = main
-          .map((idx) => molecule.atoms[idx])
-          .filter(Boolean) as Atom[];
+        const atoms = main.map((idx) => molecule.atoms[idx]).filter(Boolean) as Atom[];
         const bonds: Bond[] = [];
         const multipleBonds: MultipleBond[] = [];
         for (let i = 0; i < main.length - 1; i++) {
           const a = main[i]!;
           const b = main[i + 1]!;
           const bond = molecule.bonds.find(
-            (bb) =>
-              (bb.atom1 === a && bb.atom2 === b) ||
-              (bb.atom1 === b && bb.atom2 === a),
+            (bb) => (bb.atom1 === a && bb.atom2 === b) || (bb.atom1 === b && bb.atom2 === a),
           );
           if (bond) {
             bonds.push(bond);
@@ -243,11 +223,7 @@ export class ImmutableNamingContext {
             }
           }
         }
-        const subsRaw = findSubstituents(
-          molecule,
-          main as number[],
-          services.detector,
-        );
+        const subsRaw = findSubstituents(molecule, main as number[], services.detector);
         const substituents = (subsRaw as RawSubstituent[]).map((s) => {
           if (process.env.VERBOSE) {
             console.log(
@@ -266,9 +242,7 @@ export class ImmutableNamingContext {
                   .filter((a) => a !== undefined)
               : [];
           if (process.env.VERBOSE && atoms.length > 0) {
-            console.log(
-              `[immutable-context]   Preserved ${atoms.length} atom objects`,
-            );
+            console.log(`[immutable-context]   Preserved ${atoms.length} atom objects`);
           }
           return {
             atoms,
@@ -557,10 +531,7 @@ export class ImmutableNamingContext {
    */
   generateResult(): NamingResult {
     return {
-      name:
-        this.state.finalName ||
-        this.state.parentStructure?.name ||
-        this.generateFallbackName(),
+      name: this.state.finalName || this.state.parentStructure?.name || this.generateFallbackName(),
       method: this.state.nomenclatureMethod || NomenclatureMethod.SUBSTITUTIVE,
       parentStructure: this.state.parentStructure!,
       functionalGroups: this.state.functionalGroups,
@@ -588,14 +559,10 @@ export class ImmutableNamingContext {
   private generateFallbackName(): string {
     if (this.state.parentStructure?.type === "chain") {
       const length = this.state.parentStructure.chain?.length || 0;
-      return length > 0
-        ? `Unknown ${length}-carbon compound`
-        : "Unknown compound";
+      return length > 0 ? `Unknown ${length}-carbon compound` : "Unknown compound";
     } else if (this.state.parentStructure?.type === "ring") {
       const size = this.state.parentStructure.ring?.size || 0;
-      return size > 0
-        ? `Unknown ${size}-membered ring`
-        : "Unknown ring compound";
+      return size > 0 ? `Unknown ${size}-membered ring` : "Unknown ring compound";
     }
     return "Unable to generate IUPAC name";
   }
@@ -615,10 +582,7 @@ export class ImmutableNamingContext {
       case ExecutionPhase.FUNCTIONAL_GROUP:
         return this.state.molecule.atoms.length > 0;
       case ExecutionPhase.PARENT_STRUCTURE:
-        return (
-          this.state.functionalGroups.length > 0 ||
-          this.state.molecule.atoms.length > 0
-        );
+        return this.state.functionalGroups.length > 0 || this.state.molecule.atoms.length > 0;
       case ExecutionPhase.NUMBERING:
         return this.state.parentStructure !== undefined;
       case ExecutionPhase.ASSEMBLY:

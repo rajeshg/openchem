@@ -250,8 +250,7 @@ export class PolycyclicBuilders {
     expectedAtomCount?: number,
   ): number[] {
     if (hasSecondaryBridges) {
-      const expectedAtoms =
-        expectedAtomCount || bridges.reduce((sum, b) => sum + b, 0) + 4;
+      const expectedAtoms = expectedAtomCount || bridges.reduce((sum, b) => sum + b, 0) + 4;
 
       const atoms: number[] = [];
       for (let i = 0; i < expectedAtoms; i++) {

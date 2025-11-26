@@ -108,15 +108,9 @@ describe("Bulk Operations API", () => {
 
     // All passers should be subsets of individual filters
     for (const passer of results.allPassers) {
-      const foundInLipinski = results.lipinskiPassers.some(
-        (p) => p.index === passer.index,
-      );
-      const foundInVeber = results.veberPassers.some(
-        (p) => p.index === passer.index,
-      );
-      const foundInBBB = results.bbbPassers.some(
-        (p) => p.index === passer.index,
-      );
+      const foundInLipinski = results.lipinskiPassers.some((p) => p.index === passer.index);
+      const foundInVeber = results.veberPassers.some((p) => p.index === passer.index);
+      const foundInBBB = results.bbbPassers.some((p) => p.index === passer.index);
 
       expect(foundInLipinski).toBe(true);
       expect(foundInVeber).toBe(true);
@@ -125,9 +119,7 @@ describe("Bulk Operations API", () => {
 
     // Small molecules like ethanol should pass most filters
     const ethanolIndex = 1;
-    expect(results.lipinskiPassers.some((p) => p.index === ethanolIndex)).toBe(
-      true,
-    );
+    expect(results.lipinskiPassers.some((p) => p.index === ethanolIndex)).toBe(true);
   });
 
   it("bulk operations preserve molecule order and indices", () => {

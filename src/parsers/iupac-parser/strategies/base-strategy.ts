@@ -1,14 +1,8 @@
-import type {
-  SubstituentBuildStrategy,
-  TokenContext,
-  BuildResult,
-} from "./types";
+import type { SubstituentBuildStrategy, TokenContext, BuildResult } from "./types";
 import type { MoleculeGraphBuilder } from "../../molecule-graph-builder";
 import type { IUPACBuilderContext } from "../iupac-builder-context";
 
-export abstract class BaseSubstituentStrategy
-  implements SubstituentBuildStrategy
-{
+export abstract class BaseSubstituentStrategy implements SubstituentBuildStrategy {
   abstract readonly name: string;
   abstract readonly priority: number;
 

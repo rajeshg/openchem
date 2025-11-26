@@ -1,9 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import {
-  generateIUPACNameFromSMILES,
-  parseSMILES,
-  generateSMILES,
-} from "index";
+import { generateIUPACNameFromSMILES, parseSMILES, generateSMILES } from "index";
 
 describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
   describe("Case 1: Complex saturated heterocycles with multiple functional groups", () => {
@@ -17,9 +13,7 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
 
       // Verify structure has correct elements
       const mol = parsed.molecules[0]!;
-      const nitrogenCount = mol.atoms.filter(
-        (a) => a.atomicNumber === 7,
-      ).length;
+      const nitrogenCount = mol.atoms.filter((a) => a.atomicNumber === 7).length;
       expect(nitrogenCount).toBeGreaterThanOrEqual(3); // 3 nitrogens in imidazolidine + imine
 
       // Try round-trip
@@ -72,9 +66,7 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
 
       // Verify multiple bonds exist (evidence of ring fusion)
       const { BondType } = require("types");
-      const doubleBonds = mol.bonds.filter(
-        (b) => b.type === BondType.DOUBLE,
-      ).length;
+      const doubleBonds = mol.bonds.filter((b) => b.type === BondType.DOUBLE).length;
       expect(doubleBonds).toBeGreaterThanOrEqual(2);
     });
   });
@@ -146,8 +138,7 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
   describe("Case 5: Polycyclic compounds with multiple functional groups", () => {
     it("should handle N-[2-chloro-5-[(2-methoxyphenyl)sulfamoyl]phenyl]-2-(4-methoxyphenyl)quinoline-4-carboxamide", () => {
       // Quinoline core + amide linkage + sulfamoyl group + anilino moiety
-      const smiles =
-        "c2(ccc(cc2)-c5nc1c(c(C(Nc3cc(S(=O)(=O)Nc4ccccc4OC)ccc3Cl)=O)c5)cccc1)OC";
+      const smiles = "c2(ccc(cc2)-c5nc1c(c(C(Nc3cc(S(=O)(=O)Nc4ccccc4OC)ccc3Cl)=O)c5)cccc1)OC";
       const parsed = parseSMILES(smiles);
 
       expect(parsed.molecules.length).toBe(1);
@@ -155,13 +146,9 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
       expect(mol.atoms.length).toBeGreaterThan(30);
 
       // Should have N, S, Cl atoms
-      const nitrogenCount = mol.atoms.filter(
-        (a) => a.atomicNumber === 7,
-      ).length;
+      const nitrogenCount = mol.atoms.filter((a) => a.atomicNumber === 7).length;
       const sulfurCount = mol.atoms.filter((a) => a.atomicNumber === 16).length;
-      const chlorineCount = mol.atoms.filter(
-        (a) => a.atomicNumber === 17,
-      ).length;
+      const chlorineCount = mol.atoms.filter((a) => a.atomicNumber === 17).length;
 
       expect(nitrogenCount).toBeGreaterThanOrEqual(3);
       expect(sulfurCount).toBeGreaterThanOrEqual(1);
@@ -177,8 +164,7 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
     });
 
     it("should identify quinoline + amide + sulfamoyl structure", () => {
-      const smiles =
-        "c2(ccc(cc2)-c5nc1c(c(C(Nc3cc(S(=O)(=O)Nc4ccccc4OC)ccc3Cl)=O)c5)cccc1)OC";
+      const smiles = "c2(ccc(cc2)-c5nc1c(c(C(Nc3cc(S(=O)(=O)Nc4ccccc4OC)ccc3Cl)=O)c5)cccc1)OC";
       const result = generateIUPACNameFromSMILES(smiles);
       expect(result.name).toBeDefined();
       expect(result.name.length).toBeGreaterThan(15);
@@ -197,9 +183,7 @@ describe("IUPAC Engine Improvements - 5 Additional Realistic Cases", () => {
       expect(mol.atoms.length).toBeGreaterThan(40); // Very large with many fluorines
 
       // Should have fluorine, sulfur atoms
-      const fluorineCount = mol.atoms.filter(
-        (a) => a.atomicNumber === 9,
-      ).length;
+      const fluorineCount = mol.atoms.filter((a) => a.atomicNumber === 9).length;
       const sulfurCount = mol.atoms.filter((a) => a.atomicNumber === 16).length;
 
       expect(fluorineCount).toBeGreaterThanOrEqual(22); // 2 × undecafluoro (11 each)

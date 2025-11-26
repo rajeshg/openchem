@@ -37,9 +37,7 @@ export function writeSDF(
 
       sdfLines.push("$$$$");
     } catch (_error) {
-      errors.push(
-        `Record ${i}: ${_error instanceof Error ? _error.message : String(_error)}`,
-      );
+      errors.push(`Record ${i}: ${_error instanceof Error ? _error.message : String(_error)}`);
     }
   }
 
@@ -49,9 +47,7 @@ export function writeSDF(
   };
 }
 
-function formatPropertyBlock(
-  properties: Record<string, string | number | boolean>,
-): string {
+function formatPropertyBlock(properties: Record<string, string | number | boolean>): string {
   const lines: string[] = [];
 
   for (const [key, value] of Object.entries(properties)) {

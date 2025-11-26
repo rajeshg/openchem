@@ -15,8 +15,7 @@ import { ExecutionPhase } from "../../immutable-context";
 export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
   id: "acyl-substituent-correction",
   name: "Acyl Substituent Correction",
-  description:
-    "Mark ketones NOT on main chain as non-principal (acyl substituents)",
+  description: "Mark ketones NOT on main chain as non-principal (acyl substituents)",
   blueBookReference: "P-62.2.1.1 - Acyl groups as substituents",
   priority: RulePriority.ONE, // Run after PARENT_CHAIN_SELECTION_COMPLETE (priority TEN=100)
   conditions: (context: ImmutableNamingContext) => {
@@ -37,9 +36,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
     // Only run if we have a parent chain and ketone functional groups
     if (!parentStructure || parentStructure.type !== "chain") {
       if (process.env.VERBOSE) {
-        console.log(
-          `[ACYL_SUBSTITUENT_CORRECTION conditions] SKIP - no parent chain`,
-        );
+        console.log(`[ACYL_SUBSTITUENT_CORRECTION conditions] SKIP - no parent chain`);
       }
       return false;
     }
@@ -48,9 +45,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
       (fg) => (fg.name === "ketone" || fg.type === "ketone") && fg.isPrincipal,
     );
     if (process.env.VERBOSE) {
-      console.log(
-        `[ACYL_SUBSTITUENT_CORRECTION conditions] hasKetones=${hasKetones}`,
-      );
+      console.log(`[ACYL_SUBSTITUENT_CORRECTION conditions] hasKetones=${hasKetones}`);
     }
     return hasKetones;
   },
@@ -64,18 +59,14 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
 
     if (!parentStructure || parentStructure.type !== "chain") {
       if (process.env.VERBOSE) {
-        console.log(
-          `[ACYL_SUBSTITUENT_CORRECTION action] No parent chain, returning`,
-        );
+        console.log(`[ACYL_SUBSTITUENT_CORRECTION action] No parent chain, returning`);
       }
       return context;
     }
 
     const mainChain = parentStructure.chain?.atoms || [];
     // Build a set of atom IDs in the main chain
-    const chainSet = new Set(
-      mainChain.map((a) => (typeof a === "number" ? a : a.id)),
-    );
+    const chainSet = new Set(mainChain.map((a) => (typeof a === "number" ? a : a.id)));
 
     if (process.env.VERBOSE) {
       console.log(
@@ -85,10 +76,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
 
     // Filter ketones and check if they're on the main chain
     const ketoneGroups = functionalGroups.filter(
-      (fg) =>
-        (fg.name === "ketone" || fg.type === "ketone") &&
-        fg.atoms &&
-        fg.atoms.length >= 2,
+      (fg) => (fg.name === "ketone" || fg.type === "ketone") && fg.atoms && fg.atoms.length >= 2,
     );
 
     if (process.env.VERBOSE) {
@@ -110,9 +98,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
         );
       }
 
-      const carbonylCarbon = ketoneGroup.atoms.find(
-        (atom) => atom.symbol === "C",
-      );
+      const carbonylCarbon = ketoneGroup.atoms.find((atom) => atom.symbol === "C");
 
       if (!carbonylCarbon) {
         if (process.env.VERBOSE) {
@@ -168,9 +154,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
 
     if (correctionsMade === 0) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[ACYL_SUBSTITUENT_CORRECTION action] No corrections needed`,
-        );
+        console.log(`[ACYL_SUBSTITUENT_CORRECTION action] No corrections needed`);
       }
       return context; // No changes needed
     }
@@ -192,9 +176,7 @@ export const ACYL_SUBSTITUENT_CORRECTION_RULE: IUPACRule = {
     );
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[ACYL_SUBSTITUENT_CORRECTION action] DONE - updated context`,
-      );
+      console.log(`[ACYL_SUBSTITUENT_CORRECTION action] DONE - updated context`);
     }
 
     return updatedContext;

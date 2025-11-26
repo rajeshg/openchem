@@ -65,10 +65,7 @@ export const DEFAULT_COLORS: Record<string, string> = {
 // Helper Functions
 // ============================================================================
 
-function determineVisibleAtoms(
-  molecule: Molecule,
-  showCarbonLabels: boolean,
-): Set<number> {
+function determineVisibleAtoms(molecule: Molecule, showCarbonLabels: boolean): Set<number> {
   const atomsToShow = new Set<number>();
 
   for (let i = 0; i < molecule.atoms.length; ++i) {
@@ -87,9 +84,7 @@ function determineVisibleAtoms(
     }
 
     if (atom.symbol === "C") {
-      const bonds = molecule.bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const bonds = molecule.bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
       if (bonds.length === 1) {
         atomsToShow.add(i);
       }
@@ -111,29 +106,16 @@ function assignStereoBondsFromChirality(molecule: Molecule): Molecule {
       const atom2 = molecule.atoms.find((a) => a.id === bond.atom2);
 
       if (atom1?.chiral && (atom1.chiral === "@" || atom1.chiral === "@@")) {
-        const atom1BondsFromChiral = molecule.bonds.filter(
-          (b) => b.atom1 === atom1.id,
-        );
-        if (
-          atom1BondsFromChiral.length > 0 &&
-          atom1BondsFromChiral[0] === bond
-        ) {
+        const atom1BondsFromChiral = molecule.bonds.filter((b) => b.atom1 === atom1.id);
+        if (atom1BondsFromChiral.length > 0 && atom1BondsFromChiral[0] === bond) {
           newBond = {
             ...bond,
             stereo: atom1.chiral === "@@" ? StereoEnum.DOWN : StereoEnum.UP,
           };
         }
-      } else if (
-        atom2?.chiral &&
-        (atom2.chiral === "@" || atom2.chiral === "@@")
-      ) {
-        const atom2BondsFromChiral = molecule.bonds.filter(
-          (b) => b.atom1 === atom2.id,
-        );
-        if (
-          atom2BondsFromChiral.length > 0 &&
-          atom2BondsFromChiral[0] === bond
-        ) {
+      } else if (atom2?.chiral && (atom2.chiral === "@" || atom2.chiral === "@@")) {
+        const atom2BondsFromChiral = molecule.bonds.filter((b) => b.atom1 === atom2.id);
+        if (atom2BondsFromChiral.length > 0 && atom2BondsFromChiral[0] === bond) {
           newBond = {
             ...bond,
             stereo: atom2.chiral === "@@" ? StereoEnum.DOWN : StereoEnum.UP,
@@ -306,10 +288,8 @@ function createCoordinateTransforms(
       (width - 2 * padding) / (maxX - minX || 1),
       (height - 2 * padding) / (maxY - minY || 1),
     );
-    const offsetX =
-      padding - minX * scale + (width - (maxX - minX) * scale) / 2;
-    const offsetY =
-      padding - minY * scale + (height - (maxY - minY) * scale) / 2;
+    const offsetX = padding - minX * scale + (width - (maxX - minX) * scale) / 2;
+    const offsetY = padding - minY * scale + (height - (maxY - minY) * scale) / 2;
 
     const tx = (x: number) => x * scale + offsetX;
     const ty = (y: number) => y * scale + offsetY;
@@ -357,9 +337,7 @@ function computeLayoutQuality(
     let bestDiff = Number.POSITIVE_INFINITY;
     for (const aRad of allowedRad) {
       for (const base of [aRad, (aRad + Math.PI) % (Math.PI * 2)]) {
-        const diff = Math.abs(
-          Math.atan2(Math.sin(angle - base), Math.cos(angle - base)),
-        );
+        const diff = Math.abs(Math.atan2(Math.sin(angle - base), Math.cos(angle - base)));
         if (diff < bestDiff) bestDiff = diff;
       }
     }
@@ -394,14 +372,11 @@ function computeLayoutQuality(
 
   const minLabelDist = Math.max(
     fontSize * 0.6,
-    bondLens.length > 0
-      ? (bondLens.reduce((s, v) => s + v, 0) / bondLens.length) * 0.2
-      : fontSize,
+    bondLens.length > 0 ? (bondLens.reduce((s, v) => s + v, 0) / bondLens.length) * 0.2 : fontSize,
   );
   const shown: number[] = [];
   for (const n of atomsToShow) {
-    if (typeof n === "number" && n >= 0 && n < coords.length)
-      shown.push(n as number);
+    if (typeof n === "number" && n >= 0 && n < coords.length) shown.push(n as number);
   }
   for (let i = 0; i < shown.length; i++) {
     for (let j = i + 1; j < shown.length; j++) {
@@ -455,8 +430,7 @@ function computeLabelOffsets(
     return { x: c.x - w / 2, y: c.y - h / 2, w, h };
   }
 
-  for (let i = 0; i < molecule.atoms.length; i++)
-    offsets.set(i, { dx: 0, dy: 0 });
+  for (let i = 0; i < molecule.atoms.length; i++) offsets.set(i, { dx: 0, dy: 0 });
 
   const labels: {
     idx: number;
@@ -487,12 +461,7 @@ function computeLabelOffsets(
         const ay = A.box.y + offA.dy;
         const bx = B.box.x + offB.dx;
         const by = B.box.y + offB.dy;
-        if (
-          ax < bx + B.box.w &&
-          ax + A.box.w > bx &&
-          ay < by + B.box.h &&
-          ay + A.box.h > by
-        ) {
+        if (ax < bx + B.box.w && ax + A.box.w > bx && ay < by + B.box.h && ay + A.box.h > by) {
           const acx = ax + A.box.w / 2;
           const acy = ay + A.box.h / 2;
           const bcx = bx + B.box.w / 2;
@@ -537,10 +506,7 @@ function computeLabelOffsets(
       const vy = b.y - a.y;
       const segLen2 = vx * vx + vy * vy;
       if (segLen2 === 0) continue;
-      const t = Math.max(
-        0,
-        Math.min(1, ((lx - a.x) * vx + (ly - a.y) * vy) / segLen2),
-      );
+      const t = Math.max(0, Math.min(1, ((lx - a.x) * vx + (ly - a.y) * vy) / segLen2));
       const projX = a.x + vx * t;
       const projY = a.y + vy * t;
       const dx = lx - projX;
@@ -593,14 +559,11 @@ function detectAromaticRings(molecule: Molecule): AromaticRing[] {
     }
 
     const ringBonds: Bond[] = molecule.bonds.filter((bond) => {
-      return (
-        ringAtomIds.includes(bond.atom1) && ringAtomIds.includes(bond.atom2)
-      );
+      return ringAtomIds.includes(bond.atom1) && ringAtomIds.includes(bond.atom2);
     });
 
     const allBondsAromatic =
-      ringBonds.length > 0 &&
-      ringBonds.every((bond) => bond.type === BondType.AROMATIC);
+      ringBonds.length > 0 && ringBonds.every((bond) => bond.type === BondType.AROMATIC);
 
     let allBondsAlternating = false;
     if (ringBonds.length > 0 && ringBonds.length === ringAtomIds.length) {
@@ -608,10 +571,7 @@ function detectAromaticRings(molecule: Molecule): AromaticRing[] {
       allBondsAlternating = checkAlternatingBonds(orderedBonds);
     }
 
-    if (
-      (allBondsAromatic || allBondsAlternating) &&
-      ringBonds.length === ringAtomIds.length
-    ) {
+    if ((allBondsAromatic || allBondsAlternating) && ringBonds.length === ringAtomIds.length) {
       aromaticRings.push({ ringId: rid, atoms: ringAtomIds, bonds: ringBonds });
     }
   }
@@ -625,9 +585,7 @@ function orderBondsInRing(ringAtomIds: number[], ringBonds: Bond[]): Bond[] {
     const a1 = ringAtomIds[i]!;
     const a2 = ringAtomIds[(i + 1) % ringAtomIds.length]!;
     const bond = ringBonds.find(
-      (b) =>
-        (b.atom1 === a1 && b.atom2 === a2) ||
-        (b.atom1 === a2 && b.atom2 === a1),
+      (b) => (b.atom1 === a1 && b.atom2 === a2) || (b.atom1 === a2 && b.atom2 === a1),
     );
     if (bond) orderedBonds.push(bond);
   }
@@ -676,10 +634,7 @@ function svgDoubleBond(
   let outerOffset = offset;
   let innerOffset = offset;
 
-  function isRegularPolygon(
-    ringAtoms: number[],
-    coords: Map<number, AtomCoordinates>,
-  ): boolean {
+  function isRegularPolygon(ringAtoms: number[], coords: Map<number, AtomCoordinates>): boolean {
     if (ringAtoms.length < 5 || ringAtoms.length > 7) return false;
     const dists: number[] = [];
     for (let i = 0; i < ringAtoms.length; ++i) {
@@ -698,12 +653,7 @@ function svgDoubleBond(
   let usePolygonParallel = false;
   let ringAtoms: number[] | undefined = undefined;
 
-  if (
-    bond.isInRing &&
-    molecule.ringInfo &&
-    bond.ringIds &&
-    bond.ringIds.length > 0
-  ) {
+  if (bond.isInRing && molecule.ringInfo && bond.ringIds && bond.ringIds.length > 0) {
     for (const rid of bond.ringIds) {
       const ringArr = molecule.ringInfo.rings[rid];
       if (!ringArr) continue;
@@ -959,14 +909,10 @@ function renderSingleMolecule(
 
   // Compute bounding box in SVG coordinate space (after transforms) so we can emit
   // a tight, normalized viewBox and keep preserveAspectRatio for consistent scaling.
-  const transformedPoints = coords
-    .filter(Boolean)
-    .map((c) => ({ x: tx(c.x), y: ty(c.y) }));
+  const transformedPoints = coords.filter(Boolean).map((c) => ({ x: tx(c.x), y: ty(c.y) }));
 
   // Prepare SVG-space coords array for helpers (one entry per atom index)
-  const svgCoords: Array<{ x: number; y: number } | undefined> = Array(
-    coords.length,
-  );
+  const svgCoords: Array<{ x: number; y: number } | undefined> = Array(coords.length);
   for (let i = 0; i < coords.length; i++) {
     const c = coords[i];
     if (!c) {
@@ -979,15 +925,10 @@ function renderSingleMolecule(
   // Decide which atoms get labels
   // (we compute label offsets and layout quality after this point)
 
-  const atomsToShow = determineVisibleAtoms(
-    molecule,
-    options.showCarbonLabels ?? false,
-  );
+  const atomsToShow = determineVisibleAtoms(molecule, options.showCarbonLabels ?? false);
 
   // Prepare a dense SVG coordinate array (no undefined) for helper routines
-  const denseSvgCoords: Array<{ x: number; y: number }> = svgCoords.map(
-    (c) => c ?? { x: 0, y: 0 },
-  );
+  const denseSvgCoords: Array<{ x: number; y: number }> = svgCoords.map((c) => c ?? { x: 0, y: 0 });
 
   // Compute label offsets to avoid overlaps in SVG space
   let labelOffsets = new Map<number, { dx: number; dy: number }>();
@@ -1055,11 +996,7 @@ function renderSingleMolecule(
       if (atomsToShow.has(i)) {
         const atom = molecule.atoms[i]!;
         let label = atom.symbol;
-        if (
-          options.showImplicitHydrogens &&
-          atom.hydrogens > 0 &&
-          atom.symbol !== "C"
-        ) {
+        if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
           const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
           label = atom.symbol + hText;
         }
@@ -1079,9 +1016,7 @@ function renderSingleMolecule(
         if (atom.charge !== 0) {
           const chargeSign = atom.charge > 0 ? "+" : "−";
           const chargeStr =
-            Math.abs(atom.charge) > 1
-              ? `${Math.abs(atom.charge)}${chargeSign}`
-              : chargeSign;
+            Math.abs(atom.charge) > 1 ? `${Math.abs(atom.charge)}${chargeSign}` : chargeSign;
           const chargeX = labelX + fontSize * 0.5;
           const chargeY = labelY - fontSize * 0.3;
           const smallFontSize = fontSize * 0.7;
@@ -1134,13 +1069,7 @@ function renderSingleMolecule(
 
   // Compute a layout quality score and append as comment to the SVG header
   try {
-    const quality = computeLayoutQuality(
-      coords,
-      molecule,
-      atomsToShow,
-      fontSize,
-      bondLineWidth,
-    );
+    const quality = computeLayoutQuality(coords, molecule, atomsToShow, fontSize, bondLineWidth);
     const qc = `<!-- layout-quality: total=${quality.total.toFixed(3)} angle=${quality.components.angle.toFixed(3)} length=${quality.components.length.toFixed(3)} atomOverlap=${quality.components.atomOverlap.toFixed(3)} labelOverlap=${quality.components.labelOverlap.toFixed(3)} -->\n`;
     svg += qc;
   } catch (_e) {
@@ -1175,17 +1104,12 @@ function renderSingleMolecule(
 
       if (bond.type === BondType.SINGLE) {
         svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
-      } else if (
-        bond.type === BondType.DOUBLE ||
-        bond.type === BondType.AROMATIC
-      ) {
+      } else if (bond.type === BondType.DOUBLE || bond.type === BondType.AROMATIC) {
         // For bonds that participate in aromatic rings, compute an orientation
         // using the average center of all aromatic rings that include this bond.
         // This makes the offset decision stable for fused rings (e.g., naphthalene)
         // where a bond may belong to more than one ring.
-        const ringsForBond = aromaticRings.filter((r) =>
-          r.bonds.includes(bond),
-        );
+        const ringsForBond = aromaticRings.filter((r) => r.bonds.includes(bond));
         if (ringsForBond.length > 0) {
           let cx = 0,
             cy = 0,
@@ -1235,15 +1159,7 @@ function renderSingleMolecule(
             line2X2 -= (innerDx / innerLen) * shortenAmount;
             line2Y2 -= (innerDy / innerLen) * shortenAmount;
 
-            svgBody += svgLine(
-              x1,
-              y1,
-              x2,
-              y2,
-              bondColor,
-              bondLineWidth,
-              bondClass,
-            );
+            svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
             svgBody += svgLine(
               line2X1,
               line2Y1,
@@ -1323,15 +1239,7 @@ function renderSingleMolecule(
         bondClass,
       );
     } else if (bond.type === BondType.TRIPLE) {
-      svgBody += svgTripleBond(
-        x1,
-        y1,
-        x2,
-        y2,
-        bondColor,
-        bondLineWidth,
-        bondClass,
-      );
+      svgBody += svgTripleBond(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
     } else {
       svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
     }
@@ -1354,11 +1262,7 @@ function renderSingleMolecule(
 
       let label = atom.symbol;
 
-      if (
-        options.showImplicitHydrogens &&
-        atom.hydrogens > 0 &&
-        atom.symbol !== "C"
-      ) {
+      if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
         const hColor = atomColors["H"] ?? "#AAAAAA";
         const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
 
@@ -1400,20 +1304,11 @@ function renderSingleMolecule(
       if (atom.charge !== 0) {
         const chargeSign = atom.charge > 0 ? "+" : "−";
         const chargeStr =
-          Math.abs(atom.charge) > 1
-            ? `${Math.abs(atom.charge)}${chargeSign}`
-            : chargeSign;
+          Math.abs(atom.charge) > 1 ? `${Math.abs(atom.charge)}${chargeSign}` : chargeSign;
         const chargeX = labelX + fontSize * 0.5;
         const chargeY = labelY - fontSize * 0.3;
         const smallFontSize = fontSize * 0.7;
-        svgBody += svgText(
-          chargeX,
-          chargeY,
-          chargeStr,
-          color,
-          smallFontSize,
-          fontFamily,
-        );
+        svgBody += svgText(chargeX, chargeY, chargeStr, color, smallFontSize, fontFamily);
       }
     }
   }
@@ -1489,20 +1384,14 @@ function renderMultipleMolecules(
     let height_i = bounds.maxY - bounds.minY;
     let isSingleAtom = false;
 
-    if (
-      width_i === 0 &&
-      height_i === 0 &&
-      moleculesWithCoords[i]!.molecule.atoms.length === 1
-    ) {
+    if (width_i === 0 && height_i === 0 && moleculesWithCoords[i]!.molecule.atoms.length === 1) {
       width_i = 30;
       height_i = 30;
       isSingleAtom = true;
     }
 
-    moleculesWithCoords[i]!.offsetX =
-      currentX - bounds.minX + (isSingleAtom ? width_i / 2 : 0);
-    moleculesWithCoords[i]!.offsetY =
-      -bounds.minY + (isSingleAtom ? height_i / 2 : 0);
+    moleculesWithCoords[i]!.offsetX = currentX - bounds.minX + (isSingleAtom ? width_i / 2 : 0);
+    moleculesWithCoords[i]!.offsetY = -bounds.minY + (isSingleAtom ? height_i / 2 : 0);
 
     currentX += width_i + spacing;
     maxY = Math.max(maxY, height_i);
@@ -1553,10 +1442,7 @@ function renderMultipleMolecules(
       }
     });
 
-    const atomsToShow = determineVisibleAtoms(
-      molecule,
-      options.showCarbonLabels ?? false,
-    );
+    const atomsToShow = determineVisibleAtoms(molecule, options.showCarbonLabels ?? false);
     const aromaticRings = detectAromaticRings(molecule);
 
     // Compute heteroatoms that belong to rings for this molecule and force
@@ -1607,22 +1493,9 @@ function renderMultipleMolecules(
         const bondClass = `bond-${bondIndex} atom-${bond.atom1} atom-${bond.atom2}`;
 
         if (bond.type === BondType.SINGLE) {
-          svgBody += svgLine(
-            x1,
-            y1,
-            x2,
-            y2,
-            bondColor,
-            bondLineWidth,
-            bondClass,
-          );
-        } else if (
-          bond.type === BondType.DOUBLE ||
-          bond.type === BondType.AROMATIC
-        ) {
-          const ringsForBond = aromaticRings.filter((r) =>
-            r.bonds.includes(bond),
-          );
+          svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
+        } else if (bond.type === BondType.DOUBLE || bond.type === BondType.AROMATIC) {
+          const ringsForBond = aromaticRings.filter((r) => r.bonds.includes(bond));
           if (ringsForBond.length > 0) {
             let cx = 0,
               cy = 0,
@@ -1672,15 +1545,7 @@ function renderMultipleMolecules(
               line2X2 -= (innerDx / innerLen) * shortenAmount;
               line2Y2 -= (innerDy / innerLen) * shortenAmount;
 
-              svgBody += svgLine(
-                x1,
-                y1,
-                x2,
-                y2,
-                bondColor,
-                bondLineWidth,
-                bondClass,
-              );
+              svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
               svgBody += svgLine(
                 line2X1,
                 line2Y1,
@@ -1757,15 +1622,7 @@ function renderMultipleMolecules(
           bondClass,
         );
       } else if (bond.type === BondType.TRIPLE) {
-        svgBody += svgTripleBond(
-          x1,
-          y1,
-          x2,
-          y2,
-          bondColor,
-          bondLineWidth,
-          bondClass,
-        );
+        svgBody += svgTripleBond(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
       } else {
         svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
       }
@@ -1784,11 +1641,7 @@ function renderMultipleMolecules(
 
         let label = atom.symbol;
 
-        if (
-          options.showImplicitHydrogens &&
-          atom.hydrogens > 0 &&
-          atom.symbol !== "C"
-        ) {
+        if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
           const hColor = atomColors["H"] ?? "#AAAAAA";
           const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
 
@@ -1832,20 +1685,11 @@ function renderMultipleMolecules(
         if (atom.charge !== 0) {
           const chargeSign = atom.charge > 0 ? "+" : "−";
           const chargeStr =
-            Math.abs(atom.charge) > 1
-              ? `${Math.abs(atom.charge)}${chargeSign}`
-              : chargeSign;
+            Math.abs(atom.charge) > 1 ? `${Math.abs(atom.charge)}${chargeSign}` : chargeSign;
           const chargeX = x + fontSize * 0.5;
           const chargeY = y - fontSize * 0.3;
           const smallFontSize = fontSize * 0.7;
-          svgBody += svgText(
-            chargeX,
-            chargeY,
-            chargeStr,
-            color,
-            smallFontSize,
-            fontFamily,
-          );
+          svgBody += svgText(chargeX, chargeY, chargeStr, color, smallFontSize, fontFamily);
         }
       }
     }

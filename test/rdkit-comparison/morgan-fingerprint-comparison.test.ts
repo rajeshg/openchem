@@ -111,10 +111,7 @@ function fpToHex(fp: number[]): string {
   let hex = "";
   for (let i = 0; i < fp.length; i += 4) {
     let nibble =
-      ((fp[i] ?? 0) << 3) |
-      ((fp[i + 1] ?? 0) << 2) |
-      ((fp[i + 2] ?? 0) << 1) |
-      (fp[i + 3] ?? 0);
+      ((fp[i] ?? 0) << 3) | ((fp[i + 1] ?? 0) << 2) | ((fp[i + 2] ?? 0) << 1) | (fp[i + 3] ?? 0);
     hex += nibble.toString(16);
   }
   return hex;
@@ -134,11 +131,7 @@ it("compares OpenChem and RDKit-JS Morgan fingerprints (radius=2, nBits=2048)", 
     const smi = bulkSmiles[i];
     if (typeof smi !== "string") {
       if (process.env.VERBOSE) {
-        console.log(
-          `# DEBUG: Non-string SMILES at index ${i}:`,
-          smi,
-          typeof smi,
-        );
+        console.log(`# DEBUG: Non-string SMILES at index ${i}:`, smi, typeof smi);
       }
       errorCount++;
       continue;
@@ -146,9 +139,7 @@ it("compares OpenChem and RDKit-JS Morgan fingerprints (radius=2, nBits=2048)", 
 
     const result = parseSMILES(smi);
     if (result.errors.length > 0) {
-      console.log(
-        `# ERROR parsing SMILES: ${smi} => ${result.errors.join("; ")} (OpenChem)`,
-      );
+      console.log(`# ERROR parsing SMILES: ${smi} => ${result.errors.join("; ")} (OpenChem)`);
       errorCount++;
       continue;
     }
@@ -174,9 +165,7 @@ it("compares OpenChem and RDKit-JS Morgan fingerprints (radius=2, nBits=2048)", 
         rdkitFp = [];
       }
     } catch (e) {
-      console.log(
-        `# ERROR generating fingerprint: ${smi} => ${String(e)} (RDKit)`,
-      );
+      console.log(`# ERROR generating fingerprint: ${smi} => ${String(e)} (RDKit)`);
       errorCount++;
       if (rdkitMol && rdkitMol.delete) rdkitMol.delete();
       continue;
@@ -195,26 +184,19 @@ it("compares OpenChem and RDKit-JS Morgan fingerprints (radius=2, nBits=2048)", 
     openchemBits.length = 2048;
 
     // Compute semantic similarity metrics
-    const tanimoto = tanimotoSimilarity(
-      new Uint8Array(openchemBits),
-      new Uint8Array(rdkitFp),
-    );
+    const tanimoto = tanimotoSimilarity(new Uint8Array(openchemBits), new Uint8Array(rdkitFp));
     const hamming = hammingDistance(openchemFp, rdkitFp);
     similarities.push(tanimoto);
 
     successCount++;
     if (successCount <= 10) {
-      console.log(
-        `✓ ${smi}: Tanimoto=${tanimoto.toFixed(3)}, Hamming=${hamming}`,
-      );
+      console.log(`✓ ${smi}: Tanimoto=${tanimoto.toFixed(3)}, Hamming=${hamming}`);
     }
   }
 
   // Compute statistics
   const avgSimilarity =
-    similarities.length > 0
-      ? similarities.reduce((a, b) => a + b, 0) / similarities.length
-      : 0;
+    similarities.length > 0 ? similarities.reduce((a, b) => a + b, 0) / similarities.length : 0;
   const minSimilarity = similarities.length > 0 ? Math.min(...similarities) : 0;
   const maxSimilarity = similarities.length > 0 ? Math.max(...similarities) : 0;
 

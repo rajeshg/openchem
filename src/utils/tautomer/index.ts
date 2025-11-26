@@ -1,11 +1,10 @@
 import type { Molecule } from "types";
-import { enumerateTautomers } from "./tautomer-enumerator";
+import { enumerateTautomers, getCanonicalTautomer } from "./tautomer-enumerator";
 
-export { enumerateTautomers };
+export { enumerateTautomers, getCanonicalTautomer };
+export type { TautomerOptions, TautomerResult } from "./tautomer-enumerator";
 
 export function canonicalTautomer(input: Molecule) {
-  const tautomers = enumerateTautomers(input, { maxTautomers: 128 });
-  if (!tautomers || tautomers.length === 0) return input;
-  // naive: return highest-scored (score currently 0), fallback to first
-  return tautomers[0]?.molecule ?? input;
+  const result = getCanonicalTautomer(input, { maxTautomers: 128 });
+  return result.molecule;
 }

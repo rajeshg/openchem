@@ -34,12 +34,8 @@ describe("P-14.4 Alphabetization Rules", () => {
       const result = namer.generateName(mol);
       expect(result.name).toBe("1-bromo-5-chloro-3-methylpentane");
       // Verify alphabetical order: bromo (b) < chloro (c) < methyl (m)
-      expect(result.name.indexOf("bromo")).toBeLessThan(
-        result.name.indexOf("chloro"),
-      );
-      expect(result.name.indexOf("chloro")).toBeLessThan(
-        result.name.indexOf("methyl"),
-      );
+      expect(result.name.indexOf("bromo")).toBeLessThan(result.name.indexOf("chloro"));
+      expect(result.name.indexOf("chloro")).toBeLessThan(result.name.indexOf("methyl"));
     });
   });
 
@@ -131,13 +127,9 @@ describe("P-14.4 Alphabetization Rules", () => {
         expect(result.name).toBe(expected);
 
         // Verify bromo comes before chloro
-        expect(result.name.indexOf("bromo")).toBeLessThan(
-          result.name.indexOf("chloro"),
-        );
+        expect(result.name.indexOf("bromo")).toBeLessThan(result.name.indexOf("chloro"));
         // Verify chloro comes before methyl
-        expect(result.name.indexOf("chloro")).toBeLessThan(
-          result.name.indexOf("methyl"),
-        );
+        expect(result.name.indexOf("chloro")).toBeLessThan(result.name.indexOf("methyl"));
       });
     });
 

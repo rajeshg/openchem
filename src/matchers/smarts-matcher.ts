@@ -17,10 +17,7 @@ import { getCSRGraph } from "src/utils/csr-graph";
 const debugSmarts: boolean = !!process.env.OPENCHEM_DEBUG_SMARTS;
 const debug: boolean = debugSmarts;
 
-const matchSMARTSCache: WeakMap<
-  Molecule,
-  Map<string, MatchResult>
-> = new WeakMap();
+const matchSMARTSCache: WeakMap<Molecule, Map<string, MatchResult>> = new WeakMap();
 
 export function matchSMARTS(
   pattern: string | SMARTSPattern,
@@ -33,9 +30,7 @@ export function matchSMARTS(
     patternKey = pattern;
     const parseResult = parseSMARTS(pattern);
     if (!parseResult.pattern || parseResult.errors.length > 0) {
-      throw new Error(
-        `Invalid SMARTS pattern: ${parseResult.errors.join(", ")}`,
-      );
+      throw new Error(`Invalid SMARTS pattern: ${parseResult.errors.join(", ")}`);
     }
     parsedPattern = parseResult.pattern;
   } else {
@@ -63,11 +58,7 @@ export function matchSMARTS(
   const matches: Match[] = [];
   const maxMatches = options?.maxMatches ?? Infinity;
 
-  for (
-    let i = 0;
-    i < molecule.atoms.length && matches.length < maxMatches;
-    i++
-  ) {
+  for (let i = 0; i < molecule.atoms.length && matches.length < maxMatches; i++) {
     const foundMatches = tryMatchFromAtom(parsedPattern, molecule, graph, i);
     for (const match of foundMatches) {
       if (matches.length >= maxMatches) break;
@@ -106,16 +97,7 @@ function tryMatchFromAtom(
   const allMatches: Match[] = [];
   const mapping: Map<number, number> = new Map();
 
-  collectAllMatches(
-    pattern,
-    molecule,
-    graph,
-    0,
-    startAtomIndex,
-    mapping,
-    new Set(),
-    allMatches,
-  );
+  collectAllMatches(pattern, molecule, graph, 0, startAtomIndex, mapping, new Set(), allMatches);
 
   return allMatches;
 }
@@ -138,15 +120,9 @@ function validateRingClosures(
 
   if (debugSmarts) {
     // eslint-disable-next-line no-console
-    console.debug(
-      "[SMARTS DEBUG] validateRingClosures mappingIndices=",
-      mappedIndicesArr,
-    );
+    console.debug("[SMARTS DEBUG] validateRingClosures mappingIndices=", mappedIndicesArr);
     // eslint-disable-next-line no-console
-    console.debug(
-      "[SMARTS DEBUG] validateRingClosures matchedAtomIds=",
-      matchedAtomIds,
-    );
+    console.debug("[SMARTS DEBUG] validateRingClosures matchedAtomIds=", matchedAtomIds);
     // eslint-disable-next-line no-console
     console.debug(
       "[SMARTS DEBUG] validateRingClosures molecule.rings=",
@@ -178,13 +154,9 @@ function validateRingClosures(
     }
     const ringSet = new Set(ring);
     const matches =
-      matchedAtomIds.every((id) => ringSet.has(id)) &&
-      ring.every((id) => matchedAtomIdSet.has(id));
+      matchedAtomIds.every((id) => ringSet.has(id)) && ring.every((id) => matchedAtomIdSet.has(id));
     if (debug && matches) {
-      console.debug(
-        "[SMARTS DEBUG] validateRingClosures: found exact ring match",
-        ring,
-      );
+      console.debug("[SMARTS DEBUG] validateRingClosures: found exact ring match", ring);
     }
     return matches;
   });
@@ -194,10 +166,7 @@ function validateRingClosures(
   }
 
   if (debug) {
-    console.debug(
-      "[SMARTS DEBUG] validateRingClosures: no exact ring match for",
-      matchedAtomIds,
-    );
+    console.debug("[SMARTS DEBUG] validateRingClosures: no exact ring match for", matchedAtomIds);
   }
 
   // Relaxed rule: each ring-closure bond in the pattern must map to two molecule atoms
@@ -218,10 +187,10 @@ function validateRingClosures(
     const toAtom = molecule.atoms[toMolIdx];
     if (!fromAtom || !toAtom) {
       if (debug)
-        console.debug(
-          "[SMARTS DEBUG] validateRingClosures: fromAtom or toAtom is undefined",
-          { fromMolIdx, toMolIdx },
-        );
+        console.debug("[SMARTS DEBUG] validateRingClosures: fromAtom or toAtom is undefined", {
+          fromMolIdx,
+          toMolIdx,
+        });
       return false;
     }
 
@@ -295,25 +264,16 @@ function collectAllMatches(
   const patternAtom = pattern.atoms[patternAtomIdx]!;
   const moleculeAtom = molecule.atoms[moleculeAtomIdx];
 
-  if (
-    !moleculeAtom ||
-    !matchesAtomPrimitives(patternAtom, moleculeAtom, molecule)
-  ) {
+  if (!moleculeAtom || !matchesAtomPrimitives(patternAtom, moleculeAtom, molecule)) {
     return;
   }
 
   mapping.set(patternAtomIdx, moleculeAtomIdx);
   visited.add(patternAtomIdx);
 
-  const allPatternBonds = pattern.bonds.filter(
-    (b) => b.from === patternAtomIdx,
-  );
-  const ringClosureBonds = allPatternBonds.filter(
-    (b) => b.isRingClosure && visited.has(b.to),
-  );
-  const regularBonds = allPatternBonds.filter(
-    (b) => !b.isRingClosure || !visited.has(b.to),
-  );
+  const allPatternBonds = pattern.bonds.filter((b) => b.from === patternAtomIdx);
+  const ringClosureBonds = allPatternBonds.filter((b) => b.isRingClosure && visited.has(b.to));
+  const regularBonds = allPatternBonds.filter((b) => !b.isRingClosure || !visited.has(b.to));
 
   for (const ringBond of ringClosureBonds) {
     const targetMoleculeIdx = mapping.get(ringBond.to);
@@ -437,16 +397,7 @@ function collectAllBondMatches(
 
     for (let i = 0; i < molecule.atoms.length; i++) {
       if (!Array.from(mapping.values()).includes(i)) {
-        collectAllMatches(
-          pattern,
-          molecule,
-          graph,
-          nextUnmatched,
-          i,
-          mapping,
-          visited,
-          allMatches,
-        );
+        collectAllMatches(pattern, molecule, graph, nextUnmatched, i, mapping, visited, allMatches);
       }
     }
     return;
@@ -499,16 +450,7 @@ function collectAllBondPermutations(
 
     for (let i = 0; i < molecule.atoms.length; i++) {
       if (!Array.from(mapping.values()).includes(i)) {
-        collectAllMatches(
-          pattern,
-          molecule,
-          graph,
-          nextUnmatched,
-          i,
-          mapping,
-          visited,
-          allMatches,
-        );
+        collectAllMatches(pattern, molecule, graph, nextUnmatched, i, mapping, visited, allMatches);
       }
     }
     return;
@@ -525,12 +467,8 @@ function collectAllBondPermutations(
 
     const moleculeBond = moleculeBonds[i]!;
     const neighborAtomId =
-      moleculeBond.atom1 === currentMoleculeAtomId
-        ? moleculeBond.atom2
-        : moleculeBond.atom1;
-    const neighborAtomIdx = molecule.atoms.findIndex(
-      (a) => a.id === neighborAtomId,
-    );
+      moleculeBond.atom1 === currentMoleculeAtomId ? moleculeBond.atom2 : moleculeBond.atom1;
+    const neighborAtomIdx = molecule.atoms.findIndex((a) => a.id === neighborAtomId);
 
     if (neighborAtomIdx === -1) {
       continue;
@@ -543,9 +481,7 @@ function collectAllBondPermutations(
       continue;
     }
 
-    if (
-      !matchesBondPrimitives(patternBond.primitives[0]!, moleculeBond, molecule)
-    ) {
+    if (!matchesBondPrimitives(patternBond.primitives[0]!, moleculeBond, molecule)) {
       continue;
     }
 
@@ -621,10 +557,7 @@ function matchAtomRecursive(
   const patternAtom = pattern.atoms[patternAtomIdx]!;
   const moleculeAtom = molecule.atoms[moleculeAtomIdx];
 
-  if (
-    !moleculeAtom ||
-    !matchesAtomPrimitives(patternAtom, moleculeAtom, molecule)
-  ) {
+  if (!moleculeAtom || !matchesAtomPrimitives(patternAtom, moleculeAtom, molecule)) {
     return false;
   }
 
@@ -641,16 +574,7 @@ function matchAtomRecursive(
 
     for (let i = 0; i < molecule.atoms.length; i++) {
       if (!Array.from(mapping.values()).includes(i)) {
-        if (
-          matchAtomRecursive(
-            pattern,
-            molecule,
-            nextUnmatched,
-            i,
-            mapping,
-            visited,
-          )
-        ) {
+        if (matchAtomRecursive(pattern, molecule, nextUnmatched, i, mapping, visited)) {
           return true;
         }
       }
@@ -702,16 +626,7 @@ function tryMatchBonds(
 
     for (let i = 0; i < molecule.atoms.length; i++) {
       if (!Array.from(mapping.values()).includes(i)) {
-        if (
-          matchAtomRecursive(
-            pattern,
-            molecule,
-            nextUnmatched,
-            i,
-            mapping,
-            visited,
-          )
-        ) {
+        if (matchAtomRecursive(pattern, molecule, nextUnmatched, i, mapping, visited)) {
           return true;
         }
       }
@@ -751,16 +666,7 @@ function tryMatchBondsPermutation(
 
     for (let i = 0; i < molecule.atoms.length; i++) {
       if (!Array.from(mapping.values()).includes(i)) {
-        if (
-          matchAtomRecursive(
-            pattern,
-            molecule,
-            nextUnmatched,
-            i,
-            mapping,
-            visited,
-          )
-        ) {
+        if (matchAtomRecursive(pattern, molecule, nextUnmatched, i, mapping, visited)) {
           return true;
         }
       }
@@ -779,12 +685,8 @@ function tryMatchBondsPermutation(
 
     const moleculeBond = moleculeBonds[i]!;
     const neighborAtomId =
-      moleculeBond.atom1 === currentMoleculeAtomId
-        ? moleculeBond.atom2
-        : moleculeBond.atom1;
-    const neighborAtomIdx = molecule.atoms.findIndex(
-      (a) => a.id === neighborAtomId,
-    );
+      moleculeBond.atom1 === currentMoleculeAtomId ? moleculeBond.atom2 : moleculeBond.atom1;
+    const neighborAtomIdx = molecule.atoms.findIndex((a) => a.id === neighborAtomId);
 
     if (neighborAtomIdx === -1) {
       continue;
@@ -797,9 +699,7 @@ function tryMatchBondsPermutation(
       continue;
     }
 
-    if (
-      !matchesBondPrimitives(patternBond.primitives[0]!, moleculeBond, molecule)
-    ) {
+    if (!matchesBondPrimitives(patternBond.primitives[0]!, moleculeBond, molecule)) {
       continue;
     }
 
@@ -807,14 +707,7 @@ function tryMatchBondsPermutation(
     const prevVisited = new Set(visited);
 
     if (
-      !matchAtomRecursive(
-        pattern,
-        molecule,
-        targetPatternAtom,
-        neighborAtomIdx,
-        mapping,
-        visited,
-      )
+      !matchAtomRecursive(pattern, molecule, targetPatternAtom, neighborAtomIdx, mapping, visited)
     ) {
       mapping.clear();
       for (const [k, v] of prevMapping) {
@@ -872,17 +765,9 @@ function findNextUnmatchedPatternAtom(
   return -1;
 }
 
-function matchesAtomPrimitives(
-  patternAtom: PatternAtom,
-  atom: Atom,
-  molecule: Molecule,
-): boolean {
+function matchesAtomPrimitives(patternAtom: PatternAtom, atom: Atom, molecule: Molecule): boolean {
   if (patternAtom.logicalExpression) {
-    return evaluateLogicalExpression(
-      patternAtom.logicalExpression,
-      atom,
-      molecule,
-    );
+    return evaluateLogicalExpression(patternAtom.logicalExpression, atom, molecule);
   }
 
   if (!patternAtom.primitives || patternAtom.primitives.length === 0) {
@@ -926,28 +811,18 @@ function evaluateLogicalExpression(
   }
 }
 
-function matchesAtomPrimitive(
-  primitive: AtomPrimitive,
-  atom: Atom,
-  molecule: Molecule,
-): boolean {
+function matchesAtomPrimitive(primitive: AtomPrimitive, atom: Atom, molecule: Molecule): boolean {
   const result = checkAtomPrimitive(primitive, atom, molecule);
   return primitive.negate ? !result : result;
 }
 
-function checkAtomPrimitive(
-  primitive: AtomPrimitive,
-  atom: Atom,
-  molecule: Molecule,
-): boolean {
+function checkAtomPrimitive(primitive: AtomPrimitive, atom: Atom, molecule: Molecule): boolean {
   switch (primitive.type) {
     case "wildcard":
       return true;
 
     case "element":
-      return (
-        atom.symbol.toUpperCase() === (primitive.value as string).toUpperCase()
-      );
+      return atom.symbol.toUpperCase() === (primitive.value as string).toUpperCase();
 
     case "aromatic_element":
       return (
@@ -974,15 +849,12 @@ function checkAtomPrimitive(
       const connectivityBonds = molecule.bonds.filter(
         (b) => b.atom1 === atom.id || b.atom2 === atom.id,
       );
-      const totalConnectivity =
-        connectivityBonds.length + (atom.hydrogens ?? 0);
+      const totalConnectivity = connectivityBonds.length + (atom.hydrogens ?? 0);
       return totalConnectivity === primitive.value;
 
     case "total_h":
       const implicitH = atom.hydrogens ?? 0;
-      const bondsForH = molecule.bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const bondsForH = molecule.bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
       const explicitHCount = bondsForH.filter((b) => {
         const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
         const other = molecule.atoms.find((a) => a.id === otherId);
@@ -992,9 +864,7 @@ function checkAtomPrimitive(
 
     case "implicit_h":
       const explicitH = atom.hydrogens ?? 0;
-      const bonds = molecule.bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const bonds = molecule.bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
       const bondedH = bonds.filter((b) => {
         const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
         const other = molecule.atoms.find((a) => a.id === otherId);
@@ -1017,15 +887,12 @@ function checkAtomPrimitive(
         return false;
       }
       return (
-        atom.ringIds.some(
-          (ringId) => molecule.rings![ringId]?.length === primitive.value,
-        ) ?? false
+        atom.ringIds.some((ringId) => molecule.rings![ringId]?.length === primitive.value) ?? false
       );
 
     case "ring_connectivity":
       const ringBonds = molecule.bonds.filter(
-        (b) =>
-          (b.atom1 === atom.id || b.atom2 === atom.id) && b.isInRing === true,
+        (b) => (b.atom1 === atom.id || b.atom2 === atom.id) && b.isInRing === true,
       );
       return ringBonds.length === primitive.value;
 
@@ -1073,9 +940,7 @@ function checkBondPrimitive(
 
     case "aromatic":
       return (
-        bond.type === BondType.AROMATIC &&
-        fromAtom?.aromatic === true &&
-        toAtom?.aromatic === true
+        bond.type === BondType.AROMATIC && fromAtom?.aromatic === true && toAtom?.aromatic === true
       );
 
     case "any":

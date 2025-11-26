@@ -27,9 +27,7 @@ export interface MoleculeGraphInfo {
 
 let graphCache = new WeakMap<object, MoleculeGraphInfo>();
 
-export function buildGraphFromMolecule(
-  mol: Molecule,
-): Graph<Atom | undefined, EdgeData> {
+export function buildGraphFromMolecule(mol: Molecule): Graph<Atom | undefined, EdgeData> {
   const g = new Graph<Atom | undefined, EdgeData>();
 
   for (const atom of mol.atoms) {
@@ -134,10 +132,7 @@ export class MoleculeGraph {
 
   get sssr(): number[][] {
     if (!this._sssr) {
-      this._sssr = findSSSR_Kekule(
-        Array.from(this.mol.atoms),
-        Array.from(this.mol.bonds),
-      );
+      this._sssr = findSSSR_Kekule(Array.from(this.mol.atoms), Array.from(this.mol.bonds));
     }
     return this._sssr;
   }
@@ -191,11 +186,7 @@ export class MoleculeGraph {
     return findShortestPath(this.graph, startNode, endNode);
   }
 
-  findAllSimplePaths(
-    startNode: number,
-    endNode: number,
-    maxLength?: number,
-  ): number[][] {
+  findAllSimplePaths(startNode: number, endNode: number, maxLength?: number): number[][] {
     return findAllSimplePaths(this.graph, startNode, endNode, maxLength);
   }
 
@@ -210,9 +201,7 @@ export class MoleculeGraph {
   }
 }
 
-export function getFragmentGraphs(
-  mol: Molecule,
-): Graph<Atom | undefined, EdgeData>[] {
+export function getFragmentGraphs(mol: Molecule): Graph<Atom | undefined, EdgeData>[] {
   const info = computeMoleculeGraphInfo(mol);
   const graphs: Graph<Atom | undefined, EdgeData>[] = [];
 
@@ -223,9 +212,6 @@ export function getFragmentGraphs(
   return graphs;
 }
 
-function getInducedSubgraphFromGraph(
-  graph: Graph<Atom | undefined, EdgeData>,
-  nodeIds: number[],
-) {
+function getInducedSubgraphFromGraph(graph: Graph<Atom | undefined, EdgeData>, nodeIds: number[]) {
   return getInducedSubgraph(graph, nodeIds);
 }

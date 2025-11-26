@@ -1,8 +1,4 @@
-import type {
-  IUPACToken,
-  IUPACTokenizationResult,
-  OPSINRules,
-} from "./iupac-types";
+import type { IUPACToken, IUPACTokenizationResult, OPSINRules } from "./iupac-types";
 
 /**
  * IUPAC tokenizer - converts IUPAC name strings into semantic tokens
@@ -37,11 +33,7 @@ export class IUPACTokenizer {
       const remaining = normalized.substring(pos);
 
       // Skip hyphens and other punctuation between tokens
-      if (
-        remaining[0] === "-" ||
-        remaining[0] === "," ||
-        remaining[0] === " "
-      ) {
+      if (remaining[0] === "-" || remaining[0] === "," || remaining[0] === " ") {
         pos++;
         continue;
       }
@@ -55,8 +47,7 @@ export class IUPACTokenizer {
 
           // Check if this is a stereochemistry marker (E, Z, R, S, @, @@, or locant combos like 1R,2S)
           // Stereo markers are typically short (1-10 chars) and contain only letters, numbers, commas, @
-          const isStereoMarker =
-            /^[\d,@ezrs]+$/i.test(parenContent) && parenContent.length <= 10;
+          const isStereoMarker = /^[\d,@ezrs]+$/i.test(parenContent) && parenContent.length <= 10;
 
           if (isStereoMarker) {
             // Skip the opening paren, let the stereo regex match the content, skip closing paren
@@ -113,9 +104,7 @@ export class IUPACTokenizer {
           const bracketContent = remaining.substring(1, closeBracketIdx);
 
           if (process.env.VERBOSE) {
-            console.log(
-              `[tokenizer] Tokenizing bracket content: "${bracketContent}"`,
-            );
+            console.log(`[tokenizer] Tokenizing bracket content: "${bracketContent}"`);
           }
 
           // Tokenize the bracket content recursively
@@ -256,13 +245,10 @@ export class IUPACTokenizer {
           selectedToken.type === "PARENT" &&
           candidates.some((c) => c.type === "SUFFIX" && c.value === "oxy")
         ) {
-          const suffixToken = candidates.find(
-            (c) => c.type === "SUFFIX" && c.value === "oxy",
-          );
+          const suffixToken = candidates.find((c) => c.type === "SUFFIX" && c.value === "oxy");
           if (
             suffixToken &&
-            selectedToken.position + selectedToken.length ===
-              suffixToken.position
+            selectedToken.position + selectedToken.length === suffixToken.position
           ) {
             // Combine into alkoxy substituent
             const alkoxyValue = selectedToken.value + "oxy";
@@ -345,8 +331,7 @@ export class IUPACTokenizer {
     // Check for compound atom locant prefixes (e.g., "N,N-", "N,O-", "O,O-", "N,N'-", "N,N,N'-", "N,N,3-")
     // Supports apostrophes for primed notation and numeric locants after atom locants
     // Pattern: [atom](?:,[atom])* optionally followed by (?:,[digit]+)* then -
-    const compoundMatch =
-      /^([nNosOS])(?:')?(?:,([nNosOS])(?:')?)*(?:,\d+)*-/.exec(str);
+    const compoundMatch = /^([nNosOS])(?:')?(?:,([nNosOS])(?:')?)*(?:,\d+)*-/.exec(str);
     if (compoundMatch) {
       const prefixValue = compoundMatch[0].slice(0, -1); // Remove trailing hyphen
       const nextChar = str[compoundMatch[0].length];
@@ -740,9 +725,7 @@ export class IUPACTokenizer {
 
     // Return longest valid multiplier
     if (validMultipliers.length > 0) {
-      return validMultipliers.reduce((prev, curr) =>
-        curr.length > prev.length ? curr : prev,
-      );
+      return validMultipliers.reduce((prev, curr) => (curr.length > prev.length ? curr : prev));
     }
 
     return null;
@@ -854,9 +837,7 @@ export class IUPACTokenizer {
     }
 
     // Pattern: dimethoxy, trimethoxy, etc. on phenyl
-    const methoxyPhenylMatch = str.match(
-      /^([0-9]+-)?(di|tri|tetra)methoxy[^-]*(-.*)?phenyl/,
-    );
+    const methoxyPhenylMatch = str.match(/^([0-9]+-)?(di|tri|tetra)methoxy[^-]*(-.*)?phenyl/);
     if (methoxyPhenylMatch) {
       const locant = methoxyPhenylMatch[1] || "";
       const methoxyCount = methoxyPhenylMatch[2];
@@ -890,13 +871,11 @@ export class IUPACTokenizer {
     }
 
     // Try longest SMILES values first (usually longer names)
-    const substEntries = Object.entries(this.rules.substituents).sort(
-      (a, b) => {
-        const aLen = Math.max(...a[1].aliases.map((x) => x.length));
-        const bLen = Math.max(...b[1].aliases.map((x) => x.length));
-        return bLen - aLen;
-      },
-    );
+    const substEntries = Object.entries(this.rules.substituents).sort((a, b) => {
+      const aLen = Math.max(...a[1].aliases.map((x) => x.length));
+      const bLen = Math.max(...b[1].aliases.map((x) => x.length));
+      return bLen - aLen;
+    });
 
     for (const [smiles, data] of substEntries) {
       for (const alias of data.aliases) {
@@ -944,18 +923,14 @@ export class IUPACTokenizer {
     // Try to match bicyclo with known heteroatom prefixes
     for (const heteroType of heteroAtomPrefixes) {
       const heteroMatch = str.match(
-        new RegExp(
-          `^(\\d+-)?${heteroType}bicycl(?:ic|o)\\[(\\d+)\\.(\\d+)\\.(\\d+)\\]`,
-          "i",
-        ),
+        new RegExp(`^(\\d+-)?${heteroType}bicycl(?:ic|o)\\[(\\d+)\\.(\\d+)\\.(\\d+)\\]`, "i"),
       );
       if (heteroMatch) {
         const heteroPrefix = heteroMatch[1] ? heteroMatch[1].slice(0, -1) : "";
         const bridgeN = heteroMatch[2]!;
         const bridgeM = heteroMatch[3]!;
         const bridgeP = heteroMatch[4]!;
-        const totalAtoms =
-          parseInt(bridgeN) + parseInt(bridgeM) + parseInt(bridgeP) + 2;
+        const totalAtoms = parseInt(bridgeN) + parseInt(bridgeM) + parseInt(bridgeP) + 2;
 
         return {
           type: "PARENT",
@@ -976,16 +951,13 @@ export class IUPACTokenizer {
     }
 
     // Try to match bicyclo WITHOUT heteroatom prefix
-    const bicycloMatch = str.match(
-      /^(\d+-)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i,
-    );
+    const bicycloMatch = str.match(/^(\d+-)?bicycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)\]/i);
     if (bicycloMatch) {
       const heteroPrefix = bicycloMatch[1] ? bicycloMatch[1].slice(0, -1) : "";
       const bridgeN = bicycloMatch[2]!;
       const bridgeM = bicycloMatch[3]!;
       const bridgeP = bicycloMatch[4]!;
-      const totalAtoms =
-        parseInt(bridgeN) + parseInt(bridgeM) + parseInt(bridgeP) + 2;
+      const totalAtoms = parseInt(bridgeN) + parseInt(bridgeM) + parseInt(bridgeP) + 2;
 
       return {
         type: "PARENT",
@@ -1018,8 +990,7 @@ export class IUPACTokenizer {
         const bridgeA = tricycloWithHeteroMatch[3]!;
         const bridgeB = tricycloWithHeteroMatch[4]!;
         const bridgeC = tricycloWithHeteroMatch[5]!;
-        const totalAtoms =
-          parseInt(bridgeA) + parseInt(bridgeB) + parseInt(bridgeC) + 3; // 3 bridgeheads for tricyclic
+        const totalAtoms = parseInt(bridgeA) + parseInt(bridgeB) + parseInt(bridgeC) + 3; // 3 bridgeheads for tricyclic
 
         return {
           type: "PARENT",
@@ -1044,21 +1015,14 @@ export class IUPACTokenizer {
       /^(\d+-)?tricycl(?:ic|o)\[(\d+)\.(\d+)\.(\d+)(?:\.(\d+)(?:\^\{?(\d+),(\d+)\}?)?)?/i,
     );
     if (tricycloMatch) {
-      const heteroPrefix = tricycloMatch[1]
-        ? tricycloMatch[1].slice(0, -1)
-        : "";
+      const heteroPrefix = tricycloMatch[1] ? tricycloMatch[1].slice(0, -1) : "";
       const bridgeA = tricycloMatch[2]!;
       const bridgeB = tricycloMatch[3]!;
       const bridgeC = tricycloMatch[4]!;
       const bridgeD = tricycloMatch[5] ?? "0";
-      const sharedPos1 = tricycloMatch[6]
-        ? parseInt(tricycloMatch[6])
-        : undefined;
-      const sharedPos2 = tricycloMatch[7]
-        ? parseInt(tricycloMatch[7])
-        : undefined;
-      const totalAtoms =
-        parseInt(bridgeA) + parseInt(bridgeB) + parseInt(bridgeC) + 3; // 3 bridgeheads for tricyclic
+      const sharedPos1 = tricycloMatch[6] ? parseInt(tricycloMatch[6]) : undefined;
+      const sharedPos2 = tricycloMatch[7] ? parseInt(tricycloMatch[7]) : undefined;
+      const totalAtoms = parseInt(bridgeA) + parseInt(bridgeB) + parseInt(bridgeC) + 3; // 3 bridgeheads for tricyclic
 
       return {
         type: "PARENT",
@@ -1087,9 +1051,7 @@ export class IUPACTokenizer {
         new RegExp(`^(\\d+-)?${heteroType}spiro\\[(\\d+)\\.(\\d+)\\]`, "i"),
       );
       if (spiroWithHeteroMatch) {
-        const heteroPrefix = spiroWithHeteroMatch[1]
-          ? spiroWithHeteroMatch[1].slice(0, -1)
-          : "";
+        const heteroPrefix = spiroWithHeteroMatch[1] ? spiroWithHeteroMatch[1].slice(0, -1) : "";
         const ringA = parseInt(spiroWithHeteroMatch[2]!);
         const ringB = parseInt(spiroWithHeteroMatch[3]!);
         const totalAtoms = ringA + ringB + 1; // +1 for the spiro atom
@@ -1162,9 +1124,7 @@ export class IUPACTokenizer {
     // This handles cases like "nonadecane" (19 carbons) that should NOT be split into "non" + "dec"
     // Priority: Try longest multiplier names first (nonadec, octadec, etc.) before short stems
     if (this.rules.multipliers && this.rules.multipliers.basic) {
-      const multiplierEntries = Object.entries(
-        this.rules.multipliers.basic,
-      ).sort((a, b) => {
+      const multiplierEntries = Object.entries(this.rules.multipliers.basic).sort((a, b) => {
         // Sort by multiplier name length (longest first)
         const aName = String(a[1]);
         const bName = String(b[1]);
@@ -1193,9 +1153,7 @@ export class IUPACTokenizer {
             // - "ana" + word boundary (for carboxylic acids like "hexanoic")
             // But NOT "ene" or "yne" when multiplier is small (di, tri, tetra)
             // These are unsaturation suffixes (diene, triene), not parent chains
-            const suffixMatch = remainder.match(
-              /^(ane|ana(?=[^a-z]|$)|ano(?=[^a-z]|$))/,
-            );
+            const suffixMatch = remainder.match(/^(ane|ana(?=[^a-z]|$)|ano(?=[^a-z]|$))/);
 
             // Special case: "ene" and "yne" should only be matched for long chains (C11+)
             // For short chains, "diene", "triene", "diyne", etc. are SUFFIXES, not parents
@@ -1315,9 +1273,7 @@ export class IUPACTokenizer {
     if (bestMatch) return bestMatch;
 
     // Try alkane stem components (for longer chains)
-    for (const [num, names] of Object.entries(
-      this.rules.alkaneStemComponents.hundreds,
-    )) {
+    for (const [num, names] of Object.entries(this.rules.alkaneStemComponents.hundreds)) {
       const nameList = names.split("|");
       for (const nm of nameList) {
         if (str.startsWith(nm)) {
@@ -1366,9 +1322,7 @@ export class IUPACTokenizer {
       }
     }
 
-    for (const [num, names] of Object.entries(
-      this.rules.alkaneStemComponents.tens,
-    )) {
+    for (const [num, names] of Object.entries(this.rules.alkaneStemComponents.tens)) {
       const nameList = names.split("|");
       for (const nm of nameList) {
         if (str.startsWith(nm)) {
@@ -1383,9 +1337,7 @@ export class IUPACTokenizer {
             // Check if string STARTS with a units component (e.g., "do" in "dodecane")
             // If so, skip this tens match - let units be matched first, then tens on next iteration
             let startsWithUnits = false;
-            for (const stemNames of Object.values(
-              this.rules.alkaneStemComponents.units,
-            )) {
+            for (const stemNames of Object.values(this.rules.alkaneStemComponents.units)) {
               const stemList = stemNames.split("|");
               for (const s of stemList) {
                 if (str.startsWith(s) && str[s.length] === nm[0]) {
@@ -1404,9 +1356,7 @@ export class IUPACTokenizer {
           } else {
             // Check if followed by another stem component
             let isValidStem = false;
-            for (const stemNames of Object.values(
-              this.rules.alkaneStemComponents.units,
-            )) {
+            for (const stemNames of Object.values(this.rules.alkaneStemComponents.units)) {
               const stemList = stemNames.split("|");
               for (const s of stemList) {
                 if (remainder.startsWith(s)) {
@@ -1436,9 +1386,7 @@ export class IUPACTokenizer {
       }
     }
 
-    for (const [num, names] of Object.entries(
-      this.rules.alkaneStemComponents.units,
-    )) {
+    for (const [num, names] of Object.entries(this.rules.alkaneStemComponents.units)) {
       const nameList = names.split("|");
       for (const nm of nameList) {
         if (str.startsWith(nm)) {

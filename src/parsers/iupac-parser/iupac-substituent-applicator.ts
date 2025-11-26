@@ -45,9 +45,7 @@ export class IUPACSubstituentApplicator {
       // Now find the ester alkyl group (substituent without locant)
       const esterAlkylSubst = substituentTokens.find((s) => {
         const val = s.value.toLowerCase();
-        const hasLocant = locantTokens.some(
-          (l) => l.position < s.position && l.position !== 0,
-        );
+        const hasLocant = locantTokens.some((l) => l.position < s.position && l.position !== 0);
         return (
           !hasLocant &&
           !s.isInParentheses &&
@@ -111,17 +109,13 @@ export class IUPACSubstituentApplicator {
       // Skip if already processed by another handler
       if (processedSubstituents.has(substituent)) {
         if (process.env.VERBOSE) {
-          console.log(
-            `[substituent] Skipping ${substituent.value} - already processed`,
-          );
+          console.log(`[substituent] Skipping ${substituent.value} - already processed`);
         }
         continue;
       }
 
       // Check if this is an N-substituent (defer to applyNPrefixSubstituents)
-      const nPrefix = prefixTokens.find((p) =>
-        this.context.isNSubstitutionPrefix(p),
-      );
+      const nPrefix = prefixTokens.find((p) => this.context.isNSubstitutionPrefix(p));
       if (nPrefix && substituent.position > nPrefix.position) {
         // Check if it has explicit numeric locants
         const precedingLocant = locantTokens.find(
@@ -159,9 +153,7 @@ export class IUPACSubstituentApplicator {
         (p) =>
           p.metadata?.isCyclic &&
           p.position < substituent.position &&
-          !prefixTokens.some(
-            (x) => x.position > p.position && x.position < substituent.position,
-          ),
+          !prefixTokens.some((x) => x.position > p.position && x.position < substituent.position),
       );
 
       if (cycloPrefix) {
@@ -191,32 +183,22 @@ export class IUPACSubstituentApplicator {
         "bromomethyl",
       ].includes(modifiedSubstValue);
 
-      if (
-        substituent.isInParentheses &&
-        substituent.nestedTokens &&
-        !isSimpleSubstituent
-      ) {
+      if (substituent.isInParentheses && substituent.nestedTokens && !isSimpleSubstituent) {
         // Get locants for where to attach this substituent
-        const locants = this.getLocantsBeforeSubstituent(
-          substituent,
-          locantTokens,
-        );
+        const locants = this.getLocantsBeforeSubstituent(substituent, locantTokens);
 
         // Check for ester attachment (complex group without explicit locant attached to carboxylate)
         if (locants.length === 0 && esterAttachmentPoints.length > 0) {
           const oIdx = esterAttachmentPoints.shift();
           if (oIdx !== undefined) {
-            const nestedResult =
-              this.context.nestedBuilder.buildNestedSubstituent(
-                builder,
-                substituent.nestedTokens,
-              );
+            const nestedResult = this.context.nestedBuilder.buildNestedSubstituent(
+              builder,
+              substituent.nestedTokens,
+            );
             if (nestedResult) {
               builder.addBond(oIdx, nestedResult.attachmentPoint);
               if (process.env.VERBOSE) {
-                console.log(
-                  `[graph-builder] Attached nested ester group to oxygen ${oIdx}`,
-                );
+                console.log(`[graph-builder] Attached nested ester group to oxygen ${oIdx}`);
               }
             }
             continue;
@@ -227,18 +209,13 @@ export class IUPACSubstituentApplicator {
 
         for (const loc of positions) {
           // Handle complex substituent by building it as a sub-molecule for each position
-          const nestedResult =
-            this.context.nestedBuilder.buildNestedSubstituent(
-              builder,
-              substituent.nestedTokens,
-            );
+          const nestedResult = this.context.nestedBuilder.buildNestedSubstituent(
+            builder,
+            substituent.nestedTokens,
+          );
 
           if (nestedResult) {
-            const atomIdx = this.context.locantToAtomIndex(
-              loc,
-              mainChainAtoms,
-              reverseNumbering,
-            );
+            const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms, reverseNumbering);
             if (atomIdx !== null) {
               let attachmentAtom = nestedResult.attachmentPoint;
 
@@ -249,9 +226,7 @@ export class IUPACSubstituentApplicator {
                   s.value === "oxy" &&
                   s.position > substituent.position &&
                   !substituentTokens.some(
-                    (x) =>
-                      x.position > substituent.position &&
-                      x.position < s.position,
+                    (x) => x.position > substituent.position && x.position < s.position,
                   ),
               );
 
@@ -262,18 +237,14 @@ export class IUPACSubstituentApplicator {
                 attachmentAtom = oxyIdx;
 
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `[nested-substituent] Added oxygen linkage for oxy suffix`,
-                  );
+                  console.log(`[nested-substituent] Added oxygen linkage for oxy suffix`);
                 }
               }
 
               // Attach the nested substituent at this position
               // Check if nested tokens indicate ylidene (double bond attachment)
               const hasYlideneSuffix = substituent.nestedTokens?.some(
-                (t) =>
-                  t.type === "SUFFIX" &&
-                  (t.value === "idene" || t.value === "ylidene"),
+                (t) => t.type === "SUFFIX" && (t.value === "idene" || t.value === "ylidene"),
               );
 
               if (hasYlideneSuffix) {
@@ -308,13 +279,8 @@ export class IUPACSubstituentApplicator {
       }
 
       // Get multiplier and locants for this substituent
-      const multiplier = this.getMultiplierBeforeSubstituent(
-        substituent,
-        multiplierTokens,
-      );
-      let multiplierCount = multiplier
-        ? (multiplier.metadata?.count as number) || 1
-        : 1;
+      const multiplier = this.getMultiplierBeforeSubstituent(substituent, multiplierTokens);
+      let multiplierCount = multiplier ? (multiplier.metadata?.count as number) || 1 : 1;
       let locants = this.getLocantsBeforeSubstituent(substituent, locantTokens);
 
       if (process.env.VERBOSE && substituent.value.includes("phenyl")) {
@@ -343,10 +309,7 @@ export class IUPACSubstituentApplicator {
           (p) =>
             this.context.isNSubstitutionPrefix(p) &&
             p.position < substituent.position &&
-            !locantTokens.some(
-              (l) =>
-                l.position > p.position && l.position < substituent.position,
-            ),
+            !locantTokens.some((l) => l.position > p.position && l.position < substituent.position),
         );
         if (nPrefix) {
           // Check if there's an amine suffix - if so, handle differently
@@ -367,9 +330,7 @@ export class IUPACSubstituentApplicator {
                 const amineNIdx = amineNitrogens[amineNitrogens.length - 1]!; // Use last added amine
                 builder.addMethyl(amineNIdx);
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `[graph-builder] Applied N-methyl to amine nitrogen ${amineNIdx}`,
-                  );
+                  console.log(`[graph-builder] Applied N-methyl to amine nitrogen ${amineNIdx}`);
                 }
               }
             }
@@ -429,9 +390,7 @@ export class IUPACSubstituentApplicator {
               // When we have explicit locants, use their count instead of the multiplier
               multiplierCount = locants.length;
               if (process.env.VERBOSE) {
-                console.log(
-                  `[graph-builder] Extracted locants from N-prefix: ${locants}`,
-                );
+                console.log(`[graph-builder] Extracted locants from N-prefix: ${locants}`);
               }
             }
           }
@@ -469,20 +428,14 @@ export class IUPACSubstituentApplicator {
                 );
               }
               // Look for locants before the alkyl group (earlier ones)
-              const earlierLocants = locantTokens.filter(
-                (l) => l.position < nextSubst.position,
-              );
+              const earlierLocants = locantTokens.filter((l) => l.position < nextSubst.position);
               if (process.env.VERBOSE) {
-                console.log(
-                  `[sulfanyl-fix] earlierLocants.length=${earlierLocants.length}`,
-                );
+                console.log(`[sulfanyl-fix] earlierLocants.length=${earlierLocants.length}`);
               }
               if (earlierLocants.length > 0) {
                 // Use the last (closest) locant before the alkyl group
-                const lastEarlierLocant =
-                  earlierLocants[earlierLocants.length - 1]!;
-                const earlyLocants =
-                  (lastEarlierLocant.metadata?.positions as number[]) || [];
+                const lastEarlierLocant = earlierLocants[earlierLocants.length - 1]!;
+                const earlyLocants = (lastEarlierLocant.metadata?.positions as number[]) || [];
                 if (process.env.VERBOSE) {
                   console.log(`[sulfanyl-fix] earlyLocants=${earlyLocants}`);
                 }
@@ -537,34 +490,25 @@ export class IUPACSubstituentApplicator {
           const oIdx = esterAttachmentPoints.shift();
           if (oIdx !== undefined) {
             if (substituent.isInParentheses && substituent.nestedTokens) {
-              const nestedRes =
-                this.context.nestedBuilder.buildNestedSubstituent(
-                  builder,
-                  substituent.nestedTokens,
-                );
+              const nestedRes = this.context.nestedBuilder.buildNestedSubstituent(
+                builder,
+                substituent.nestedTokens,
+              );
               if (nestedRes) {
                 builder.addBond(oIdx, nestedRes.attachmentPoint);
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `[graph-builder] Attached nested ester group to oxygen ${oIdx}`,
-                  );
+                  console.log(`[graph-builder] Attached nested ester group to oxygen ${oIdx}`);
                 }
               }
             } else {
               if (modifiedSubstValue === "methyl") builder.addMethyl(oIdx);
               else if (modifiedSubstValue === "ethyl") builder.addEthyl(oIdx);
-              else if (modifiedSubstValue === "propyl")
-                builder.addAlkylSubstituent(oIdx, 3);
-              else if (modifiedSubstValue === "butyl")
-                builder.addAlkylSubstituent(oIdx, 4);
-              else if (modifiedSubstValue === "pentyl")
-                builder.addAlkylSubstituent(oIdx, 5);
-              else if (modifiedSubstValue === "hexyl")
-                builder.addAlkylSubstituent(oIdx, 6);
-              else if (modifiedSubstValue === "isopropyl")
-                builder.addIsopropyl(oIdx);
-              else if (modifiedSubstValue === "tert-butyl")
-                builder.addTertButyl(oIdx);
+              else if (modifiedSubstValue === "propyl") builder.addAlkylSubstituent(oIdx, 3);
+              else if (modifiedSubstValue === "butyl") builder.addAlkylSubstituent(oIdx, 4);
+              else if (modifiedSubstValue === "pentyl") builder.addAlkylSubstituent(oIdx, 5);
+              else if (modifiedSubstValue === "hexyl") builder.addAlkylSubstituent(oIdx, 6);
+              else if (modifiedSubstValue === "isopropyl") builder.addIsopropyl(oIdx);
+              else if (modifiedSubstValue === "tert-butyl") builder.addTertButyl(oIdx);
               else if (modifiedSubstValue === "phenyl") {
                 const ph = builder.createBenzeneRing();
                 builder.addBond(oIdx, ph[0]!);
@@ -580,11 +524,7 @@ export class IUPACSubstituentApplicator {
           }
         }
 
-        const atomIdx = this.context.locantToAtomIndex(
-          loc,
-          mainChainAtoms,
-          reverseNumbering,
-        );
+        const atomIdx = this.context.locantToAtomIndex(loc, mainChainAtoms, reverseNumbering);
         if (atomIdx === null) continue;
 
         // Allow substituents on C, N, S, P, Si atoms (heterocyclic rings can have substituents on heteroatoms)
@@ -630,10 +570,7 @@ export class IUPACSubstituentApplicator {
           builder.addAlkylSubstituent(atomIdx, 11);
         } else if (modifiedSubstValue === "dodecyl") {
           builder.addAlkylSubstituent(atomIdx, 12);
-        } else if (
-          modifiedSubstValue === "isopropyl" ||
-          modifiedSubstValue === "propan-2-yl"
-        ) {
+        } else if (modifiedSubstValue === "isopropyl" || modifiedSubstValue === "propan-2-yl") {
           builder.addIsopropyl(atomIdx);
         } else if (modifiedSubstValue === "isobutyl") {
           builder.addIsobutyl(atomIdx);
@@ -673,10 +610,7 @@ export class IUPACSubstituentApplicator {
           const oxygenIdx = builder.addAtom("O");
           builder.addBond(atomIdx, oxygenIdx);
           builder.addAlkylSubstituent(oxygenIdx, 8);
-        } else if (
-          modifiedSubstValue === "hydroxy" ||
-          modifiedSubstValue === "hydroxyl"
-        ) {
+        } else if (modifiedSubstValue === "hydroxy" || modifiedSubstValue === "hydroxyl") {
           builder.addHydroxyl(atomIdx);
         } else if (modifiedSubstValue === "oxo") {
           // Oxo = carbonyl =O on this carbon
@@ -699,10 +633,7 @@ export class IUPACSubstituentApplicator {
           if (benzeneAtoms[0] !== undefined) {
             builder.addBond(atomIdx, benzeneAtoms[0]);
           }
-        } else if (
-          modifiedSubstValue.endsWith("phenyl") &&
-          modifiedSubstValue !== "phenyl"
-        ) {
+        } else if (modifiedSubstValue.endsWith("phenyl") && modifiedSubstValue !== "phenyl") {
           // Handle complex phenyl with locants and substituents (e.g., "3-chloro-4-hydroxyphenyl")
           const benzeneAtoms = builder.createBenzeneRing();
           if (benzeneAtoms[0] !== undefined) {
@@ -728,11 +659,7 @@ export class IUPACSubstituentApplicator {
 
             // Apply each substituent to the benzene ring at its specified locant
             for (const { locant, substName } of locantsAndSubsts) {
-              const benzeneAtomIdx = this.context.locantToAtomIndex(
-                locant,
-                benzeneAtoms,
-                false,
-              );
+              const benzeneAtomIdx = this.context.locantToAtomIndex(locant, benzeneAtoms, false);
               if (benzeneAtomIdx !== null) {
                 // Apply the substituent based on its type
                 if (substName === "chloro") {
@@ -747,10 +674,7 @@ export class IUPACSubstituentApplicator {
                 } else if (substName === "fluoro" || substName === "fluo") {
                   const fIdx = builder.addAtom("F");
                   builder.addBond(benzeneAtomIdx, fIdx);
-                } else if (
-                  substName === "hydroxy" ||
-                  substName === "hydroxyl"
-                ) {
+                } else if (substName === "hydroxy" || substName === "hydroxyl") {
                   builder.addHydroxyl(benzeneAtomIdx);
                 } else if (substName === "methyl") {
                   builder.addMethyl(benzeneAtomIdx);
@@ -860,30 +784,18 @@ export class IUPACSubstituentApplicator {
           builder.addCyclohexyl(atomIdx);
         } else if (modifiedSubstValue === "cyclohexylidene") {
           builder.addCyclohexylidene(atomIdx);
-        } else if (
-          modifiedSubstValue === "chloro" ||
-          modifiedSubstValue === "chlor"
-        ) {
+        } else if (modifiedSubstValue === "chloro" || modifiedSubstValue === "chlor") {
           const clIdx = builder.addAtom("Cl");
           builder.addBond(atomIdx, clIdx);
-        } else if (
-          modifiedSubstValue === "bromo" ||
-          modifiedSubstValue === "brom"
-        ) {
+        } else if (modifiedSubstValue === "bromo" || modifiedSubstValue === "brom") {
           const brIdx = builder.addAtom("Br");
           builder.addBond(atomIdx, brIdx);
-        } else if (
-          modifiedSubstValue === "fluoro" ||
-          modifiedSubstValue === "fluor"
-        ) {
+        } else if (modifiedSubstValue === "fluoro" || modifiedSubstValue === "fluor") {
           const fIdx = builder.addAtom("F");
           builder.addBond(atomIdx, fIdx);
         } else if (modifiedSubstValue === "trifluoromethyl") {
           builder.addTrifluoromethyl(atomIdx);
-        } else if (
-          modifiedSubstValue === "iodo" ||
-          modifiedSubstValue === "iod"
-        ) {
+        } else if (modifiedSubstValue === "iodo" || modifiedSubstValue === "iod") {
           const iIdx = builder.addAtom("I");
           builder.addBond(atomIdx, iIdx);
         } else if (modifiedSubstValue === "nitro") {
@@ -897,19 +809,13 @@ export class IUPACSubstituentApplicator {
           // Set charges: N+ and O-
           builder.setCharge(nIdx, 1);
           builder.setCharge(o2, -1);
-        } else if (
-          modifiedSubstValue === "sulfinyl" ||
-          modifiedSubstValue === "sulfoxide"
-        ) {
+        } else if (modifiedSubstValue === "sulfinyl" || modifiedSubstValue === "sulfoxide") {
           // Sulfinyl group: -SO-
           const sIdx = builder.addAtom("S");
           const oIdx = builder.addAtom("O");
           builder.addBond(atomIdx, sIdx);
           builder.addBond(sIdx, oIdx, BondTypeEnum.DOUBLE);
-        } else if (
-          modifiedSubstValue === "sulfonyl" ||
-          modifiedSubstValue === "sulfone"
-        ) {
+        } else if (modifiedSubstValue === "sulfonyl" || modifiedSubstValue === "sulfone") {
           // Sulfonyl group: -SO2-
           const sIdx = builder.addAtom("S");
           const o1 = builder.addAtom("O");
@@ -917,10 +823,7 @@ export class IUPACSubstituentApplicator {
           builder.addBond(atomIdx, sIdx);
           builder.addBond(sIdx, o1, BondTypeEnum.DOUBLE);
           builder.addBond(sIdx, o2, BondTypeEnum.DOUBLE);
-        } else if (
-          modifiedSubstValue === "sulfanyl" ||
-          modifiedSubstValue === "thio"
-        ) {
+        } else if (modifiedSubstValue === "sulfanyl" || modifiedSubstValue === "thio") {
           // Sulfanyl group: -S-
           // Check if next substituent is an alkyl group (e.g., "propan-2-ylsulfanyl")
           const currentIdx = substituentTokens.indexOf(substituent);
@@ -929,18 +832,14 @@ export class IUPACSubstituentApplicator {
               ? substituentTokens[currentIdx + 1]
               : null;
           const nextValue = nextSubst?.value.toLowerCase() || "";
-          const isNextAlkyl =
-            nextValue.endsWith("-yl") || nextValue.endsWith("yl");
+          const isNextAlkyl = nextValue.endsWith("-yl") || nextValue.endsWith("yl");
 
           const sIdx = builder.addAtom("S");
           builder.addBond(atomIdx, sIdx);
 
           // If next substituent is an alkyl group at the same position, attach it to sulfur
           if (isNextAlkyl && nextSubst) {
-            const nextLocants = this.getLocantsBeforeSubstituent(
-              nextSubst,
-              locantTokens,
-            );
+            const nextLocants = this.getLocantsBeforeSubstituent(nextSubst, locantTokens);
             const nextPositions = nextLocants.length > 0 ? nextLocants : [1];
 
             // Check if this alkyl is at the same position as sulfanyl
@@ -956,10 +855,7 @@ export class IUPACSubstituentApplicator {
                 builder.addAlkylSubstituent(sIdx, 3);
               } else if (nextValue === "butyl") {
                 builder.addAlkylSubstituent(sIdx, 4);
-              } else if (
-                nextValue === "tert-butyl" ||
-                nextValue === "tertbutyl"
-              ) {
+              } else if (nextValue === "tert-butyl" || nextValue === "tertbutyl") {
                 builder.addTertButyl(sIdx);
               }
 
@@ -967,16 +863,13 @@ export class IUPACSubstituentApplicator {
               processedSubstituents.add(nextSubst);
 
               if (process.env.VERBOSE) {
-                console.log(
-                  `[sulfanyl] Attached ${nextValue} to sulfur at position ${loc}`,
-                );
+                console.log(`[sulfanyl] Attached ${nextValue} to sulfur at position ${loc}`);
               }
             }
           }
         } else if (substituent.metadata?.isComplexSubstituent) {
           // Handle complex substituents identified by tokenizer
-          const substituentType = substituent.metadata
-            .substituentType as string;
+          const substituentType = substituent.metadata.substituentType as string;
 
           if (substituentType === "anilino") {
             // X-anilino where X is a substituted phenyl group
@@ -993,8 +886,7 @@ export class IUPACSubstituentApplicator {
             // X-methoxyphenyl where X is methoxy count and position
             const locant = substituent.metadata.locant as string;
             const methoxyCount = substituent.metadata.methoxyCount as string;
-            const additionalSubstituents = substituent.metadata
-              .additionalSubstituents as string;
+            const additionalSubstituents = substituent.metadata.additionalSubstituents as string;
 
             // Add oxygen connector
             const oIdx = builder.addAtom("O");
@@ -1006,30 +898,19 @@ export class IUPACSubstituentApplicator {
               builder.addBond(oIdx, benzeneAtoms[0]);
 
               // Add methoxy groups to phenyl ring
-              this.addMethoxyGroupsToPhenyl(
-                builder,
-                benzeneAtoms,
-                methoxyCount,
-                locant,
-              );
+              this.addMethoxyGroupsToPhenyl(builder, benzeneAtoms, methoxyCount, locant);
 
               // Add additional substituents if any
               if (additionalSubstituents) {
-                this.applyPhenylSubstituents(
-                  builder,
-                  benzeneAtoms,
-                  additionalSubstituents,
-                );
+                this.applyPhenylSubstituents(builder, benzeneAtoms, additionalSubstituents);
               }
             }
           } else if (substituentType === "ylidene") {
             // X-ylidene where X is substituted alkyl group
-            const alkylSubstituents = substituent.metadata
-              .alkylSubstituents as string;
+            const alkylSubstituents = substituent.metadata.alkylSubstituents as string;
 
             // Create alkyl chain
-            const alkylLength =
-              this.context.getAlkylLength(alkylSubstituents) + 2; // +2 for =CH2
+            const alkylLength = this.context.getAlkylLength(alkylSubstituents) + 2; // +2 for =CH2
             const alkylAtoms = builder.createLinearChain(alkylLength);
 
             // Connect via double bond to create ylidene
@@ -1249,11 +1130,7 @@ export class IUPACSubstituentApplicator {
 
     // Add methoxy groups at standard positions (2,4 for di; 2,3,4 for tri)
     const positions =
-      methoxyCount === "di"
-        ? [1, 3]
-        : methoxyCount === "tri"
-          ? [1, 2, 3]
-          : [basePos];
+      methoxyCount === "di" ? [1, 3] : methoxyCount === "tri" ? [1, 2, 3] : [basePos];
 
     for (let i = 0; i < Math.min(count, positions.length); i++) {
       const pos = (positions[i] ?? 0) % benzeneAtoms.length;

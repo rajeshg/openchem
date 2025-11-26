@@ -1,11 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES, parseSMARTS, matchSMARTS } from "index";
 
-function testPattern(
-  pattern: string,
-  smiles: string,
-  expectedMatches: number[],
-) {
+function testPattern(pattern: string, smiles: string, expectedMatches: number[]) {
   const smartsPattern = parseSMARTS(pattern);
   expect(smartsPattern.errors).toEqual([]);
 
@@ -16,9 +12,7 @@ function testPattern(
     uniqueMatches: true,
   });
   const matches = result.matches
-    .map((match) =>
-      match.atoms.map((a) => a.moleculeIndex).sort((a, b) => a - b),
-    )
+    .map((match) => match.atoms.map((a) => a.moleculeIndex).sort((a, b) => a - b))
     .sort();
 
   const expected = expectedMatches.map((idx) => [idx]).sort();
@@ -87,11 +81,7 @@ describe("Aromatic Ring Primitives [r] and [!r]", () => {
     });
 
     it("matches aromatic atoms in biphenyl", () => {
-      testPattern(
-        "[r]",
-        "c1ccccc1-c2ccccc2",
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      );
+      testPattern("[r]", "c1ccccc1-c2ccccc2", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     });
 
     it("does not match aliphatic atoms in alkene", () => {

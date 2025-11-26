@@ -1,10 +1,7 @@
 import type { Molecule } from "types";
 import { buildPerimeterFromRings } from "./utils";
 import type { FusedSystem } from "./utils";
-import {
-  findMatchingFusionTemplate,
-  parseFusionTemplate,
-} from "./fusion-templates";
+import { findMatchingFusionTemplate, parseFusionTemplate } from "./fusion-templates";
 
 /**
  * Get numbering function using OPSIN-style templates
@@ -38,20 +35,12 @@ export function getTemplateBasedNumberingFunction(
 
     // Then try specific builders
     if (baseName && baseName.includes("naphthalene")) {
-      const template = buildNaphthaleneTemplate(
-        fusedSystem as FusedSystem,
-        molecule,
-      );
-      if (template && template[atomIdx] !== undefined)
-        return template[atomIdx].toString();
+      const template = buildNaphthaleneTemplate(fusedSystem as FusedSystem, molecule);
+      if (template && template[atomIdx] !== undefined) return template[atomIdx].toString();
     }
     if (baseName && baseName.includes("anthracene")) {
-      const template = buildAnthraceneTemplate(
-        fusedSystem as FusedSystem,
-        molecule,
-      );
-      if (template && template[atomIdx] !== undefined)
-        return template[atomIdx].toString();
+      const template = buildAnthraceneTemplate(fusedSystem as FusedSystem, molecule);
+      if (template && template[atomIdx] !== undefined) return template[atomIdx].toString();
     }
 
     // Fallback to perimeter-based numbering
@@ -79,8 +68,7 @@ export function numberNaphthalene(
 ): string {
   // Use the template for canonical numbering
   const template = buildNaphthaleneTemplate(fusedSystem, molecule);
-  if (template && template[atomIdx] !== undefined)
-    return template[atomIdx].toString();
+  if (template && template[atomIdx] !== undefined) return template[atomIdx].toString();
   // Fallback
   const allAtoms = Array.from(new Set(fusedSystem.rings.flat())) as number[];
   const perimeter = buildPerimeterFromRings(fusedSystem);
@@ -96,8 +84,7 @@ export function numberAnthracene(
 ): string {
   // Use the template for canonical numbering
   const template = buildAnthraceneTemplate(fusedSystem, molecule);
-  if (template && template[atomIdx] !== undefined)
-    return template[atomIdx].toString();
+  if (template && template[atomIdx] !== undefined) return template[atomIdx].toString();
   // Fallback to perimeter
   const allAtoms = Array.from(new Set(fusedSystem.rings.flat()));
   const perimeter = buildPerimeterFromRings(fusedSystem);
@@ -138,8 +125,7 @@ export function numberIndole(
       const node = path[path.length - 1]!;
       if (node === end) return path;
       for (const b of molecule.bonds) {
-        const nbr =
-          b.atom1 === node ? b.atom2 : b.atom2 === node ? b.atom1 : -1;
+        const nbr = b.atom1 === node ? b.atom2 : b.atom2 === node ? b.atom1 : -1;
         if (nbr >= 0 && !seen.has(nbr)) {
           seen.add(nbr);
           q.push(path.concat([nbr]));
@@ -150,24 +136,19 @@ export function numberIndole(
   };
   // Prefer a small ring (<=5) that contains N
   let fiveMemberedRing = rings.find(
-    (r: number[]) =>
-      r.length <= 5 && r.some((idx) => molecule.atoms[idx]?.symbol === "N"),
+    (r: number[]) => r.length <= 5 && r.some((idx) => molecule.atoms[idx]?.symbol === "N"),
   );
-  const sixRing = rings.find(
-    (r: number[]) => r !== fiveMemberedRing && r.length >= 6,
-  );
+  const sixRing = rings.find((r: number[]) => r !== fiveMemberedRing && r.length >= 6);
   // If we couldn't find an explicit 5-membered ring (decomposition noisy), try to reconstruct
   // a 5-member cycle around N by finding a shortest path between the two carbon neighbours
   // of N that yields a 5-member cycle.
   if (!fiveMemberedRing) {
     // find N atom index
-    const _nIdx =
-      rings.flat().find((idx) => molecule.atoms[idx]?.symbol === "N") ?? null;
+    const _nIdx = rings.flat().find((idx) => molecule.atoms[idx]?.symbol === "N") ?? null;
     // alternatively, search whole molecule for N in fused system atoms
     const possibleNs: number[] = [];
     for (const r of rings)
-      for (const idx of r)
-        if (molecule.atoms[idx]?.symbol === "N") possibleNs.push(idx);
+      for (const idx of r) if (molecule.atoms[idx]?.symbol === "N") possibleNs.push(idx);
     const chosenN = possibleNs[0];
     if (chosenN !== undefined) {
       // find carbon neighbors of chosenN
@@ -190,9 +171,7 @@ export function numberIndole(
     }
   }
   if (fiveMemberedRing) {
-    const nIdx = fiveMemberedRing.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "N",
-    );
+    const nIdx = fiveMemberedRing.find((idx: number) => molecule.atoms[idx]?.symbol === "N");
     if (nIdx === undefined) return (atomIdx + 1).toString();
     // Ordered array as provided by ring finder.
     const five = fiveMemberedRing.slice();
@@ -222,9 +201,7 @@ export function numberIndole(
     })();
     const forwardIsTowardShared = distToSharedF <= distToSharedB;
     const c2 = forwardIsTowardShared ? neighF : neighB; // position 2
-    const c3 = forwardIsTowardShared
-      ? five[(idxA + 1) % len5]!
-      : five[(idxB - 1 + len5) % len5]!; // position 3
+    const c3 = forwardIsTowardShared ? five[(idxA + 1) % len5]! : five[(idxB - 1 + len5) % len5]!; // position 3
 
     // Now build benzene positions (4..7) from sixRing ordering between the shared atoms.
     const locantMap: Record<number, number> = {};
@@ -238,8 +215,7 @@ export function numberIndole(
       let sharedAfterC3: number | null = null;
       // walk forward from N to find the shared that comes after c3
       for (let d = 1; d < len5; d++) {
-        const idx =
-          five[(idxNPos + (forwardIsTowardShared ? d : -d) + len5) % len5]!;
+        const idx = five[(idxNPos + (forwardIsTowardShared ? d : -d) + len5) % len5]!;
         if (sharedSet.has(idx)) {
           sharedAfterC3 = idx;
           break;
@@ -287,9 +263,7 @@ export function numberQuinoline(
   const rings: number[][] = fusedSystem.rings || [];
 
   // Find the ring containing N (the nitrogen-containing 6-membered ring)
-  const nRing = rings.find((r: number[]) =>
-    r.some((idx) => molecule.atoms[idx]?.symbol === "N"),
-  );
+  const nRing = rings.find((r: number[]) => r.some((idx) => molecule.atoms[idx]?.symbol === "N"));
 
   if (!nRing) {
     return (atomIdx + 1).toString();
@@ -425,17 +399,9 @@ export function numberQuinoline(
   while (position <= 4) {
     // Find next atom in the ring
     const next = molecule.bonds.reduce((acc: number[], b) => {
-      if (
-        b.atom1 === current &&
-        nRing.includes(b.atom2) &&
-        !visited.has(b.atom2)
-      ) {
+      if (b.atom1 === current && nRing.includes(b.atom2) && !visited.has(b.atom2)) {
         acc.push(b.atom2);
-      } else if (
-        b.atom2 === current &&
-        nRing.includes(b.atom1) &&
-        !visited.has(b.atom1)
-      ) {
+      } else if (b.atom2 === current && nRing.includes(b.atom1) && !visited.has(b.atom1)) {
         acc.push(b.atom1);
       }
       return acc;
@@ -455,8 +421,7 @@ export function numberQuinoline(
 
   // Now handle the benzene ring (positions 5, 6, 7, 8)
   // Find which shared atom comes after position 4
-  const sharedAfter4 =
-    shared.find((s) => locantMap[s] === undefined) ?? shared[0];
+  const sharedAfter4 = shared.find((s) => locantMap[s] === undefined) ?? shared[0];
   const otherShared = shared.find((s) => s !== sharedAfter4) ?? shared[1];
 
   if (sharedAfter4 !== undefined && otherShared !== undefined) {
@@ -477,11 +442,7 @@ export function numberQuinoline(
 
     while (benzPos <= 8) {
       const next = molecule.bonds.reduce((acc: number[], b) => {
-        if (
-          b.atom1 === benzCurrent &&
-          benzeneRing.includes(b.atom2) &&
-          !benzVisited.has(b.atom2)
-        ) {
+        if (b.atom1 === benzCurrent && benzeneRing.includes(b.atom2) && !benzVisited.has(b.atom2)) {
           acc.push(b.atom2);
         } else if (
           b.atom2 === benzCurrent &&
@@ -524,9 +485,7 @@ export function numberBenzofuran(
 ): string {
   const five = fusedSystem.rings.find((r: number[]) => r.length === 5);
   if (five) {
-    const oIdx = five.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "O",
-    );
+    const oIdx = five.find((idx: number) => molecule.atoms[idx]?.symbol === "O");
     if (oIdx !== undefined) return oIdx === atomIdx ? "1" : "2";
   }
   return (atomIdx + 1).toString();
@@ -539,9 +498,7 @@ export function numberBenzothiophene(
 ): string {
   const five = fusedSystem.rings.find((r: number[]) => r.length === 5);
   if (five) {
-    const sIdx = five.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "S",
-    );
+    const sIdx = five.find((idx: number) => molecule.atoms[idx]?.symbol === "S");
     if (sIdx !== undefined) return "1";
   }
   return (atomIdx + 1).toString();
@@ -613,12 +570,8 @@ export function buildAnthraceneTemplate(
     let middleIdx = -1;
     for (let i = 0; i < ringSets.length; i++) {
       const s = ringSets[i] as Set<number>;
-      const others = ringSets.filter(
-        (_: Set<number>, j: number) => j !== i,
-      ) as Set<number>[];
-      const sharedWithAll = [...s].filter((a: number) =>
-        others.every((o) => o.has(a)),
-      );
+      const others = ringSets.filter((_: Set<number>, j: number) => j !== i) as Set<number>[];
+      const sharedWithAll = [...s].filter((a: number) => others.every((o) => o.has(a)));
       if (sharedWithAll.length >= 2) {
         middleIdx = i;
         break;

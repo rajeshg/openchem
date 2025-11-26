@@ -19,20 +19,12 @@ export const RING_SELECTION_COMPLETE_RULE: IUPACRule = {
     const candidateRings = state.candidateRings;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[ring-selection-complete conditions] Checking conditions...`,
-      );
+      console.log(`[ring-selection-complete conditions] Checking conditions...`);
       console.log(`  - candidateRings: ${candidateRings?.length || 0}`);
-      console.log(
-        `  - parentStructure: ${state.parentStructure ? "EXISTS" : "NULL"}`,
-      );
+      console.log(`  - parentStructure: ${state.parentStructure ? "EXISTS" : "NULL"}`);
     }
 
-    if (
-      !candidateRings ||
-      candidateRings.length === 0 ||
-      state.parentStructure
-    ) {
+    if (!candidateRings || candidateRings.length === 0 || state.parentStructure) {
       if (process.env.VERBOSE) {
         console.log(
           `[ring-selection-complete conditions] FAIL: Missing rings or parent already set`,
@@ -56,9 +48,7 @@ export const RING_SELECTION_COMPLETE_RULE: IUPACRule = {
       Bi: 3,
     };
 
-    const heteroatoms = molecule.atoms.filter((atom) =>
-      HETEROATOM_HYDRIDES.includes(atom.symbol),
-    );
+    const heteroatoms = molecule.atoms.filter((atom) => HETEROATOM_HYDRIDES.includes(atom.symbol));
 
     // If exactly one heteroatom with correct valence exists, P-2.1 should handle it
     if (heteroatoms.length === 1) {
@@ -66,10 +56,7 @@ export const RING_SELECTION_COMPLETE_RULE: IUPACRule = {
       const implicitHydrogens = heteroatom.hydrogens || 0;
       const heteroatomIndex = molecule.atoms.indexOf(heteroatom);
       const bondOrders = molecule.bonds
-        .filter(
-          (bond) =>
-            bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
-        )
+        .filter((bond) => bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex)
         .reduce((sum, bond) => {
           const order =
             bond.type === "single"

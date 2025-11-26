@@ -32,9 +32,7 @@ if (parseResult.errors.length > 0) {
 } else {
   const molecule = parseResult.molecules[0]!;
   console.log(`✓ Parsed SMILES: ${smilesString}`);
-  console.log(
-    `  Atoms: ${molecule.atoms.length}, Bonds: ${molecule.bonds.length}`,
-  );
+  console.log(`  Atoms: ${molecule.atoms.length}, Bonds: ${molecule.bonds.length}`);
 
   // Generate different SMILES variants
   const canonicalSMILES = generateSMILES(molecule, true);
@@ -62,16 +60,12 @@ if (parseResult.molecules.length > 0) {
   console.log(`  Rings: ${props.rings} (Aromatic: ${props.aromaticRings})`);
   console.log(`  Ring Information:`);
   console.log(`    SSSR Rings: ${ringInfo.numRings()}`);
-  console.log(
-    `  Fraction sp³ carbons: ${(props.fractionCsp3 * 100).toFixed(1)}%`,
-  );
+  console.log(`  Fraction sp³ carbons: ${(props.fractionCsp3 * 100).toFixed(1)}%`);
   console.log(`  H-bond Donors: ${props.hbondDonors}`);
   console.log(`  H-bond Acceptors: ${props.hbondAcceptors}`);
   console.log(`  Rotatable Bonds: ${props.rotatableBonds}`);
   console.log(`  TPSA: ${props.tpsa.toFixed(2)} Å²`);
-  console.log(
-    `  Lipinski Rule of Five: ${drugLike.lipinski.passes ? "PASS" : "FAIL"}`,
-  );
+  console.log(`  Lipinski Rule of Five: ${drugLike.lipinski.passes ? "PASS" : "FAIL"}`);
   if (!drugLike.lipinski.passes) {
     console.log(`    Violations: ${drugLike.lipinski.violations.join(", ")}`);
   }
@@ -163,9 +157,7 @@ if (smartsResult.errors.length > 0) {
 
     const molecule = parseRes.molecules[0]!;
     const matchResult = matchSMARTS(smartsResult.pattern!, molecule);
-    console.log(
-      `  ${testSMILES}: ${matchResult.matches.length > 0 ? "MATCH" : "NO MATCH"}`,
-    );
+    console.log(`  ${testSMILES}: ${matchResult.matches.length > 0 ? "MATCH" : "NO MATCH"}`);
   }
 }
 
@@ -190,21 +182,15 @@ if (fingerprints.length >= 2) {
 
   // Calculate similarity between ethanol and acetic acid
   const similarity1 = tanimotoSimilarity(fingerprints[0]!, fingerprints[1]!);
-  console.log(
-    `  Ethanol vs Acetic Acid similarity: ${(similarity1 * 100).toFixed(1)}%`,
-  );
+  console.log(`  Ethanol vs Acetic Acid similarity: ${(similarity1 * 100).toFixed(1)}%`);
 
   // Calculate similarity between acetic acid and aspirin
   const similarity2 = tanimotoSimilarity(fingerprints[1]!, fingerprints[2]!);
-  console.log(
-    `  Acetic Acid vs Aspirin similarity: ${(similarity2 * 100).toFixed(1)}%`,
-  );
+  console.log(`  Acetic Acid vs Aspirin similarity: ${(similarity2 * 100).toFixed(1)}%`);
 
   // Calculate similarity between ethanol and aspirin
   const similarity3 = tanimotoSimilarity(fingerprints[0]!, fingerprints[2]!);
-  console.log(
-    `  Ethanol vs Aspirin similarity: ${(similarity3 * 100).toFixed(1)}%`,
-  );
+  console.log(`  Ethanol vs Aspirin similarity: ${(similarity3 * 100).toFixed(1)}%`);
 }
 
 // 7. InChI Generation
@@ -244,9 +230,7 @@ if (parseResult.molecules.length > 0) {
     console.log("✓ Generated IUPAC name for aspirin");
     console.log(`  Name: ${iupacResult.name}`);
     if (iupacResult.confidence !== undefined) {
-      console.log(
-        `  Confidence: ${(iupacResult.confidence * 100).toFixed(0)}%`,
-      );
+      console.log(`  Confidence: ${(iupacResult.confidence * 100).toFixed(0)}%`);
     }
   }
 }

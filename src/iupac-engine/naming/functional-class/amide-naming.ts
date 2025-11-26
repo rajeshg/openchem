@@ -16,33 +16,15 @@ export function buildAmideName(
   _functionalGroups: FunctionalGroup[],
 ): string {
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildAmideName] parentStructure:",
-      JSON.stringify(parentStructure, null, 2),
-    );
+    console.log("[buildAmideName] parentStructure:", JSON.stringify(parentStructure, null, 2));
     console.log("[buildAmideName] functionalGroup:", functionalGroup);
-    console.log(
-      "[buildAmideName] functionalGroup.atoms:",
-      functionalGroup.atoms,
-    );
+    console.log("[buildAmideName] functionalGroup.atoms:", functionalGroup.atoms);
   }
 
   // Build base amide name from parent structure
   // For functional class nomenclature, build like: "butanamide", "pentanamide", etc.
   const chainLength = parentStructure.chain?.length || 0;
-  const chainNames = [
-    "",
-    "meth",
-    "eth",
-    "prop",
-    "but",
-    "pent",
-    "hex",
-    "hept",
-    "oct",
-    "non",
-    "dec",
-  ];
+  const chainNames = ["", "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"];
   let baseName = "amide";
   if (chainLength > 0 && chainLength < chainNames.length) {
     const stem = chainNames[chainLength];
@@ -59,9 +41,7 @@ export function buildAmideName(
 
   if (!nitrogenAtom) {
     if (process.env.VERBOSE) {
-      console.log(
-        "[buildAmideName] No nitrogen found in amide functional group",
-      );
+      console.log("[buildAmideName] No nitrogen found in amide functional group");
     }
     return baseName;
   }
@@ -88,10 +68,7 @@ export function buildAmideName(
     let neighborId: number | undefined;
     if (bond.atom1 === amideNitrogenId && bond.atom2 !== carbonylCarbonId) {
       neighborId = bond.atom2;
-    } else if (
-      bond.atom2 === amideNitrogenId &&
-      bond.atom1 !== carbonylCarbonId
-    ) {
+    } else if (bond.atom2 === amideNitrogenId && bond.atom1 !== carbonylCarbonId) {
       neighborId = bond.atom1;
     }
 
@@ -133,14 +110,10 @@ export function buildAmideName(
   // Build final name with N-substituents and carbon chain substituents
 
   // Get carbon chain substituents from parent structure
-  const chainSubstituents =
-    (parentStructure as { substituents?: unknown[] }).substituents || [];
+  const chainSubstituents = (parentStructure as { substituents?: unknown[] }).substituents || [];
 
   // Group identical substituents by locant
-  const groupedSubstituents = new Map<
-    string,
-    { locants: number[]; name: string }
-  >();
+  const groupedSubstituents = new Map<string, { locants: number[]; name: string }>();
   for (const sub of chainSubstituents) {
     const s = sub as { type: string; name?: string; locant?: number };
     const key = s.name || s.type;
@@ -154,8 +127,7 @@ export function buildAmideName(
   const substituentParts: string[] = [];
   for (const [_, group] of groupedSubstituents) {
     const locantStr = group.locants.join(",");
-    const multiplier =
-      group.locants.length > 1 ? getMultiplier(group.locants.length) : "";
+    const multiplier = group.locants.length > 1 ? getMultiplier(group.locants.length) : "";
     substituentParts.push(`${locantStr}-${multiplier}${group.name}`);
   }
 
@@ -254,15 +226,7 @@ function getAlkylSubstituentName(
 
   // Build alkyl name based on carbon count
   const chainLength = carbonIds.length;
-  const alkylNames = [
-    "",
-    "methyl",
-    "ethyl",
-    "propyl",
-    "butyl",
-    "pentyl",
-    "hexyl",
-  ];
+  const alkylNames = ["", "methyl", "ethyl", "propyl", "butyl", "pentyl", "hexyl"];
 
   if (chainLength > 0 && chainLength < alkylNames.length) {
     const name = alkylNames[chainLength];

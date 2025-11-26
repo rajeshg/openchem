@@ -8,23 +8,15 @@ function bondKey(atom1: number, atom2: number): string {
   return `${Math.min(atom1, atom2)}-${Math.max(atom1, atom2)}`;
 }
 
-function canFormDoubleBond(
-  atom: Atom,
-  ringAtoms: Set<number>,
-  bonds: Bond[],
-): boolean {
-  const atomBonds = bonds.filter(
-    (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-  );
+function canFormDoubleBond(atom: Atom, ringAtoms: Set<number>, bonds: Bond[]): boolean {
+  const atomBonds = bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
 
   const exocyclicBonds = atomBonds.filter((b) => {
     const otherId = b.atom1 === atom.id ? b.atom2 : b.atom1;
     return !ringAtoms.has(otherId);
   });
 
-  const hasExocyclicDouble = exocyclicBonds.some(
-    (b) => b.type === BondType.DOUBLE,
-  );
+  const hasExocyclicDouble = exocyclicBonds.some((b) => b.type === BondType.DOUBLE);
   if (hasExocyclicDouble) return false;
 
   if (atom.symbol === "N" && atom.hydrogens > 0) return false;
@@ -52,12 +44,8 @@ function kekulizeSingleRing(
       continue;
     }
 
-    const atomBonds = allBonds.filter(
-      (b) => b.atom1 === atomId || b.atom2 === atomId,
-    );
-    const existingDoubleBonds = atomBonds.filter(
-      (b) => b.type === BondType.DOUBLE,
-    ).length;
+    const atomBonds = allBonds.filter((b) => b.atom1 === atomId || b.atom2 === atomId);
+    const existingDoubleBonds = atomBonds.filter((b) => b.type === BondType.DOUBLE).length;
 
     atomDegrees[atomId] = Math.max(0, 1 - existingDoubleBonds);
   }
@@ -70,11 +58,7 @@ function kekulizeSingleRing(
     const a2 = ring[(i + 1) % ring.length]!;
     const k = bondKey(a1, a2);
     const existingBond = allBonds.find((b) => bondKey(b.atom1, b.atom2) === k);
-    if (
-      existingBond &&
-      existingBond.type !== BondType.AROMATIC &&
-      existingBond.isInRing
-    ) {
+    if (existingBond && existingBond.type !== BondType.AROMATIC && existingBond.isInRing) {
       fusionAtoms.add(a1);
       fusionAtoms.add(a2);
     }
@@ -100,11 +84,7 @@ function kekulizeSingleRing(
       assignments[k] = existingBond.type;
       const degree1 = atomDegrees[atom1];
       const degree2 = atomDegrees[atom2];
-      if (
-        degree1 !== undefined &&
-        degree2 !== undefined &&
-        existingBond.type === BondType.DOUBLE
-      ) {
+      if (degree1 !== undefined && degree2 !== undefined && existingBond.type === BondType.DOUBLE) {
         atomDegrees[atom1] = degree1 - 1;
         atomDegrees[atom2] = degree2 - 1;
         const result = backtrack(bondIndex + 1);
@@ -161,9 +141,7 @@ function kekulizeSingleRing(
 export function kekulize(molecule: Molecule): Molecule {
   const mutableBonds: MutableBond[] = molecule.bonds.map((b) => ({ ...b }));
 
-  const aromaticBonds = mutableBonds.filter(
-    (b) => b.type === BondType.AROMATIC,
-  );
+  const aromaticBonds = mutableBonds.filter((b) => b.type === BondType.AROMATIC);
   if (aromaticBonds.length === 0) {
     return molecule;
   }

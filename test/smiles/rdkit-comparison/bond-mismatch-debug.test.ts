@@ -19,9 +19,7 @@ describe("Bond mismatch debug", () => {
   it("prints openchem vs RDKit bond counts and openchem bond lists", async () => {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     const RDKit: any = await (initRDKitModule as any)();
@@ -32,14 +30,8 @@ describe("Bond mismatch debug", () => {
         // suppressed detailed openchem parse errors in debug run
         continue;
       }
-      const openchemAtoms = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.atoms.length,
-        0,
-      );
-      const openchemBonds = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.bonds.length,
-        0,
-      );
+      const openchemAtoms = parsed.molecules.reduce((sum, mol) => sum + mol.atoms.length, 0);
+      const openchemBonds = parsed.molecules.reduce((sum, mol) => sum + mol.bonds.length, 0);
       const bondList: string[] = [];
       for (const mol of parsed.molecules) {
         for (const b of mol.bonds) {

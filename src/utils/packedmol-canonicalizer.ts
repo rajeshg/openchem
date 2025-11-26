@@ -20,21 +20,14 @@ export function computeCanonicalOrdering(mol: Molecule): CanonicalOrdering {
   const N = mol.atoms.length;
 
   // Precompute adjacency list for O(1) neighbor lookups
-  const adjacencyList = new Map<
-    number,
-    Array<{ otherId: number; bondType: number }>
-  >();
+  const adjacencyList = new Map<number, Array<{ otherId: number; bondType: number }>>();
   for (const atom of mol.atoms) {
     adjacencyList.set(atom.id, []);
   }
   for (const bond of mol.bonds) {
     const bondCode = bond.type.charCodeAt(0) ?? 0;
-    adjacencyList
-      .get(bond.atom1)
-      ?.push({ otherId: bond.atom2, bondType: bondCode });
-    adjacencyList
-      .get(bond.atom2)
-      ?.push({ otherId: bond.atom1, bondType: bondCode });
+    adjacencyList.get(bond.atom1)?.push({ otherId: bond.atom2, bondType: bondCode });
+    adjacencyList.get(bond.atom2)?.push({ otherId: bond.atom1, bondType: bondCode });
   }
 
   // Compute iterative refinement labels (WL-like algorithm)

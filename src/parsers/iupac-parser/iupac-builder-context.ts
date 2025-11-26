@@ -36,15 +36,9 @@ export interface IUPACBuilderContext {
     reverseNumbering?: boolean,
   ): number | null;
 
-  getLocantsBeforeSuffix(
-    suffix: IUPACToken,
-    locantTokens: IUPACToken[],
-  ): number[];
+  getLocantsBeforeSuffix(suffix: IUPACToken, locantTokens: IUPACToken[]): number[];
 
-  getLocantsBeforeSubstituent(
-    substituent: IUPACToken,
-    locantTokens: IUPACToken[],
-  ): number[];
+  getLocantsBeforeSubstituent(substituent: IUPACToken, locantTokens: IUPACToken[]): number[];
 
   getMultiplierBeforeSubstituent(
     substituent: IUPACToken,

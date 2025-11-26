@@ -34,9 +34,7 @@ describe("Ring Amide Suffix Removal", () => {
     if (!mol) throw new Error("Failed to parse molecule");
     const name = generateIUPACName(mol);
 
-    expect(name.name).toBe(
-      "2,2-dimethyl-3-(propan-2-ylideneamino)imidazolidin-4-one",
-    );
+    expect(name.name).toBe("2,2-dimethyl-3-(propan-2-ylideneamino)imidazolidin-4-one");
   });
 
   it("should handle simple 5-membered lactams", () => {

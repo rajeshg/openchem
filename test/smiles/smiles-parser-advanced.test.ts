@@ -28,9 +28,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles carboxylate anion", () => {
       const result = parseSMILES("[O-]C=O");
       expect(result.errors).toHaveLength(0);
-      const oxygens = result.molecules[0]!.atoms.filter(
-        (a) => a.symbol === "O",
-      );
+      const oxygens = result.molecules[0]!.atoms.filter((a) => a.symbol === "O");
       expect(oxygens).toHaveLength(2);
       expect(oxygens.some((o) => o.charge === -1)).toBe(true);
       expect(oxygens.some((o) => o.charge === 0)).toBe(true);
@@ -87,9 +85,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles aromatic bonds", () => {
       const result = parseSMILES("c1ccccc1");
       expect(result.errors).toHaveLength(0);
-      expect(
-        result.molecules[0]!.bonds.some((b) => b.type === "aromatic"),
-      ).toBe(true);
+      expect(result.molecules[0]!.bonds.some((b) => b.type === "aromatic")).toBe(true);
     });
 
     it("handles mixed bond types", () => {
@@ -118,9 +114,7 @@ describe("Comprehensive SMILES Tests", () => {
       const result = parseSMILES("CC(C)(C)C");
       expect(result.errors).toHaveLength(0);
       const centerCarbon = result.molecules[0]!.atoms.find((a) => a.id === 1);
-      const bonds = result.molecules[0]!.bonds.filter(
-        (b) => b.atom1 === 1 || b.atom2 === 1,
-      );
+      const bonds = result.molecules[0]!.bonds.filter((b) => b.atom1 === 1 || b.atom2 === 1);
       expect(bonds).toHaveLength(4);
     });
   });
@@ -155,9 +149,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles ring with double bond", () => {
       const result = parseSMILES("C1=CCCCC1");
       expect(result.errors).toHaveLength(0);
-      const doubleBond = result.molecules[0]!.bonds.find(
-        (b) => b.type === "double",
-      );
+      const doubleBond = result.molecules[0]!.bonds.find((b) => b.type === "double");
       expect(doubleBond).toBeDefined();
     });
 
@@ -240,18 +232,14 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles E/Z double bond stereo /", () => {
       const result = parseSMILES("F/C=C/F");
       expect(result.errors).toHaveLength(0);
-      const stereoBonds = result.molecules[0]!.bonds.filter(
-        (b) => b.stereo && b.stereo !== "none",
-      );
+      const stereoBonds = result.molecules[0]!.bonds.filter((b) => b.stereo && b.stereo !== "none");
       expect(stereoBonds.length).toBeGreaterThan(0);
     });
 
     it("handles E/Z double bond stereo \\", () => {
       const result = parseSMILES("F\\C=C\\F");
       expect(result.errors).toHaveLength(0);
-      const stereoBonds = result.molecules[0]!.bonds.filter(
-        (b) => b.stereo && b.stereo !== "none",
-      );
+      const stereoBonds = result.molecules[0]!.bonds.filter((b) => b.stereo && b.stereo !== "none");
       expect(stereoBonds.length).toBeGreaterThan(0);
     });
   });
@@ -595,9 +583,7 @@ describe("Comprehensive SMILES Tests", () => {
       // Invalid: aromatic atom not in ring
       const result2 = parseSMILES("cC");
       expect(result2.errors.length).toBeGreaterThan(0);
-      expect(
-        result2.errors.some((e) => e.message.includes("not in a ring")),
-      ).toBe(true);
+      expect(result2.errors.some((e) => e.message.includes("not in a ring"))).toBe(true);
 
       // Aromatic notation accepted even for non-Hückel systems (matches RDKit behavior)
       const result3 = parseSMILES("c1ccc1"); // cyclobutadiene, 4 π electrons
@@ -611,9 +597,7 @@ describe("Comprehensive SMILES Tests", () => {
       const result = parseSMILES("CC(=O)O");
       expect(result.errors).toHaveLength(0);
       expect(result.molecules[0]!.atoms).toHaveLength(4);
-      const doubleBond = result.molecules[0]!.bonds.find(
-        (b) => b.type === "double",
-      );
+      const doubleBond = result.molecules[0]!.bonds.find((b) => b.type === "double");
       expect(doubleBond).toBeDefined();
     });
 
@@ -643,9 +627,7 @@ describe("Comprehensive SMILES Tests", () => {
       const result = parseSMILES("C1=CCCCC1");
       expect(result.errors).toHaveLength(0);
       expect(result.molecules[0]!.atoms).toHaveLength(6);
-      const doubleBond = result.molecules[0]!.bonds.find(
-        (b) => b.type === "double",
-      );
+      const doubleBond = result.molecules[0]!.bonds.find((b) => b.type === "double");
       expect(doubleBond).toBeDefined();
     });
   });
@@ -733,9 +715,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles invalid aromaticity - chain not ring", () => {
       const result = parseSMILES("ccccc");
       expect(result.errors.length).toBeGreaterThan(0);
-      expect(
-        result.errors.some((e) => e.message.includes("not in a ring")),
-      ).toBe(true);
+      expect(result.errors.some((e) => e.message.includes("not in a ring"))).toBe(true);
     });
 
     it("handles wildcard in simple chain", () => {
@@ -779,18 +759,14 @@ describe("Comprehensive SMILES Tests", () => {
       const result = parseSMILES("*C*C*");
       expect(result.errors).toHaveLength(0);
       expect(result.molecules[0]!.atoms).toHaveLength(5);
-      const wildcards = result.molecules[0]!.atoms.filter(
-        (a) => a.symbol === "*",
-      );
+      const wildcards = result.molecules[0]!.atoms.filter((a) => a.symbol === "*");
       expect(wildcards).toHaveLength(3);
     });
 
     it("handles ring with mixed bond types", () => {
       const result = parseSMILES("C1=CC=CC=C1");
       expect(result.errors).toHaveLength(0);
-      const aromaticBonds = result.molecules[0]!.bonds.filter(
-        (b) => b.type === "aromatic",
-      );
+      const aromaticBonds = result.molecules[0]!.bonds.filter((b) => b.type === "aromatic");
       expect(aromaticBonds).toHaveLength(6);
     });
 
@@ -829,18 +805,7 @@ describe("Comprehensive SMILES Tests", () => {
     });
 
     it("handles transition metals", () => {
-      const elements = [
-        "Sc",
-        "Ti",
-        "V",
-        "Cr",
-        "Mn",
-        "Fe",
-        "Co",
-        "Ni",
-        "Cu",
-        "Zn",
-      ];
+      const elements = ["Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"];
       elements.forEach((element) => {
         const result = parseSMILES(`[${element}]`);
         expect(result.errors).toHaveLength(0);
@@ -899,9 +864,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles ring with explicit single bonds", () => {
       const result = parseSMILES("C1CCCCC1");
       expect(result.errors).toHaveLength(0);
-      expect(result.molecules[0]!.bonds.every((b) => b.type === "single")).toBe(
-        true,
-      );
+      expect(result.molecules[0]!.bonds.every((b) => b.type === "single")).toBe(true);
     });
 
     it("handles aromatic sulfur", () => {
@@ -928,9 +891,7 @@ describe("Comprehensive SMILES Tests", () => {
     it("handles aromatic phosphorus", () => {
       const result = parseSMILES("c1[pH]ccc1");
       expect(result.errors).toHaveLength(0);
-      const phosphorus = result.molecules[0]!.atoms.find(
-        (a) => a.symbol === "P",
-      );
+      const phosphorus = result.molecules[0]!.atoms.find((a) => a.symbol === "P");
       expect(phosphorus?.aromatic).toBe(true);
     });
   });

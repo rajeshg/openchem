@@ -376,16 +376,7 @@ describe("LabuteASA (Labute's Approximate Surface Area)", () => {
 
   describe("Special cases", () => {
     it("should return non-negative values", () => {
-      const testMolecules = [
-        "C",
-        "CC",
-        "C=C",
-        "C#C",
-        "c1ccccc1",
-        "CCO",
-        "CC(=O)O",
-        "CN",
-      ];
+      const testMolecules = ["C", "CC", "C=C", "C#C", "c1ccccc1", "CCO", "CC(=O)O", "CN"];
 
       for (const smiles of testMolecules) {
         const result = parseSMILES(smiles);

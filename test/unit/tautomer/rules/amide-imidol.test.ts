@@ -11,9 +11,7 @@ describe("tautomer: amide-imidol", () => {
     expect(tautomers.length).toBeGreaterThanOrEqual(1);
     const smilesList = tautomers.map((t) => t.smiles);
     // There should be at least one tautomer with an OH (indicative of imidol-like form) or changed connectivity
-    const hasImidolLike = smilesList.some(
-      (s) => /O/.test(s) && /(N=|=N)/.test(s),
-    );
+    const hasImidolLike = smilesList.some((s) => /O/.test(s) && /(N=|=N)/.test(s));
     expect(hasImidolLike).toBe(true);
   });
 });

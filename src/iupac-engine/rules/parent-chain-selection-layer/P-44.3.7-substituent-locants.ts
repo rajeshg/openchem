@@ -35,8 +35,7 @@ export const P44_3_7_SUBSTITUENT_LOCANTS_RULE: IUPACRule = {
         {
           ruleId: "P-44.3.7",
           conflictType: "state_inconsistency",
-          description:
-            "No candidate chains found for substituent locant selection",
+          description: "No candidate chains found for substituent locant selection",
           context: { chains },
         },
         "P-44.3.7",
@@ -49,27 +48,19 @@ export const P44_3_7_SUBSTITUENT_LOCANTS_RULE: IUPACRule = {
     }
     // Get locant sets for substituents for each chain
     const substituentLocantSets: number[][] = chains.map((chain: Chain) => {
-      return chain.substituents
-        .map((substituent) => substituent.locant ?? 0)
-        .sort((a, b) => a - b);
+      return chain.substituents.map((substituent) => substituent.locant ?? 0).sort((a, b) => a - b);
     });
     // Find the lexicographically smallest substituent locant set
-    const lowestSubstituentLocantSet = lexicographicallySmallest(
-      substituentLocantSets,
-    );
+    const lowestSubstituentLocantSet = lexicographicallySmallest(substituentLocantSets);
     // Find chains with this locant set
-    const chainsWithLowestSubstituentLocants = chains.filter(
-      (chain: Chain, index: number) => {
-        const chainLocants = substituentLocantSets[index] || [];
-        return (
-          lowestSubstituentLocantSet !== null &&
-          chainLocants.length === lowestSubstituentLocantSet.length &&
-          chainLocants.every(
-            (locant, i) => locant === lowestSubstituentLocantSet[i],
-          )
-        );
-      },
-    );
+    const chainsWithLowestSubstituentLocants = chains.filter((chain: Chain, index: number) => {
+      const chainLocants = substituentLocantSets[index] || [];
+      return (
+        lowestSubstituentLocantSet !== null &&
+        chainLocants.length === lowestSubstituentLocantSet.length &&
+        chainLocants.every((locant, i) => locant === lowestSubstituentLocantSet[i])
+      );
+    });
     updatedContext = updatedContext.withUpdatedCandidates(
       chainsWithLowestSubstituentLocants,
       "P-44.3.7",

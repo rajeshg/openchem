@@ -16,15 +16,12 @@ import { NomenclatureMethod, ExecutionPhase } from "../../immutable-context";
 export const P51_2_FUNCTIONAL_CLASS_RULE: IUPACRule = {
   id: "P-51.2",
   name: "Functional Class Nomenclature Method",
-  description:
-    "Select functional class nomenclature for specific cases (P-51.2)",
+  description: "Select functional class nomenclature for specific cases (P-51.2)",
   blueBookReference: BLUE_BOOK_RULES.P51_2,
   priority: RulePriority.TEN, // 100 - Highest priority for special cases
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    const functionalGroups = Array.isArray(state.functionalGroups)
-      ? state.functionalGroups
-      : [];
+    const functionalGroups = Array.isArray(state.functionalGroups) ? state.functionalGroups : [];
 
     if (process.env.VERBOSE) {
       console.log("[P-51.2] Checking functional class nomenclature conditions");
@@ -36,15 +33,13 @@ export const P51_2_FUNCTIONAL_CLASS_RULE: IUPACRule = {
 
     // Don't override if a method has already been selected (e.g., by ESTER_DETECTION_RULE)
     if (state.nomenclatureMethod) {
-      if (process.env.VERBOSE)
-        console.log("[P-51.2] Nomenclature method already set, skipping");
+      if (process.env.VERBOSE) console.log("[P-51.2] Nomenclature method already set, skipping");
       return false;
     }
 
     // Check if we have functional groups that prefer functional class
     if (!functionalGroups || functionalGroups.length === 0) {
-      if (process.env.VERBOSE)
-        console.log("[P-51.2] No functional groups found");
+      if (process.env.VERBOSE) console.log("[P-51.2] No functional groups found");
       return false;
     }
 
@@ -67,19 +62,14 @@ export const P51_2_FUNCTIONAL_CLASS_RULE: IUPACRule = {
     );
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-51.2] Should apply functional class nomenclature:",
-        shouldApply,
-      );
+      console.log("[P-51.2] Should apply functional class nomenclature:", shouldApply);
     }
 
     return shouldApply;
   },
   action: (context: ImmutableNamingContext) => {
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-51.2] ACTION: Setting nomenclature method to FUNCTIONAL_CLASS",
-      );
+      console.log("[P-51.2] ACTION: Setting nomenclature method to FUNCTIONAL_CLASS");
     }
     return context.withNomenclatureMethod(
       NomenclatureMethod.FUNCTIONAL_CLASS,

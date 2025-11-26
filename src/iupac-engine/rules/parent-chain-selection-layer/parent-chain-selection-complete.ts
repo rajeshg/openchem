@@ -89,10 +89,7 @@ export const PARENT_CHAIN_SELECTION_COMPLETE_RULE: IUPACRule = {
  * @param chain - The chain to generate a name for
  * @param includeSubstituents - If false, only return the base chain name without substituents (default: true)
  */
-export function generateChainName(
-  chain: Chain,
-  includeSubstituents: boolean = true,
-): string {
+export function generateChainName(chain: Chain, includeSubstituents: boolean = true): string {
   if (process.env.VERBOSE)
     console.log(
       `[generateChainName] called with chain.length=${chain.length}, includeSubstituents=${includeSubstituents}, chain.substituents=${JSON.stringify(chain.substituents)}`,
@@ -142,12 +139,8 @@ export function generateChainName(
   // Work from the root (e.g., 'but' for 'butane')
   const root = (chainNames[length] || `${length}-carbon`).replace(/ane$/, "");
   // Total counts of multiple bonds (may be present even if locants not assigned yet)
-  const doubleCount = chain.multipleBonds.filter(
-    (b: MultipleBond) => b.type === "double",
-  ).length;
-  const tripleCount = chain.multipleBonds.filter(
-    (b: MultipleBond) => b.type === "triple",
-  ).length;
+  const doubleCount = chain.multipleBonds.filter((b: MultipleBond) => b.type === "double").length;
+  const tripleCount = chain.multipleBonds.filter((b: MultipleBond) => b.type === "triple").length;
 
   const opsinService = getSharedOPSINService();
 
@@ -155,8 +148,7 @@ export function generateChainName(
   const parts: string[] = [];
   if (doubleCount > 0) {
     const locStr = doubleBondLocants.join(",");
-    const mult =
-      doubleCount > 1 ? getSimpleMultiplier(doubleCount, opsinService) : "";
+    const mult = doubleCount > 1 ? getSimpleMultiplier(doubleCount, opsinService) : "";
     const suf = `${mult}ene`;
     // IUPAC rule: Omit locant when unambiguous (chains ≤3 carbons have only one possible position)
     // Include locant for chains ≥4 carbons where position matters (but-1-ene vs but-2-ene)
@@ -168,8 +160,7 @@ export function generateChainName(
   }
   if (tripleCount > 0) {
     const locStr = tripleBondLocants.join(",");
-    const mult =
-      tripleCount > 1 ? getSimpleMultiplier(tripleCount, opsinService) : "";
+    const mult = tripleCount > 1 ? getSimpleMultiplier(tripleCount, opsinService) : "";
     const suf = `${mult}yne`;
     // IUPAC rule: Omit locant when unambiguous (chains ≤3 carbons have only one possible position)
     // Include locant for chains ≥4 carbons where position matters (but-1-yne vs but-2-yne)
@@ -192,9 +183,7 @@ export function generateChainName(
       // IUPAC rule: Add "a" to root when multiple unsaturations (diene, triene, diyne, etc.)
       // Examples: buta-1,3-diene, hexa-1,3,5-triene
       const hasMultipleUnsaturations =
-        doubleCount > 1 ||
-        tripleCount > 1 ||
-        (doubleCount > 0 && tripleCount > 0);
+        doubleCount > 1 || tripleCount > 1 || (doubleCount > 0 && tripleCount > 0);
       const rootWithA = hasMultipleUnsaturations ? `${root}a` : root;
 
       // If unsaturation suffix begins with a digit (locant), insert hyphen
@@ -212,20 +201,13 @@ export function generateChainName(
     const isComplexSubstituent = (name: string): boolean => {
       // Complex if contains digits followed by hyphen (e.g., "2-methylbutan-2-yloxy")
       // but not just at the start (that's our locant)
-      return (
-        /\d+-\w/.test(name) ||
-        (name.includes("oxy") && name.match(/-\d/) !== null)
-      );
+      return /\d+-\w/.test(name) || (name.includes("oxy") && name.match(/-\d/) !== null);
     };
 
     // Helper to determine if square brackets are needed
     const needsSquareBrackets = (name: string): boolean => {
       // Square brackets for nested complex substituents (contains "oxy" and internal locants)
-      return (
-        name.includes("oxy") &&
-        /\d+-/.test(name) &&
-        name.split("oxy").length > 2
-      );
+      return name.includes("oxy") && /\d+-/.test(name) && name.split("oxy").length > 2;
     };
 
     // Create array of individual substituent entries with their locants
@@ -239,9 +221,7 @@ export function generateChainName(
     chain.substituents.forEach((sub) => {
       if (sub && sub.type && typeof sub.locant === "number") {
         if (process.env.VERBOSE)
-          console.log(
-            `[generateChainName] substituent: ${sub.type}, locant: ${sub.locant}`,
-          );
+          console.log(`[generateChainName] substituent: ${sub.type}, locant: ${sub.locant}`);
 
         // Extract the base name for alphabetical sorting (ignore any existing locant prefix)
         const sortKey = sub.type.replace(/^\d+-/, "");

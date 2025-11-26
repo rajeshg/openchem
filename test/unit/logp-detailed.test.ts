@@ -232,9 +232,7 @@ describe("LogP Pattern Debugging", () => {
       const result = matchSMARTS(parsed.pattern!, mol);
       if (result.success) {
         if (process.env.RUN_VERBOSE)
-          console.log(
-            `Pattern ${label} (${smarts}) matched ${result.matches.length} times`,
-          );
+          console.log(`Pattern ${label} (${smarts}) matched ${result.matches.length} times`);
       }
     }
   });
@@ -255,25 +253,19 @@ describe("LogP Pattern Debugging", () => {
       const parsed = parseSMARTS(smarts);
       if (parsed.errors.length > 0) {
         if (process.env.RUN_VERBOSE)
-          console.log(
-            `Pattern ${label} failed to parse: ${parsed.errors.join(", ")}`,
-          );
+          console.log(`Pattern ${label} failed to parse: ${parsed.errors.join(", ")}`);
         continue;
       }
 
       const result = matchSMARTS(parsed.pattern!, mol);
       if (result.success) {
         if (process.env.RUN_VERBOSE)
-          console.log(
-            `Pattern ${label} (${desc}): ${result.matches.length} matches`,
-          );
+          console.log(`Pattern ${label} (${desc}): ${result.matches.length} matches`);
         for (const match of result.matches) {
           const atomIdx = match.atoms[0]?.moleculeIndex;
           if (atomIdx !== undefined) {
             if (process.env.RUN_VERBOSE)
-              console.log(
-                `  - Atom ${atomIdx} (${mol.atoms[atomIdx]?.symbol})`,
-              );
+              console.log(`  - Atom ${atomIdx} (${mol.atoms[atomIdx]?.symbol})`);
           }
         }
       }

@@ -16,16 +16,11 @@ export const ATOMIC_HYBRIDIZATION_RULE: IUPACRule = {
   priority: RulePriority.NINE, // 90 - Hybridization analysis
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    return (
-      Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0
-    );
+    return Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    if (
-      !Array.isArray(state.molecule?.atoms) ||
-      !Array.isArray(state.molecule?.bonds)
-    ) {
+    if (!Array.isArray(state.molecule?.atoms) || !Array.isArray(state.molecule?.bonds)) {
       return context;
     }
     const hybridizationMap = new Map<number, string>();

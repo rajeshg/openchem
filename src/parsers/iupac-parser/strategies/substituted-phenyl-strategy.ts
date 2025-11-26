@@ -63,11 +63,7 @@ export class SubstitutedPhenylStrategy extends BaseSubstituentStrategy {
       for (const locToken of ctx.locantTokens) {
         const locs = (locToken.metadata?.positions as number[]) || [];
         for (const loc of locs) {
-          const atomIdx = builderContext.locantToAtomIndex(
-            loc,
-            benzeneAtoms,
-            false,
-          );
+          const atomIdx = builderContext.locantToAtomIndex(loc, benzeneAtoms, false);
           if (atomIdx !== null) {
             const oIdx = builder.addAtom("O");
             builder.addBond(atomIdx, oIdx);
@@ -89,10 +85,7 @@ export class SubstitutedPhenylStrategy extends BaseSubstituentStrategy {
     }
 
     for (const subst of otherSubsts) {
-      const substLocants = builderContext.getLocantsBeforeSubstituent(
-        subst,
-        ctx.locantTokens,
-      );
+      const substLocants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
 
       if (process.env.VERBOSE) {
         console.log(
@@ -101,20 +94,11 @@ export class SubstitutedPhenylStrategy extends BaseSubstituentStrategy {
       }
 
       for (const loc of substLocants) {
-        const atomIdx = builderContext.locantToAtomIndex(
-          loc,
-          benzeneAtoms,
-          false,
-        );
+        const atomIdx = builderContext.locantToAtomIndex(loc, benzeneAtoms, false);
         if (atomIdx !== null) {
           // Handle nested complex substituents (e.g., "(2-methoxyphenyl)sulfamoyl")
           if (subst.nestedTokens && subst.nestedTokens.length > 0) {
-            this.applyNestedSubstituent(
-              builder,
-              builderContext,
-              subst,
-              atomIdx,
-            );
+            this.applyNestedSubstituent(builder, builderContext, subst, atomIdx);
           } else if (subst.value === "methoxy") {
             const oIdx = builder.addAtom("O");
             builder.addBond(atomIdx, oIdx);
@@ -168,9 +152,7 @@ export class SubstitutedPhenylStrategy extends BaseSubstituentStrategy {
       );
       if (nestedResult) {
         builder.addBond(attachAtomIdx, nestedResult.attachmentPoint);
-        this.log(
-          `Applied nested substituent with ${nestedResult.fragmentAtoms.length} atoms`,
-        );
+        this.log(`Applied nested substituent with ${nestedResult.fragmentAtoms.length} atoms`);
       }
     }
   }

@@ -58,23 +58,16 @@ export function nameRingSubstituent(
   // Prevent infinite recursion
   if (depth >= maxDepth) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[nameRingSubstituent] Max depth ${maxDepth} reached, stopping recursion`,
-      );
+      console.log(`[nameRingSubstituent] Max depth ${maxDepth} reached, stopping recursion`);
     }
     return null;
   }
 
   // Import aromatic naming function dynamically to avoid circular dependencies
-  const {
-    generateAromaticRingName,
-    isRingAromatic,
-  } = require("../../iupac-rings/aromatic-naming");
+  const { generateAromaticRingName, isRingAromatic } = require("../../iupac-rings/aromatic-naming");
 
   // Find which ring(s) contain the starting atom
-  const containingRings = molecule.rings.filter((ring) =>
-    ring.includes(startAtomIdx),
-  );
+  const containingRings = molecule.rings.filter((ring) => ring.includes(startAtomIdx));
   if (containingRings.length === 0) return null;
 
   // For now, handle simple case: single ring attached to chain
@@ -95,9 +88,7 @@ export function nameRingSubstituent(
     ringName = generateAromaticRingName(ring, molecule);
   } else {
     // For non-aromatic rings, use generateRingName to handle heterocycles properly
-    const {
-      generateRingName,
-    } = require("../../../rules/ring-analysis-layer/helpers");
+    const { generateRingName } = require("../../../rules/ring-analysis-layer/helpers");
 
     // Build ring system object with atoms and bonds
     const ringAtoms = ring.map((idx: number) => molecule.atoms[idx]);
@@ -154,25 +145,18 @@ export function nameRingSubstituent(
   }
 
   if (process.env.VERBOSE && hasExocyclicDoubleBond) {
-    console.log(
-      `[nameRingSubstituent] Detected exocyclic double bond from atom ${startAtomIdx}`,
-    );
+    console.log(`[nameRingSubstituent] Detected exocyclic double bond from atom ${startAtomIdx}`);
   }
 
   const ringSubstituents = findRingSubstituents(molecule, ring, parentAtom);
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameRingSubstituent] Found ${ringSubstituents.length} substituents on ring`,
-    );
+    console.log(`[nameRingSubstituent] Found ${ringSubstituents.length} substituents on ring`);
   }
 
   // For benzene rings with multiple substituents, determine optimal numbering direction
   let optimalDirection: "forward" | "reverse" | undefined;
-  if (
-    (ringName === "benzene" || ringName === "phenyl") &&
-    ringSubstituents.length > 0
-  ) {
+  if ((ringName === "benzene" || ringName === "phenyl") && ringSubstituents.length > 0) {
     optimalDirection = determineOptimalBenzeneDirection(
       ring,
       ringSubstituents,
@@ -180,9 +164,7 @@ export function nameRingSubstituent(
       molecule,
     );
     if (process.env.VERBOSE) {
-      console.log(
-        `[nameRingSubstituent] Optimal benzene numbering direction: ${optimalDirection}`,
-      );
+      console.log(`[nameRingSubstituent] Optimal benzene numbering direction: ${optimalDirection}`);
     }
   }
 
@@ -195,13 +177,7 @@ export function nameRingSubstituent(
 
   for (const sub of ringSubstituents) {
     // Recursively classify this substituent
-    const subInfo = classifySubstituent(
-      molecule,
-      sub.atomIdx,
-      ringSet,
-      new Set(),
-      depth + 1,
-    );
+    const subInfo = classifySubstituent(molecule, sub.atomIdx, ringSet, new Set(), depth + 1);
 
     if (subInfo) {
       // Determine the IUPAC position number for this substituent on the ring
@@ -233,9 +209,7 @@ export function nameRingSubstituent(
 
     // Separate ring substituents from simple substituents
     const _ringSubsts = namedSubstituents.filter((s) => s.name.includes("yl"));
-    const _simpleSubsts = namedSubstituents.filter(
-      (s) => !s.name.includes("yl"),
-    );
+    const _simpleSubsts = namedSubstituents.filter((s) => !s.name.includes("yl"));
 
     // Build substituent prefix
     // For ring substituents, use format: "locant-(substituent)"
@@ -280,28 +254,12 @@ export function nameRingSubstituent(
 
       // Calculate their IUPAC positions
       const nIupacPos =
-        nPos >= 0
-          ? determineRingAttachmentPosition(
-              ring,
-              ring[nPos]!,
-              molecule,
-              ringName,
-            )
-          : 1;
+        nPos >= 0 ? determineRingAttachmentPosition(ring, ring[nPos]!, molecule, ringName) : 1;
       const sIupacPos =
-        sPos >= 0
-          ? determineRingAttachmentPosition(
-              ring,
-              ring[sPos]!,
-              molecule,
-              ringName,
-            )
-          : 3;
+        sPos >= 0 ? determineRingAttachmentPosition(ring, ring[sPos]!, molecule, ringName) : 3;
 
       // Build heteroatom locants: "1,3-" for N=1, S=3
-      const heteroLocants = [nIupacPos, sIupacPos]
-        .sort((a, b) => a - b)
-        .join(",");
+      const heteroLocants = [nIupacPos, sIupacPos].sort((a, b) => a - b).join(",");
 
       fullName = `${subPrefix}-${heteroLocants}-${ringStem}-${attachmentPosition}-yl`;
     } else if (ringName === "benzene") {
@@ -313,11 +271,7 @@ export function nameRingSubstituent(
     }
   } else {
     // No substituents, use simple conversion
-    fullName = convertRingNameToSubstituent(
-      ringName,
-      attachmentPosition,
-      hasExocyclicDoubleBond,
-    );
+    fullName = convertRingNameToSubstituent(ringName, attachmentPosition, hasExocyclicDoubleBond);
   }
 
   if (process.env.VERBOSE) {
@@ -432,9 +386,7 @@ export function determineRingAttachmentPosition(
     const relativePos = (posInRing - nPos + ring.length) % ring.length;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[determineRingAttachmentPosition] relativePos from N: ${relativePos}`,
-      );
+      console.log(`[determineRingAttachmentPosition] relativePos from N: ${relativePos}`);
     }
 
     // Map relative position to IUPAC number
@@ -512,9 +464,7 @@ export function determineRingAttachmentPosition(
     }
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[determineRingAttachmentPosition] carbonsForward (N to S): ${carbonsForward}`,
-      );
+      console.log(`[determineRingAttachmentPosition] carbonsForward (N to S): ${carbonsForward}`);
     }
 
     // For standard thiazole: N-C-S-C-C, so carbonsForward should be 1
@@ -563,9 +513,7 @@ export function determineRingAttachmentPosition(
         console.log(
           `[determineRingAttachmentPosition] Using 2-carbon thiazole mapping (1 C in shorter path)`,
         );
-        console.log(
-          `[determineRingAttachmentPosition] Mapped position: ${mapping[relativePos]}`,
-        );
+        console.log(`[determineRingAttachmentPosition] Mapped position: ${mapping[relativePos]}`);
       }
       return mapping[relativePos] || relativePos + 1;
     }
@@ -589,11 +537,7 @@ export function determineRingAttachmentPosition(
       // Check if this atom has bonds outside the ring
       for (const bond of molecule.bonds) {
         const otherAtom =
-          bond.atom1 === ringAtomIdx
-            ? bond.atom2
-            : bond.atom2 === ringAtomIdx
-              ? bond.atom1
-              : -1;
+          bond.atom1 === ringAtomIdx ? bond.atom2 : bond.atom2 === ringAtomIdx ? bond.atom1 : -1;
         if (otherAtom >= 0 && !ringSet.has(otherAtom)) {
           const otherAtomObj = molecule.atoms[otherAtom];
           // Ignore hydrogen atoms
@@ -626,9 +570,7 @@ export function determineRingAttachmentPosition(
 
     if (attachmentIdx === -1) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[determineRingAttachmentPosition] No main attachment found, using fallback`,
-        );
+        console.log(`[determineRingAttachmentPosition] No main attachment found, using fallback`);
       }
       // Fallback if we can't find attachment point
       return posInRing + 1;
@@ -658,18 +600,10 @@ export function determineRingAttachmentPosition(
 
   // For heterocyclic rings (oxolane, thiolane, pyrrolidine, etc.), renumber starting from heteroatom
   // Per IUPAC: heteroatom should be at position 1
-  const heteroatomRings = [
-    "oxolane",
-    "thiolane",
-    "pyrrolidine",
-    "oxane",
-    "thiane",
-    "piperidine",
-  ];
+  const heteroatomRings = ["oxolane", "thiolane", "pyrrolidine", "oxane", "thiane", "piperidine"];
   if (
     heteroatomRings.some(
-      (name) =>
-        ringName.includes(name) || ringName.startsWith(name.slice(0, -1)),
+      (name) => ringName.includes(name) || ringName.startsWith(name.slice(0, -1)),
     )
   ) {
     // Find the heteroatom in the ring
@@ -684,8 +618,7 @@ export function determineRingAttachmentPosition(
 
     if (heteroatomPos !== -1) {
       // Calculate position relative to heteroatom
-      const relativePos =
-        (posInRing - heteroatomPos + ring.length) % ring.length;
+      const relativePos = (posInRing - heteroatomPos + ring.length) % ring.length;
 
       if (process.env.VERBOSE) {
         console.log(
@@ -725,11 +658,7 @@ function determineOptimalBenzeneDirection(
 
     for (const bond of molecule.bonds) {
       const otherAtom =
-        bond.atom1 === ringAtomIdx
-          ? bond.atom2
-          : bond.atom2 === ringAtomIdx
-            ? bond.atom1
-            : -1;
+        bond.atom1 === ringAtomIdx ? bond.atom2 : bond.atom2 === ringAtomIdx ? bond.atom1 : -1;
       if (otherAtom >= 0 && !ringSet.has(otherAtom)) {
         const otherAtomObj = molecule.atoms[otherAtom];
         if (otherAtomObj && otherAtomObj.symbol !== "H") {
@@ -760,13 +689,11 @@ function determineOptimalBenzeneDirection(
 
   for (const sub of ringSubstituents) {
     // Forward direction: go clockwise from attachment point
-    const forwardRelPos =
-      (sub.ringPosition - attachmentIdx + ring.length) % ring.length;
+    const forwardRelPos = (sub.ringPosition - attachmentIdx + ring.length) % ring.length;
     forwardLocants.push(forwardRelPos + 1);
 
     // Reverse direction: go counter-clockwise from attachment point
-    const reverseRelPos =
-      (attachmentIdx - sub.ringPosition + ring.length) % ring.length;
+    const reverseRelPos = (attachmentIdx - sub.ringPosition + ring.length) % ring.length;
     reverseLocants.push(reverseRelPos + 1);
   }
 
@@ -784,11 +711,7 @@ function determineOptimalBenzeneDirection(
   }
 
   // Compare locant sets lexicographically
-  for (
-    let i = 0;
-    i < Math.min(forwardLocants.length, reverseLocants.length);
-    i++
-  ) {
+  for (let i = 0; i < Math.min(forwardLocants.length, reverseLocants.length); i++) {
     if (forwardLocants[i]! < reverseLocants[i]!) {
       return "forward";
     }

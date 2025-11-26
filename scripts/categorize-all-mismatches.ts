@@ -75,9 +75,7 @@ console.log("\n=== Recommended Priority ===");
 console.log("1. Ester naming (2 cases) - likely quick fix");
 console.log("2. Multiple ketones/acyl (1 case) - related to recent FG work");
 console.log("3. Complex substituents (1 case) - alkoxy group nesting");
-console.log(
-  "4. Polycyclic fallback (5 cases) - complex, may need VON-BAEYER implementation",
-);
+console.log("4. Polycyclic fallback (5 cases) - complex, may need VON-BAEYER implementation");
 console.log("5. Heterocycles (4 cases) - requires specialized naming rules");
 console.log("6. Phosphorus/Boron (3 cases) - specialized element rules");
 console.log("7. Sulfur compounds (1 case) - specialized element rules");

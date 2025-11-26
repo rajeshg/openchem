@@ -24,8 +24,7 @@ export function normalizePriority(p: number): number {
  */
 export function isCarbonyl(atom1: Atom, atom2: Atom): boolean {
   return (
-    (atom1.symbol === "C" && atom2.symbol === "O") ||
-    (atom2.symbol === "C" && atom1.symbol === "O")
+    (atom1.symbol === "C" && atom2.symbol === "O") || (atom2.symbol === "C" && atom1.symbol === "O")
   );
 }
 
@@ -108,10 +107,7 @@ export function findAcylChain(mol: Molecule, carbonylCarbon: number): number[] {
  * @param ketoneAtomIndices - Original ketone atom indices [carbonyl C, O]
  * @returns Expanded atom indices including full acyl chain, or original if not an acyl substituent
  */
-export function expandKetoneToAcylGroup(
-  mol: Molecule,
-  ketoneAtomIndices: number[],
-): number[] {
+export function expandKetoneToAcylGroup(mol: Molecule, ketoneAtomIndices: number[]): number[] {
   // Ketone detection gives us [carbonyl C, O]
   if (ketoneAtomIndices.length < 2) return ketoneAtomIndices;
 
@@ -172,8 +168,7 @@ export function expandKetoneToAcylGroup(
 
   // If connections are unequal, use connection count heuristic
   if (neighbor1Connections !== neighbor2Connections) {
-    acylChainStart =
-      neighbor1Connections < neighbor2Connections ? neighbor1Idx : neighbor2Idx;
+    acylChainStart = neighbor1Connections < neighbor2Connections ? neighbor1Idx : neighbor2Idx;
   } else {
     // Tie-breaker: count chain length from each neighbor (BFS)
     const getChainLength = (startIdx: number, excludeIdx: number): number => {
@@ -209,8 +204,7 @@ export function expandKetoneToAcylGroup(
     }
 
     // Shorter chain is likely the acyl substituent
-    acylChainStart =
-      neighbor1ChainLength < neighbor2ChainLength ? neighbor1Idx : neighbor2Idx;
+    acylChainStart = neighbor1ChainLength < neighbor2ChainLength ? neighbor1Idx : neighbor2Idx;
   }
 
   // BFS traversal from acyl chain start, away from carbonyl

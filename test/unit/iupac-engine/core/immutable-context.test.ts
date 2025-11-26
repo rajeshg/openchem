@@ -31,10 +31,7 @@ describe("Improved IUPAC Rule Engine", () => {
       bonds: [],
     } as any;
 
-    const context = ImmutableNamingContext.create(
-      molecule,
-      createTestServices(),
-    );
+    const context = ImmutableNamingContext.create(molecule, createTestServices());
 
     expect(context.getState().molecule).toBe(molecule);
     expect(context.getState().confidence).toBe(1.0);
@@ -47,10 +44,7 @@ describe("Improved IUPAC Rule Engine", () => {
       bonds: [],
     } as any;
 
-    const context = ImmutableNamingContext.create(
-      molecule,
-      createTestServices(),
-    );
+    const context = ImmutableNamingContext.create(molecule, createTestServices());
 
     // Update candidate chains with trace
     const chain = {
@@ -88,14 +82,9 @@ describe("Improved IUPAC Rule Engine", () => {
       bonds: [],
     } as any;
 
-    const context = ImmutableNamingContext.create(
-      molecule,
-      createTestServices(),
-    );
+    const context = ImmutableNamingContext.create(molecule, createTestServices());
 
-    expect(context.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(
-      false,
-    );
+    expect(context.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(false);
 
     const completedContext = context.withPhaseCompletion(
       ExecutionPhase.FUNCTIONAL_GROUP,
@@ -106,12 +95,8 @@ describe("Improved IUPAC Rule Engine", () => {
       "Phase completed",
     );
 
-    expect(
-      completedContext.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP),
-    ).toBe(true);
-    expect(context.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(
-      false,
-    ); // Original unchanged
+    expect(completedContext.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(true);
+    expect(context.isPhaseComplete(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(false); // Original unchanged
   });
 
   test("should maintain trace history for debugging", () => {
@@ -174,24 +159,13 @@ describe("Improved IUPAC Rule Engine", () => {
       bonds: [],
     } as any;
 
-    const context = ImmutableNamingContext.create(
-      molecule,
-      createTestServices(),
-    );
+    const context = ImmutableNamingContext.create(molecule, createTestServices());
 
     // Check phase readiness
-    expect(
-      context.hasRequiredDataForPhase(ExecutionPhase.FUNCTIONAL_GROUP),
-    ).toBe(true);
-    expect(
-      context.hasRequiredDataForPhase(ExecutionPhase.PARENT_STRUCTURE),
-    ).toBe(true);
-    expect(context.hasRequiredDataForPhase(ExecutionPhase.NUMBERING)).toBe(
-      false,
-    );
-    expect(context.hasRequiredDataForPhase(ExecutionPhase.ASSEMBLY)).toBe(
-      false,
-    );
+    expect(context.hasRequiredDataForPhase(ExecutionPhase.FUNCTIONAL_GROUP)).toBe(true);
+    expect(context.hasRequiredDataForPhase(ExecutionPhase.PARENT_STRUCTURE)).toBe(true);
+    expect(context.hasRequiredDataForPhase(ExecutionPhase.NUMBERING)).toBe(false);
+    expect(context.hasRequiredDataForPhase(ExecutionPhase.ASSEMBLY)).toBe(false);
   });
 
   test("should validate layer contracts", () => {
@@ -203,10 +177,7 @@ describe("Improved IUPAC Rule Engine", () => {
       bonds: [],
     } as any;
 
-    const context = ImmutableNamingContext.create(
-      molecule,
-      createTestServices(),
-    );
+    const context = ImmutableNamingContext.create(molecule, createTestServices());
 
     // Add atomic analysis to satisfy functional group contract
     const contextWithAnalysis = context.withStateUpdate(

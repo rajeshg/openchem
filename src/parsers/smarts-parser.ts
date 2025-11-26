@@ -9,18 +9,14 @@ import type {
 
 function isAtomAromatic(atom: PatternAtom): boolean {
   if (atom.primitives) {
-    return atom.primitives.some(
-      (p) => p.type === "aromatic_element" || p.type === "aromatic",
-    );
+    return atom.primitives.some((p) => p.type === "aromatic_element" || p.type === "aromatic");
   }
   return false;
 }
 
 function isAtomAliphatic(atom: PatternAtom): boolean {
   if (atom.primitives) {
-    return atom.primitives.some(
-      (p) => p.type === "aliphatic_element" || p.type === "aliphatic",
-    );
+    return atom.primitives.some((p) => p.type === "aliphatic_element" || p.type === "aliphatic");
   }
   return false;
 }
@@ -30,10 +26,7 @@ function canMatchBothAromaticAndAliphatic(atom: PatternAtom): boolean {
     return true;
   }
   return atom.primitives.some(
-    (p) =>
-      p.type === "atomic_number" ||
-      p.type === "element" ||
-      p.type === "wildcard",
+    (p) => p.type === "atomic_number" || p.type === "element" || p.type === "wildcard",
   );
 }
 
@@ -45,12 +38,7 @@ function getImplicitBondType(
   const fromAtom = atoms[fromIndex];
   const toAtom = atoms[toIndex];
 
-  if (
-    fromAtom &&
-    toAtom &&
-    isAtomAromatic(fromAtom) &&
-    isAtomAromatic(toAtom)
-  ) {
+  if (fromAtom && toAtom && isAtomAromatic(fromAtom) && isAtomAromatic(toAtom)) {
     return [{ type: "aromatic" }];
   }
 
@@ -66,8 +54,7 @@ function getImplicitBondType(
   if (
     fromAtom &&
     toAtom &&
-    (canMatchBothAromaticAndAliphatic(fromAtom) ||
-      canMatchBothAromaticAndAliphatic(toAtom))
+    (canMatchBothAromaticAndAliphatic(fromAtom) || canMatchBothAromaticAndAliphatic(toAtom))
   ) {
     return [{ type: "any" }];
   }
@@ -88,10 +75,7 @@ export function parseSMARTS(pattern: string): {
 
   const atoms: PatternAtom[] = [];
   const bonds: PatternBond[] = [];
-  const ringClosures = new Map<
-    string,
-    { atomIndex: number; bond?: BondPrimitive[] }
-  >();
+  const ringClosures = new Map<string, { atomIndex: number; bond?: BondPrimitive[] }>();
   const parentStack: number[] = [];
 
   let i = 0;
@@ -273,8 +257,7 @@ export function parseSMARTS(pattern: string): {
         bonds.push({
           from: lastAtomIndex,
           to: atomIndex,
-          primitives:
-            pendingBond || getImplicitBondType(atoms, lastAtomIndex, atomIndex),
+          primitives: pendingBond || getImplicitBondType(atoms, lastAtomIndex, atomIndex),
         });
         pendingBond = undefined;
       }
@@ -305,9 +288,7 @@ export function parseSMARTS(pattern: string): {
   }
 
   if (ringClosures.size > 0) {
-    errors.push(
-      `Unclosed ring closures: ${Array.from(ringClosures.keys()).join(", ")}`,
-    );
+    errors.push(`Unclosed ring closures: ${Array.from(ringClosures.keys()).join(", ")}`);
     return { pattern: null, errors };
   }
 
@@ -326,10 +307,7 @@ interface BracketAtomResult {
   error?: string;
 }
 
-function parseBracketAtom(
-  pattern: string,
-  startIndex: number,
-): BracketAtomResult {
+function parseBracketAtom(pattern: string, startIndex: number): BracketAtomResult {
   let i = startIndex + 1;
   const primitives: AtomPrimitive[] = [];
   const tokens: (AtomPrimitive | string)[] = [];
@@ -643,60 +621,57 @@ function buildLogicalExpression(
       semicolonSections.push(currentSection);
     }
 
-    const andOperands: (AtomPrimitive | LogicalExpression)[] =
-      semicolonSections.map((section) => {
-        const sectionPrimitives = section.filter(
-          (t): t is AtomPrimitive => typeof t !== "string",
-        );
-        const hasComma = section.some((t) => t === ",");
+    const andOperands: (AtomPrimitive | LogicalExpression)[] = semicolonSections.map((section) => {
+      const sectionPrimitives = section.filter((t): t is AtomPrimitive => typeof t !== "string");
+      const hasComma = section.some((t) => t === ",");
 
-        if (!hasComma) {
-          if (sectionPrimitives.length === 1) {
-            return sectionPrimitives[0]!;
-          }
-          return {
-            operator: "and" as const,
-            operands: sectionPrimitives,
-          };
+      if (!hasComma) {
+        if (sectionPrimitives.length === 1) {
+          return sectionPrimitives[0]!;
         }
-
-        const commaGroups: AtomPrimitive[][] = [];
-        let currentGroup: AtomPrimitive[] = [];
-
-        for (const token of section) {
-          if (typeof token === "string" && token === ",") {
-            if (currentGroup.length > 0) {
-              commaGroups.push(currentGroup);
-              currentGroup = [];
-            }
-          } else if (typeof token !== "string") {
-            currentGroup.push(token);
-          }
-        }
-
-        if (currentGroup.length > 0) {
-          commaGroups.push(currentGroup);
-        }
-
-        const orOperands = commaGroups.map((cg) => {
-          if (cg.length === 1) {
-            return cg[0]!;
-          }
-          return {
-            operator: "and" as const,
-            operands: cg,
-          } as LogicalExpression;
-        });
-
-        if (orOperands.length === 1) {
-          return orOperands[0]!;
-        }
-
         return {
-          operator: "or" as const,
-          operands: orOperands,
+          operator: "and" as const,
+          operands: sectionPrimitives,
         };
+      }
+
+      const commaGroups: AtomPrimitive[][] = [];
+      let currentGroup: AtomPrimitive[] = [];
+
+      for (const token of section) {
+        if (typeof token === "string" && token === ",") {
+          if (currentGroup.length > 0) {
+            commaGroups.push(currentGroup);
+            currentGroup = [];
+          }
+        } else if (typeof token !== "string") {
+          currentGroup.push(token);
+        }
+      }
+
+      if (currentGroup.length > 0) {
+        commaGroups.push(currentGroup);
+      }
+
+      const orOperands = commaGroups.map((cg) => {
+        if (cg.length === 1) {
+          return cg[0]!;
+        }
+        return {
+          operator: "and" as const,
+          operands: cg,
+        } as LogicalExpression;
       });
+
+      if (orOperands.length === 1) {
+        return orOperands[0]!;
+      }
+
+      return {
+        operator: "or" as const,
+        operands: orOperands,
+      };
+    });
 
     if (andOperands.length === 1) {
       return andOperands[0] as LogicalExpression;
@@ -769,19 +744,12 @@ interface OrganicAtomResult {
   nextIndex: number;
 }
 
-function parseOrganicAtom(
-  pattern: string,
-  startIndex: number,
-): OrganicAtomResult {
+function parseOrganicAtom(pattern: string, startIndex: number): OrganicAtomResult {
   const char = pattern[startIndex]!;
 
   let nextIndex = startIndex + 1;
 
-  if (
-    isUpperCase(char) &&
-    nextIndex < pattern.length &&
-    isLowerCase(pattern[nextIndex]!)
-  ) {
+  if (isUpperCase(char) && nextIndex < pattern.length && isLowerCase(pattern[nextIndex]!)) {
     const twoChar = char + pattern[nextIndex]!;
     if (["Br", "Cl"].includes(twoChar)) {
       return {
@@ -843,9 +811,7 @@ function parseRingClosures(
           from: closure.atomIndex,
           to: atomIndex,
           primitives:
-            ringBond ||
-            closure.bond ||
-            getImplicitBondType(atoms, closure.atomIndex, atomIndex),
+            ringBond || closure.bond || getImplicitBondType(atoms, closure.atomIndex, atomIndex),
           isRingClosure: true,
         });
         ringClosures.delete(digit);
@@ -859,11 +825,7 @@ function parseRingClosures(
 
   if (i < pattern.length && pattern[i] === "%") {
     i++;
-    if (
-      i + 1 < pattern.length &&
-      isDigit(pattern[i]!) &&
-      isDigit(pattern[i + 1]!)
-    ) {
+    if (i + 1 < pattern.length && isDigit(pattern[i]!) && isDigit(pattern[i + 1]!)) {
       const digit = pattern[i]! + pattern[i + 1]!;
       i += 2;
 
@@ -872,9 +834,7 @@ function parseRingClosures(
         bonds.push({
           from: closure.atomIndex,
           to: atomIndex,
-          primitives:
-            closure.bond ||
-            getImplicitBondType(atoms, closure.atomIndex, atomIndex),
+          primitives: closure.bond || getImplicitBondType(atoms, closure.atomIndex, atomIndex),
           isRingClosure: true,
         });
         ringClosures.delete(digit);
@@ -892,10 +852,7 @@ function parseRingClosures(
   return { nextIndex: i };
 }
 
-function parseElement(
-  pattern: string,
-  startIndex: number,
-): { value: string; nextIndex: number } {
+function parseElement(pattern: string, startIndex: number): { value: string; nextIndex: number } {
   let i = startIndex;
   let element = pattern[i]!;
   i++;

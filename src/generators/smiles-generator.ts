@@ -5,11 +5,7 @@ import { isOrganicAtom } from "src/utils/atom-utils";
 import { perceiveAromaticity } from "src/utils/aromaticity-perceiver";
 import { removeInvalidStereo } from "src/utils/symmetry-detector";
 import { analyzeRings } from "src/utils/ring-analysis";
-import {
-  getBondsForAtom,
-  getOtherAtomId,
-  bondKey as utilBondKey,
-} from "src/utils/bond-utils";
+import { getBondsForAtom, getOtherAtomId, bondKey as utilBondKey } from "src/utils/bond-utils";
 
 type MutableAtom = {
   -readonly [K in keyof Atom]: Atom[K];
@@ -30,9 +26,7 @@ export function generateSMILES(
   ringInfo?: RingInfo,
 ): string {
   if (Array.isArray(input)) {
-    return input
-      .map((mol) => generateSMILES(mol, canonical, ringInfo))
-      .join(".");
+    return input.map((mol) => generateSMILES(mol, canonical, ringInfo)).join(".");
   }
   const molecule = input as Molecule;
   let cloned: MutableMolecule = {
@@ -44,17 +38,10 @@ export function generateSMILES(
 
   if (canonical) {
     // Store original aromatic flags and bond types to preserve manually set aromaticity
-    const _originalAromaticFlags = new Map(
-      cloned.atoms.map((a) => [a.id, a.aromatic]),
-    );
-    const _originalBondTypes = new Map(
-      cloned.bonds.map((b) => [`${b.atom1}-${b.atom2}`, b.type]),
-    );
+    const _originalAromaticFlags = new Map(cloned.atoms.map((a) => [a.id, a.aromatic]));
+    const _originalBondTypes = new Map(cloned.bonds.map((b) => [`${b.atom1}-${b.atom2}`, b.type]));
 
-    const { atoms, bonds } = perceiveAromaticity(
-      cloned.atoms as Atom[],
-      cloned.bonds as Bond[],
-    );
+    const { atoms, bonds } = perceiveAromaticity(cloned.atoms as Atom[], cloned.bonds as Bond[]);
     const validated = removeInvalidStereo({ atoms, bonds });
     cloned = {
       atoms: validated.atoms.map((a) => ({
@@ -80,12 +67,7 @@ export function generateSMILES(
       const neighbors = getNeighbors(atom.id, cloned);
       if (neighbors.length < 3) {
         atom.chiral = null;
-        if (
-          atom.symbol === "C" &&
-          atom.hydrogens <= 1 &&
-          atom.charge === 0 &&
-          !atom.isotope
-        ) {
+        if (atom.symbol === "C" && atom.hydrogens <= 1 && atom.charge === 0 && !atom.isotope) {
           atom.isBracket = false;
           atom.hydrogens = 0;
         }
@@ -101,8 +83,7 @@ export function generateSMILES(
     for (const atom of cloned.atoms) {
       // Only minimize brackets for non-chiral organic atoms with no isotope/charge/atomClass
       // EXCEPTION: aromatic nitrogen with explicit H (pyrrole, indole) MUST use bracket notation [nH]
-      const isAromaticNitrogenWithH =
-        atom.aromatic && atom.symbol === "N" && atom.hydrogens > 0;
+      const isAromaticNitrogenWithH = atom.aromatic && atom.symbol === "N" && atom.hydrogens > 0;
 
       // For [nH] in pyrrole/indole, keep brackets.
       // But if atom.aromatic is TRUE and atom.symbol is "N" and hydrogens is 0,
@@ -130,14 +111,9 @@ export function generateSMILES(
 
   for (const bond of cloned.bonds) {
     if (bond.type === BondType.DOUBLE) {
-      const inSmallRing = ringInfo.areBothAtomsInSameRing(
-        bond.atom1,
-        bond.atom2,
-      );
+      const inSmallRing = ringInfo.areBothAtomsInSameRing(bond.atom1, bond.atom2);
       if (inSmallRing) {
-        const ringsContainingAtom1 = ringInfo.getRingsContainingAtom(
-          bond.atom1,
-        );
+        const ringsContainingAtom1 = ringInfo.getRingsContainingAtom(bond.atom1);
         const ringsContainingBond = ringsContainingAtom1.filter((ring) =>
           ring.includes(bond.atom2),
         );
@@ -146,13 +122,8 @@ export function generateSMILES(
           ring.forEach((atomId) => ringAtoms.add(atomId));
         }
         for (const b of cloned.bonds) {
-          if (
-            b.type === BondType.SINGLE &&
-            b.stereo &&
-            b.stereo !== StereoType.NONE
-          ) {
-            const connectsToRingAtom =
-              ringAtoms.has(b.atom1) || ringAtoms.has(b.atom2);
+          if (b.type === BondType.SINGLE && b.stereo && b.stereo !== StereoType.NONE) {
+            const connectsToRingAtom = ringAtoms.has(b.atom1) || ringAtoms.has(b.atom2);
             if (connectsToRingAtom) {
               const otherAtom = ringAtoms.has(b.atom1) ? b.atom2 : b.atom1;
               const partOfExocyclicDoubleBond = cloned.bonds.some(
@@ -178,9 +149,7 @@ export function generateSMILES(
 
   const components = findConnectedComponents(cloned);
   if (components.length > 1) {
-    return components
-      .map((comp) => generateComponentSMILES(comp, cloned, canonical))
-      .join(".");
+    return components.map((comp) => generateComponentSMILES(comp, cloned, canonical)).join(".");
   }
 
   return generateComponentSMILES(
@@ -219,9 +188,7 @@ function generateComponentSMILES(
   molecule: Molecule,
   useCanonical = true,
 ): string {
-  const componentAtoms = atomIds.map(
-    (id) => molecule.atoms.find((a) => a.id === id)!,
-  );
+  const componentAtoms = atomIds.map((id) => molecule.atoms.find((a) => a.id === id)!);
   const componentBonds = molecule.bonds.filter(
     (b) => atomIds.includes(b.atom1) && atomIds.includes(b.atom2),
   );
@@ -240,8 +207,7 @@ function generateComponentSMILES(
     const lb = labels.get(b.id)!;
     if (la < lb) return -1;
     if (la > lb) return 1;
-    if (a.atomicNumber !== b.atomicNumber)
-      return a.atomicNumber - b.atomicNumber;
+    if (a.atomicNumber !== b.atomicNumber) return a.atomicNumber - b.atomicNumber;
     if (a.charge !== b.charge) return (a.charge || 0) - (b.charge || 0);
     return a.id - b.id;
   });
@@ -348,9 +314,7 @@ function generateComponentSMILES(
     backEdges: Set<string>,
   ) => {
     visited.add(atomId);
-    const neighbors = getNeighbors(atomId, subMol).filter(
-      ([nid]) => nid !== parentId,
-    );
+    const neighbors = getNeighbors(atomId, subMol).filter(([nid]) => nid !== parentId);
 
     // Sort neighbors by canonical labels for deterministic traversal order
     neighbors.sort((x, y) => {
@@ -426,8 +390,7 @@ function generateComponentSMILES(
     const atom = componentAtoms.find((a) => a.id === atomId)!;
     const sym = atom.aromatic ? atom.symbol.toLowerCase() : atom.symbol;
 
-    const needsBracket =
-      atom.isBracket || atom.atomClass > 0 || !isOrganicAtom(atom.symbol);
+    const needsBracket = atom.isBracket || atom.atomClass > 0 || !isOrganicAtom(atom.symbol);
     if (needsBracket) out.push("[");
     if (atom.isotope) out.push(atom.isotope.toString());
     out.push(sym);
@@ -452,8 +415,7 @@ function generateComponentSMILES(
 
     const ringNums = atomRingNumbers.get(atomId) || [];
     for (const num of ringNums) {
-      const numStr =
-        num < 10 ? String(num) : `%${String(num).padStart(2, "0")}`;
+      const numStr = num < 10 ? String(num) : `%${String(num).padStart(2, "0")}`;
 
       // Find the ring closure bond and the other atom for this ring number
       let ringBond: Bond | undefined;
@@ -463,8 +425,7 @@ function generateComponentSMILES(
           const [a, b] = edgeKey.split("-").map(Number);
           ringBond = componentBonds.find(
             (bond) =>
-              (bond.atom1 === a && bond.atom2 === b) ||
-              (bond.atom1 === b && bond.atom2 === a),
+              (bond.atom1 === a && bond.atom2 === b) || (bond.atom1 === b && bond.atom2 === a),
           );
           otherAtom = a === atomId ? b : a;
           break;
@@ -493,9 +454,7 @@ function generateComponentSMILES(
 
     seen.add(atomId);
 
-    const neighbors = getNeighbors(atomId, subMol).filter(
-      ([nid]) => nid !== parentId,
-    );
+    const neighbors = getNeighbors(atomId, subMol).filter(([nid]) => nid !== parentId);
 
     neighbors.sort((x, y) => {
       const [aId, aBond] = x;
@@ -521,14 +480,7 @@ function generateComponentSMILES(
     // Process all but the last as branches, then process the last as main chain
     for (let i = 0; i < unseenNeighbors.length; i++) {
       const [nid, bond] = unseenNeighbors[i]!;
-      const bondStr = bondSymbolForOutput(
-        bond,
-        nid,
-        subMol,
-        atomId,
-        duplicates,
-        labels,
-      );
+      const bondStr = bondSymbolForOutput(bond, nid, subMol, atomId, duplicates, labels);
 
       if (i === unseenNeighbors.length - 1) {
         // Last neighbor: main chain continuation
@@ -622,20 +574,19 @@ function canonicalLabels(mol: Molecule): {
     // Ring invariants: ring membership count and smallest ring size
     const ringsContaining = ringInfo.getRingsContainingAtom(a.id);
     const ringCount = ringsContaining.length;
-    const smallestRing =
-      ringCount > 0 ? Math.min(...ringsContaining.map((r) => r.length)) : 999; // Non-ring atoms get high value
+    const smallestRing = ringCount > 0 ? Math.min(...ringsContaining.map((r) => r.length)) : 999; // Non-ring atoms get high value
 
     const lbl = [
       String(heteroatomPriority).padStart(3, "0"), // Heteroatom priority FIRST
       String(absCharge).padStart(3, "0"), // Charge second (prefer neutral)
-      String(ringCount).padStart(2, "0"), // Ring membership count (NEW!)
-      String(smallestRing).padStart(3, "0"), // Smallest ring size (NEW!)
+      String(ringCount).padStart(2, "0"), // Ring membership count
+      String(smallestRing).padStart(3, "0"), // Smallest ring size
       String(deg).padStart(3, "0"),
       String(bondOrderSum.toFixed(1)).padStart(5, "0"), // Bond order sum for symmetry breaking
       String(a.atomicNumber).padStart(3, "0"),
+      String(a.isotope || 0).padStart(3, "0"), // Isotope (prefer non-isotope atoms as root)
+      String(a.hydrogens || 0).padStart(3, "0"), // Hydrogen count (for symmetry breaking [nH] vs [n])
       a.aromatic ? "ar" : "al",
-      String(a.isotope || 0).padStart(3, "0"),
-      String(a.hydrogens || 0).padStart(3, "0"),
     ].join("|");
     labels.set(a.id, lbl);
   }
@@ -660,16 +611,13 @@ function canonicalLabels(mol: Molecule): {
 
     const labelMap = new Map<string, number>();
     let counter = 1;
-    const uniqueLabels = Array.from(
-      new Set(mol.atoms.map((a) => newLabels.get(a.id)!)),
-    );
+    const uniqueLabels = Array.from(new Set(mol.atoms.map((a) => newLabels.get(a.id)!)));
     uniqueLabels.sort();
     for (const lbl of uniqueLabels) {
       labelMap.set(lbl, counter++);
     }
     const normalized = new Map<number, string>();
-    for (const a of mol.atoms)
-      normalized.set(a.id, String(labelMap.get(newLabels.get(a.id)!)!));
+    for (const a of mol.atoms) normalized.set(a.id, String(labelMap.get(newLabels.get(a.id)!)!));
 
     let same = true;
     for (const a of mol.atoms) {
@@ -720,8 +668,7 @@ function bondSymbolForOutput(
   duplicates: Set<number>,
   labels: Map<number, string>,
 ): string {
-  const parentAtom =
-    parentId !== null ? molecule.atoms.find((a) => a.id === parentId) : null;
+  const parentAtom = parentId !== null ? molecule.atoms.find((a) => a.id === parentId) : null;
   const childAtom = molecule.atoms.find((a) => a.id === childId);
 
   if (parentAtom?.aromatic && childAtom?.aromatic) {
@@ -739,22 +686,14 @@ function bondSymbolForOutput(
   if (bond.type === BondType.SINGLE && parentId !== null) {
     // Check if either end of this bond is connected to a double bond
     const parentDoubleBond = molecule.bonds.find(
-      (b) =>
-        b.type === BondType.DOUBLE &&
-        (b.atom1 === parentId || b.atom2 === parentId),
+      (b) => b.type === BondType.DOUBLE && (b.atom1 === parentId || b.atom2 === parentId),
     );
 
     const childDoubleBond = molecule.bonds.find(
-      (b) =>
-        b.type === BondType.DOUBLE &&
-        (b.atom1 === childId || b.atom2 === childId),
+      (b) => b.type === BondType.DOUBLE && (b.atom1 === childId || b.atom2 === childId),
     );
 
-    const doubleBondCarbon = parentDoubleBond
-      ? parentId
-      : childDoubleBond
-        ? childId
-        : null;
+    const doubleBondCarbon = parentDoubleBond ? parentId : childDoubleBond ? childId : null;
     const doubleBond = parentDoubleBond || childDoubleBond;
 
     if (!doubleBond) {
@@ -785,9 +724,7 @@ function bondSymbolForOutput(
     );
 
     // Check if any substituent has stereo info
-    const hasStereoInfo = allSubstituents.some(
-      (b) => b.stereo && b.stereo !== StereoType.NONE,
-    );
+    const hasStereoInfo = allSubstituents.some((b) => b.stereo && b.stereo !== StereoType.NONE);
     if (!hasStereoInfo) {
       return "";
     }

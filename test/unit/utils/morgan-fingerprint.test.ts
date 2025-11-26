@@ -1,9 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
-import {
-  computeMorganFingerprint,
-  getBitsSet,
-} from "src/utils/morgan-fingerprint";
+import { computeMorganFingerprint, getBitsSet } from "src/utils/morgan-fingerprint";
 
 describe("computeMorganFingerprint", () => {
   // Bulk test set for cross-validation with RDKit-JS
@@ -92,10 +89,7 @@ describe("computeMorganFingerprint", () => {
     let hex = "";
     for (let i = 0; i < fp.length; i += 4) {
       let nibble =
-        ((fp[i] ?? 0) << 3) |
-        ((fp[i + 1] ?? 0) << 2) |
-        ((fp[i + 2] ?? 0) << 1) |
-        (fp[i + 3] ?? 0);
+        ((fp[i] ?? 0) << 3) | ((fp[i + 1] ?? 0) << 2) | ((fp[i + 2] ?? 0) << 1) | (fp[i + 3] ?? 0);
       hex += nibble.toString(16);
     }
     return hex;

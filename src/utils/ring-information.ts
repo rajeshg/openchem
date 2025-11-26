@@ -1,10 +1,6 @@
 import type { Molecule } from "types";
 import type { RingInfo } from "./ring-analysis";
-import {
-  analyzeRings,
-  findSSSR,
-  getRingsContainingAtom,
-} from "./ring-analysis";
+import { analyzeRings, findSSSR, getRingsContainingAtom } from "./ring-analysis";
 
 /**
  * Comprehensive ring information interface providing access to SSSR (Smallest Set of Smallest Rings)
@@ -79,9 +75,7 @@ class RingInformationImpl implements RingInformation {
   }
 
   isAtomInRingOfSize(atomIdx: number, size: number): boolean {
-    return this.sssr.some(
-      (ring) => ring.length === size && ring.includes(atomIdx),
-    );
+    return this.sssr.some((ring) => ring.length === size && ring.includes(atomIdx));
   }
 
   isBondInRingOfSize(atom1: number, atom2: number, size: number): boolean {
@@ -99,9 +93,7 @@ class RingInformationImpl implements RingInformation {
   }
 
   bondRingMembership(atom1: number, atom2: number): number {
-    return this.sssr.filter(
-      (ring) => ring.includes(atom1) && ring.includes(atom2),
-    ).length;
+    return this.sssr.filter((ring) => ring.includes(atom1) && ring.includes(atom2)).length;
   }
 
   atomRings(atomIdx: number): number[][] {
@@ -109,9 +101,7 @@ class RingInformationImpl implements RingInformation {
   }
 
   bondRings(atom1: number, atom2: number): number[][] {
-    return this.sssr.filter(
-      (ring) => ring.includes(atom1) && ring.includes(atom2),
-    );
+    return this.sssr.filter((ring) => ring.includes(atom1) && ring.includes(atom2));
   }
 
   ringAtoms(ringIdx: number): number[] {

@@ -1,10 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import {
-  parseSMILES,
-  generateSMILES,
-  generateMolfile,
-  parseMolfile,
-} from "index";
+import { parseSMILES, generateSMILES, generateMolfile, parseMolfile } from "index";
 
 let rdkitInstance: any = null;
 let rdkitInitialized = false;
@@ -15,9 +10,7 @@ async function initializeRDKit(): Promise<any> {
   try {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     rdkitInstance = await (initRDKitModule as any)();
@@ -118,10 +111,7 @@ describe("RDKit MOL File Generation Comparison", () => {
           rdkitCanonical = rdkitMol.get_smiles();
         }
       } catch (e) {
-        console.error(
-          `RDKit failed to parse generated MOL file for ${name}:`,
-          e,
-        );
+        console.error(`RDKit failed to parse generated MOL file for ${name}:`, e);
       } finally {
         if (rdkitMol) {
           try {

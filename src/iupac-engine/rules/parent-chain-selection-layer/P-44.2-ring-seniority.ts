@@ -1,8 +1,4 @@
-import type {
-  IUPACRule,
-  FunctionalGroup,
-  StructuralSubstituent,
-} from "../../types";
+import type { IUPACRule, FunctionalGroup, StructuralSubstituent } from "../../types";
 import type { Atom, Bond, Molecule } from "types";
 import { BLUE_BOOK_RULES, RulePriority } from "../../types";
 import { ExecutionPhase } from "../../immutable-context";
@@ -41,13 +37,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
     const functionalGroups = state.functionalGroups || [];
     const principalFGs = functionalGroups.filter((fg) => fg.isPrincipal);
 
-    if (
-      chains &&
-      chains.length > 0 &&
-      rings &&
-      rings.length > 0 &&
-      principalFGs.length > 0
-    ) {
+    if (chains && chains.length > 0 && rings && rings.length > 0 && principalFGs.length > 0) {
       const molecule = state.molecule;
 
       // Count FGs on rings
@@ -79,28 +69,22 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
         if (!isOnRing) {
           // Check if the FG atom is bonded to any ring atom
           const bonds = molecule.bonds.filter(
-            (b: Bond) =>
-              b.atom1 === attachmentAtomId || b.atom2 === attachmentAtomId,
+            (b: Bond) => b.atom1 === attachmentAtomId || b.atom2 === attachmentAtomId,
           );
 
           for (const bond of bonds) {
-            const neighborId =
-              bond.atom1 === attachmentAtomId ? bond.atom2 : bond.atom1;
+            const neighborId = bond.atom1 === attachmentAtomId ? bond.atom2 : bond.atom1;
 
             // Check if neighbor is in a ring
             if (ringAtomIds.has(neighborId)) {
               // Additional check: prefer heterocycles over carbocycles for amines
               // An amine connecting two rings should be counted with the heterocycle
-              const neighborAtom = molecule.atoms.find(
-                (a: Atom) => a.id === neighborId,
-              );
+              const neighborAtom = molecule.atoms.find((a: Atom) => a.id === neighborId);
 
               if (neighborAtom) {
                 // Find which ring(s) contain this neighbor
                 for (const ring of rings) {
-                  const ringContainsNeighbor = ring.atoms.some(
-                    (a: Atom) => a.id === neighborId,
-                  );
+                  const ringContainsNeighbor = ring.atoms.some((a: Atom) => a.id === neighborId);
 
                   if (ringContainsNeighbor) {
                     // Check if this ring is a heterocycle
@@ -156,9 +140,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.2 conditions] FG count: ring=${ringFGCount}, chain=${chainFGCount}`,
-        );
+        console.log(`[P-44.2 conditions] FG count: ring=${ringFGCount}, chain=${chainFGCount}`);
       }
 
       // P-44.1.1: If chains have MORE FGs than rings, defer to chain selection
@@ -191,9 +173,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
       (state as { functionalGroups: FunctionalGroup[] }).functionalGroups || [];
 
     // Get principal functional groups (highest priority groups like carboxylic acids, ketones, etc.)
-    const principalFGs = functionalGroups.filter(
-      (fg: FunctionalGroup) => fg.isPrincipal,
-    );
+    const principalFGs = functionalGroups.filter((fg: FunctionalGroup) => fg.isPrincipal);
 
     // For each ring, count how many principal functional groups are attached
     const ringFGScores = rings.map((ring) => {
@@ -204,9 +184,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
 
       for (const fg of principalFGs) {
         // Check if any FG atom is in the ring
-        const fgInRing = (fg.atoms || []).some((atom: Atom) =>
-          ringAtomIds.has(atom.id),
-        );
+        const fgInRing = (fg.atoms || []).some((atom: Atom) => ringAtomIds.has(atom.id));
 
         // Check if any FG atom is bonded to a ring atom
         let fgAttachedToRing = false;
@@ -217,8 +195,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
             );
 
             for (const bond of bonds) {
-              const neighborId =
-                bond.atom1 === fgAtom.id ? bond.atom2 : bond.atom1;
+              const neighborId = bond.atom1 === fgAtom.id ? bond.atom2 : bond.atom1;
               if (ringAtomIds.has(neighborId)) {
                 fgAttachedToRing = true;
                 break;
@@ -246,8 +223,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
     // 3. Ring size (descending)
     ringFGScores.sort((a, b) => {
       if (a.fgCount !== b.fgCount) return b.fgCount - a.fgCount;
-      if (a.highestPriority !== b.highestPriority)
-        return a.highestPriority - b.highestPriority;
+      if (a.highestPriority !== b.highestPriority) return a.highestPriority - b.highestPriority;
       return b.size - a.size;
     });
 
@@ -256,9 +232,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
     const size = ring.atoms ? ring.atoms.length : ring.size || 0;
     const type =
       ring.type ||
-      (ring.atoms && ring.atoms.some((a: Atom) => a.aromatic)
-        ? "aromatic"
-        : "aliphatic");
+      (ring.atoms && ring.atoms.some((a: Atom) => a.aromatic) ? "aromatic" : "aliphatic");
 
     // Check for heterocyclic name first
     let name = "";
@@ -295,9 +269,7 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
         name = ringNames[size] || `cyclo${size}ane`;
       }
     }
-    const locants = ring.atoms
-      ? ring.atoms.map((_: Atom, idx: number) => idx + 1)
-      : [];
+    const locants = ring.atoms ? ring.atoms.map((_: Atom, idx: number) => idx + 1) : [];
     // Try to find substituents on the ring atoms so substituted ring names can be produced
     let substituents: StructuralSubstituent[] = [];
     try {
@@ -305,16 +277,10 @@ export const P44_2_RING_SENIORITY_RULE: IUPACRule = {
       if (ring && ring.atoms && mol) {
         const atomIds = ring.atoms.map((a: Atom) => a.id);
         if (process.env.VERBOSE) {
-          console.log(
-            "[P-44.2] Finding substituents on ring with atom IDs:",
-            atomIds,
-          );
+          console.log("[P-44.2] Finding substituents on ring with atom IDs:", atomIds);
         }
         substituents =
-          (_findSubstituentsOnMonocyclicRing(
-            atomIds,
-            mol,
-          ) as StructuralSubstituent[]) || [];
+          (_findSubstituentsOnMonocyclicRing(atomIds, mol) as StructuralSubstituent[]) || [];
         if (process.env.VERBOSE) {
           console.log("[P-44.2] Found substituents:", substituents);
         }

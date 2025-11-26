@@ -42,9 +42,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const ptAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Pt",
-      );
+      const ptAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "Pt");
       expect(ptAtom?.chiral).toBe("@SP2");
     });
 
@@ -55,9 +53,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const ptAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Pt",
-      );
+      const ptAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "Pt");
       expect(ptAtom?.chiral).toBe("@SP3");
     });
   });
@@ -111,24 +107,18 @@ describe("Extended Stereochemistry", () => {
       for (let i = 1; i <= 20; i++) {
         const result = parseSMILES(`S[As@TB${i}](F)(Cl)(Br)N`);
         expect(result.errors).toEqual([]);
-        const asAtom = result.molecules[0]!.atoms.find(
-          (a) => a.symbol === "As",
-        );
+        const asAtom = result.molecules[0]!.atoms.find((a) => a.symbol === "As");
         expect(asAtom?.chiral).toBe(`@TB${i}`);
       }
     });
 
     it("should reject invalid TB numbers (@TB21, @TB0)", () => {
       const result1 = parseSMILES("S[As@TB21](F)(Cl)(Br)N");
-      const asAtom1 = result1.molecules[0]!.atoms.find(
-        (a) => a.symbol === "As",
-      );
+      const asAtom1 = result1.molecules[0]!.atoms.find((a) => a.symbol === "As");
       expect(asAtom1?.chiral).toBe("@");
 
       const result2 = parseSMILES("S[As@TB0](F)(Cl)(Br)N");
-      const asAtom2 = result2.molecules[0]!.atoms.find(
-        (a) => a.symbol === "As",
-      );
+      const asAtom2 = result2.molecules[0]!.atoms.find((a) => a.symbol === "As");
       expect(asAtom2?.chiral).toBe("@");
     });
 
@@ -139,9 +129,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const asAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "As",
-      );
+      const asAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "As");
       expect(asAtom?.chiral).toBe("@TB1");
     });
 
@@ -152,9 +140,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const asAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "As",
-      );
+      const asAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "As");
       expect(asAtom?.chiral).toBe("@TB15");
     });
   });
@@ -228,24 +214,18 @@ describe("Extended Stereochemistry", () => {
       for (let i = 1; i <= 30; i++) {
         const result = parseSMILES(`C[Co@OH${i}](F)(Cl)(Br)(I)S`);
         expect(result.errors).toEqual([]);
-        const coAtom = result.molecules[0]!.atoms.find(
-          (a) => a.symbol === "Co",
-        );
+        const coAtom = result.molecules[0]!.atoms.find((a) => a.symbol === "Co");
         expect(coAtom?.chiral).toBe(`@OH${i}`);
       }
     });
 
     it("should reject invalid OH numbers (@OH31, @OH0)", () => {
       const result1 = parseSMILES("C[Co@OH31](F)(Cl)(Br)(I)S");
-      const coAtom1 = result1.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Co",
-      );
+      const coAtom1 = result1.molecules[0]!.atoms.find((a) => a.symbol === "Co");
       expect(coAtom1?.chiral).toBe("@");
 
       const result2 = parseSMILES("C[Co@OH0](F)(Cl)(Br)(I)S");
-      const coAtom2 = result2.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Co",
-      );
+      const coAtom2 = result2.molecules[0]!.atoms.find((a) => a.symbol === "Co");
       expect(coAtom2?.chiral).toBe("@");
     });
 
@@ -256,9 +236,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const coAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Co",
-      );
+      const coAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "Co");
       expect(coAtom?.chiral).toBe("@OH1");
     });
 
@@ -269,9 +247,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const coAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Co",
-      );
+      const coAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "Co");
       expect(coAtom?.chiral).toBe("@OH15");
     });
 
@@ -282,9 +258,7 @@ describe("Extended Stereochemistry", () => {
       const generated = generateSMILES(parsed.molecules[0]!);
       const reparsed = parseSMILES(generated);
       expect(reparsed.errors).toEqual([]);
-      const coAtom = reparsed.molecules[0]!.atoms.find(
-        (a) => a.symbol === "Co",
-      );
+      const coAtom = reparsed.molecules[0]!.atoms.find((a) => a.symbol === "Co");
       expect(coAtom?.chiral).toBe("@OH30");
     });
   });
@@ -304,9 +278,7 @@ describe("Extended Stereochemistry", () => {
         const result = parseSMILES(smiles);
         expect(result.errors).toEqual([]);
         expect(result.molecules).toHaveLength(1);
-        const asAtom = result.molecules[0]!.atoms.find(
-          (a) => a.symbol === "As",
-        );
+        const asAtom = result.molecules[0]!.atoms.find((a) => a.symbol === "As");
         expect(asAtom).toBeDefined();
         expect(asAtom?.chiral).toMatch(/@TB\d+/);
       }
@@ -326,9 +298,7 @@ describe("Extended Stereochemistry", () => {
         const result = parseSMILES(smiles);
         expect(result.errors).toEqual([]);
         expect(result.molecules).toHaveLength(1);
-        const coAtom = result.molecules[0]!.atoms.find(
-          (a) => a.symbol === "Co",
-        );
+        const coAtom = result.molecules[0]!.atoms.find((a) => a.symbol === "Co");
         expect(coAtom).toBeDefined();
         expect(coAtom?.chiral).toBeTruthy();
       }
@@ -363,16 +333,12 @@ describe("Extended Stereochemistry", () => {
     it("should parse @AL1 and @AL2 for allene-like", () => {
       const result1 = parseSMILES("N[C@AL1](C)=C=C(O)C");
       expect(result1.errors).toEqual([]);
-      const cAtom1 = result1.molecules[0]!.atoms.find(
-        (a) => a.symbol === "C" && a.chiral,
-      );
+      const cAtom1 = result1.molecules[0]!.atoms.find((a) => a.symbol === "C" && a.chiral);
       expect(cAtom1?.chiral).toBe("@AL1");
 
       const result2 = parseSMILES("N[C@AL2](C)=C=C(O)C");
       expect(result2.errors).toEqual([]);
-      const cAtom2 = result2.molecules[0]!.atoms.find(
-        (a) => a.symbol === "C" && a.chiral,
-      );
+      const cAtom2 = result2.molecules[0]!.atoms.find((a) => a.symbol === "C" && a.chiral);
       expect(cAtom2?.chiral).toBe("@AL2");
     });
   });

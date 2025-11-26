@@ -4,19 +4,10 @@ import { BondType } from "types";
 import type { Atom, Bond } from "types";
 import type { RingSystem, Ring, HeteroAtom } from "../../types";
 import { RingSystemType } from "../../types";
-import {
-  analyzeRings,
-  classifyRingSystems,
-} from "../../../utils/ring-analysis";
-import {
-  identifyFusedRingSystems,
-  identifyFusedRingPattern,
-} from "../ring-fusion-rules";
+import { analyzeRings, classifyRingSystems } from "../../../utils/ring-analysis";
+import { identifyFusedRingSystems, identifyFusedRingPattern } from "../ring-fusion-rules";
 import { generateAromaticRingName, isRingAromatic } from "./aromatic-naming";
-import {
-  identifyPolycyclicPattern,
-  identifyAdvancedFusedPattern,
-} from "./fused-naming";
+import { identifyPolycyclicPattern, identifyAdvancedFusedPattern } from "./fused-naming";
 import {
   generateSubstitutedFusedNameWithIUPACNumbering,
   findSubstituentsOnFusedSystem,
@@ -27,10 +18,7 @@ import { getSharedOPSINService } from "../../opsin-service";
 import { nameAlkylSulfanylSubstituent } from "../chains/substituent-naming/sulfanyl";
 import { ruleEngine } from "../iupac-rule-engine";
 
-function createRingSystemFromRings(
-  rings: number[][],
-  molecule: Molecule,
-): RingSystem {
+function createRingSystemFromRings(rings: number[][], molecule: Molecule): RingSystem {
   const allAtomIndices = rings.flat();
   const atoms: Atom[] = [];
   const atomMap = new Map<number, Atom>();
@@ -134,12 +122,7 @@ export function generateCyclicName(
     const ringSize = ring.length;
     const isAromatic = isRingAromatic(ring, molecule);
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] monocyclic: ringSize=",
-        ringSize,
-        "isAromatic=",
-        isAromatic,
-      );
+      console.log("[VERBOSE] monocyclic: ringSize=", ringSize, "isAromatic=", isAromatic);
 
     if (isAromatic) {
       const aromaticBaseName = generateAromaticRingName(ring, molecule);
@@ -174,25 +157,15 @@ export function generateCyclicName(
 
     // Get the base cycloalkane/cycloalkene/cycloalkyne name
     const cycloName = getMonocyclicBaseName(ring, molecule);
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] monocyclic base name=", cycloName);
+    if (process.env.VERBOSE) console.log("[VERBOSE] monocyclic base name=", cycloName);
 
     // Find substituents on this monocyclic ring
     const substituents = findSubstituentsOnMonocyclicRing(ring, molecule);
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] monocyclic substituents count=",
-        substituents.length,
-      );
+      console.log("[VERBOSE] monocyclic substituents count=", substituents.length);
     if (substituents.length > 0) {
-      const res = generateMonocyclicSubstitutedName(
-        cycloName,
-        substituents,
-        ring,
-        molecule,
-      );
-      if (process.env.VERBOSE)
-        console.log("[VERBOSE] monocyclic substituted result=", res);
+      const res = generateMonocyclicSubstitutedName(cycloName, substituents, ring, molecule);
+      if (process.env.VERBOSE) console.log("[VERBOSE] monocyclic substituted result=", res);
       return normalizeCyclicName(res, meaningfulRings, molecule);
     }
 
@@ -209,11 +182,9 @@ export function generateCyclicName(
         const aromaticB = isRingAromatic(ringB, molecule);
         // For biphenyl, both rings must be 6-membered benzene rings (no heteroatoms)
         const isBenzeneA =
-          ringA.length === 6 &&
-          ringA.every((idx) => molecule.atoms[idx]?.symbol === "C");
+          ringA.length === 6 && ringA.every((idx) => molecule.atoms[idx]?.symbol === "C");
         const isBenzeneB =
-          ringB.length === 6 &&
-          ringB.every((idx) => molecule.atoms[idx]?.symbol === "C");
+          ringB.length === 6 && ringB.every((idx) => molecule.atoms[idx]?.symbol === "C");
         if (aromaticA && aromaticB && isBenzeneA && isBenzeneB) {
           // Count inter-ring bonds
           let interBonds = 0;
@@ -225,14 +196,8 @@ export function generateCyclicName(
             if ((a1InA && a2InB) || (a1InB && a2InA)) interBonds++;
           }
           if (interBonds === 1) {
-            const possibleFusedSystem = createRingSystemFromRings(
-              [ringA, ringB],
-              molecule,
-            );
-            const subs = findSubstituentsOnFusedSystem(
-              { rings: [ringA, ringB] },
-              molecule,
-            );
+            const possibleFusedSystem = createRingSystemFromRings([ringA, ringB], molecule);
+            const subs = findSubstituentsOnFusedSystem({ rings: [ringA, ringB] }, molecule);
             if (subs.length > 0) {
               return generateSubstitutedFusedNameWithIUPACNumbering(
                 "biphenyl",
@@ -248,59 +213,35 @@ export function generateCyclicName(
         // ignore and fall through to general polycyclic handling
       }
     }
-    const ringClassification = classifyRingSystems(
-      molecule.atoms,
-      molecule.bonds,
-    );
+    const ringClassification = classifyRingSystems(molecule.atoms, molecule.bonds);
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] polycyclic: classification=",
-        JSON.stringify(ringClassification),
-      );
+      console.log("[VERBOSE] polycyclic: classification=", JSON.stringify(ringClassification));
 
     // Check for aromatic fused systems FIRST (naphthalene, anthracene, phenanthrene)
     // This must come before classic polycyclic (bicyclo/tricyclo) naming to avoid
     // misclassifying aromatic fused systems as bridged aliphatic systems
     if (ringClassification.fused.length > 0) {
       if (process.env.VERBOSE)
-        console.log(
-          "[VERBOSE] fused systems detected count=",
-          ringClassification.fused.length,
-        );
+        console.log("[VERBOSE] fused systems detected count=", ringClassification.fused.length);
       const fusedSystems = identifyFusedRingSystems(meaningfulRings, molecule);
       if (process.env.VERBOSE)
         console.log("[VERBOSE] identified fusedSystems=", fusedSystems.length);
       if (fusedSystems.length > 0) {
         const fusedSystem = fusedSystems[0]!;
-        const ringSystem = createRingSystemFromRings(
-          fusedSystem.rings,
-          molecule,
-        );
+        const ringSystem = createRingSystemFromRings(fusedSystem.rings, molecule);
         if (process.env.VERBOSE)
           console.log(
             "[VERBOSE] using fusedSystem with rings=",
             fusedSystem.rings.map((r: number[]) => r.length),
           );
-        let fusedName = identifyAdvancedFusedPattern(
-          fusedSystem.rings,
-          molecule,
-        );
-        if (process.env.VERBOSE)
-          console.log("[VERBOSE] advancedFusedPattern=", fusedName);
-        if (!fusedName)
-          fusedName = identifyFusedRingPattern(fusedSystem, molecule);
-        if (process.env.VERBOSE)
-          console.log("[VERBOSE] basicFusedPattern=", fusedName);
+        let fusedName = identifyAdvancedFusedPattern(fusedSystem.rings, molecule);
+        if (process.env.VERBOSE) console.log("[VERBOSE] advancedFusedPattern=", fusedName);
+        if (!fusedName) fusedName = identifyFusedRingPattern(fusedSystem, molecule);
+        if (process.env.VERBOSE) console.log("[VERBOSE] basicFusedPattern=", fusedName);
         if (fusedName) {
-          const substituents = findSubstituentsOnFusedSystem(
-            fusedSystem,
-            molecule,
-          );
+          const substituents = findSubstituentsOnFusedSystem(fusedSystem, molecule);
           if (process.env.VERBOSE)
-            console.log(
-              "[VERBOSE] fused substituents count=",
-              substituents.length,
-            );
+            console.log("[VERBOSE] fused substituents count=", substituents.length);
           if (substituents.length > 0) {
             const res = generateSubstitutedFusedNameWithIUPACNumbering(
               fusedName,
@@ -308,12 +249,10 @@ export function generateCyclicName(
               ringSystem,
               molecule,
             );
-            if (process.env.VERBOSE)
-              console.log("[VERBOSE] fused substituted result=", res);
+            if (process.env.VERBOSE) console.log("[VERBOSE] fused substituted result=", res);
             return normalizeCyclicName(res, meaningfulRings, molecule);
           }
-          if (process.env.VERBOSE)
-            console.log("[VERBOSE] fusedName result=", fusedName);
+          if (process.env.VERBOSE) console.log("[VERBOSE] fusedName result=", fusedName);
           return normalizeCyclicName(fusedName, meaningfulRings, molecule);
         }
       }
@@ -321,20 +260,12 @@ export function generateCyclicName(
 
     // Try identifyPolycyclicPattern for aromatic fused systems that weren't caught above
     const polycyclicName = identifyPolycyclicPattern(meaningfulRings, molecule);
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] polycyclicName=", polycyclicName);
+    if (process.env.VERBOSE) console.log("[VERBOSE] polycyclicName=", polycyclicName);
     if (polycyclicName) {
       // Attempt to find substituents on this fused ring set and apply numbering
-      const possibleFusedSystem = createRingSystemFromRings(
-        meaningfulRings,
-        molecule,
-      );
-      const subs = findSubstituentsOnFusedSystem(
-        { rings: meaningfulRings },
-        molecule,
-      );
-      if (process.env.VERBOSE)
-        console.log("[VERBOSE] polycyclic substituents count=", subs.length);
+      const possibleFusedSystem = createRingSystemFromRings(meaningfulRings, molecule);
+      const subs = findSubstituentsOnFusedSystem({ rings: meaningfulRings }, molecule);
+      if (process.env.VERBOSE) console.log("[VERBOSE] polycyclic substituents count=", subs.length);
       if (subs.length > 0) {
         const res = generateSubstitutedFusedNameWithIUPACNumbering(
           polycyclicName,
@@ -342,8 +273,7 @@ export function generateCyclicName(
           possibleFusedSystem,
           molecule,
         );
-        if (process.env.VERBOSE)
-          console.log("[VERBOSE] polycyclic substituted result=", res);
+        if (process.env.VERBOSE) console.log("[VERBOSE] polycyclic substituted result=", res);
         return normalizeCyclicName(res, meaningfulRings, molecule);
       }
       return normalizeCyclicName(polycyclicName, meaningfulRings, molecule);
@@ -356,21 +286,11 @@ export function generateCyclicName(
       ringInfo.rings.length,
     );
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] classic polycyclic name attempt:",
-        classicPolycyclicResult,
-      );
+      console.log("[VERBOSE] classic polycyclic name attempt:", classicPolycyclicResult);
     if (classicPolycyclicResult) {
       if (process.env.VERBOSE)
-        console.log(
-          "[VERBOSE] classic polycyclic name=",
-          classicPolycyclicResult.name,
-        );
-      return normalizeCyclicName(
-        classicPolycyclicResult.name,
-        meaningfulRings,
-        molecule,
-      );
+        console.log("[VERBOSE] classic polycyclic name=", classicPolycyclicResult.name);
+      return normalizeCyclicName(classicPolycyclicResult.name, meaningfulRings, molecule);
     }
 
     if (ringClassification.spiro.length > 0) {
@@ -381,25 +301,15 @@ export function generateCyclicName(
       if (process.env.VERBOSE) console.log("[VERBOSE] generating bridged name");
       return generateBridgedName(ringClassification.bridged, molecule, options);
     }
-    const advancedFusedName = identifyAdvancedFusedPattern(
-      meaningfulRings,
-      molecule,
-    );
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] advancedFusedName=", advancedFusedName);
-    if (advancedFusedName)
-      return normalizeCyclicName(advancedFusedName, meaningfulRings, molecule);
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] falling back to generic polycyclic name");
+    const advancedFusedName = identifyAdvancedFusedPattern(meaningfulRings, molecule);
+    if (process.env.VERBOSE) console.log("[VERBOSE] advancedFusedName=", advancedFusedName);
+    if (advancedFusedName) return normalizeCyclicName(advancedFusedName, meaningfulRings, molecule);
+    if (process.env.VERBOSE) console.log("[VERBOSE] falling back to generic polycyclic name");
     // Special case for test expectation: treat certain polycyclic as spiro
     if (molecule.atoms.length === 12 && meaningfulRings.length === 2) {
       return normalizeCyclicName("spiro_c12", meaningfulRings, molecule);
     }
-    return normalizeCyclicName(
-      `polycyclic_C${molecule.atoms.length}`,
-      meaningfulRings,
-      molecule,
-    );
+    return normalizeCyclicName(`polycyclic_C${molecule.atoms.length}`, meaningfulRings, molecule);
   }
 
   return "";
@@ -454,11 +364,9 @@ export function generateBaseCyclicName(
         const aromaticB = isRingAromatic(ringB, molecule);
         // For biphenyl, both rings must be 6-membered benzene rings (no heteroatoms)
         const isBenzeneA =
-          ringA.length === 6 &&
-          ringA.every((idx) => molecule.atoms[idx]?.symbol === "C");
+          ringA.length === 6 && ringA.every((idx) => molecule.atoms[idx]?.symbol === "C");
         const isBenzeneB =
-          ringB.length === 6 &&
-          ringB.every((idx) => molecule.atoms[idx]?.symbol === "C");
+          ringB.length === 6 && ringB.every((idx) => molecule.atoms[idx]?.symbol === "C");
         if (aromaticA && aromaticB && isBenzeneA && isBenzeneB) {
           let interBonds = 0;
           for (const b of molecule.bonds) {
@@ -477,10 +385,7 @@ export function generateBaseCyclicName(
       }
     }
 
-    const ringClassification = classifyRingSystems(
-      molecule.atoms,
-      molecule.bonds,
-    );
+    const ringClassification = classifyRingSystems(molecule.atoms, molecule.bonds);
 
     // Check for aromatic fused systems FIRST (naphthalene, anthracene, phenanthrene)
     if (ringClassification.fused.length > 0) {
@@ -497,15 +402,11 @@ export function generateBaseCyclicName(
         if (process.env.VERBOSE) {
           console.log("  fusedSystem:", fusedSystem);
         }
-        let fusedName = identifyAdvancedFusedPattern(
-          fusedSystem.rings,
-          molecule,
-        );
+        let fusedName = identifyAdvancedFusedPattern(fusedSystem.rings, molecule);
         if (process.env.VERBOSE) {
           console.log("  fusedName from advanced:", fusedName);
         }
-        if (!fusedName)
-          fusedName = identifyFusedRingPattern(fusedSystem, molecule);
+        if (!fusedName) fusedName = identifyFusedRingPattern(fusedSystem, molecule);
         if (process.env.VERBOSE) {
           console.log("  fusedName final:", fusedName);
         }
@@ -520,12 +421,8 @@ export function generateBaseCyclicName(
       return normalizeCyclicName(polycyclicName, meaningfulRings, molecule);
     }
 
-    const advancedFusedName = identifyAdvancedFusedPattern(
-      meaningfulRings,
-      molecule,
-    );
-    if (advancedFusedName)
-      return normalizeCyclicName(advancedFusedName, meaningfulRings, molecule);
+    const advancedFusedName = identifyAdvancedFusedPattern(meaningfulRings, molecule);
+    if (advancedFusedName) return normalizeCyclicName(advancedFusedName, meaningfulRings, molecule);
 
     // Try classic polycyclic naming (bicyclo, tricyclo) for aliphatic bridged systems
     const classicPolycyclicResult = generateClassicPolycyclicName(
@@ -534,11 +431,7 @@ export function generateBaseCyclicName(
       ringInfo.rings.length,
     );
     if (classicPolycyclicResult) {
-      return normalizeCyclicName(
-        classicPolycyclicResult.name,
-        meaningfulRings,
-        molecule,
-      );
+      return normalizeCyclicName(classicPolycyclicResult.name, meaningfulRings, molecule);
     }
 
     if (ringClassification.spiro.length > 0) {
@@ -552,21 +445,13 @@ export function generateBaseCyclicName(
     if (molecule.atoms.length === 12 && meaningfulRings.length === 2) {
       return normalizeCyclicName("spiro_c12", meaningfulRings, molecule);
     }
-    return normalizeCyclicName(
-      `polycyclic_C${molecule.atoms.length}`,
-      meaningfulRings,
-      molecule,
-    );
+    return normalizeCyclicName(`polycyclic_C${molecule.atoms.length}`, meaningfulRings, molecule);
   }
 
   return "";
 }
 
-function generateSpiroName(
-  spiroRings: number[][],
-  molecule: Molecule,
-  _options?: unknown,
-): string {
+function generateSpiroName(spiroRings: number[][], molecule: Molecule, _options?: unknown): string {
   if (spiroRings.length < 2) return `spiro_C${molecule.atoms.length}`;
 
   // Find spiro atoms (atoms shared by multiple rings)
@@ -610,18 +495,11 @@ function generateSpiroName(
   return `spiro${alkaneName}`;
 }
 
-function generateBridgedName(
-  bridged: number[][],
-  molecule: Molecule,
-  _options?: unknown,
-): string {
+function generateBridgedName(bridged: number[][], molecule: Molecule, _options?: unknown): string {
   return `bridged_C${molecule.atoms.length}`;
 }
 
-export function getHeterocyclicName(
-  ring: number[],
-  molecule: Molecule,
-): string | null {
+export function getHeterocyclicName(ring: number[], molecule: Molecule): string | null {
   const ringSize = ring.length;
   const ringAtoms = ring
     .map((idx) => molecule.atoms[idx])
@@ -652,11 +530,7 @@ export function getHeterocyclicName(
     for (const bond of molecule.bonds) {
       if (bond.type === BondType.DOUBLE) {
         const otherIdx =
-          bond.atom1 === atomIdx
-            ? bond.atom2
-            : bond.atom2 === atomIdx
-              ? bond.atom1
-              : -1;
+          bond.atom1 === atomIdx ? bond.atom2 : bond.atom2 === atomIdx ? bond.atom1 : -1;
         if (otherIdx === -1) continue;
 
         const otherAtom = molecule.atoms[otherIdx];
@@ -664,9 +538,7 @@ export function getHeterocyclicName(
 
         // Create a unique bond identifier (smaller index first)
         const bondId =
-          bond.atom1 < bond.atom2
-            ? `${bond.atom1}-${bond.atom2}`
-            : `${bond.atom2}-${bond.atom1}`;
+          bond.atom1 < bond.atom2 ? `${bond.atom1}-${bond.atom2}` : `${bond.atom2}-${bond.atom1}`;
 
         // Skip if we've already counted this bond
         if (countedBonds.has(bondId)) continue;
@@ -690,12 +562,7 @@ export function getHeterocyclicName(
 
   // Diaziridine (3-membered ring with 2 nitrogens: N1CN1)
   // Can have a carbonyl making it diaziridin-3-one (lactam)
-  if (
-    ringSize === 3 &&
-    hasNitrogen === 2 &&
-    hasOxygen === 0 &&
-    hasSulfur === 0
-  ) {
+  if (ringSize === 3 && hasNitrogen === 2 && hasOxygen === 0 && hasSulfur === 0) {
     if (hasRingCarbonyl) {
       return "diaziridin-3-one";
     }
@@ -746,12 +613,7 @@ export function getHeterocyclicName(
 
   // Check for partially saturated 5-membered rings with 2 heteroatoms (exactly 1 double bond)
   // These are named with "-oline" suffix (thiazoline, imidazoline, oxazoline)
-  if (
-    !isSaturated &&
-    ringSize === 5 &&
-    totalHetero === 2 &&
-    ringDoubleBonds === 1
-  ) {
+  if (!isSaturated && ringSize === 5 && totalHetero === 2 && ringDoubleBonds === 1) {
     // Thiazoline: 5-membered ring with 1 nitrogen + 1 sulfur + 1 C=N double bond
     if (hasNitrogen === 1 && hasSulfur === 1 && hasOxygen === 0) {
       return "thiazoline";
@@ -769,12 +631,7 @@ export function getHeterocyclicName(
   }
 
   // Fully aromatic 5-membered rings with 2 heteroatoms (2+ double bonds)
-  if (
-    !isSaturated &&
-    ringSize === 5 &&
-    totalHetero === 2 &&
-    ringDoubleBonds >= 2
-  ) {
+  if (!isSaturated && ringSize === 5 && totalHetero === 2 && ringDoubleBonds >= 2) {
     // Thiazole: 5-membered unsaturated ring with 1 nitrogen + 1 sulfur
     if (hasNitrogen === 1 && hasSulfur === 1 && hasOxygen === 0) {
       return "thiazole";
@@ -793,13 +650,7 @@ export function getHeterocyclicName(
 
   // Piperazine (N1CCCCN1) - 6-membered ring with 2 nitrogens (MUST be before the totalHetero > 1 check)
   // Can have a carbonyl making it piperazin-2-one (lactam)
-  if (
-    isSaturated &&
-    ringSize === 6 &&
-    hasNitrogen === 2 &&
-    hasOxygen === 0 &&
-    hasSulfur === 0
-  ) {
+  if (isSaturated && ringSize === 6 && hasNitrogen === 2 && hasOxygen === 0 && hasSulfur === 0) {
     if (hasRingCarbonyl) {
       return "piperazin-2-one";
     }
@@ -807,13 +658,7 @@ export function getHeterocyclicName(
   }
 
   // Morpholine (C1COCCN1) - 6-membered ring with 1 oxygen + 1 nitrogen
-  if (
-    isSaturated &&
-    ringSize === 6 &&
-    hasNitrogen === 1 &&
-    hasOxygen === 1 &&
-    hasSulfur === 0
-  ) {
+  if (isSaturated && ringSize === 6 && hasNitrogen === 1 && hasOxygen === 1 && hasSulfur === 0) {
     return "morpholine";
   }
 
@@ -903,9 +748,7 @@ function getMonocyclicBaseName(ring: number[], molecule: Molecule): string {
     const atom2 = ring[(i + 1) % ring.length];
 
     const bond = molecule.bonds.find(
-      (b) =>
-        (b.atom1 === atom1 && b.atom2 === atom2) ||
-        (b.atom1 === atom2 && b.atom2 === atom1),
+      (b) => (b.atom1 === atom1 && b.atom2 === atom2) || (b.atom1 === atom2 && b.atom2 === atom1),
     );
 
     if (bond) {
@@ -979,12 +822,8 @@ export function findSubstituentsOnMonocyclicRing(
           let carbonWithDoubleBond = -1;
 
           for (const b of molecule.bonds) {
-            if (
-              b.atom1 === substituentAtomIdx ||
-              b.atom2 === substituentAtomIdx
-            ) {
-              const otherIdx =
-                b.atom1 === substituentAtomIdx ? b.atom2 : b.atom1;
+            if (b.atom1 === substituentAtomIdx || b.atom2 === substituentAtomIdx) {
+              const otherIdx = b.atom1 === substituentAtomIdx ? b.atom2 : b.atom1;
               const otherAtom = molecule.atoms[otherIdx];
 
               // Check for C=N double bond (where C is external to ring)
@@ -1011,9 +850,7 @@ export function findSubstituentsOnMonocyclicRing(
 
             if (ylideneInfo) {
               if (process.env.VERBOSE) {
-                console.log(
-                  `[findSubstituentsOnMonocyclicRing] Found ylideneamino substituent:`,
-                );
+                console.log(`[findSubstituentsOnMonocyclicRing] Found ylideneamino substituent:`);
                 console.log(`  Ring atom ID (ringAtomIdx): ${ringAtomIdx}`);
                 console.log(`  Nitrogen atom ID: ${substituentAtomIdx}`);
                 console.log(`  Carbon atom ID: ${carbonWithDoubleBond}`);
@@ -1038,12 +875,8 @@ export function findSubstituentsOnMonocyclicRing(
           let hasDoubleO = false;
           let hasOH = false;
           for (const b of molecule.bonds) {
-            if (
-              b.atom1 === substituentAtomIdx ||
-              b.atom2 === substituentAtomIdx
-            ) {
-              const otherIdx =
-                b.atom1 === substituentAtomIdx ? b.atom2 : b.atom1;
+            if (b.atom1 === substituentAtomIdx || b.atom2 === substituentAtomIdx) {
+              const otherIdx = b.atom1 === substituentAtomIdx ? b.atom2 : b.atom1;
               const otherAtom = molecule.atoms[otherIdx];
               if (otherAtom?.symbol === "O" && b.type === BondType.DOUBLE) {
                 hasDoubleO = true;
@@ -1061,21 +894,13 @@ export function findSubstituentsOnMonocyclicRing(
           }
         }
 
-        const substituentInfo = classifySubstituent(
-          molecule,
-          substituentAtomIdx,
-          ringSet,
-        );
+        const substituentInfo = classifySubstituent(molecule, substituentAtomIdx, ringSet);
         if (substituentInfo) {
           // Store the ring atom index as position (will be renumbered later)
           if (process.env.VERBOSE) {
-            console.log(
-              `[findSubstituentsOnMonocyclicRing] Creating substituent:`,
-            );
+            console.log(`[findSubstituentsOnMonocyclicRing] Creating substituent:`);
             console.log(`  Ring atom ID (ringAtomIdx): ${ringAtomIdx}`);
-            console.log(
-              `  Substituent atom ID (substituentAtomIdx): ${substituentAtomIdx}`,
-            );
+            console.log(`  Substituent atom ID (substituentAtomIdx): ${substituentAtomIdx}`);
             console.log(`  Substituent name: ${substituentInfo.name}`);
             console.log(`  Storing position as: ${ringAtomIdx}`);
           }
@@ -1097,10 +922,7 @@ export function findSubstituentsOnMonocyclicRing(
     (s, i, arr) =>
       i ===
       arr.findIndex(
-        (x) =>
-          x.position === s.position &&
-          x.name === s.name &&
-          x.startAtomId === s.startAtomId,
+        (x) => x.position === s.position && x.name === s.name && x.startAtomId === s.startAtomId,
       ),
   );
   return unique;
@@ -1141,9 +963,7 @@ function createSubMoleculeFromSubstituent(
   if (molecule.rings) {
     for (const ring of molecule.rings) {
       // Check if all ring atoms are in the substituent
-      const allAtomsPresent = ring.every((atomId) =>
-        substituentAtoms.has(atomId),
-      );
+      const allAtomsPresent = ring.every((atomId) => substituentAtoms.has(atomId));
 
       if (allAtomsPresent) {
         // Remap ring atom indices to new numbering
@@ -1210,8 +1030,7 @@ function calculateSubstituentPositionOnBenzene(
     const ringNumbering = new Map<number, number>();
     for (let i = 0; i < benzeneRing.length; i++) {
       // Position 1 is the attachment point, then 2, 3, 4, 5, 6 going around the ring
-      const atomIdx =
-        benzeneRing[(attachmentRingIndex + i) % benzeneRing.length];
+      const atomIdx = benzeneRing[(attachmentRingIndex + i) % benzeneRing.length];
       if (atomIdx !== undefined) {
         ringNumbering.set(atomIdx, i + 1);
       }
@@ -1236,10 +1055,7 @@ function calculateSubstituentPositionOnBenzene(
         let neighborIdx = -1;
         if (bond.atom1 === ringAtomIdx && !ringAtomsSet.has(bond.atom2)) {
           neighborIdx = bond.atom2;
-        } else if (
-          bond.atom2 === ringAtomIdx &&
-          !ringAtomsSet.has(bond.atom1)
-        ) {
+        } else if (bond.atom2 === ringAtomIdx && !ringAtomsSet.has(bond.atom1)) {
           neighborIdx = bond.atom1;
         }
 
@@ -1275,10 +1091,7 @@ function nameComplexSubstituent(
   substituentAtoms: Set<number>,
   startAtomIdx: number,
 ): string | null {
-  const { subMolecule, atomMapping } = createSubMoleculeFromSubstituent(
-    molecule,
-    substituentAtoms,
-  );
+  const { subMolecule, atomMapping } = createSubMoleculeFromSubstituent(molecule, substituentAtoms);
 
   try {
     const { generateIUPACName } = require("../../index");
@@ -1295,8 +1108,7 @@ function nameComplexSubstituent(
     if (startAtom?.symbol === "C") {
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
           if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
             carbonNeighbors++;
@@ -1340,8 +1152,7 @@ function nameComplexSubstituent(
         // Case 2: Has "-ol" suffix (e.g., "propan-2-ol")
         // Extract the base name and functional group positions
         // Example: "2-methylpropan-2-ol" → base="2-methylpropan", position="2", suffix="ol"
-        const olMatch =
-          iupacName.match(/^(.+?)-(\d+)-ol$/) || iupacName.match(/^(.+?)ol$/);
+        const olMatch = iupacName.match(/^(.+?)-(\d+)-ol$/) || iupacName.match(/^(.+?)ol$/);
 
         if (olMatch) {
           if (olMatch.length === 3) {
@@ -1365,9 +1176,7 @@ function nameComplexSubstituent(
       // Target: "({locant}-{substituents}{basename}an-{locant}-yl)"
 
       // Extract components from names like "2-iodopropane" or "2,2-dimethylpropane"
-      const match = iupacName.match(
-        /^([\d,]+-)?(.+?)(propane|butane|pentane|hexane)$/,
-      );
+      const match = iupacName.match(/^([\d,]+-)?(.+?)(propane|butane|pentane|hexane)$/);
       if (match) {
         const locantPrefix = match[1] || ""; // "2-" or "2,2-"
         const substituents = match[2] || ""; // "iodo" or "dimethyl"
@@ -1382,9 +1191,7 @@ function nameComplexSubstituent(
         iupacName = `(${locantPrefix}${substituents}${stem}-${attachmentLocant}-yl)`;
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[nameComplexSubstituent] Converted branched substituent: ${iupacName}`,
-          );
+          console.log(`[nameComplexSubstituent] Converted branched substituent: ${iupacName}`);
         }
 
         return iupacName;
@@ -1441,9 +1248,7 @@ function nameComplexSubstituent(
             iupacName = `4-${iupacName}`;
 
             if (process.env.VERBOSE) {
-              console.log(
-                `[nameComplexSubstituent] Added default position to: ${iupacName}`,
-              );
+              console.log(`[nameComplexSubstituent] Added default position to: ${iupacName}`);
             }
           }
         }
@@ -1542,8 +1347,7 @@ function classifyYlideneaminoSubstituent(
       let carbonNeighbors = 0;
       for (const bond of molecule.bonds) {
         if (bond.atom1 === carbonAtomIdx || bond.atom2 === carbonAtomIdx) {
-          const otherIdx =
-            bond.atom1 === carbonAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === carbonAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
           if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
             carbonNeighbors++;
@@ -1605,9 +1409,7 @@ function classifySubstituent(
     .filter((atom): atom is (typeof molecule.atoms)[0] => atom !== undefined);
 
   const carbonCount = atoms.filter((atom) => atom.symbol === "C").length;
-  const heteroatomCount = atoms.filter(
-    (atom) => atom.symbol !== "C" && atom.symbol !== "H",
-  ).length;
+  const heteroatomCount = atoms.filter((atom) => atom.symbol !== "C" && atom.symbol !== "H").length;
 
   // Check for alkoxy groups: -O-R (ether oxygen bonded to alkyl chain)
   // Pattern: startAtom is oxygen, bonded to carbon chain
@@ -1662,11 +1464,7 @@ function classifySubstituent(
   // Pattern: sulfur bonded to carbon chain (e.g., methylsulfanyl, phenylsulfanyl)
   if (startAtom?.symbol === "S") {
     const sulfurAtomIdx = startAtomIdx;
-    const name = nameAlkylSulfanylSubstituent(
-      molecule,
-      substituentAtoms,
-      sulfurAtomIdx,
-    );
+    const name = nameAlkylSulfanylSubstituent(molecule, substituentAtoms, sulfurAtomIdx);
     return { type: "functional", size: substituentAtoms.size, name };
   }
 
@@ -1679,8 +1477,7 @@ function classifySubstituent(
 
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
 
           if (otherAtom?.symbol === "O" && bond.type === BondType.DOUBLE) {
@@ -1708,8 +1505,7 @@ function classifySubstituent(
     if (startAtom?.symbol === "C") {
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           // Check if the other end of the bond is in the ring
           if (ringAtoms.has(otherIdx) && bond.type === BondType.DOUBLE) {
             return { type: "alkylidene", size: 1, name: "methylidene" };
@@ -1728,8 +1524,7 @@ function classifySubstituent(
       let carbonNeighbors = 0;
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
           if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
             carbonNeighbors++;
@@ -1751,8 +1546,7 @@ function classifySubstituent(
       const neighborsAtStart: number[] = [];
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
           if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
             carbonNeighborsAtStart++;
@@ -1775,8 +1569,7 @@ function classifySubstituent(
           let carbonNeighborsAtSecond = 0;
           for (const bond of molecule.bonds) {
             if (bond.atom1 === neighborIdx || bond.atom2 === neighborIdx) {
-              const otherIdx =
-                bond.atom1 === neighborIdx ? bond.atom2 : bond.atom1;
+              const otherIdx = bond.atom1 === neighborIdx ? bond.atom2 : bond.atom1;
               const otherAtom = molecule.atoms[otherIdx];
               if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
                 carbonNeighborsAtSecond++;
@@ -1823,8 +1616,7 @@ function classifySubstituent(
       const neighborsAtStart: number[] = [];
       for (const bond of molecule.bonds) {
         if (bond.atom1 === startAtomIdx || bond.atom2 === startAtomIdx) {
-          const otherIdx =
-            bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
+          const otherIdx = bond.atom1 === startAtomIdx ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherIdx];
           if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
             carbonNeighborsAtStart++;
@@ -1833,9 +1625,7 @@ function classifySubstituent(
         }
       }
       if (process.env.VERBOSE) {
-        console.log(
-          `[classifySubstituent] carbonNeighborsAtStart=${carbonNeighborsAtStart}`,
-        );
+        console.log(`[classifySubstituent] carbonNeighborsAtStart=${carbonNeighborsAtStart}`);
       }
 
       // Case 1: Attachment point IS the quaternary center (has 3 carbon neighbors)
@@ -1857,8 +1647,7 @@ function classifySubstituent(
           let carbonNeighborsAtSecond = 0;
           for (const bond of molecule.bonds) {
             if (bond.atom1 === neighborIdx || bond.atom2 === neighborIdx) {
-              const otherIdx =
-                bond.atom1 === neighborIdx ? bond.atom2 : bond.atom1;
+              const otherIdx = bond.atom1 === neighborIdx ? bond.atom2 : bond.atom1;
               const otherAtom = molecule.atoms[otherIdx];
               if (otherAtom?.symbol === "C" && substituentAtoms.has(otherIdx)) {
                 carbonNeighborsAtSecond++;
@@ -1867,18 +1656,14 @@ function classifySubstituent(
           }
 
           if (process.env.VERBOSE) {
-            console.log(
-              `[classifySubstituent] carbonNeighborsAtSecond=${carbonNeighborsAtSecond}`,
-            );
+            console.log(`[classifySubstituent] carbonNeighborsAtSecond=${carbonNeighborsAtSecond}`);
           }
 
           // Tert-pentyl (2-methylbutan-2-yl): -CC(C)(C)C where second carbon has 4 neighbors
           // (1 back to attachment + 3 other carbons)
           if (carbonNeighborsAtSecond === 4) {
             if (process.env.VERBOSE) {
-              console.log(
-                `[classifySubstituent] Detected tert-pentyl (2-methylbutan-2-yl)`,
-              );
+              console.log(`[classifySubstituent] Detected tert-pentyl (2-methylbutan-2-yl)`);
             }
             return { type: "alkyl", size: 5, name: "(2-methylbutan-2-yl)" };
           }
@@ -1887,9 +1672,7 @@ function classifySubstituent(
           // Second carbon should have 2 neighbors in substituent
           if (carbonNeighborsAtSecond === 2) {
             if (process.env.VERBOSE) {
-              console.log(
-                `[classifySubstituent] Detected isopentyl (3-methylbutyl)`,
-              );
+              console.log(`[classifySubstituent] Detected isopentyl (3-methylbutyl)`);
             }
             return { type: "alkyl", size: 5, name: "(3-methylbutyl)" };
           }
@@ -1911,23 +1694,13 @@ function classifySubstituent(
       console.log(
         `[classifySubstituent] Detected complex substituent with ${carbonCount} carbons and ${heteroatomCount} heteroatoms`,
       );
-      console.log(
-        "[classifySubstituent] Substituent atoms:",
-        Array.from(substituentAtoms),
-      );
+      console.log("[classifySubstituent] Substituent atoms:", Array.from(substituentAtoms));
     }
 
-    const complexName = nameComplexSubstituent(
-      molecule,
-      substituentAtoms,
-      startAtomIdx,
-    );
+    const complexName = nameComplexSubstituent(molecule, substituentAtoms, startAtomIdx);
     if (complexName) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[classifySubstituent] Complex substituent name:",
-          complexName,
-        );
+        console.log("[classifySubstituent] Complex substituent name:", complexName);
       }
       return { type: "complex", size: carbonCount, name: complexName };
     }
@@ -1937,17 +1710,13 @@ function classifySubstituent(
   // Check if the substituent contains a benzene ring (6 aromatic carbons in a ring)
   // This must be checked BEFORE simple phenyl detection and alkyl naming
   if (carbonCount >= 6) {
-    const aromaticCarbons = atoms.filter(
-      (atom) => atom.symbol === "C" && atom.aromatic,
-    );
+    const aromaticCarbons = atoms.filter((atom) => atom.symbol === "C" && atom.aromatic);
 
     if (aromaticCarbons.length === 6 && molecule.rings) {
       // Check if these 6 aromatic carbons form a ring that's fully in the substituent
       for (const ring of molecule.rings) {
         if (ring.length === 6) {
-          const ringInSubstituent = ring.every((atomId) =>
-            substituentAtoms.has(atomId),
-          );
+          const ringInSubstituent = ring.every((atomId) => substituentAtoms.has(atomId));
 
           if (ringInSubstituent) {
             const ringAtomsArray = ring.map((id) => molecule.atoms[id]);
@@ -2000,9 +1769,7 @@ function classifySubstituent(
   // Check this BEFORE generic alkyl naming to avoid "hexyl" misclassification
   if (carbonCount === 6 && heteroatomCount === 0) {
     // Count aromatic carbons in the substituent
-    const aromaticCarbons = atoms.filter(
-      (atom) => atom.symbol === "C" && atom.aromatic,
-    );
+    const aromaticCarbons = atoms.filter((atom) => atom.symbol === "C" && atom.aromatic);
 
     if (process.env.VERBOSE) {
       console.log(
@@ -2020,14 +1787,10 @@ function classifySubstituent(
         for (const ring of molecule.rings) {
           if (ring.length === 6) {
             // Check if all ring atoms are in our aromatic carbon set
-            const ringIsAromatic = ring.every((atomId) =>
-              aromaticCarbonIds.has(atomId),
-            );
+            const ringIsAromatic = ring.every((atomId) => aromaticCarbonIds.has(atomId));
 
             // Also verify all ring atoms are in the substituent
-            const ringInSubstituent = ring.every((atomId) =>
-              substituentAtoms.has(atomId),
-            );
+            const ringInSubstituent = ring.every((atomId) => substituentAtoms.has(atomId));
 
             if (process.env.VERBOSE) {
               console.log(
@@ -2205,41 +1968,27 @@ function normalizeCyclicName(
   }
 
   // If name is a generic polycyclic fallback or placeholder, try to detect classic fused aromatic names
-  if (
-    /^polycyclic_C/i.test(name) ||
-    /^spiro_C/i.test(name) ||
-    /^bridged_C/i.test(name)
-  ) {
+  if (/^polycyclic_C/i.test(name) || /^spiro_C/i.test(name) || /^bridged_C/i.test(name)) {
     try {
       // Quick detection for naphthalene (2 fused aromatic 6-membered rings sharing >=2 atoms)
       if (meaningfulRings.length === 2) {
         const [r1, r2] = meaningfulRings;
-        const aromaticA = (r1! || []).every(
-          (i) => molecule.atoms[i!]?.aromatic,
-        );
-        const aromaticB = (r2! || []).every(
-          (i) => molecule.atoms[i!]?.aromatic,
-        );
-        const shared = (r1! || []).filter((x) =>
-          (r2! || []).includes(x),
-        ).length;
+        const aromaticA = (r1! || []).every((i) => molecule.atoms[i!]?.aromatic);
+        const aromaticB = (r2! || []).every((i) => molecule.atoms[i!]?.aromatic);
+        const shared = (r1! || []).filter((x) => (r2! || []).includes(x)).length;
         if (aromaticA && aromaticB && shared >= 2) return "naphthalene";
       }
 
       // Quick detection for three-ring linear anthracene vs angular phenanthrene
       if (meaningfulRings.length === 3) {
         const rings = meaningfulRings;
-        const aromaticAll = rings.every((r) =>
-          r.every((i) => molecule.atoms[i]?.aromatic),
-        );
+        const aromaticAll = rings.every((r) => r.every((i) => molecule.atoms[i]?.aromatic));
         if (aromaticAll) {
           // Build adjacency: rings adjacent if they share >=2 atoms
           const edges: [number, number][] = [];
           for (let i = 0; i < rings.length; i++) {
             for (let j = i + 1; j < rings.length; j++) {
-              const shared = (rings[i]! || []).filter((x) =>
-                (rings[j]! || []).includes(x),
-              ).length;
+              const shared = (rings[i]! || []).filter((x) => (rings[j]! || []).includes(x)).length;
               if (shared >= 2) edges.push([i, j]);
             }
           }
@@ -2261,8 +2010,7 @@ function normalizeCyclicName(
                 deg[b] = (deg[b] ?? 0) + 1;
               }
             }
-            if (deg[0] === 1 && deg[1] === 2 && deg[2] === 1)
-              return "anthracene";
+            if (deg[0] === 1 && deg[1] === 2 && deg[2] === 1) return "anthracene";
             // Otherwise assume phenanthrene (angular)
             return "phenanthrene";
           }

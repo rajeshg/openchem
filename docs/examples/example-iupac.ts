@@ -90,8 +90,7 @@ for (const example of iupacExamples) {
   // Parse expected SMILES to compare canonical forms
   const expectedResult = parseSMILES(example.expected);
   const expectedCanonical =
-    expectedResult.molecules[0] &&
-    generateSMILES(expectedResult.molecules[0], true);
+    expectedResult.molecules[0] && generateSMILES(expectedResult.molecules[0], true);
 
   const match = generatedSMILES === expectedCanonical;
   const status = match ? "✓" : "~";
@@ -136,11 +135,8 @@ for (const iupacName of roundtripExamples) {
   // Compare
   const match =
     nameResult.name.toLowerCase() === iupacName.toLowerCase() ||
-    nameResult.name.toLowerCase().replace(/\s/g, "") ===
-      iupacName.toLowerCase().replace(/\s/g, "");
-  console.log(
-    `  ${match ? "✓" : "~"} Round-trip ${match ? "successful" : "differs"}`,
-  );
+    nameResult.name.toLowerCase().replace(/\s/g, "") === iupacName.toLowerCase().replace(/\s/g, "");
+  console.log(`  ${match ? "✓" : "~"} Round-trip ${match ? "successful" : "differs"}`);
 }
 
 // Part 4: Complex Molecules

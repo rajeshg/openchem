@@ -1,10 +1,5 @@
 import type { Molecule } from "types";
-import type {
-  DrugLikenessProperties,
-  LipinskiResult,
-  VeberResult,
-  BBBResult,
-} from "./types";
+import type { DrugLikenessProperties, LipinskiResult, VeberResult, BBBResult } from "./types";
 import {
   checkLipinskiRuleOfFive,
   checkVeberRules,
@@ -20,8 +15,7 @@ export function drugLikeness(mol: Molecule): DrugLikenessProperties {
     passes: lipinskiOld.passes,
     violations: lipinskiOld.violations,
     properties: {
-      mw: (lipinskiOld.properties as { molecularWeight: number })
-        .molecularWeight,
+      mw: (lipinskiOld.properties as { molecularWeight: number }).molecularWeight,
       logP: lipinskiOld.properties.logP,
       hbondDonors: lipinskiOld.properties.hbondDonors,
       hbondAcceptors: lipinskiOld.properties.hbondAcceptors,
@@ -39,9 +33,7 @@ export function drugLikeness(mol: Molecule): DrugLikenessProperties {
 
   const bbb: BBBResult = {
     penetrates: bbbOld.likelyPenetration,
-    reason: bbbOld.likelyPenetration
-      ? undefined
-      : `TPSA ${bbbOld.tpsa.toFixed(1)} > 90`,
+    reason: bbbOld.likelyPenetration ? undefined : `TPSA ${bbbOld.tpsa.toFixed(1)} > 90`,
     properties: {
       tpsa: bbbOld.tpsa,
       logP: lipinskiOld.properties.logP,

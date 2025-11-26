@@ -34,9 +34,7 @@ describe("Analyze mismatches", () => {
       console.log(`\n${m.name}`);
       console.log(`  Expected: ${expAtoms} atoms, ${expBonds} bonds`);
       console.log(`  Generated: ${genAtoms} atoms, ${genBonds} bonds`);
-      console.log(
-        `  Diff: ${genAtoms - expAtoms} atoms, ${genBonds - expBonds} bonds`,
-      );
+      console.log(`  Diff: ${genAtoms - expAtoms} atoms, ${genBonds - expBonds} bonds`);
     }
   });
 });

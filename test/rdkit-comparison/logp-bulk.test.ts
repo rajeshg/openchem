@@ -207,9 +207,7 @@ describe("LogP Bulk Comparison with RDKit", () => {
   it(`compares LogP against RDKit for ${TEST_SMILES.length} diverse molecules`, async () => {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     const rdkit: any = await (initRDKitModule as any)();
@@ -231,17 +229,13 @@ describe("LogP Bulk Comparison with RDKit", () => {
 
       const diff = Math.abs(ourLogP - rdkitLogP);
       if (diff >= 0.2) {
-        failures.push(
-          `${smiles} -> Our: ${ourLogP}, RDKit: ${rdkitLogP}, Diff: ${diff}`,
-        );
+        failures.push(`${smiles} -> Our: ${ourLogP}, RDKit: ${rdkitLogP}, Diff: ${diff}`);
       }
     }
 
     // Report failures
     if (failures.length > 0) {
-      console.log(
-        `\nLogP Bulk Test Failures (${failures.length}/${TEST_SMILES.length}):`,
-      );
+      console.log(`\nLogP Bulk Test Failures (${failures.length}/${TEST_SMILES.length}):`);
       failures.slice(0, 10).forEach((failure) => console.log(failure));
       if (failures.length > 10) {
         console.log(`... and ${failures.length - 10} more`);

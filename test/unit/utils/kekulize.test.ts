@@ -11,19 +11,13 @@ describe("kekulize()", () => {
       expect(parseResult.errors).toEqual([]);
       const molecule = parseResult.molecules[0]!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b: Bond) => b.type === BondType.AROMATIC,
-      ).length;
+      const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
       expect(aromaticBonds).toBe(6);
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -38,19 +32,13 @@ describe("kekulize()", () => {
       expect(parseResult.errors).toEqual([]);
       const molecule = parseResult.molecules[0]!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b: Bond) => b.type === BondType.AROMATIC,
-      ).length;
+      const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
       expect(aromaticBonds).toBe(6);
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -67,12 +55,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
 
       expect(singleBonds).toBe(3);
       expect(doubleBonds).toBe(2);
@@ -85,12 +69,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
 
       expect(singleBonds).toBe(3);
       expect(doubleBonds).toBe(2);
@@ -103,12 +83,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
 
       expect(singleBonds).toBe(3);
       expect(doubleBonds).toBe(2);
@@ -123,19 +99,13 @@ describe("kekulize()", () => {
 
       expect(molecule.bonds.length).toBe(11);
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b: Bond) => b.type === BondType.AROMATIC,
-      ).length;
+      const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
       expect(aromaticBonds).toBe(11);
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -154,12 +124,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -176,12 +142,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -198,12 +160,8 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -222,9 +180,7 @@ describe("kekulize()", () => {
 
       const kekulized = kekulize(molecule);
 
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       expect(doubleBonds).toBeGreaterThanOrEqual(2);
     });
 
@@ -233,19 +189,13 @@ describe("kekulize()", () => {
       expect(parseResult.errors).toEqual([]);
       const molecule = parseResult.molecules[0]!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b: Bond) => b.type === BondType.AROMATIC,
-      ).length;
+      const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
       expect(aromaticBonds).toBe(6);
 
       const kekulized = kekulize(molecule);
 
-      const singleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = kekulized.bonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
       const aromaticBondsAfter = kekulized.bonds.filter(
         (b: Bond) => b.type === BondType.AROMATIC,
       ).length;
@@ -286,20 +236,14 @@ describe("kekulize()", () => {
       expect(parseResult.errors).toEqual([]);
       const molecule = parseResult.molecules[0]!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b: Bond) => b.type === BondType.AROMATIC,
-      ).length;
+      const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
       expect(aromaticBonds).toBe(6);
 
       const kekulized = kekulize(molecule);
 
       const ringBonds = kekulized.bonds.slice(1);
-      const singleBonds = ringBonds.filter(
-        (b: Bond) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBonds = ringBonds.filter(
-        (b: Bond) => b.type === BondType.DOUBLE,
-      ).length;
+      const singleBonds = ringBonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+      const doubleBonds = ringBonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
 
       expect(singleBonds).toBe(3);
       expect(doubleBonds).toBe(3);

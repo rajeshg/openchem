@@ -66,27 +66,18 @@ export function findAllAtomChains(
   // until no chains are found at target length.
   let allChainsAtMaxLength: number[][] = [];
 
-  for (
-    let targetLength = minLength;
-    targetLength <= atomIndices.length;
-    targetLength++
-  ) {
+  for (let targetLength = minLength; targetLength <= atomIndices.length; targetLength++) {
     const found: number[][] = [];
     const seen = new Set<string>();
 
-    function dfsLimited(
-      current: number,
-      visited: Set<number>,
-      path: number[],
-    ): void {
+    function dfsLimited(current: number, visited: Set<number>, path: number[]): void {
       if (path.length === targetLength) {
         const forward = path.join(",");
         const reversed = [...path].slice().reverse().join(",");
         const key = forward < reversed ? forward : reversed;
         if (!seen.has(key)) {
           seen.add(key);
-          const canonical =
-            forward < reversed ? [...path] : [...path].slice().reverse();
+          const canonical = forward < reversed ? [...path] : [...path].slice().reverse();
           found.push(canonical);
         }
         return;
@@ -167,11 +158,7 @@ export function findAllCarbonChains(
   // Use iterative deepening to find the true maximum chain length.
   // Start with DFS estimate as lower bound, then try increasingly longer chains.
   let longestPath: number[] = [];
-  const dfsFindLongest = (
-    node: number,
-    visited: Set<number>,
-    path: number[],
-  ): void => {
+  const dfsFindLongest = (node: number, visited: Set<number>, path: number[]): void => {
     if (path.length > longestPath.length) longestPath = [...path];
     const neighbors = adjList.get(node) ?? [];
     for (const neighbor of neighbors) {
@@ -200,27 +187,18 @@ export function findAllCarbonChains(
   // until no chains are found at target length.
   let allChainsAtMaxLength: number[][] = [];
 
-  for (
-    let targetLength = minLength;
-    targetLength <= carbonIndices.length;
-    targetLength++
-  ) {
+  for (let targetLength = minLength; targetLength <= carbonIndices.length; targetLength++) {
     const found: number[][] = [];
     const seen = new Set<string>();
 
-    function dfsLimited(
-      current: number,
-      visited: Set<number>,
-      path: number[],
-    ): void {
+    function dfsLimited(current: number, visited: Set<number>, path: number[]): void {
       if (path.length === targetLength) {
         const forward = path.join(",");
         const reversed = [...path].slice().reverse().join(",");
         const key = forward < reversed ? forward : reversed;
         if (!seen.has(key)) {
           seen.add(key);
-          const canonical =
-            forward < reversed ? [...path] : [...path].slice().reverse();
+          const canonical = forward < reversed ? [...path] : [...path].slice().reverse();
           found.push(canonical);
         }
         return;
@@ -304,11 +282,7 @@ export function findAllCarbonChainsFromStart(
 
   // Find longest path starting from startAtom
   let longestPath: number[] = [];
-  const dfsFindLongest = (
-    node: number,
-    visited: Set<number>,
-    path: number[],
-  ): void => {
+  const dfsFindLongest = (node: number, visited: Set<number>, path: number[]): void => {
     if (path.length > longestPath.length) longestPath = [...path];
     const neighbors = adjList.get(node) ?? [];
     for (const neighbor of neighbors) {
@@ -337,11 +311,7 @@ export function findAllCarbonChainsFromStart(
   const found: number[][] = [];
   const seen = new Set<string>();
 
-  function dfsLimited(
-    current: number,
-    visited: Set<number>,
-    path: number[],
-  ): void {
+  function dfsLimited(current: number, visited: Set<number>, path: number[]): void {
     if (path.length === targetLength) {
       const key = path.join(",");
       if (!seen.has(key)) {

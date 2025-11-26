@@ -280,8 +280,7 @@ class IUPACRuleEngine {
 
     let name: string;
     if (units > 0) {
-      const unitsStemRaw =
-        rulesData.alkaneStemComponents.units[units.toString()];
+      const unitsStemRaw = rulesData.alkaneStemComponents.units[units.toString()];
       if (!unitsStemRaw) return null;
       const tensStem = this.selectVariant(tensStemRaw, unitsStemRaw, true);
       const lastCharOfUnits = unitsStemRaw.slice(-1);
@@ -309,8 +308,7 @@ class IUPACRuleEngine {
     const hundreds = Math.floor(carbonCount / 100) * 100;
     const remainder = carbonCount % 100;
 
-    const hundredsStem =
-      rulesData.alkaneStemComponents.hundreds[hundreds.toString()];
+    const hundredsStem = rulesData.alkaneStemComponents.hundreds[hundreds.toString()];
     if (!hundredsStem) return null;
 
     let name = hundredsStem;
@@ -324,8 +322,7 @@ class IUPACRuleEngine {
 
       let tensStem: string;
       if (units > 0) {
-        const unitsStem =
-          rulesData.alkaneStemComponents.units[units.toString()];
+        const unitsStem = rulesData.alkaneStemComponents.units[units.toString()];
         if (!unitsStem) return null;
         tensStem = this.selectVariant(tensStemRaw, unitsStem, true);
         name = this.applyVowelElision(name, tensStem);
@@ -335,8 +332,7 @@ class IUPACRuleEngine {
         name = this.applyVowelElision(name, tensStem);
       }
     } else if (remainder > 0) {
-      const unitsStem =
-        rulesData.alkaneStemComponents.units[remainder.toString()];
+      const unitsStem = rulesData.alkaneStemComponents.units[remainder.toString()];
       if (!unitsStem) return null;
       name = this.applyVowelElision(name, unitsStem);
     }
@@ -351,10 +347,7 @@ class IUPACRuleEngine {
   /**
    * Get Greek numeral prefix for a count
    */
-  getMultiplierPrefix(
-    count: number,
-    isGroupMultiplier: boolean = false,
-  ): string | null {
+  getMultiplierPrefix(count: number, isGroupMultiplier: boolean = false): string | null {
     if (count === 1) return null;
 
     const rulesData = this.loadRules();
@@ -441,15 +434,8 @@ class IUPACRuleEngine {
     const firstCharOfSuffixLower = firstCharOfSuffix.toLowerCase();
     const vowels = ["a", "e", "i", "o", "u"];
 
-    if (
-      vowels.includes(lastCharOfName) &&
-      vowels.includes(firstCharOfSuffixLower)
-    ) {
-      if (
-        lastCharOfName === "a" ||
-        lastCharOfName === "o" ||
-        lastCharOfName === "e"
-      ) {
+    if (vowels.includes(lastCharOfName) && vowels.includes(firstCharOfSuffixLower)) {
+      if (lastCharOfName === "a" || lastCharOfName === "o" || lastCharOfName === "e") {
         return name.slice(0, -1) + suffix;
       }
       if (lastCharOfName === "i" && firstCharOfSuffixLower === "a") {

@@ -35,8 +35,7 @@ async function doInitializeInChIWasm(): Promise<void> {
     const wasmPath = "/dist/third-party/inchi-wasm/inchi_wasm.wasm";
     const response = await fetch(wasmPath);
     const bytes = await response.arrayBuffer();
-    const wasiModule =
-      (await import("../third-party/inchi-wasm/wasi.esm.js")) as unknown;
+    const wasiModule = (await import("../third-party/inchi-wasm/wasi.esm.js")) as unknown;
     // @ts-ignore
     const wasi = new wasiModule.default();
     // @ts-ignore
@@ -48,15 +47,11 @@ async function doInitializeInChIWasm(): Promise<void> {
     // Node/Bun: Use fs and WASI
     const { readFileSync } = await import("fs");
     const { join } = await import("path");
-    const wasiModule =
-      (await import("../third-party/inchi-wasm/wasi.esm.js")) as unknown;
+    const wasiModule = (await import("../third-party/inchi-wasm/wasi.esm.js")) as unknown;
     // @ts-ignore
     const WASI = wasiModule.default;
 
-    const wasmPath = join(
-      process.cwd(),
-      "src/third-party/inchi-wasm/inchi_wasm.wasm",
-    );
+    const wasmPath = join(process.cwd(), "src/third-party/inchi-wasm/inchi_wasm.wasm");
     const wasmBuffer = readFileSync(wasmPath);
     // @ts-ignore
     const wasi = new WASI();
@@ -69,11 +64,7 @@ async function doInitializeInChIWasm(): Promise<void> {
 
   interface WasmExports {
     malloc: (size: number) => number;
-    molfile_to_inchi: (
-      pInput: number,
-      pOptions: number,
-      pOutput: number,
-    ) => number;
+    molfile_to_inchi: (pInput: number, pOptions: number, pOutput: number) => number;
     inchi_to_inchikey: (pInput: number, pOutput: number) => number;
   }
   const exports = instance.exports as unknown as WasmExports;
@@ -94,9 +85,7 @@ async function doInitializeInChIWasm(): Promise<void> {
     inputView.set(encoder.encode(options + "\0"), pOptions);
 
     const result = exports.molfile_to_inchi(pInput, pOptions, pOutput);
-    const outputView = new Uint8Array(
-      memory.buffer.slice(pOutput, pOutput + outputMaxBytes),
-    );
+    const outputView = new Uint8Array(memory.buffer.slice(pOutput, pOutput + outputMaxBytes));
     const o = outputView.subarray(0, outputView.indexOf(0));
     const output = decoder.decode(o);
 
@@ -112,17 +101,13 @@ async function doInitializeInChIWasm(): Promise<void> {
     inputView.set(new TextEncoder().encode(inchi + "\0"), pInput);
 
     const result = exports.inchi_to_inchikey(pInput, pOutput);
-    const outputView = new Uint8Array(
-      memory.buffer.slice(pOutput, pOutput + outputMaxBytes),
-    );
+    const outputView = new Uint8Array(memory.buffer.slice(pOutput, pOutput + outputMaxBytes));
 
     if (result !== 0) {
       throw new Error("Failed to generate InChIKey");
     }
 
-    return new TextDecoder().decode(
-      outputView.subarray(0, outputView.indexOf(0)),
-    );
+    return new TextDecoder().decode(outputView.subarray(0, outputView.indexOf(0)));
   };
 
   inchiWasm = { molfileToInChI, inchiToInChIKey };

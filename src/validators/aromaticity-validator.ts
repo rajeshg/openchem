@@ -1,10 +1,6 @@
 import type { Atom, Bond, ParseError, Molecule } from "types";
 import { BondType } from "types";
-import {
-  getRingAtoms,
-  getRingBonds,
-  isPartOfFusedSystem,
-} from "src/utils/ring-analysis";
+import { getRingAtoms, getRingBonds, isPartOfFusedSystem } from "src/utils/ring-analysis";
 import { getBondsForAtom } from "src/utils/bond-utils";
 import { MoleculeGraph } from "src/utils/molecular-graph";
 
@@ -49,10 +45,7 @@ function countPiElectrons(atom: Atom, bonds: readonly Bond[]): number {
   }
 }
 
-function isHuckelAromatic(
-  ringAtoms: readonly Atom[],
-  ringBonds: readonly Bond[],
-): boolean {
+function isHuckelAromatic(ringAtoms: readonly Atom[], ringBonds: readonly Bond[]): boolean {
   const totalPiElectrons = ringAtoms.reduce(
     (sum, atom) => sum + countPiElectrons(atom, ringBonds),
     0,
@@ -74,12 +67,8 @@ function detectAromaticRings(
     const ringBonds = getRingBonds(ring, bonds);
 
     const hasAlternatingBonds = ringBonds.every((bond) => {
-      const atom1Bonds = ringBonds.filter(
-        (b) => b.atom1 === bond.atom1 || b.atom2 === bond.atom1,
-      );
-      const atom2Bonds = ringBonds.filter(
-        (b) => b.atom1 === bond.atom2 || b.atom2 === bond.atom2,
-      );
+      const atom1Bonds = ringBonds.filter((b) => b.atom1 === bond.atom1 || b.atom2 === bond.atom1);
+      const atom2Bonds = ringBonds.filter((b) => b.atom1 === bond.atom2 || b.atom2 === bond.atom2);
       return atom1Bonds.length <= 2 && atom2Bonds.length <= 2;
     });
 
@@ -193,20 +182,11 @@ export function validateAromaticity(
     if (allAromatic) {
       const ringBonds = getRingBonds(ring, updatedBonds);
 
-      const aromaticBondCount = ringBonds.filter(
-        (b) => b.type === BondType.AROMATIC,
-      ).length;
-      const singleBondCount = ringBonds.filter(
-        (b) => b.type === BondType.SINGLE,
-      ).length;
-      const doubleBondCount = ringBonds.filter(
-        (b) => b.type === BondType.DOUBLE,
-      ).length;
+      const aromaticBondCount = ringBonds.filter((b) => b.type === BondType.AROMATIC).length;
+      const singleBondCount = ringBonds.filter((b) => b.type === BondType.SINGLE).length;
+      const doubleBondCount = ringBonds.filter((b) => b.type === BondType.DOUBLE).length;
 
-      if (
-        aromaticBondCount !== ring.length &&
-        singleBondCount + doubleBondCount !== ring.length
-      ) {
+      if (aromaticBondCount !== ring.length && singleBondCount + doubleBondCount !== ring.length) {
         errors.push({
           message: `Aromatic ring ${ring.join(",")} has inconsistent bond types`,
           position: -1,

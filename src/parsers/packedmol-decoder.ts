@@ -237,10 +237,7 @@ function decodeBondStereoFromBlock(
 /**
  * Decode atom chirality from stereo block
  */
-function decodeAtomChirality(
-  stereoType: number,
-  stereoParity: number,
-): string | null {
+function decodeAtomChirality(stereoType: number, stereoParity: number): string | null {
   if (stereoType === ATOM_STEREO_TYPE.NONE) {
     return null;
   }

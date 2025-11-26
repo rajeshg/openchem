@@ -31,9 +31,7 @@ export class RingStructureBuilders {
     const atomIndices: number[] = [];
 
     for (let i = 0; i < size; i++) {
-      const atomIdx = aromatic
-        ? this.context.addAtom("C", true)
-        : this.context.addCarbon();
+      const atomIdx = aromatic ? this.context.addAtom("C", true) : this.context.addCarbon();
       atomIndices.push(atomIdx);
 
       // Bond to previous carbon
@@ -46,11 +44,7 @@ export class RingStructureBuilders {
     // Close the ring
     if (atomIndices.length > 2) {
       const bondType = aromatic ? BondTypeEnum.AROMATIC : BondTypeEnum.SINGLE;
-      this.context.addBond(
-        atomIndices[atomIndices.length - 1]!,
-        atomIndices[0]!,
-        bondType,
-      );
+      this.context.addBond(atomIndices[atomIndices.length - 1]!, atomIndices[0]!, bondType);
     }
 
     return atomIndices;

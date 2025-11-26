@@ -1,8 +1,4 @@
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../../types";
 import type { NamingSubstituent } from "../../../naming/iupac-types";
 import type { Molecule, Atom } from "types";
 import { getMultiplicativePrefix, collectSubstituentAtoms } from "../utils";
@@ -76,13 +72,8 @@ export function detectNSubstituents(
         }
 
         if (potentialNitrogenId !== undefined) {
-          const potentialNitrogen = molecule.atoms.find(
-            (a: Atom) => a.id === potentialNitrogenId,
-          );
-          if (
-            potentialNitrogen?.symbol === "N" &&
-            !potentialNitrogen.isInRing
-          ) {
+          const potentialNitrogen = molecule.atoms.find((a: Atom) => a.id === potentialNitrogenId);
+          if (potentialNitrogen?.symbol === "N" && !potentialNitrogen.isInRing) {
             nitrogenAtoms.push(potentialNitrogen);
             break;
           }
@@ -110,11 +101,7 @@ export function detectNSubstituents(
   const allNSubstituents: NSubstituent[] = [];
 
   // Process each nitrogen atom and collect its substituents
-  for (
-    let nitrogenIndex = 0;
-    nitrogenIndex < nitrogenAtoms.length;
-    nitrogenIndex++
-  ) {
+  for (let nitrogenIndex = 0; nitrogenIndex < nitrogenAtoms.length; nitrogenIndex++) {
     const amineNitrogen = nitrogenAtoms[nitrogenIndex];
     if (!amineNitrogen) continue;
 
@@ -131,9 +118,7 @@ export function detectNSubstituents(
       if (substituentAtomId === undefined) continue;
       if (parentAtomIds.has(substituentAtomId)) continue;
 
-      const substituentAtom = molecule.atoms.find(
-        (a) => a.id === substituentAtomId,
-      );
+      const substituentAtom = molecule.atoms.find((a) => a.id === substituentAtomId);
       if (!substituentAtom || substituentAtom.symbol !== "C") continue;
 
       const isDoubleBond = bond.type === "double";
@@ -144,13 +129,7 @@ export function detectNSubstituents(
 
       if (substituentAtom.isInRing && substituentAtom.aromatic) {
         isRing = true;
-        const ringSubInfo = nameRingSubstituent(
-          molecule,
-          substituentAtomId,
-          parentAtomIds,
-          0,
-          3,
-        );
+        const ringSubInfo = nameRingSubstituent(molecule, substituentAtomId, parentAtomIds, 0, 3);
         substituentName = ringSubInfo?.name || "phenyl";
       } else if (!substituentAtom.isInRing) {
         if (isDoubleBond) {
@@ -197,12 +176,7 @@ export function detectNSubstituents(
     // Add the substituent root atom
     nSubstituentAtomIds.add(sub.atomId);
     // Collect all atoms in this substituent chain
-    const subAtoms = collectSubstituentAtoms(
-      molecule,
-      sub.atomId,
-      parentAtomIds,
-      sub.nitrogenId,
-    );
+    const subAtoms = collectSubstituentAtoms(molecule, sub.atomId, parentAtomIds, sub.nitrogenId);
     for (const atomId of subAtoms) {
       nSubstituentAtomIds.add(atomId);
     }
@@ -242,14 +216,7 @@ export function detectNSubstituents(
       // Check if this is a complex substituent (contains another functional group)
       // Complex substituents need bis(), tris(), etc. with parentheses
       // Simple substituents (methyl, ethyl, propyl, formyl, etc.) use di-, tri-, tetra-
-      const simpleSubstituents = [
-        "methyl",
-        "ethyl",
-        "propyl",
-        "butyl",
-        "formyl",
-        "acetyl",
-      ];
+      const simpleSubstituents = ["methyl", "ethyl", "propyl", "butyl", "formyl", "acetyl"];
       const isSimpleSubstituent = simpleSubstituents.includes(name);
       const isComplexSubstituent =
         !isSimpleSubstituent &&
@@ -286,10 +253,7 @@ export function detectNSubstituents(
       const getBaseName = (s: string): string => {
         const afterLastHyphen = s.split("-").pop() || s;
         // Remove multiplicative prefixes like "di", "tri", "bis", "tris"
-        const withoutPrefix = afterLastHyphen.replace(
-          /^(di|tri|tetra|bis|tris|tetrakis)\(?/,
-          "",
-        );
+        const withoutPrefix = afterLastHyphen.replace(/^(di|tri|tetra|bis|tris|tetrakis)\(?/, "");
         // Remove trailing parenthesis if present
         return withoutPrefix.replace(/\)$/, "");
       };

@@ -15,11 +15,7 @@
 
 import type { Ring, RingSystem, Vec2, Transform } from "./types";
 import type { Molecule } from "types";
-import {
-  regularPolygon,
-  radiusForEdgeLength,
-  computeAlignmentTransform,
-} from "./geometry-utils";
+import { regularPolygon, radiusForEdgeLength, computeAlignmentTransform } from "./geometry-utils";
 import {
   findSharedAtoms,
   findBondedPair,
@@ -93,10 +89,7 @@ export function placeFusedRingSystem(
       const p2Placed = coords.get(sharedAtom2)!;
 
       // Generate template for neighbor ring
-      const neighborTemplate = generateRingTemplate(
-        neighborRing.size,
-        bondLength,
-      );
+      const neighborTemplate = generateRingTemplate(neighborRing.size, bondLength);
 
       // Find positions of shared atoms in template
       const idx1 = neighborRing.atomIds.indexOf(sharedAtom1);
@@ -113,12 +106,7 @@ export function placeFusedRingSystem(
       const p2Template = neighborTemplate[idx2]!;
 
       // Compute transform to align template edge to placed edge
-      const transform = computeAlignmentTransform(
-        p1Template,
-        p2Template,
-        p1Placed,
-        p2Placed,
-      );
+      const transform = computeAlignmentTransform(p1Template, p2Template, p1Placed, p2Placed);
 
       // Apply transform to get candidate positions
       const candidatePositions = new Map<number, Vec2>();
@@ -138,9 +126,7 @@ export function placeFusedRingSystem(
       for (const [newAtomId, newCoord] of candidatePositions.entries()) {
         for (const [existingAtomId, existingCoord] of coords.entries()) {
           // Skip if atoms are bonded
-          const bonded = (
-            molecule.bonds as readonly { atom1: number; atom2: number }[]
-          ).some(
+          const bonded = (molecule.bonds as readonly { atom1: number; atom2: number }[]).some(
             (b) =>
               (b.atom1 === newAtomId && b.atom2 === existingAtomId) ||
               (b.atom1 === existingAtomId && b.atom2 === newAtomId),
@@ -166,9 +152,7 @@ export function placeFusedRingSystem(
           x: p2Placed.x - p1Placed.x,
           y: p2Placed.y - p1Placed.y,
         };
-        const edgeLength = Math.sqrt(
-          edgeVec.x * edgeVec.x + edgeVec.y * edgeVec.y,
-        );
+        const edgeLength = Math.sqrt(edgeVec.x * edgeVec.x + edgeVec.y * edgeVec.y);
         const edgeNormal = {
           x: -edgeVec.y / edgeLength,
           y: edgeVec.x / edgeLength,
@@ -187,8 +171,7 @@ export function placeFusedRingSystem(
           };
 
           // Dot product with edge normal to get distance from edge
-          const distFromEdge =
-            vecToAtom.x * edgeNormal.x + vecToAtom.y * edgeNormal.y;
+          const distFromEdge = vecToAtom.x * edgeNormal.x + vecToAtom.y * edgeNormal.y;
 
           // Reflect by flipping the distance sign
           const flippedCoord = {

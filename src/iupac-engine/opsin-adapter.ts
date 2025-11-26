@@ -15,10 +15,7 @@ import type { OPSINService } from "./opsin-service";
  * @param opsinService - OPSIN service instance
  * @returns Priority number (lower = higher priority), or 999 if not found
  */
-export function getPriorityFromOPSIN(
-  pattern: string,
-  opsinService: OPSINService,
-): number {
+export function getPriorityFromOPSIN(pattern: string, opsinService: OPSINService): number {
   const priority = opsinService.getFunctionalGroupPriority(pattern);
   return priority ?? 999; // Fallback for unknown patterns
 }
@@ -65,9 +62,7 @@ export function getMultiplierFromOPSIN(
   const prefix = opsinService.getMultiplicativePrefix(count, type);
 
   if (!prefix) {
-    throw new Error(
-      `[OPSIN Adapter] Missing ${type} multiplier for count ${count} in OPSIN data`,
-    );
+    throw new Error(`[OPSIN Adapter] Missing ${type} multiplier for count ${count} in OPSIN data`);
   }
 
   return prefix;
@@ -80,16 +75,11 @@ export function getMultiplierFromOPSIN(
  * @returns Chain name (e.g., 1 → "meth", 2 → "eth")
  * @throws Error if OPSIN data doesn't contain the requested chain length
  */
-export function getChainNameFromOPSIN(
-  length: number,
-  opsinService: OPSINService,
-): string {
+export function getChainNameFromOPSIN(length: number, opsinService: OPSINService): string {
   const chainName = opsinService.getChainName(length);
 
   if (!chainName) {
-    throw new Error(
-      `[OPSIN Adapter] Missing chain name for length ${length} in OPSIN data`,
-    );
+    throw new Error(`[OPSIN Adapter] Missing chain name for length ${length} in OPSIN data`);
   }
 
   return chainName;
@@ -102,10 +92,7 @@ export function getChainNameFromOPSIN(
  * @returns Acyloxy name (e.g., 2 → "acetoxy", 3 → "propanoyloxy")
  * @throws Error if OPSIN data doesn't contain the requested chain length
  */
-export function getAcyloxyNameFromOPSIN(
-  chainLength: number,
-  opsinService: OPSINService,
-): string {
+export function getAcyloxyNameFromOPSIN(chainLength: number, opsinService: OPSINService): string {
   // Special case: acetoxy (common name for 2-carbon acyl)
   if (chainLength === 2) {
     return "acetoxy";
@@ -143,10 +130,7 @@ function addMultiplierVowel(multiplier: string, nextChar: string): string {
  * Get simple multiplicative prefix (di, tri, tetra, etc.)
  * Wrapper for basic multiplier type
  */
-export function getSimpleMultiplier(
-  count: number,
-  opsinService: OPSINService,
-): string {
+export function getSimpleMultiplier(count: number, opsinService: OPSINService): string {
   return getMultiplierFromOPSIN(count, "basic", opsinService);
 }
 
@@ -170,10 +154,7 @@ export function getSimpleMultiplierWithVowel(
  * Get complex multiplicative prefix (bis, tris, tetrakis, etc.)
  * Wrapper for group multiplier type
  */
-export function getComplexMultiplier(
-  count: number,
-  opsinService: OPSINService,
-): string {
+export function getComplexMultiplier(count: number, opsinService: OPSINService): string {
   return getMultiplierFromOPSIN(count, "group", opsinService);
 }
 
@@ -183,10 +164,7 @@ export function getComplexMultiplier(
  * @param opsinService - OPSIN service instance
  * @returns true if pattern exists, false otherwise
  */
-export function hasFunctionalGroupInOPSIN(
-  pattern: string,
-  opsinService: OPSINService,
-): boolean {
+export function hasFunctionalGroupInOPSIN(pattern: string, opsinService: OPSINService): boolean {
   return opsinService.hasFunctionalGroup(pattern);
 }
 
@@ -210,10 +188,7 @@ export function getFunctionalGroupNameFromOPSIN(
  * @returns Alkyl prefix (e.g., 1 → "methyl", 2 → "ethyl")
  * @throws Error if OPSIN data doesn't contain the requested chain length
  */
-export function getAlkylPrefixFromOPSIN(
-  length: number,
-  opsinService: OPSINService,
-): string {
+export function getAlkylPrefixFromOPSIN(length: number, opsinService: OPSINService): string {
   const chainName = getChainNameFromOPSIN(length, opsinService);
   return `${chainName}yl`;
 }

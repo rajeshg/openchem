@@ -1,9 +1,5 @@
 import type { Molecule } from "types";
-import {
-  getAlkaneBaseName,
-  getGreekNumeral,
-  getAlkylName,
-} from "../../iupac-helpers";
+import { getAlkaneBaseName, getGreekNumeral, getAlkylName } from "../../iupac-helpers";
 
 export function namePhosphorylSubstituent(
   molecule: Molecule,
@@ -41,9 +37,7 @@ export function namePhosphorylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[namePhosphorylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`,
-    );
+    console.log(`[namePhosphorylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`);
   }
 
   if (substituentsOnP.length === 0) {
@@ -66,12 +60,7 @@ export function namePhosphorylSubstituent(
       branchAtoms.add(current);
 
       for (const bond of molecule.bonds) {
-        const next =
-          bond.atom1 === current
-            ? bond.atom2
-            : bond.atom2 === current
-              ? bond.atom1
-              : -1;
+        const next = bond.atom1 === current ? bond.atom2 : bond.atom2 === current ? bond.atom1 : -1;
         if (next !== -1 && !visited.has(next) && substituentAtoms.has(next)) {
           stack.push(next);
         }
@@ -143,9 +132,7 @@ export function namePhosphorylSubstituent(
       );
 
       if (subAtom.aromatic) {
-        const ringContainingCarbon = molecule.rings?.find((ring) =>
-          ring.includes(subAtomIdx),
-        );
+        const ringContainingCarbon = molecule.rings?.find((ring) => ring.includes(subAtomIdx));
         if (ringContainingCarbon && ringContainingCarbon.length === 6) {
           const allCarbons = ringContainingCarbon.every(
             (atomId: number) => molecule.atoms[atomId]?.symbol === "C",
@@ -242,9 +229,7 @@ export function namePhosphanylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[namePhosphanylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`,
-    );
+    console.log(`[namePhosphanylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`);
   }
 
   if (substituentsOnP.length === 0) {
@@ -268,12 +253,7 @@ export function namePhosphanylSubstituent(
       branchAtoms.add(current);
 
       for (const bond of molecule.bonds) {
-        const next =
-          bond.atom1 === current
-            ? bond.atom2
-            : bond.atom2 === current
-              ? bond.atom1
-              : -1;
+        const next = bond.atom1 === current ? bond.atom2 : bond.atom2 === current ? bond.atom1 : -1;
         if (next !== -1 && !visited.has(next) && substituentAtoms.has(next)) {
           stack.push(next);
         }
@@ -288,9 +268,7 @@ export function namePhosphanylSubstituent(
       );
 
       if (subAtom.aromatic) {
-        const ringContainingCarbon = molecule.rings?.find((ring) =>
-          ring.includes(subAtomIdx),
-        );
+        const ringContainingCarbon = molecule.rings?.find((ring) => ring.includes(subAtomIdx));
         if (ringContainingCarbon && ringContainingCarbon.length === 6) {
           const allCarbons = ringContainingCarbon.every(
             (atomId: number) => molecule.atoms[atomId]?.symbol === "C",
@@ -316,10 +294,7 @@ export function namePhosphanylSubstituent(
     }
 
     if (branchName) {
-      substituentGroups.set(
-        branchName,
-        (substituentGroups.get(branchName) || 0) + 1,
-      );
+      substituentGroups.set(branchName, (substituentGroups.get(branchName) || 0) + 1);
     }
   }
 
@@ -359,9 +334,7 @@ export function namePhosphanylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[namePhosphanylSubstituent] final name: ${baseName} (linker=${linkerSymbol})`,
-    );
+    console.log(`[namePhosphanylSubstituent] final name: ${baseName} (linker=${linkerSymbol})`);
   }
 
   return baseName;

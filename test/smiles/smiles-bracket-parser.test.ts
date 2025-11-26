@@ -216,12 +216,8 @@ describe("Atom Class Support", () => {
       const result2 = parseSMILES(output);
       expect(result2.errors).toEqual([]);
 
-      expect(result2.molecules[0]!.atoms.some((a) => a.atomClass === 1)).toBe(
-        true,
-      );
-      expect(result2.molecules[0]!.atoms.some((a) => a.atomClass === 2)).toBe(
-        true,
-      );
+      expect(result2.molecules[0]!.atoms.some((a) => a.atomClass === 1)).toBe(true);
+      expect(result2.molecules[0]!.atoms.some((a) => a.atomClass === 2)).toBe(true);
     });
 
     it("should round-trip complex atom class notation", () => {
@@ -249,9 +245,7 @@ describe("Atom Class Support", () => {
       const result2 = parseSMILES(output);
       expect(result2.errors).toEqual([]);
 
-      const classAtom = result2.molecules[0]!.atoms.find(
-        (a) => a.atomClass === 1,
-      );
+      const classAtom = result2.molecules[0]!.atoms.find((a) => a.atomClass === 1);
       expect(classAtom).toBeDefined();
       expect(classAtom!.aromatic).toBe(true);
     });
@@ -264,12 +258,8 @@ describe("Atom Class Support", () => {
       const result2 = parseSMILES(output);
       expect(result2.errors).toEqual([]);
 
-      const class1Count = result2.molecules[0]!.atoms.filter(
-        (a) => a.atomClass === 1,
-      ).length;
-      const class2Count = result2.molecules[0]!.atoms.filter(
-        (a) => a.atomClass === 2,
-      ).length;
+      const class1Count = result2.molecules[0]!.atoms.filter((a) => a.atomClass === 1).length;
+      const class2Count = result2.molecules[0]!.atoms.filter((a) => a.atomClass === 2).length;
       expect(class1Count).toBe(2);
       expect(class2Count).toBe(1);
     });
@@ -326,12 +316,8 @@ describe("Atom Class Support", () => {
       expect(reactant.errors).toEqual([]);
       expect(product.errors).toEqual([]);
 
-      const reactantC = reactant.molecules[0]!.atoms.find(
-        (a) => a.atomClass === 1,
-      )!;
-      const productC = product.molecules[0]!.atoms.find(
-        (a) => a.atomClass === 1,
-      )!;
+      const reactantC = reactant.molecules[0]!.atoms.find((a) => a.atomClass === 1)!;
+      const productC = product.molecules[0]!.atoms.find((a) => a.atomClass === 1)!;
 
       expect(reactantC.symbol).toBe("C");
       expect(productC.symbol).toBe("C");

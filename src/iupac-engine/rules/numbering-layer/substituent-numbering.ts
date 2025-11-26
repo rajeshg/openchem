@@ -1,9 +1,6 @@
 import type { IUPACRule, FunctionalGroup } from "../../types";
 import { RulePriority } from "../../types";
-import {
-  ExecutionPhase,
-  ImmutableNamingContext,
-} from "../../immutable-context";
+import { ExecutionPhase, ImmutableNamingContext } from "../../immutable-context";
 import type { ContextState } from "../../immutable-context";
 import { isPrincipalGroup, assignSubstituentLocants } from "./helpers";
 
@@ -24,8 +21,7 @@ export const SUBSTITUENT_NUMBERING_RULE: IUPACRule = {
     return !!(
       functionalGroups &&
       functionalGroups.some(
-        (group: FunctionalGroup) =>
-          group.type === "substituent" || !isPrincipalGroup(group),
+        (group: FunctionalGroup) => group.type === "substituent" || !isPrincipalGroup(group),
       )
     );
   },
@@ -48,29 +44,22 @@ export const SUBSTITUENT_NUMBERING_RULE: IUPACRule = {
     );
 
     // Number substituent groups, but skip those already converted by P-14.3
-    const numberedSubstituents = substituentGroups.map(
-      (group: FunctionalGroup, index: number) => {
-        // Skip locant assignment if already converted by P-14.3
-        if (group.locantsConverted) {
-          if (process.env.VERBOSE) {
-            console.log(
-              `[SUBSTITUENT_NUMBERING] Skipping ${group.type}: locants already converted to ${JSON.stringify(group.locants)}`,
-            );
-          }
-          return group;
+    const numberedSubstituents = substituentGroups.map((group: FunctionalGroup, index: number) => {
+      // Skip locant assignment if already converted by P-14.3
+      if (group.locantsConverted) {
+        if (process.env.VERBOSE) {
+          console.log(
+            `[SUBSTITUENT_NUMBERING] Skipping ${group.type}: locants already converted to ${JSON.stringify(group.locants)}`,
+          );
         }
+        return group;
+      }
 
-        return {
-          ...group,
-          locants: assignSubstituentLocants(
-            group,
-            parentStructure,
-            molecule,
-            index,
-          ),
-        };
-      },
-    );
+      return {
+        ...group,
+        locants: assignSubstituentLocants(group, parentStructure, molecule, index),
+      };
+    });
 
     return context.withStateUpdate(
       (state: ContextState) => ({

@@ -141,9 +141,7 @@ export class PhaseController {
         return state.candidateRings.length > 0;
       default:
         // Unknown dependency - check if it exists in state
-        return (
-          (state as Record<string, unknown>)[dependency.name] !== undefined
-        );
+        return (state as Record<string, unknown>)[dependency.name] !== undefined;
     }
   }
 
@@ -165,10 +163,7 @@ export class PhaseController {
   /**
    * Check if an output was properly provided
    */
-  private isOutputProvided(
-    provided: DataStructureDefinition,
-    state: ContextState,
-  ): boolean {
+  private isOutputProvided(provided: DataStructureDefinition, state: ContextState): boolean {
     const output = (state as unknown as Record<string, unknown>)[provided.name];
 
     if (output === undefined) {
@@ -194,14 +189,10 @@ export class PhaseController {
       phase: this.phase,
       rulesExecuted: phaseTraces.length,
       rulesSucceeded: phaseTraces.filter(
-        (trace) =>
-          !trace.description.includes("failed") &&
-          !trace.description.includes("error"),
+        (trace) => !trace.description.includes("failed") && !trace.description.includes("error"),
       ).length,
       rulesFailed: phaseTraces.filter(
-        (trace) =>
-          trace.description.includes("failed") ||
-          trace.description.includes("error"),
+        (trace) => trace.description.includes("failed") || trace.description.includes("error"),
       ).length,
       confidenceChange: this.calculateConfidenceChange(history),
       executionTime: this.calculateExecutionTime(phaseTraces),
@@ -211,9 +202,7 @@ export class PhaseController {
   /**
    * Calculate confidence change from this phase
    */
-  private calculateConfidenceChange(
-    history: ReadonlyArray<RuleExecutionTrace>,
-  ): number {
+  private calculateConfidenceChange(history: ReadonlyArray<RuleExecutionTrace>): number {
     const phaseTraces = history.filter((trace) => trace.phase === this.phase);
 
     if (phaseTraces.length === 0) {
@@ -229,9 +218,7 @@ export class PhaseController {
   /**
    * Calculate execution time for this phase
    */
-  private calculateExecutionTime(
-    traces: ReadonlyArray<RuleExecutionTrace>,
-  ): number {
+  private calculateExecutionTime(traces: ReadonlyArray<RuleExecutionTrace>): number {
     if (traces.length === 0) {
       return 0;
     }
@@ -331,10 +318,7 @@ export class PhaseControllerFactory {
               typeof (v[0] as { id?: unknown }).id === "string"
             ) {
               candidates.push(...v);
-            } else if (
-              typeof v === "object" &&
-              typeof (v as { id?: unknown }).id === "string"
-            ) {
+            } else if (typeof v === "object" && typeof (v as { id?: unknown }).id === "string") {
               candidates.push(v);
             }
           }
@@ -345,11 +329,7 @@ export class PhaseControllerFactory {
         } catch (_e) {
           // continue on import errors but log under VERBOSE mode
           if (process.env.VERBOSE)
-            console.warn(
-              "discoverRules import failed for",
-              filePath,
-              String(_e),
-            );
+            console.warn("discoverRules import failed for", filePath, String(_e));
           continue;
         }
       }

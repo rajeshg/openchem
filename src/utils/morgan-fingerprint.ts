@@ -22,13 +22,7 @@ class OC_MorganAtom implements IMorganAtom {
   private atomIdx: number;
   private atoms: Atom[];
   private bonds: Bond[];
-  constructor(
-    atom: Atom,
-    mol: Molecule,
-    atomIdx: number,
-    atoms: Atom[],
-    bonds: Bond[],
-  ) {
+  constructor(atom: Atom, mol: Molecule, atomIdx: number, atoms: Atom[], bonds: Bond[]) {
     this.atom = atom;
     this.mol = mol;
     this.atomIdx = atomIdx;
@@ -193,25 +187,13 @@ class OC_MorganAtom implements IMorganAtom {
         const idx = this.atoms.findIndex((a) => a.id === b.atom2);
         if (idx !== -1 && this.atoms[idx])
           neighbors.push(
-            new OC_MorganAtom(
-              this.atoms[idx]!,
-              this.mol,
-              idx,
-              this.atoms,
-              this.bonds,
-            ),
+            new OC_MorganAtom(this.atoms[idx]!, this.mol, idx, this.atoms, this.bonds),
           );
       } else if (b.atom2 === this.atom.id) {
         const idx = this.atoms.findIndex((a) => a.id === b.atom1);
         if (idx !== -1 && this.atoms[idx])
           neighbors.push(
-            new OC_MorganAtom(
-              this.atoms[idx]!,
-              this.mol,
-              idx,
-              this.atoms,
-              this.bonds,
-            ),
+            new OC_MorganAtom(this.atoms[idx]!, this.mol, idx, this.atoms, this.bonds),
           );
       }
     }
@@ -242,22 +224,12 @@ class OC_MorganBond implements IMorganBond {
     this.atom = atom;
   }
   getOtherAtom(_atom: IMorganAtom): IMorganAtom {
-    const a =
-      this.bond.atom1 === this.atom.getAtomData().id
-        ? this.bond.atom2
-        : this.bond.atom1;
+    const a = this.bond.atom1 === this.atom.getAtomData().id ? this.bond.atom2 : this.bond.atom1;
     const atoms = this.atom.getAtomsData();
     const mol = this.atom.getMoleculeData();
     const idx = atoms.findIndex((at) => at.id === a);
-    if (idx === -1 || !atoms[idx])
-      throw new Error("Invalid atom index in getOtherAtom");
-    return new OC_MorganAtom(
-      atoms[idx]!,
-      mol,
-      idx,
-      atoms,
-      this.atom.getBondsData(),
-    );
+    if (idx === -1 || !atoms[idx]) throw new Error("Invalid atom index in getOtherAtom");
+    return new OC_MorganAtom(atoms[idx]!, mol, idx, atoms, this.atom.getBondsData());
   }
   getBondType(): number {
     switch (this.bond.type) {
@@ -285,9 +257,7 @@ class OC_MorganMolecule implements IMorganMolecule {
     this.mol = mol;
     this.atoms = Array.from(mol.atoms);
     this.bonds = Array.from(mol.bonds);
-    this.ocAtoms = this.atoms.map(
-      (a, i) => new OC_MorganAtom(a, mol, i, this.atoms, this.bonds),
-    );
+    this.ocAtoms = this.atoms.map((a, i) => new OC_MorganAtom(a, mol, i, this.atoms, this.bonds));
   }
   getAtoms(): IMorganAtom[] {
     return this.ocAtoms;
@@ -304,11 +274,7 @@ class OC_MorganMolecule implements IMorganMolecule {
  * @param fpSize fingerprint bit length (default 2048)
  * @returns Uint8Array bit vector
  */
-export function computeMorganFingerprint(
-  mol: Molecule,
-  radius = 2,
-  fpSize = 2048,
-): Uint8Array {
+export function computeMorganFingerprint(mol: Molecule, radius = 2, fpSize = 2048): Uint8Array {
   const morganMol = new OC_MorganMolecule(mol);
   return getMorganFingerprint(morganMol, radius, fpSize);
 }

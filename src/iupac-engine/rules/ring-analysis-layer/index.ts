@@ -48,8 +48,4 @@ export {
 };
 
 // Re-export helper functions
-export {
-  detectRingSystems,
-  generateRingName,
-  generateRingLocants,
-} from "./helpers";
+export { detectRingSystems, generateRingName, generateRingLocants } from "./helpers";

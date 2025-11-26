@@ -46,9 +46,8 @@ export const P44_3_2_MULTIPLE_BONDS_RULE: IUPACRule = {
     }
     // Count multiple bonds for each chain
     const multipleBondCounts = chains.map((chain) => {
-      return chain.multipleBonds.filter(
-        (bond) => bond.type === "double" || bond.type === "triple",
-      ).length;
+      return chain.multipleBonds.filter((bond) => bond.type === "double" || bond.type === "triple")
+        .length;
     });
     const maxMultipleBonds = Math.max(...multipleBondCounts);
     const chainsWithMaxMultipleBonds = chains.filter(

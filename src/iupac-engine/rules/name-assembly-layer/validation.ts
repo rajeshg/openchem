@@ -45,10 +45,7 @@ export function applyFinalFormatting(name: string): string {
   formatted = formatted.replace(/(\d)(?=[A-GI-Za-gi-z])/g, "$1-");
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[applyFinalFormatting] after digit-letter hyphenation:",
-      formatted,
-    );
+    console.log("[applyFinalFormatting] after digit-letter hyphenation:", formatted);
   }
 
   // Ensure hyphen between letters and following locant digit when missing,
@@ -76,10 +73,7 @@ export function applyFinalFormatting(name: string): string {
   // IUPAC names should be lowercase unless they start with a locant
   // Don't capitalize the first letter - IUPAC names are lowercase
   // Exception: If the name starts with "N" as a locant (e.g., "N,N-dimethylethanamine" or "N-methylethanamine"), keep it uppercase
-  if (
-    formatted.charAt(0) !== "N" ||
-    (!formatted.startsWith("N,") && !formatted.startsWith("N-"))
-  ) {
+  if (formatted.charAt(0) !== "N" || (!formatted.startsWith("N,") && !formatted.startsWith("N-"))) {
     formatted = formatted.charAt(0).toLowerCase() + formatted.slice(1);
   }
 
@@ -91,17 +85,13 @@ export function applyFinalFormatting(name: string): string {
       const loc = m[1];
       if (loc && formatted.includes(`${loc}-ol`)) {
         // Remove the hydroxy occurrence (with optional leading hyphen/comma)
-        formatted = formatted.replace(
-          new RegExp(`[,-]?${loc}-?hydroxy`, "gi"),
-          "",
-        );
+        formatted = formatted.replace(new RegExp(`[,-]?${loc}-?hydroxy`, "gi"), "");
         // Clean up any accidental double hyphens created
         formatted = formatted.replace(/--+/g, "-");
       }
     }
   } catch (_e) {
-    if (process.env.VERBOSE)
-      console.log("[applyFinalFormatting] hydroxy cleanup error", _e);
+    if (process.env.VERBOSE) console.log("[applyFinalFormatting] hydroxy cleanup error", _e);
   }
 
   return formatted;
@@ -112,20 +102,17 @@ export function calculateNameConfidence(state: ContextState): number {
 
   // Reduce confidence if components are missing
   if (!state.parentStructure) confidence -= 0.3;
-  if (!state.functionalGroups || state.functionalGroups.length === 0)
-    confidence -= 0.1;
+  if (!state.functionalGroups || state.functionalGroups.length === 0) confidence -= 0.1;
 
   // Reduce confidence if conflicts were detected (if available in extended state)
-  const conflicts = (state as unknown as { conflicts?: Array<unknown> })
-    .conflicts;
+  const conflicts = (state as unknown as { conflicts?: Array<unknown> }).conflicts;
   if (conflicts && conflicts.length > 0) {
     confidence -= conflicts.length * 0.1;
   }
 
   // Reduce confidence if validation failed (if available in extended state)
-  const nameValidation = (
-    state as unknown as { nameValidation?: { isValid: boolean } }
-  ).nameValidation;
+  const nameValidation = (state as unknown as { nameValidation?: { isValid: boolean } })
+    .nameValidation;
   if (nameValidation && !nameValidation.isValid) {
     confidence -= 0.2;
   }

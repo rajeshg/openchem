@@ -54,11 +54,7 @@ function isDiamineBackbone(
     if (n2 === lastAtom && amineNitrogens.has(n1)) lastAmineId = n1;
   }
 
-  return (
-    firstAmineId !== null &&
-    lastAmineId !== null &&
-    firstAmineId !== lastAmineId
-  );
+  return firstAmineId !== null && lastAmineId !== null && firstAmineId !== lastAmineId;
 }
 
 /**
@@ -98,11 +94,7 @@ export function findMainChain(
 
   // Normalize functional groups to ensure atoms are number arrays
   const functionalGroups = rawFunctionalGroups.map(
-    (fg: {
-      name?: string;
-      type?: string;
-      atoms?: (number | { id: number })[];
-    }) => ({
+    (fg: { name?: string; type?: string; atoms?: (number | { id: number })[] }) => ({
       name: fg.name || fg.type || "",
       type: fg.type || fg.name || "",
       atoms: (fg.atoms || []).map((a: number | { id: number }) =>
@@ -117,15 +109,11 @@ export function findMainChain(
   // For most functional groups, only heteroatoms (O, N, S, etc.) are excluded
   // The carbon atoms bearing the functional groups should remain in the parent chain
   if (process.env.VERBOSE) {
-    console.log(
-      `[findMainChain] Detected ${functionalGroups.length} functional groups`,
-    );
+    console.log(`[findMainChain] Detected ${functionalGroups.length} functional groups`);
   }
   for (const fg of functionalGroups) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[findMainChain] FG: name="${fg.name}", type="${fg.type}", atoms=${fg.atoms}`,
-      );
+      console.log(`[findMainChain] FG: name="${fg.name}", type="${fg.type}", atoms=${fg.atoms}`);
     }
     if (fg.atoms && Array.isArray(fg.atoms)) {
       for (const atomId of fg.atoms) {
@@ -134,11 +122,7 @@ export function findMainChain(
           if (!atom) continue;
 
           // Apply selective exclusion based on functional group type
-          const shouldExclude = shouldExcludeAtomFromChain(
-            atom,
-            fg.name,
-            fg.type,
-          );
+          const shouldExclude = shouldExcludeAtomFromChain(atom, fg.name, fg.type);
           if (process.env.VERBOSE) {
             console.log(
               `[findMainChain]   Atom ${atomId} (${atom.symbol}): shouldExclude=${shouldExclude}`,
@@ -152,9 +136,7 @@ export function findMainChain(
     }
   }
   if (process.env.VERBOSE) {
-    console.log(
-      `[findMainChain] Excluded FG atoms: ${Array.from(excludedAtomIds).join(",")}`,
-    );
+    console.log(`[findMainChain] Excluded FG atoms: ${Array.from(excludedAtomIds).join(",")}`);
   }
 
   // CRITICAL CHECK: Before chain finding, check if molecule has significant ring systems.
@@ -176,10 +158,7 @@ export function findMainChain(
 
     // Count non-excluded carbon atoms NOT in rings (potential acyclic chain atoms)
     const acyclicCarbons = molecule.atoms.filter(
-      (a) =>
-        a.symbol === "C" &&
-        !excludedAtomIds.has(a.id) &&
-        !ringAtomIds.has(a.id),
+      (a) => a.symbol === "C" && !excludedAtomIds.has(a.id) && !ringAtomIds.has(a.id),
     ).length;
 
     if (process.env.VERBOSE) {
@@ -197,13 +176,9 @@ export function findMainChain(
     // - Large bicyclic system with ketone (30+ ring atoms, 1-2 chain carbons) → ring parent
     // - Naphthalene with ester (10 ring atoms, 2 ester carbons) → let normal logic decide
     // - Ethyl benzoate (6 ring atoms, 3 chain carbons) → let normal logic decide
-    const ringToAcyclicRatio =
-      acyclicCarbons > 0 ? ringAtomIds.size / acyclicCarbons : Infinity;
+    const ringToAcyclicRatio = acyclicCarbons > 0 ? ringAtomIds.size / acyclicCarbons : Infinity;
 
-    if (
-      (ringAtomIds.size >= 20 && acyclicCarbons <= 3) ||
-      ringToAcyclicRatio >= 15
-    ) {
+    if ((ringAtomIds.size >= 20 && acyclicCarbons <= 3) || ringToAcyclicRatio >= 15) {
       if (process.env.VERBOSE) {
         console.log(
           `[findMainChain] Large ring system detected (${ringAtomIds.size} atoms, ratio=${ringToAcyclicRatio.toFixed(1)}) with few acyclic carbons (${acyclicCarbons}). Deferring to ring-based nomenclature.`,
@@ -267,18 +242,13 @@ export function findMainChain(
   // Consider both carbon-only parent candidates and hetero-containing parent candidates.
   // Find all longest carbon-only chains and all longest heavy-atom chains (non-hydrogen).
   const skipRingAtomsForCarbonChains = functionalGroups.length > 0;
-  const carbonChains = findAllCarbonChains(
-    molecule,
-    excludedAtomIds,
-    skipRingAtomsForCarbonChains,
-  );
+  const carbonChains = findAllCarbonChains(molecule, excludedAtomIds, skipRingAtomsForCarbonChains);
   let atomChains = findAllAtomChains(molecule, excludedAtomIds);
 
   // Special handling for amines: construct parent chains as [nitrogen] + [longest carbon chain]
   // Example: CN(C)CC should give chain [1,3,4] (N-C-C = ethanamine), not [0,1,3,4] or [2,1,3,4]
   const amineGroups = functionalGroups.filter(
-    (fg: { name: string; type: string; atoms: number[] }) =>
-      fg.name === "amine",
+    (fg: { name: string; type: string; atoms: number[] }) => fg.name === "amine",
   );
   if (process.env.VERBOSE) {
     console.log(
@@ -290,9 +260,7 @@ export function findMainChain(
       amineGroups.flatMap((fg: { atoms: number[] }) => fg.atoms || []),
     );
     if (process.env.VERBOSE) {
-      console.log(
-        `[findMainChain] Amine nitrogen atoms: ${Array.from(amineNitrogens).join(",")}`,
-      );
+      console.log(`[findMainChain] Amine nitrogen atoms: ${Array.from(amineNitrogens).join(",")}`);
     }
 
     // For each amine nitrogen, construct chains as [N] + [carbon-only chain from N]
@@ -302,10 +270,7 @@ export function findMainChain(
       const carbonNeighbors = molecule.bonds
         .filter((b) => b.atom1 === nIdx || b.atom2 === nIdx)
         .map((b) => (b.atom1 === nIdx ? b.atom2 : b.atom1))
-        .filter(
-          (idx) =>
-            molecule.atoms[idx]?.symbol === "C" && !excludedAtomIds.has(idx),
-        );
+        .filter((idx) => molecule.atoms[idx]?.symbol === "C" && !excludedAtomIds.has(idx));
 
       if (process.env.VERBOSE) {
         console.log(
@@ -327,11 +292,7 @@ export function findMainChain(
 
       for (const carbonStart of carbonNeighbors) {
         // Find all carbon-only chains starting from this carbon
-        const chainsFromCarbon = findAllCarbonChainsFromStart(
-          molecule,
-          carbonStart,
-          excludeWithN,
-        );
+        const chainsFromCarbon = findAllCarbonChainsFromStart(molecule, carbonStart, excludeWithN);
 
         if (process.env.VERBOSE) {
           console.log(
@@ -344,9 +305,7 @@ export function findMainChain(
           const fullChain = [nIdx, ...carbonChain];
           amineChains.push(fullChain);
           if (process.env.VERBOSE) {
-            console.log(
-              `[findMainChain]     Amine chain: [${fullChain.join(",")}]`,
-            );
+            console.log(`[findMainChain]     Amine chain: [${fullChain.join(",")}]`);
           }
         }
       }
@@ -361,9 +320,7 @@ export function findMainChain(
     // These carbon chains will be given amine priority during chain selection
     if (amineChains.length > 0) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[findMainChain] Found ${amineChains.length} amine-specific chains`,
-        );
+        console.log(`[findMainChain] Found ${amineChains.length} amine-specific chains`);
       }
       // Extract carbon-only portions from amine chains and add to carbon chain pool
       for (const amineChain of amineChains) {
@@ -442,15 +399,12 @@ export function findMainChain(
       const reverseStr = [...newChain].reverse().join(",");
       const isDuplicate = carbonChains.some(
         (existingChain) =>
-          existingChain.join(",") === chainStr ||
-          existingChain.join(",") === reverseStr,
+          existingChain.join(",") === chainStr || existingChain.join(",") === reverseStr,
       );
       if (!isDuplicate) {
         carbonChains.push(newChain);
         if (process.env.VERBOSE) {
-          console.log(
-            `[findMainChain]     Added functional group chain: [${newChain.join(",")}]`,
-          );
+          console.log(`[findMainChain]     Added functional group chain: [${newChain.join(",")}]`);
         }
       }
     }
@@ -465,9 +419,7 @@ export function findMainChain(
   // Primary preference is by number of carbons in the parent chain. Compute the
   // longest carbon-only chain length; consider hetero-containing chains only if
   // they have the same number of carbons.
-  const maxCarbonLen = carbonChains.length
-    ? Math.max(...carbonChains.map((c) => c.length))
-    : 0;
+  const maxCarbonLen = carbonChains.length ? Math.max(...carbonChains.map((c) => c.length)) : 0;
 
   // STRATEGY: First evaluate all chains (carbon and hetero) for functional group priority.
   // Then select candidates based on priority + carbon count.
@@ -522,9 +474,7 @@ export function findMainChain(
   // Detect ALL nitrogen atoms in the molecule, not just those labeled as "amine" functional groups.
   // This is crucial for diamines where nitrogens may be part of amide/other groups.
   const amineNitrogens = new Set<number>(
-    molecule.atoms
-      .map((a, idx) => (a.symbol === "N" ? idx : -1))
-      .filter((idx) => idx !== -1),
+    molecule.atoms.map((a, idx) => (a.symbol === "N" ? idx : -1)).filter((idx) => idx !== -1),
   );
 
   if (process.env.VERBOSE) {
@@ -554,18 +504,14 @@ export function findMainChain(
     }
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[findMainChain] Found ${diamineBackbones.length} diamine backbone(s)`,
-      );
+      console.log(`[findMainChain] Found ${diamineBackbones.length} diamine backbone(s)`);
     }
 
     if (diamineBackbones.length > 0) {
       const bestDiaminePriority = Math.min(...diamineBackbonePriorities);
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[findMainChain] Best diamine priority: ${bestDiaminePriority}`,
-        );
+        console.log(`[findMainChain] Best diamine priority: ${bestDiaminePriority}`);
       }
 
       // Override minPriority to use amine priority (13) if we found a diamine backbone
@@ -606,10 +552,7 @@ export function findMainChain(
     // If we have functional groups, prefer chains with most carbons among best-priority chains
     const maxCarbonInPriority = Math.max(
       ...bestPriorityChains.map(
-        (c) =>
-          c.filter(
-            (idx) => molecule.atoms[idx] && molecule.atoms[idx].symbol === "C",
-          ).length,
+        (c) => c.filter((idx) => molecule.atoms[idx] && molecule.atoms[idx].symbol === "C").length,
       ),
     );
     for (const c of bestPriorityChains) {
@@ -629,23 +572,17 @@ export function findMainChain(
       }
       // If no carbon-only chains at maxCarbonLen, fall back to hetero chains
       if (candidates.length === 0) {
-        const maxAtomLen = atomChains.length
-          ? Math.max(...atomChains.map((c) => c.length))
-          : 0;
+        const maxAtomLen = atomChains.length ? Math.max(...atomChains.map((c) => c.length)) : 0;
         for (const c of atomChains) {
-          if (c.length === maxAtomLen && !containsHalogen(c, molecule))
-            candidates.push(c);
+          if (c.length === maxAtomLen && !containsHalogen(c, molecule)) candidates.push(c);
         }
       }
     } else {
       // No carbon chains at all: use longest hetero chains
-      const maxAtomLen = atomChains.length
-        ? Math.max(...atomChains.map((c) => c.length))
-        : 0;
+      const maxAtomLen = atomChains.length ? Math.max(...atomChains.map((c) => c.length)) : 0;
       if (maxAtomLen < 1) return [];
       for (const c of atomChains) {
-        if (c.length === maxAtomLen && !containsHalogen(c, molecule))
-          candidates.push(c);
+        if (c.length === maxAtomLen && !containsHalogen(c, molecule)) candidates.push(c);
       }
     }
   }
@@ -664,15 +601,11 @@ export function findMainChain(
   //    implemented below.
 
   // Compute functional-group priority for each candidate
-  const fgPriorities = candidates.map((c) =>
-    getChainFunctionalGroupPriority(c, molecule),
-  );
+  const fgPriorities = candidates.map((c) => getChainFunctionalGroupPriority(c, molecule));
   if (process.env.VERBOSE) {
     console.log("[findMainChain] Functional group priorities for candidates:");
     candidates.forEach((c, i) => {
-      console.log(
-        `  Chain ${i} [${c.join(",")}]: priority = ${fgPriorities[i]}`,
-      );
+      console.log(`  Chain ${i} [${c.join(",")}]: priority = ${fgPriorities[i]}`);
     });
   }
   const minFG = Math.min(...fgPriorities);
@@ -686,9 +619,7 @@ export function findMainChain(
     candidates.push(...filtered);
   } else {
     // No principal functional groups found in any candidate: prefer hydrocarbon chain(s)
-    const hydroCandidates = candidates.filter((c) =>
-      isHydrocarbonChain(c, molecule),
-    );
+    const hydroCandidates = candidates.filter((c) => isHydrocarbonChain(c, molecule));
     // Always check orientation even for single hydrocarbon candidates
     // if (hydroCandidates.length === 1) return hydroCandidates[0]!;
     if (hydroCandidates.length > 0) {
@@ -718,9 +649,7 @@ export function findMainChain(
     }
 
     if (maxAttachments > 0) {
-      const filteredByFG = candidates.filter(
-        (_, i) => fgAttachmentCounts[i] === maxAttachments,
-      );
+      const filteredByFG = candidates.filter((_, i) => fgAttachmentCounts[i] === maxAttachments);
       if (filteredByFG.length > 0) {
         candidates.length = 0;
         candidates.push(...filteredByFG);
@@ -742,10 +671,7 @@ export function findMainChain(
   for (const chain of candidates) {
     // Check for functional groups and orient chain to give them lowest numbers
     const fgPositions = getFunctionalGroupPositions(chain, molecule);
-    const fgPositionsReversed = getFunctionalGroupPositions(
-      [...chain].reverse(),
-      molecule,
-    );
+    const fgPositionsReversed = getFunctionalGroupPositions([...chain].reverse(), molecule);
 
     if (process.env.VERBOSE) {
       console.log(
@@ -774,9 +700,7 @@ export function findMainChain(
 
     // Calculate positions AFTER orienting the chain
     const substituents = findSubstituents(molecule, chosenChain);
-    const positions = substituents
-      .map((s) => parseInt(s.position))
-      .sort((a, b) => a - b);
+    const positions = substituents.map((s) => parseInt(s.position)).sort((a, b) => a - b);
     const count = substituents.length;
 
     if (bestPriorityLocants === null) {
@@ -797,9 +721,7 @@ export function findMainChain(
       bestPositions = positions;
       bestCount = count;
       bestPriorityLocants = chosenPriority;
-    } else if (
-      JSON.stringify(chosenPriority) === JSON.stringify(bestPriorityLocants)
-    ) {
+    } else if (JSON.stringify(chosenPriority) === JSON.stringify(bestPriorityLocants)) {
       if (process.env.VERBOSE) {
         console.log(
           `[findMainChain] Chain [${chosenChain}] has equal priority locants to [${bestChain}]`,
@@ -807,9 +729,7 @@ export function findMainChain(
       }
       if (isBetterByOpsinHeuristics(molecule, chosenChain, bestChain)) {
         if (process.env.VERBOSE) {
-          console.log(
-            `[findMainChain] Chain [${chosenChain}] is better by OPSIN heuristics`,
-          );
+          console.log(`[findMainChain] Chain [${chosenChain}] is better by OPSIN heuristics`);
         }
         bestChain = chosenChain;
         bestPositions = positions;

@@ -154,35 +154,21 @@ export function isBetterByOpsinHeuristics(
 
   if (process.env.VERBOSE) {
     console.log(`[isBetterByOpsinHeuristics] Comparing chains:`);
-    console.log(
-      `  Chain A [${aChain.join(",")}]: ${aSubs.length} substituents`,
-    );
-    aSubs.forEach((s) =>
-      console.log(`    pos=${s.position}, name=${s.name}, size=${s.size}`),
-    );
-    console.log(
-      `  Chain B [${bChain.join(",")}]: ${bSubs.length} substituents`,
-    );
-    bSubs.forEach((s) =>
-      console.log(`    pos=${s.position}, name=${s.name}, size=${s.size}`),
-    );
+    console.log(`  Chain A [${aChain.join(",")}]: ${aSubs.length} substituents`);
+    aSubs.forEach((s) => console.log(`    pos=${s.position}, name=${s.name}, size=${s.size}`));
+    console.log(`  Chain B [${bChain.join(",")}]: ${bSubs.length} substituents`);
+    bSubs.forEach((s) => console.log(`    pos=${s.position}, name=${s.name}, size=${s.size}`));
   }
 
   if (aSubs.length !== bSubs.length) return aSubs.length < bSubs.length;
 
   // Prefer chains where complex substituents (large size) are at lower positions
   // This handles cases like sulfonyl-sulfinyl where we want the complex group at position 1
-  const aComplexAtLowPos = aSubs.filter(
-    (s) => s.size >= 5 && parseInt(s.position) === 1,
-  ).length;
-  const bComplexAtLowPos = bSubs.filter(
-    (s) => s.size >= 5 && parseInt(s.position) === 1,
-  ).length;
+  const aComplexAtLowPos = aSubs.filter((s) => s.size >= 5 && parseInt(s.position) === 1).length;
+  const bComplexAtLowPos = bSubs.filter((s) => s.size >= 5 && parseInt(s.position) === 1).length;
   if (aComplexAtLowPos !== bComplexAtLowPos) {
     if (process.env.VERBOSE) {
-      console.log(
-        `  Complex subs at pos 1: A=${aComplexAtLowPos}, B=${bComplexAtLowPos}`,
-      );
+      console.log(`  Complex subs at pos 1: A=${aComplexAtLowPos}, B=${bComplexAtLowPos}`);
     }
     return aComplexAtLowPos > bComplexAtLowPos;
   }

@@ -1,8 +1,4 @@
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../types";
 import type { NamingSubstituent } from "../../naming/iupac-types";
 import type { Molecule, Atom } from "types";
 import type { OPSINService } from "../../opsin-service";
@@ -14,10 +10,7 @@ import { filterAcylKetones } from "./filtering/acyl-ketone-filter";
 import { nameSpecialSubstituent } from "./naming/special-substituent-namer";
 import { assembleHeteroatomSubstituents } from "./assembly/heteroatom-substituent-assembler";
 import { sortSubstituentsAlphabetically } from "./sorting/alphabetical-sorter";
-import {
-  filterSubstituents,
-  joinSubstituents,
-} from "./assembly/substituent-filter";
+import { filterSubstituents, joinSubstituents } from "./assembly/substituent-filter";
 import { transformPartiallySaturatedHeterocycle } from "./assembly/heterocycle-transformer";
 import { detectNSubstituents } from "./detection/n-substituent-detector";
 import {
@@ -43,10 +36,7 @@ export function buildSubstitutiveName(
   opsinService?: OPSINService,
 ): string {
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildSubstitutiveName] parentStructure.type:",
-      parentStructure.type,
-    );
+    console.log("[buildSubstitutiveName] parentStructure.type:", parentStructure.type);
     if (process.env.VERBOSE) {
       console.log(
         "[buildSubstitutiveName] parentStructure.substituents:",
@@ -86,9 +76,7 @@ export function buildSubstitutiveName(
 
   // Find principal functional group atoms to exclude from substituents
   const principalFG = functionalGroups.find((group) => group.isPrincipal);
-  const principalGroupAtomIds = principalFG
-    ? new Set(principalFG.atoms || [])
-    : new Set();
+  const principalGroupAtomIds = principalFG ? new Set(principalFG.atoms || []) : new Set();
   const principalFGPrefix = principalFG?.prefix; // e.g., "hydroxy" for alcohol
 
   if (process.env.VERBOSE) {
@@ -97,10 +85,7 @@ export function buildSubstitutiveName(
       Array.from(principalGroupAtomIds),
     );
     if (process.env.VERBOSE) {
-      console.log(
-        "[buildSubstitutiveName] principalFGPrefix:",
-        principalFGPrefix,
-      );
+      console.log("[buildSubstitutiveName] principalFGPrefix:", principalFGPrefix);
     }
   }
 
@@ -117,9 +102,7 @@ export function buildSubstitutiveName(
   // For chain parent structures, use parent substituents if they exist
   // Only add functional groups that are NOT already represented in parent substituents
   // This prevents double-counting ethers that are already named as alkoxy substituents
-  const parentStructuralSubstituents = (
-    parentStructure.substituents || []
-  ).filter((sub) => {
+  const parentStructuralSubstituents = (parentStructure.substituents || []).filter((sub) => {
     // Exclude if this substituent matches the principal functional group prefix
     // E.g., "hydroxy" substituent matches "alcohol" FG with prefix="hydroxy"
     if (principalFGPrefix && sub.type === principalFGPrefix) {
@@ -180,19 +163,17 @@ export function buildSubstitutiveName(
   // ============================================================================
 
   // Filter out functional groups whose atoms are part of the parent ring structure
-  const fgStructuralSubstituentFilteredByAtoms =
-    filterFunctionalGroupsByRingAtoms(
-      fgStructuralSubstituents,
-      parentStructure,
-    );
+  const fgStructuralSubstituentFilteredByAtoms = filterFunctionalGroupsByRingAtoms(
+    fgStructuralSubstituents,
+    parentStructure,
+  );
 
   // Filter out functional groups that are already incorporated in parent names
-  const fgStructuralSubstituentsFinal: FunctionalGroupExtended[] =
-    filterFunctionalGroupsByName(
-      fgStructuralSubstituentFilteredByAtoms,
-      parentStructure,
-      parentStructuralSubstituents,
-    );
+  const fgStructuralSubstituentsFinal: FunctionalGroupExtended[] = filterFunctionalGroupsByName(
+    fgStructuralSubstituentFilteredByAtoms,
+    parentStructure,
+    parentStructuralSubstituents,
+  );
 
   // Deduplicate parent substituents against functional group substituents
   const deduplicatedParentSubs = deduplicateSubstituents(
@@ -200,10 +181,7 @@ export function buildSubstitutiveName(
     parentStructuralSubstituents,
   );
 
-  let allStructuralSubstituents = [
-    ...fgStructuralSubstituentsFinal,
-    ...deduplicatedParentSubs,
-  ];
+  let allStructuralSubstituents = [...fgStructuralSubstituentsFinal, ...deduplicatedParentSubs];
 
   // ============================================================================
   // EARLY N-SUBSTITUENT DETECTION AND FILTERING
@@ -214,10 +192,7 @@ export function buildSubstitutiveName(
   // when they should be handled as N-substituents (e.g., "N-formyl-N-hydroxymethyl").
   // ============================================================================
   const principalAmineGroups = functionalGroups.filter(
-    (fg) =>
-      fg.isPrincipal &&
-      (fg.type === "amine" || fg.type === "imine") &&
-      fg.suffix === "amine",
+    (fg) => fg.isPrincipal && (fg.type === "amine" || fg.type === "imine") && fg.suffix === "amine",
   );
 
   if (principalAmineGroups.length > 0) {
@@ -227,9 +202,7 @@ export function buildSubstitutiveName(
       // Multiple amines → aggregate into multiplicative group
       const firstGroup = principalAmineGroups[0];
       if (!firstGroup) {
-        throw new Error(
-          "[buildSubstitutiveName] Expected at least one principal amine group",
-        );
+        throw new Error("[buildSubstitutiveName] Expected at least one principal amine group");
       }
       const allAtoms: Atom[] = [];
       const locants: number[] = [];
@@ -254,9 +227,7 @@ export function buildSubstitutiveName(
     }
 
     if (!tempPrincipalGroup) {
-      throw new Error(
-        "[buildSubstitutiveName] tempPrincipalGroup should not be undefined",
-      );
+      throw new Error("[buildSubstitutiveName] tempPrincipalGroup should not be undefined");
     }
 
     // Detect N-substituents early to get atom IDs
@@ -365,12 +336,7 @@ export function buildSubstitutiveName(
           allStructuralSubstituents.map((s) => ({
             type: s.type,
             name: s.name,
-            locant:
-              "locant" in s
-                ? s.locant
-                : "locants" in s
-                  ? s.locants?.[0]
-                  : undefined,
+            locant: "locant" in s ? s.locant : "locants" in s ? s.locants?.[0] : undefined,
           })),
         ),
       );
@@ -380,8 +346,7 @@ export function buildSubstitutiveName(
   if (allStructuralSubstituents.length > 0) {
     // Build substituent names with locants and multiplicative prefixes
     const substituentParts: string[] = [];
-    const _size =
-      parentStructure.type === "ring" ? parentStructure.size || 0 : 0;
+    const _size = parentStructure.type === "ring" ? parentStructure.size || 0 : 0;
     const isHeteroatomParent = parentStructure.type === "heteroatom";
 
     if (isHeteroatomParent) {
@@ -404,10 +369,7 @@ export function buildSubstitutiveName(
 
         // Skip N-substituents on amines/imines - they will be detected and handled separately
         // by detectNSubstituents() later in the process
-        if (
-          principalFG &&
-          (principalFG.type === "amine" || principalFG.type === "imine")
-        ) {
+        if (principalFG && (principalFG.type === "amine" || principalFG.type === "imine")) {
           const subLocant = "locant" in sub ? sub.locant : undefined;
 
           // For amine chains, check if this is attached to the nitrogen
@@ -418,9 +380,7 @@ export function buildSubstitutiveName(
             parentStructure.chain.atoms.length > 0
           ) {
             const firstChainAtomId = parentStructure.chain.atoms[0]?.id;
-            const firstChainAtom = molecule.atoms.find(
-              (a) => a.id === firstChainAtomId,
-            );
+            const firstChainAtom = molecule.atoms.find((a) => a.id === firstChainAtomId);
             if (firstChainAtom?.symbol === "N") {
               if (process.env.VERBOSE) {
                 console.log(
@@ -433,13 +393,9 @@ export function buildSubstitutiveName(
         }
 
         // For alkoxy groups, use the prefix (e.g., 'methoxy') instead of type ('alkoxy')
-        const assembledName =
-          "assembledName" in sub ? sub.assembledName : undefined;
+        const assembledName = "assembledName" in sub ? sub.assembledName : undefined;
         const prefix = "prefix" in sub ? sub.prefix : undefined;
-        let subName =
-          assembledName ||
-          sub.name ||
-          (sub.type === "alkoxy" ? prefix : sub.type);
+        let subName = assembledName || sub.name || (sub.type === "alkoxy" ? prefix : sub.type);
 
         if (process.env.VERBOSE) {
           console.log(
@@ -462,8 +418,7 @@ export function buildSubstitutiveName(
 
         if (subName) {
           // Check if assembledName already includes locants (e.g., "4-methoxy")
-          const alreadyHasLocants =
-            assembledName && /^\d+-/.test(assembledName);
+          const alreadyHasLocants = assembledName && /^\d+-/.test(assembledName);
 
           if (alreadyHasLocants) {
             // If assembledName already has locants, use it as-is without grouping
@@ -476,15 +431,9 @@ export function buildSubstitutiveName(
 
             // Special handling for multiplicative groups (e.g., dinitro with locants=[1,3])
             // These groups have already been aggregated and have all locants in the array
-            const isMultiplicative =
-              "isMultiplicative" in sub && sub.isMultiplicative;
+            const isMultiplicative = "isMultiplicative" in sub && sub.isMultiplicative;
 
-            if (
-              isMultiplicative &&
-              "locants" in sub &&
-              sub.locants &&
-              sub.locants.length > 1
-            ) {
+            if (isMultiplicative && "locants" in sub && sub.locants && sub.locants.length > 1) {
               // Push all locants for multiplicative groups
               substituentGroups.get(subName)!.push(...sub.locants);
             } else {
@@ -502,9 +451,7 @@ export function buildSubstitutiveName(
                 const subLocant = "locant" in sub ? sub.locant : undefined;
                 const subLocants = "locants" in sub ? sub.locants : undefined;
                 const subPosition =
-                  "position" in sub
-                    ? (sub as { position: string }).position
-                    : undefined;
+                  "position" in sub ? (sub as { position: string }).position : undefined;
                 if (process.env.VERBOSE) {
                   console.log(
                     `[LOCANT DEBUG] sub.type=${sub.type}, sub.name=${sub.name}, sub.locant=${subLocant}, sub.locants=${JSON.stringify(subLocants)}, sub.position=${subPosition}, calculated locant=${locant}, isMultiplicative=${isMultiplicative}`,
@@ -520,23 +467,20 @@ export function buildSubstitutiveName(
       }
       // Check if there are multiple substituent types or multiple positions
       const _hasMultipleStructuralSubstituentTypes = substituentGroups.size > 1;
-      const totalStructuralSubstituents = Array.from(
-        substituentGroups.values(),
-      ).reduce((sum, locs) => sum + locs.length, 0);
+      const totalStructuralSubstituents = Array.from(substituentGroups.values()).reduce(
+        (sum, locs) => sum + locs.length,
+        0,
+      );
 
       // Count substituents that already have locants in their assembledName (e.g., "4-nitro")
       // These are not in substituentGroups but will be added directly to substituentParts
-      const preAssembledSubstituentsCount = allStructuralSubstituents.filter(
-        (sub) => {
-          const assembledName =
-            "assembledName" in sub ? sub.assembledName : undefined;
-          return assembledName && /^\d+-/.test(assembledName);
-        },
-      ).length;
+      const preAssembledSubstituentsCount = allStructuralSubstituents.filter((sub) => {
+        const assembledName = "assembledName" in sub ? sub.assembledName : undefined;
+        return assembledName && /^\d+-/.test(assembledName);
+      }).length;
 
       // Total count including both grouped and pre-assembled substituents
-      const totalAllSubstituentsCount =
-        totalStructuralSubstituents + preAssembledSubstituentsCount;
+      const totalAllSubstituentsCount = totalStructuralSubstituents + preAssembledSubstituentsCount;
 
       if (process.env.VERBOSE) {
         console.log(
@@ -553,10 +497,8 @@ export function buildSubstitutiveName(
         // BUT only if it's the ONLY substituent on the ring
         // Note: totalStructuralSubstituents includes ALL substituents (both structural like "methyl"
         // and functional groups like "nitro"), so we can use it to check if this is the only one
-        const parentName =
-          parentStructure.assembledName || parentStructure.name || "";
-        const isSymmetricRing =
-          parentName.includes("benzene") || parentName.includes("cyclo");
+        const parentName = parentStructure.assembledName || parentStructure.name || "";
+        const isSymmetricRing = parentName.includes("benzene") || parentName.includes("cyclo");
         const isSingleStructuralSubstituentOnly =
           locants.length === 1 &&
           locants[0] === 1 &&
@@ -569,16 +511,12 @@ export function buildSubstitutiveName(
         const isChainParent = parentStructure.type === "chain";
         const isTerminalPosition = locants.length === 1 && locants[0] === 1;
         const isSingleSubstituent = totalAllSubstituentsCount === 1;
-        const isHalogen = ["chloro", "bromo", "fluoro", "iodo"].includes(
-          subName,
-        );
+        const isHalogen = ["chloro", "bromo", "fluoro", "iodo"].includes(subName);
         const isSaturated =
-          isChainParent &&
-          (parentStructure.chain?.multipleBonds?.length ?? 0) === 0;
+          isChainParent && (parentStructure.chain?.multipleBonds?.length ?? 0) === 0;
         const hasNoHeteroatoms =
           isChainParent &&
-          (parentStructure.chain?.atoms?.every((atom) => atom.symbol === "C") ??
-            true);
+          (parentStructure.chain?.atoms?.every((atom) => atom.symbol === "C") ?? true);
         const isSimpleTerminalHalogen =
           isChainParent &&
           isTerminalPosition &&
@@ -588,23 +526,17 @@ export function buildSubstitutiveName(
           hasNoHeteroatoms;
 
         // For C1 chains (methane), always omit position 1 locant
-        const isC1Chain =
-          isChainParent && (parentStructure.chain?.length ?? 0) === 1;
+        const isC1Chain = isChainParent && (parentStructure.chain?.length ?? 0) === 1;
         const shouldOmitC1Locant = isC1Chain && isTerminalPosition;
 
         const needsLocant =
-          !isSingleStructuralSubstituentOnly &&
-          !isSimpleTerminalHalogen &&
-          !shouldOmitC1Locant;
+          !isSingleStructuralSubstituentOnly && !isSimpleTerminalHalogen && !shouldOmitC1Locant;
 
         // For amines, replace numeric position "1" with "N" if position 1 is nitrogen
         const isAmine = principalFG?.type === "amine";
-        const firstAtomIsNitrogen =
-          isAmine && parentStructure.chain?.atoms?.[0]?.symbol === "N";
+        const firstAtomIsNitrogen = isAmine && parentStructure.chain?.atoms?.[0]?.symbol === "N";
         const locantList = needsLocant
-          ? locants.map((loc) =>
-              firstAtomIsNitrogen && loc === 1 ? "N" : String(loc),
-            )
+          ? locants.map((loc) => (firstAtomIsNitrogen && loc === 1 ? "N" : String(loc)))
           : [];
         const locantStr = needsLocant ? locantList.join(",") + "-" : "";
 
@@ -619,8 +551,7 @@ export function buildSubstitutiveName(
         // Do NOT use square brackets for:
         // - Simple locants: "2,2-dimethylpropyl" (just use parentheses)
         // - Linear chains: "2,2-dimethylpropylsulfonyl" (no nesting, use parentheses)
-        const hasNestedParentheses =
-          subName.includes("(") && subName.includes(")");
+        const hasNestedParentheses = subName.includes("(") && subName.includes(")");
 
         // Also check for complex yl groups that need wrapping
         const hasComplexYlGroup = /\d+-\w+an-\d+-yl/.test(subName); // Pattern: 2-methylbutan-2-yl
@@ -648,8 +579,7 @@ export function buildSubstitutiveName(
           /\d+-\w+oyl$/.test(subName) && subName.split("-").length > 1;
         // For C1 chains with single substituent and no locant, don't wrap
         // Example: CS(=O)C -> "methylsulfinylmethane" not "(methylsulfinyl)methane"
-        const isC1ChainSingleSub =
-          isC1Chain && isSingleSubstituent && isTerminalPosition;
+        const isC1ChainSingleSub = isC1Chain && isSingleSubstituent && isTerminalPosition;
 
         const needsWrapping =
           !isC1ChainSingleSub &&
@@ -682,10 +612,7 @@ export function buildSubstitutiveName(
         // Use square brackets ONLY for nested substituents with parentheses
         // Use regular parentheses for simple complex substituents
         // Per IUPAC P-14.4: square brackets distinguish nested complex substituents for alphabetization
-        if (
-          process.env.VERBOSE &&
-          (subName.includes("methyl") || subName.includes("propyl"))
-        ) {
+        if (process.env.VERBOSE && (subName.includes("methyl") || subName.includes("propyl"))) {
           if (process.env.VERBOSE) {
             console.log(
               `[WRAP DEBUG] subName="${subName}", hasNestedParentheses=${hasNestedParentheses}, needsWrapping=${needsWrapping}, alreadyWrapped=${alreadyWrapped}`,
@@ -731,10 +658,7 @@ export function buildSubstitutiveName(
     // 4. If multiple substituents on heteroatom (no locants): join directly → "ethylmethylsilane"
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[DEBUG] substituentParts before join:",
-        JSON.stringify(substituentParts),
-      );
+      console.log("[DEBUG] substituentParts before join:", JSON.stringify(substituentParts));
       console.log("[DEBUG] isHeteroatomParent:", isHeteroatomParent);
     }
 
@@ -756,10 +680,7 @@ export function buildSubstitutiveName(
       name += joined;
 
       if (process.env.VERBOSE) {
-        console.log(
-          "[buildSubstitutiveName] name after adding substituents:",
-          name,
-        );
+        console.log("[buildSubstitutiveName] name after adding substituents:", name);
       }
     }
   }
@@ -778,16 +699,11 @@ export function buildSubstitutiveName(
     }
   }
 
-  const parentName =
-    parentStructure.assembledName || parentStructure.name || "unknown";
+  const parentName = parentStructure.assembledName || parentStructure.name || "unknown";
 
   // If we have substituents and the parent name starts with a digit (locant), add hyphen
   // Example: "5-methoxy" + "2-hexyl-2-methylbutane" → "5-methoxy-2-hexyl-2-methylbutane"
-  if (
-    allStructuralSubstituents.length > 0 &&
-    name.length > 0 &&
-    /^\d/.test(parentName)
-  ) {
+  if (allStructuralSubstituents.length > 0 && name.length > 0 && /^\d/.test(parentName)) {
     name += "-";
   }
 
@@ -798,9 +714,7 @@ export function buildSubstitutiveName(
 
   // Add principal functional group suffix
   // Aggregate multiple principal groups of the same type into a single multiplicative group
-  const allPrincipalGroups = functionalGroups.filter(
-    (group) => group.isPrincipal,
-  );
+  const allPrincipalGroups = functionalGroups.filter((group) => group.isPrincipal);
 
   let principalGroup: FunctionalGroup | undefined;
   if (allPrincipalGroups.length > 1) {
@@ -842,10 +756,7 @@ export function buildSubstitutiveName(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildSubstitutiveName] principalGroup:",
-      JSON.stringify(principalGroup),
-    );
+    console.log("[buildSubstitutiveName] principalGroup:", JSON.stringify(principalGroup));
   }
 
   // Check if the principal group is already incorporated into a substituent
@@ -869,11 +780,7 @@ export function buildSubstitutiveName(
     }
   }
 
-  if (
-    principalGroup &&
-    principalGroup.suffix &&
-    !principalGroupIsInSubstituent
-  ) {
+  if (principalGroup && principalGroup.suffix && !principalGroupIsInSubstituent) {
     // PREFERRED NAMES: Use systematic names for simple carboxylic acids (C1-C3)
     // According to IUPAC Blue Book:
     // - methanoic acid (C1): HCOOH - no substituents (nowhere to put them)
@@ -881,18 +788,12 @@ export function buildSubstitutiveName(
     // - propanoic acid (C3): CH3CH2COOH - systematic name can be used WITH substituents
     const chainLength = parentStructure.chain?.length || 0;
     if (process.env.VERBOSE) {
-      console.log(
-        `[PREFERRED NAME CHECK] principalGroup.type=${principalGroup.type}`,
-      );
+      console.log(`[PREFERRED NAME CHECK] principalGroup.type=${principalGroup.type}`);
       if (process.env.VERBOSE) {
-        console.log(
-          `[PREFERRED NAME CHECK] principalGroup.suffix=${principalGroup.suffix}`,
-        );
+        console.log(`[PREFERRED NAME CHECK] principalGroup.suffix=${principalGroup.suffix}`);
       }
       if (process.env.VERBOSE) {
-        console.log(
-          `[PREFERRED NAME CHECK] parentStructure.type=${parentStructure.type}`,
-        );
+        console.log(`[PREFERRED NAME CHECK] parentStructure.type=${parentStructure.type}`);
       }
       if (process.env.VERBOSE) {
         console.log(
@@ -932,10 +833,7 @@ export function buildSubstitutiveName(
         // At this point, `name` contains: substituents + parentName
         // We need to remove the parentName and replace with the retained name
         // e.g., "2-[thiazol-4-yl]ethane" → "2-[thiazol-4-yl]ethanoic acid"
-        const nameWithoutParent = name.slice(
-          0,
-          name.length - parentName.length,
-        );
+        const nameWithoutParent = name.slice(0, name.length - parentName.length);
         return nameWithoutParent + preferredAcidNames[chainLength];
       }
     }
@@ -966,10 +864,7 @@ export function buildSubstitutiveName(
     let nSubstituentEntries: Array<{ locant: string; name: string }> = [];
 
     // Handle multiplicative suffix (e.g., dione, trione)
-    if (
-      principalGroup.isMultiplicative &&
-      (principalGroup.multiplicity ?? 0) > 1
-    ) {
+    if (principalGroup.isMultiplicative && (principalGroup.multiplicity ?? 0) > 1) {
       // For multiplicative suffixes starting with a consonant, keep the terminal 'e'
       // This follows IUPAC rule P-16.3.1: hexane-2,4-dione (not hexan-2,4-dione)
       // Build suffix: "dione", "trione", etc.
@@ -1016,9 +911,7 @@ export function buildSubstitutiveName(
         nSubstituentsPrefix = nSubstResult.prefix;
         nSubstituentAtomIds = nSubstResult.atomIds;
         if (process.env.VERBOSE) {
-          console.log(
-            `[buildSubstitutiveName] N-substituents detected: "${nSubstituentsPrefix}"`,
-          );
+          console.log(`[buildSubstitutiveName] N-substituents detected: "${nSubstituentsPrefix}"`);
           console.log(
             `[buildSubstitutiveName] N-substituent atom IDs: ${Array.from(nSubstituentAtomIds).join(",")}`,
           );
@@ -1027,8 +920,7 @@ export function buildSubstitutiveName(
         // Parse N-substituent string to extract locants and base name
         // Input format: "N,N'-diformyl-N,N'-dihydroxymethyl" or "N-methyl-N'-ethyl"
         if (nSubstituentsPrefix) {
-          nSubstituentEntries =
-            parseNSubstituentsMultiplicative(nSubstituentsPrefix);
+          nSubstituentEntries = parseNSubstituentsMultiplicative(nSubstituentsPrefix);
 
           if (process.env.VERBOSE) {
             console.log(
@@ -1049,9 +941,7 @@ export function buildSubstitutiveName(
 
         // Build the N-substituent prefix
         // Join N-substituents with hyphens
-        const nSubstParts = nSubstituentEntries.map(
-          (entry) => `${entry.locant}-${entry.name}`,
-        );
+        const nSubstParts = nSubstituentEntries.map((entry) => `${entry.locant}-${entry.name}`);
         const nSubstPrefix = nSubstParts.join("-");
 
         // For multiplicative amines, N-substituents attach directly to parent name without hyphen
@@ -1059,9 +949,7 @@ export function buildSubstitutiveName(
         name = `${nSubstPrefix}${name}`;
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[buildSubstitutiveName] Name after prepending N-substituents: "${name}"`,
-          );
+          console.log(`[buildSubstitutiveName] Name after prepending N-substituents: "${name}"`);
         }
       }
     } else {
@@ -1099,10 +987,7 @@ export function buildSubstitutiveName(
         const matchingStructuralSubstituent = parentStructure.substituents.find(
           (sub) => sub.type === principalGroup.prefix,
         );
-        if (
-          matchingStructuralSubstituent &&
-          "locant" in matchingStructuralSubstituent
-        ) {
+        if (matchingStructuralSubstituent && "locant" in matchingStructuralSubstituent) {
           fgLocant = matchingStructuralSubstituent.locant;
           if (process.env.VERBOSE) {
             console.log(
@@ -1131,8 +1016,7 @@ export function buildSubstitutiveName(
       // According to IUPAC nomenclature, locants should always be included for principal functional groups
       // including alcohols at position 1 (e.g., "pentan-1-ol" not "pentanol")
       // Exception: very simple cases like "ethanol" may omit the locant by common usage
-      const _parentName =
-        parentStructure.assembledName || parentStructure.name || "";
+      const _parentName = parentStructure.assembledName || parentStructure.name || "";
 
       // For amines, count only carbons in the chain (nitrogen is not counted)
       const isAmine = principalGroup.type === "amine";
@@ -1143,12 +1027,7 @@ export function buildSubstitutiveName(
       const needsLocant = fgLocant !== undefined && fgLocant !== null;
 
       // Functional groups that never need locant when at position 1 on a chain (terminal groups)
-      const terminalGroups = [
-        "amide",
-        "carboxylic_acid",
-        "aldehyde",
-        "nitrile",
-      ];
+      const terminalGroups = ["amide", "carboxylic_acid", "aldehyde", "nitrile"];
       const isTerminalGroup = terminalGroups.includes(principalGroup.type);
 
       // Check if this is an unsubstituted monocyclic ketone with a single carbonyl at position 1
@@ -1179,12 +1058,8 @@ export function buildSubstitutiveName(
       //    NOTE: Only "-1-" is optional; other locants like "-2-", "-3-" must always be included.
       //    If substituents are present, "-1-" must be kept: "4-methoxycycloheptan-1-one"
       const shouldOmitLocant =
-        (chainLength <= 2 &&
-          fgLocant === 1 &&
-          parentStructure.type === "chain") ||
-        (isTerminalGroup &&
-          fgLocant === 1 &&
-          parentStructure.type === "chain") ||
+        (chainLength <= 2 && fgLocant === 1 && parentStructure.type === "chain") ||
+        (isTerminalGroup && fgLocant === 1 && parentStructure.type === "chain") ||
         isSingleCyclicKetone;
 
       if (process.env.VERBOSE) {
@@ -1211,9 +1086,7 @@ export function buildSubstitutiveName(
         nSubstituentsPrefix = nSubstResult.prefix;
         nSubstituentAtomIds = nSubstResult.atomIds;
         if (process.env.VERBOSE) {
-          console.log(
-            `[buildSubstitutiveName] N-substituents detected: "${nSubstituentsPrefix}"`,
-          );
+          console.log(`[buildSubstitutiveName] N-substituents detected: "${nSubstituentsPrefix}"`);
           console.log(
             `[buildSubstitutiveName] N-substituent atom IDs: ${Array.from(nSubstituentAtomIds).join(",")}`,
           );
@@ -1235,12 +1108,7 @@ export function buildSubstitutiveName(
 
       // Merge N-substituents with existing substituents and re-sort alphabetically
       if (nSubstituentEntries.length > 0) {
-        name = mergeNSubstituentsWithName(
-          name,
-          nSubstituentEntries,
-          parentStructure,
-          opsinService,
-        );
+        name = mergeNSubstituentsWithName(name, nSubstituentEntries, parentStructure, opsinService);
       }
 
       if (needsLocant && fgLocant && !shouldOmitLocant) {

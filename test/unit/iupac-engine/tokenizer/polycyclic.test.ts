@@ -95,8 +95,7 @@ describe("Polycyclic Compound IUPAC Parsing", () => {
     });
 
     it("should tokenize 8,15,19-trioxapentacyclo[12.3.2.0^1,13.0^2,10.0^6,10]nonadec-5-en-7-one correctly", () => {
-      const iupacName =
-        "8,15,19-trioxapentacyclo[12.3.2.0^1,13.0^2,10.0^6,10]nonadec-5-en-7-one";
+      const iupacName = "8,15,19-trioxapentacyclo[12.3.2.0^1,13.0^2,10.0^6,10]nonadec-5-en-7-one";
       const result = tokenizer.tokenize(iupacName);
 
       expect(result.errors.length).toBe(0);
@@ -109,8 +108,7 @@ describe("Polycyclic Compound IUPAC Parsing", () => {
 
   describe("Hexacyclic Systems - Tokenization", () => {
     it("should tokenize hexacyclo[...] patterns", () => {
-      const iupacName =
-        "hexacyclo[15.3.2.2^3,7.1^2,12.0^13,21.0^11,25]pentacosane";
+      const iupacName = "hexacyclo[15.3.2.2^3,7.1^2,12.0^13,21.0^11,25]pentacosane";
       const result = tokenizer.tokenize(iupacName);
 
       expect(result.errors.length).toBe(0);
@@ -122,8 +120,7 @@ describe("Polycyclic Compound IUPAC Parsing", () => {
 
   describe("Heptacyclic Systems - Tokenization", () => {
     it("should tokenize heptacyclo[...] patterns", () => {
-      const iupacName =
-        "heptacyclo[12.7.1.1^2,9.1^3,6.0^2,13.0^3,7.0^18,22]docosane";
+      const iupacName = "heptacyclo[12.7.1.1^2,9.1^3,6.0^2,13.0^3,7.0^18,22]docosane";
       const result = tokenizer.tokenize(iupacName);
 
       expect(result.errors.length).toBe(0);

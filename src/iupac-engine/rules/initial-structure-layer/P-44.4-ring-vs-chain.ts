@@ -44,9 +44,7 @@ function createFilteredRingInfo(
       getRingsContainingAtom: (atomId: number) =>
         systemRings.filter((ring) => ring.includes(atomId)),
       areBothAtomsInSameRing: (atom1: number, atom2: number) =>
-        systemRings.some(
-          (ring) => ring.includes(atom1) && ring.includes(atom2),
-        ),
+        systemRings.some((ring) => ring.includes(atom1) && ring.includes(atom2)),
     };
   }
 
@@ -92,35 +90,24 @@ function isChainNArylFromRing(
   molecule: { atoms: readonly Atom[]; bonds: readonly Bond[] },
   candidateRings: RingSystem[] | undefined,
 ): boolean {
-  if (
-    !chain ||
-    chain.length < 2 ||
-    !candidateRings ||
-    candidateRings.length === 0
-  ) {
+  if (!chain || chain.length < 2 || !candidateRings || candidateRings.length === 0) {
     return false;
   }
 
   const firstAtom = molecule.atoms[chain[0]!];
   if (!firstAtom || firstAtom.symbol !== "N") {
     if (process.env.VERBOSE) {
-      console.log(
-        `[isChainNArylFromRing] First atom is not nitrogen: ${firstAtom?.symbol}`,
-      );
+      console.log(`[isChainNArylFromRing] First atom is not nitrogen: ${firstAtom?.symbol}`);
     }
     return false;
   }
 
   // Check if the nitrogen is in a ring
-  const nitrogenRings = candidateRings.filter((ring) =>
-    ring.atoms.some((a) => a.id === chain[0]),
-  );
+  const nitrogenRings = candidateRings.filter((ring) => ring.atoms.some((a) => a.id === chain[0]));
   if (nitrogenRings.length > 0) {
     // Nitrogen is IN a ring, not exocyclic
     if (process.env.VERBOSE) {
-      console.log(
-        `[isChainNArylFromRing] Nitrogen is in a ring, not exocyclic`,
-      );
+      console.log(`[isChainNArylFromRing] Nitrogen is in a ring, not exocyclic`);
     }
     return false;
   }
@@ -130,11 +117,7 @@ function isChainNArylFromRing(
   let hasBondToRing = false;
   for (const bond of molecule.bonds) {
     const otherAtomId =
-      bond.atom1 === nitrogenId
-        ? bond.atom2
-        : bond.atom2 === nitrogenId
-          ? bond.atom1
-          : null;
+      bond.atom1 === nitrogenId ? bond.atom2 : bond.atom2 === nitrogenId ? bond.atom1 : null;
     if (otherAtomId === null) continue;
 
     // Check if the other atom is in a candidate ring
@@ -149,9 +132,7 @@ function isChainNArylFromRing(
 
   if (!hasBondToRing) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[isChainNArylFromRing] Nitrogen ${nitrogenId} is not bonded to any ring atom`,
-      );
+      console.log(`[isChainNArylFromRing] Nitrogen ${nitrogenId} is not bonded to any ring atom`);
     }
     return false;
   }
@@ -160,9 +141,7 @@ function isChainNArylFromRing(
   const chainRest = chain.slice(1);
   if (chainRest.length !== 6) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[isChainNArylFromRing] Chain rest length is ${chainRest.length}, not 6`,
-      );
+      console.log(`[isChainNArylFromRing] Chain rest length is ${chainRest.length}, not 6`);
     }
     return false;
   }
@@ -232,9 +211,7 @@ function isNArylSubstituent(
   const nitrogenAtom = molecule.atoms[nitrogenId];
   if (!nitrogenAtom || nitrogenAtom.symbol !== "N") {
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.4 isNArylSubstituent] Atom ${nitrogenId} is not nitrogen`,
-      );
+      console.log(`[P-44.4 isNArylSubstituent] Atom ${nitrogenId} is not nitrogen`);
     }
     return false;
   }
@@ -287,9 +264,7 @@ function isNArylSubstituent(
 
   if (!hasBondToRing) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.4 isNArylSubstituent] Nitrogen ${nitrogenId} NOT bonded to any ring atom`,
-      );
+      console.log(`[P-44.4 isNArylSubstituent] Nitrogen ${nitrogenId} NOT bonded to any ring atom`);
     }
     return false;
   }
@@ -344,9 +319,7 @@ function isNArylSubstituent(
           });
 
           if (process.env.VERBOSE) {
-            console.log(
-              `[P-44.4 isNArylSubstituent] All atoms aromatic carbons? ${allAromatic}`,
-            );
+            console.log(`[P-44.4 isNArylSubstituent] All atoms aromatic carbons? ${allAromatic}`);
           }
 
           if (allAromatic) {
@@ -363,9 +336,7 @@ function isNArylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[P-44.4 isNArylSubstituent] No aromatic benzene ring found - NOT N-aryl`,
-    );
+    console.log(`[P-44.4 isNArylSubstituent] No aromatic benzene ring found - NOT N-aryl`);
   }
   return false;
 }
@@ -408,11 +379,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     }
 
     // Modified condition: allow execution if we have rings, even without chains
-    if (
-      !candidateRings ||
-      candidateRings.length === 0 ||
-      context.getState().parentStructure
-    ) {
+    if (!candidateRings || candidateRings.length === 0 || context.getState().parentStructure) {
       return false;
     }
 
@@ -430,9 +397,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
       Bi: 3,
     };
 
-    const heteroatoms = molecule.atoms.filter((atom) =>
-      HETEROATOM_HYDRIDES.includes(atom.symbol),
-    );
+    const heteroatoms = molecule.atoms.filter((atom) => HETEROATOM_HYDRIDES.includes(atom.symbol));
 
     // If exactly one heteroatom with correct valence exists, P-2.1 should handle it
     if (heteroatoms.length === 1) {
@@ -440,10 +405,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
       const implicitHydrogens = heteroatom.hydrogens || 0;
       const heteroatomIndex = molecule.atoms.indexOf(heteroatom);
       const bondOrders = molecule.bonds
-        .filter(
-          (bond) =>
-            bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
-        )
+        .filter((bond) => bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex)
         .reduce((sum, bond) => {
           const order =
             bond.type === "single"
@@ -460,8 +422,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
 
       if (totalValence === expectedValence) {
         // Heteroatom parent is present - let P-2.1 handle it
-        if (process.env.VERBOSE)
-          console.log("P-44.4: deferring to P-2.1 heteroatom parent");
+        if (process.env.VERBOSE) console.log("P-44.4: deferring to P-2.1 heteroatom parent");
         return false;
       }
     }
@@ -474,41 +435,29 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     if (process.env.VERBOSE) {
       console.log(`[P-44.4] principalGroups count: ${principalGroups.length}`);
       principalGroups.forEach((pg, idx) => {
-        const atomIds = pg.atoms?.map((a) =>
-          typeof a === "object" ? a.id : a,
-        );
+        const atomIds = pg.atoms?.map((a) => (typeof a === "object" ? a.id : a));
         console.log(
           `[P-44.4]   PG ${idx}: name="${pg.name}", type="${pg.type}", atoms=[${atomIds?.join(",")}]`,
         );
       });
     }
 
-    if (
-      principalGroups.length > 0 &&
-      candidateChains &&
-      candidateChains.length > 0
-    ) {
+    if (principalGroups.length > 0 && candidateChains && candidateChains.length > 0) {
       // Count FGs on rings
       // IMPORTANT: Count FG as "on ring" if:
       // 1. Its ATTACHMENT POINT is in the ring, OR
       // 2. It's directly bonded to a ring atom (e.g., N-aryl amine on thiazoline)
       let ringFGCount = 0;
-      const ringAtomIds = new Set(
-        candidateRings.flatMap((ring) => ring.atoms.map((a) => a.id)),
-      );
+      const ringAtomIds = new Set(candidateRings.flatMap((ring) => ring.atoms.map((a) => a.id)));
 
       for (const pg of principalGroups) {
         const pgAtoms = pg.atoms || [];
         if (pgAtoms.length === 0) continue;
 
-        const pgAtomIds = pgAtoms.map((a) =>
-          typeof a === "object" ? a.id : a,
-        );
+        const pgAtomIds = pgAtoms.map((a) => (typeof a === "object" ? a.id : a));
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[P-44.4] Checking FG "${pg.name}" with atoms [${pgAtomIds.join(",")}]`,
-          );
+          console.log(`[P-44.4] Checking FG "${pg.name}" with atoms [${pgAtomIds.join(",")}]`);
         }
 
         // Check if ANY atom in the FG is in the ring or bonded to a ring atom
@@ -530,8 +479,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           // Check if this FG atom is directly bonded to a ring atom
           for (const bond of molecule.bonds) {
             if (bond.atom1 === fgAtomId || bond.atom2 === fgAtomId) {
-              const otherAtomId =
-                bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
               if (ringAtomIds.has(otherAtomId)) {
                 const ringAtom = molecule.atoms[otherAtomId];
 
@@ -539,9 +487,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
                 // FG heteroatom (N, O, S) bonded to aromatic ring
                 if (
                   fgAtom &&
-                  (fgAtom.symbol === "N" ||
-                    fgAtom.symbol === "O" ||
-                    fgAtom.symbol === "S") &&
+                  (fgAtom.symbol === "N" || fgAtom.symbol === "O" || fgAtom.symbol === "S") &&
                   ringAtom &&
                   ringAtom.aromatic
                 ) {
@@ -572,9 +518,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
         // (the aromatic ring is a substituent on the FG, not vice versa)
         if (isNArylOrOArylPattern) {
           if (process.env.VERBOSE) {
-            console.log(
-              `[P-44.4]   → Not counting as ring FG (${pg.type} is N-aryl/O-aryl)`,
-            );
+            console.log(`[P-44.4]   → Not counting as ring FG (${pg.type} is N-aryl/O-aryl)`);
           }
         } else if (isAttachedToRing) {
           ringFGCount++;
@@ -599,9 +543,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           if (!attachmentAtom) continue;
 
           const attachmentAtomId =
-            typeof attachmentAtom === "object"
-              ? attachmentAtom.id
-              : attachmentAtom;
+            typeof attachmentAtom === "object" ? attachmentAtom.id : attachmentAtom;
 
           // Check if attachment point is in chain
           if (chainAtomIds.has(attachmentAtomId)) {
@@ -612,9 +554,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.4] FG count: ring=${ringFGCount}, chain=${chainFGCount}`,
-        );
+        console.log(`[P-44.4] FG count: ring=${ringFGCount}, chain=${chainFGCount}`);
       }
 
       // P-44.1.1: If chains have MORE FGs than rings, defer to chain selection
@@ -634,16 +574,10 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
         let hasNArylPattern = false;
         if (candidateChains && candidateChains.length > 0) {
           if (process.env.VERBOSE) {
-            console.log(
-              `[P-44.4] Checking ${candidateChains.length} chains for N-aryl pattern`,
-            );
-            console.log(
-              `[P-44.4] candidateRings count: ${candidateRings.length}`,
-            );
+            console.log(`[P-44.4] Checking ${candidateChains.length} chains for N-aryl pattern`);
+            console.log(`[P-44.4] candidateRings count: ${candidateRings.length}`);
             candidateRings.forEach((ring, i) => {
-              console.log(
-                `[P-44.4]   Ring ${i}: [${ring.atoms.map((a) => a.id).join(",")}]`,
-              );
+              console.log(`[P-44.4]   Ring ${i}: [${ring.atoms.map((a) => a.id).join(",")}]`);
             });
           }
           for (const chain of candidateChains) {
@@ -667,8 +601,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
 
         // If no N-aryl pattern, compare sizes
         if (!hasNArylPattern) {
-          const ringSize =
-            candidateRings[0]?.size || candidateRings[0]?.atoms?.length || 0;
+          const ringSize = candidateRings[0]?.size || candidateRings[0]?.atoms?.length || 0;
           const chainLength = candidateChains[0]?.atoms?.length || 0;
 
           if (chainLength > ringSize) {
@@ -707,14 +640,10 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
 
     // Preserve von Baeyer numbering from P-2.3 if it exists
     const existingParentStructure = context.getState().parentStructure;
-    const existingVonBaeyerNumbering =
-      existingParentStructure?.vonBaeyerNumbering;
+    const existingVonBaeyerNumbering = existingParentStructure?.vonBaeyerNumbering;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.4 ACTION] existingParentStructure:`,
-        !!existingParentStructure,
-      );
+      console.log(`[P-44.4 ACTION] existingParentStructure:`, !!existingParentStructure);
       console.log(
         `[P-44.4 ACTION] existingVonBaeyerNumbering:`,
         existingVonBaeyerNumbering
@@ -759,10 +688,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     // Check if multiple rings are connected (forming a polycyclic system)
     if (candidateRings.length > 1) {
       // Check if any two rings are connected by bonds
-      const areRingsConnected = (
-        ring1: RingSystem,
-        ring2: RingSystem,
-      ): boolean => {
+      const areRingsConnected = (ring1: RingSystem, ring2: RingSystem): boolean => {
         const ring1AtomIds = new Set(ring1.atoms.map((a: Atom) => a.id));
         const ring2AtomIds = new Set(ring2.atoms.map((a: Atom) => a.id));
 
@@ -781,11 +707,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
 
       let hasConnectedRings = false;
       for (let i = 0; i < candidateRings.length && !hasConnectedRings; i++) {
-        for (
-          let j = i + 1;
-          j < candidateRings.length && !hasConnectedRings;
-          j++
-        ) {
+        for (let j = i + 1; j < candidateRings.length && !hasConnectedRings; j++) {
           if (areRingsConnected(candidateRings[i]!, candidateRings[j]!)) {
             hasConnectedRings = true;
           }
@@ -794,9 +716,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
 
       if (hasConnectedRings) {
         if (process.env.VERBOSE) {
-          console.log(
-            "[P-44.4] Multiple connected rings detected - treating as polycyclic system",
-          );
+          console.log("[P-44.4] Multiple connected rings detected - treating as polycyclic system");
         }
 
         // Create a merged parent structure that includes all connected rings
@@ -831,10 +751,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           bonds: bondsArray,
           rings: candidateRings.flatMap((r: RingSystem) => r.rings || []),
           size: allAtoms.size,
-          ringCount: candidateRings.reduce(
-            (sum, r) => sum + (r.ringCount || 1),
-            0,
-          ), // Sum of all ring counts
+          ringCount: candidateRings.reduce((sum, r) => sum + (r.ringCount || 1), 0), // Sum of all ring counts
           heteroatoms: heteroatoms,
           type: RingSystemType.AROMATIC, // Will be determined properly by naming logic
           fused: false,
@@ -900,9 +817,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     // IUPAC Blue Book P-44.1.2.2: "Within the same class, a ring or ring system
     // has seniority over a chain."
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.4] Ring system detected, selecting as parent per P-44.1.2.2`,
-      );
+      console.log(`[P-44.4] Ring system detected, selecting as parent per P-44.1.2.2`);
       console.log(`[P-44.4] Ring atoms: ${parentRing.atoms?.length || 0}`);
       if (candidateChains && candidateChains.length > 0) {
         const longestChain = candidateChains[0];
@@ -937,9 +852,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     const ringAtomIds = new Set(parentRing.atoms.map((atom) => atom.id));
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.4] Starting FG filtering: ${functionalGroups.length} functional groups`,
-      );
+      console.log(`[P-44.4] Starting FG filtering: ${functionalGroups.length} functional groups`);
       functionalGroups.forEach((fg) => {
         console.log(`  - FG: ${fg.type}, atoms: ${fg.atoms?.join(",")}`);
       });
@@ -962,10 +875,8 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
             const nitrogen = fg.atoms[2];
 
             if (carbonylC && nitrogen) {
-              const carbonylCId =
-                typeof carbonylC === "number" ? carbonylC : carbonylC.id;
-              const nitrogenId =
-                typeof nitrogen === "number" ? nitrogen : nitrogen.id;
+              const carbonylCId = typeof carbonylC === "number" ? carbonylC : carbonylC.id;
+              const nitrogenId = typeof nitrogen === "number" ? nitrogen : nitrogen.id;
 
               // If both C and N are in ring → it's a lactam → exclude
               if (ringAtomIds.has(carbonylCId) && ringAtomIds.has(nitrogenId)) {
@@ -980,9 +891,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           }
 
           if (process.env.VERBOSE) {
-            console.log(
-              `[P-44.4] FG ${fg.type} atom ${fgAtomId} is IN RING - keeping`,
-            );
+            console.log(`[P-44.4] FG ${fg.type} atom ${fgAtomId} is IN RING - keeping`);
           }
           return true;
         }
@@ -991,8 +900,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
         // (not part of a longer side chain)
         for (const bond of molecule.bonds) {
           if (bond.atom1 === fgAtomId || bond.atom2 === fgAtomId) {
-            const otherAtomId =
-              bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
+            const otherAtomId = bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
             if (ringAtomIds.has(otherAtomId)) {
               // FG atom is directly bonded to ring
               // IMPORTANT: Don't exclude terminal functional groups like esters, ketones, aldehydes, carboxylic acids
@@ -1015,9 +923,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
               if (isTerminalFG) {
                 // Terminal functional groups are always included, even if they have non-ring carbons
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `[P-44.4] Keeping terminal FG ${fg.type} on atom ${fgAtomId}`,
-                  );
+                  console.log(`[P-44.4] Keeping terminal FG ${fg.type} on atom ${fgAtomId}`);
                 }
                 return true;
               }
@@ -1027,10 +933,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
               const nonRingNeighbors = molecule.bonds.filter((b) => {
                 if (b.atom1 === fgAtomId || b.atom2 === fgAtomId) {
                   const neighborId = b.atom1 === fgAtomId ? b.atom2 : b.atom1;
-                  return (
-                    !ringAtomIds.has(neighborId) &&
-                    molecule.atoms[neighborId]?.symbol === "C"
-                  );
+                  return !ringAtomIds.has(neighborId) && molecule.atoms[neighborId]?.symbol === "C";
                 }
                 return false;
               }).length;
@@ -1045,14 +948,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
                       `[P-44.4] Checking if amine on atom ${fgAtomId} is N-aryl substituent...`,
                     );
                   }
-                  if (
-                    isNArylSubstituent(
-                      fgAtomId,
-                      molecule,
-                      ringInfo,
-                      candidateRings,
-                    )
-                  ) {
+                  if (isNArylSubstituent(fgAtomId, molecule, ringInfo, candidateRings)) {
                     if (process.env.VERBOSE) {
                       console.log(
                         `[P-44.4] Keeping amine FG on atom ${fgAtomId} - detected N-aryl substituent pattern`,
@@ -1272,8 +1168,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           // Amine is in the ring - check if bonded to principal group atom
           for (const bond of molecule.bonds) {
             if (bond.atom1 === amineAtomId || bond.atom2 === amineAtomId) {
-              const otherAtomId =
-                bond.atom1 === amineAtomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === amineAtomId ? bond.atom2 : bond.atom1;
               if (principalAtomIds.has(otherAtomId)) {
                 fgAtomIds.add(amineAtomId);
                 if (process.env.VERBOSE) {
@@ -1297,10 +1192,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
     const expandedFgAtomIds = new Set(fgAtomIds);
 
     // Helper function to recursively collect all atoms in a substituent tree
-    function collectSubstituentAtoms(
-      startAtomId: number,
-      excludeAtoms: Set<number>,
-    ): Set<number> {
+    function collectSubstituentAtoms(startAtomId: number, excludeAtoms: Set<number>): Set<number> {
       const collected = new Set<number>();
       const toVisit = [startAtomId];
       const visited = new Set<number>();
@@ -1355,8 +1247,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
           // Check if this amine atom is directly bonded to a ring atom
           for (const bond of molecule.bonds) {
             if (bond.atom1 === fgAtomId || bond.atom2 === fgAtomId) {
-              const otherAtomId =
-                bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === fgAtomId ? bond.atom2 : bond.atom1;
               if (ringAtomIds.has(otherAtomId)) {
                 exocyclicAmineFgAtoms.add(fgAtomId);
                 if (process.env.VERBOSE) {
@@ -1380,9 +1271,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
       expandedFgAtomIds.add(fgAtomId);
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.4] Added exocyclic FG atom ${fgAtomId} to exclusion set`,
-        );
+        console.log(`[P-44.4] Added exocyclic FG atom ${fgAtomId} to exclusion set`);
       }
 
       // Find all neighbors of this FG atom
@@ -1397,10 +1286,7 @@ export const P44_4_RING_CHAIN_SELECTION_RULE: IUPACRule = {
         if (neighborAtomId >= 0 && !expandedFgAtomIds.has(neighborAtomId)) {
           // Collect all atoms in this substituent branch
           const excludeSet = new Set([...ringAtomIds, fgAtomId]);
-          const substituentAtoms = collectSubstituentAtoms(
-            neighborAtomId,
-            excludeSet,
-          );
+          const substituentAtoms = collectSubstituentAtoms(neighborAtomId, excludeSet);
 
           for (const atomId of substituentAtoms) {
             expandedFgAtomIds.add(atomId);

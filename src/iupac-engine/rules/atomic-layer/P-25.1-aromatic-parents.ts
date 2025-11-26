@@ -16,16 +16,11 @@ export const P_25_1_AROMATIC_PARENTS: IUPACRule = {
   priority: RulePriority.EIGHT,
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    return (
-      Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0
-    );
+    return Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    if (
-      !Array.isArray(state.molecule?.atoms) ||
-      !Array.isArray(state.molecule?.bonds)
-    ) {
+    if (!Array.isArray(state.molecule?.atoms) || !Array.isArray(state.molecule?.bonds)) {
       return context;
     }
     const aromaticAtoms = new Set<number>();

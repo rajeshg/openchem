@@ -39,11 +39,7 @@ describe("Failure analysis", () => {
         "O=C(C(C)(C)CC)Nc1cc(C(=O)OC)cc(c1)CCC(C)C",
         "COC(c1cc(cc(c1)CCC(C)C)NC(=O)CC(C)(C)C)=O",
       ],
-      [
-        "1-(oxolan-2-yl)ethyl octanoate",
-        "C1CCOC1C(OC(CCCCCCC)=O)C",
-        "O(C(CCCCCCCCC)=O)C1CCCO1",
-      ],
+      ["1-(oxolan-2-yl)ethyl octanoate", "C1CCOC1C(OC(CCCCCCC)=O)C", "O(C(CCCCCCCCC)=O)C1CCCO1"],
       [
         "N-(3-chloro-4-fluorophenyl)-5-methylidene-4H-1,3-thiazol-2-amine",
         "Fc1c(Cl)cc(NC2=NCC(S2)=C)cc1",
@@ -87,12 +83,8 @@ describe("Failure analysis", () => {
     console.log("\nFailures sorted by atom count difference:");
     for (const c of analysis) {
       console.log(`\n${c.name}`);
-      console.log(
-        `  Atoms: exp=${c.expAtoms}, gen=${c.genAtoms}, diff=${c.atomDiff}`,
-      );
-      console.log(
-        `  Bonds: exp=${c.expBonds}, gen=${c.genBonds}, diff=${c.bondDiff}`,
-      );
+      console.log(`  Atoms: exp=${c.expAtoms}, gen=${c.genAtoms}, diff=${c.atomDiff}`);
+      console.log(`  Bonds: exp=${c.expBonds}, gen=${c.genBonds}, diff=${c.bondDiff}`);
       console.log(`  Types match: ${c.expAtomTypes === c.genAtomTypes}`);
       if (c.expAtomTypes !== c.genAtomTypes) {
         console.log(`    Expected: ${c.expAtomTypes}`);

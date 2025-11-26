@@ -16,9 +16,7 @@ describe("RDKit 10k SMILES Comparison", () => {
   it("validates 10k SMILES against RDKit", async () => {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     const RDKit: any = await (initRDKitModule as any)();
@@ -83,9 +81,7 @@ describe("RDKit 10k SMILES Comparison", () => {
       if (openchemFailed) {
         stats.openchemParseFailures++;
         if (openchemFailures.length < 10) {
-          openchemFailures.push(
-            `${smiles} (${parsed.errors?.map((e) => e.message).join(", ")})`,
-          );
+          openchemFailures.push(`${smiles} (${parsed.errors?.map((e) => e.message).join(", ")})`);
         }
       }
 
@@ -98,30 +94,20 @@ describe("RDKit 10k SMILES Comparison", () => {
         continue;
       }
 
-      const openchemAtoms = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.atoms.length,
-        0,
-      );
-      const openchemBonds = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.bonds.length,
-        0,
-      );
+      const openchemAtoms = parsed.molecules.reduce((sum, mol) => sum + mol.atoms.length, 0);
+      const openchemBonds = parsed.molecules.reduce((sum, mol) => sum + mol.bonds.length, 0);
 
       if (!rdkitFailed) {
         if (openchemAtoms !== rdkitAtoms) {
           stats.atomCountMismatches++;
           if (mismatchDetails.length < 10) {
-            mismatchDetails.push(
-              `${smiles}: atoms ${openchemAtoms} vs ${rdkitAtoms}`,
-            );
+            mismatchDetails.push(`${smiles}: atoms ${openchemAtoms} vs ${rdkitAtoms}`);
           }
         }
         if (openchemBonds !== rdkitBonds) {
           stats.bondCountMismatches++;
           if (mismatchDetails.length < 10 && openchemAtoms === rdkitAtoms) {
-            mismatchDetails.push(
-              `${smiles}: bonds ${openchemBonds} vs ${rdkitBonds}`,
-            );
+            mismatchDetails.push(`${smiles}: bonds ${openchemBonds} vs ${rdkitBonds}`);
           }
         }
       }
@@ -135,14 +121,8 @@ describe("RDKit 10k SMILES Comparison", () => {
           roundTripFailures.push(`${smiles} -> ${generated}`);
         }
       } else {
-        const rtAtoms = roundTrip.molecules.reduce(
-          (sum, mol) => sum + mol.atoms.length,
-          0,
-        );
-        const rtBonds = roundTrip.molecules.reduce(
-          (sum, mol) => sum + mol.bonds.length,
-          0,
-        );
+        const rtAtoms = roundTrip.molecules.reduce((sum, mol) => sum + mol.atoms.length, 0);
+        const rtBonds = roundTrip.molecules.reduce((sum, mol) => sum + mol.bonds.length, 0);
 
         if (rtAtoms !== openchemAtoms || rtBonds !== openchemBonds) {
           stats.roundTripFailures++;
@@ -165,8 +145,7 @@ describe("RDKit 10k SMILES Comparison", () => {
       }
 
       if ((i + 1) % 10000 === 0) {
-        if (process.env.RUN_VERBOSE)
-          console.log(`Processed ${i + 1}/${stats.total}...`);
+        if (process.env.RUN_VERBOSE) console.log(`Processed ${i + 1}/${stats.total}...`);
       }
     }
 
@@ -202,10 +181,7 @@ describe("RDKit 10k SMILES Comparison", () => {
         openchemFailures.forEach((f) => console.log(`  ${f}`));
       }
 
-      if (
-        rdkitFailures.length > 0 &&
-        stats.rdkitParseFailures > stats.bothFailed
-      ) {
+      if (rdkitFailures.length > 0 && stats.rdkitParseFailures > stats.bothFailed) {
         console.log("\nFirst RDKit-only parse failures (openchem succeeded):");
         rdkitFailures.slice(0, 5).forEach((f) => console.log(`  ${f}`));
       }

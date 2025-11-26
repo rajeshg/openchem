@@ -14,15 +14,12 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
     );
     const isAlkyne = hasYnSuffix && hasYlSuffix;
 
-    const isSimpleAlkyl =
-      (hasYlSuffix || isAlkyne) && ctx.parentTokens.length > 0;
+    const isSimpleAlkyl = (hasYlSuffix || isAlkyne) && ctx.parentTokens.length > 0;
     const hasComplexPrefix = ctx.prefixTokens.some(
       (p) => p.value.includes("spiro") || p.value.includes("bicyclo"),
     );
     // Reject if there are oxy/methoxy suffixes (these need special handling for ether chains)
-    const hasOxySuffix = ctx.suffixTokens.some(
-      (s) => s.value === "oxy" || s.value === "methoxy",
-    );
+    const hasOxySuffix = ctx.suffixTokens.some((s) => s.value === "oxy" || s.value === "methoxy");
     const hasComplexSuffix = ctx.suffixTokens.some(
       (s) => s.value === "oxa" || s.value === "en" || s.value === "ene",
     );
@@ -43,17 +40,13 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
       "phenoxy",
     ];
     const hasAromaticSubstituent = ctx.substituentTokens.some((s) =>
-      aromaticPatterns.some((pattern) =>
-        s.value.toLowerCase().includes(pattern),
-      ),
+      aromaticPatterns.some((pattern) => s.value.toLowerCase().includes(pattern)),
     );
 
     // Reject if parent is a cyclic ether or other heterocycle (not simple alkyl)
     const cyclicEtherPatterns = ["oxolan", "oxan", "furan", "pyran"];
     const hasCyclicEtherParent = ctx.parentTokens.some((p) =>
-      cyclicEtherPatterns.some((pattern) =>
-        p.value.toLowerCase().includes(pattern),
-      ),
+      cyclicEtherPatterns.some((pattern) => p.value.toLowerCase().includes(pattern)),
     );
 
     return (
@@ -75,10 +68,7 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
     const parentValue = parentToken.value.toLowerCase();
 
     const ylToken = ctx.suffixTokens.find((s) => s.value === "yl")!;
-    const attachLocants = builderContext.getLocantsBeforeSuffix(
-      ylToken,
-      ctx.locantTokens,
-    );
+    const attachLocants = builderContext.getLocantsBeforeSuffix(ylToken, ctx.locantTokens);
     const attachPosition = attachLocants.length > 0 ? attachLocants[0]! : 1;
 
     const hasYnSuffix = ctx.suffixTokens.some(
@@ -91,10 +81,7 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
       const ynToken = ctx.suffixTokens.find(
         (s) => s.value && (s.value.endsWith("yn") || s.value.endsWith("yne")),
       )!;
-      const ynLocants = builderContext.getLocantsBeforeSuffix(
-        ynToken,
-        ctx.locantTokens,
-      );
+      const ynLocants = builderContext.getLocantsBeforeSuffix(ynToken, ctx.locantTokens);
       if (ynLocants.length > 0) {
         triplePos = ynLocants[0]!;
       }
@@ -155,16 +142,9 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
       }
 
       for (const subst of ctx.substituentTokens) {
-        const substLocants = builderContext.getLocantsBeforeSubstituent(
-          subst,
-          ctx.locantTokens,
-        );
+        const substLocants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
         for (const loc of substLocants) {
-          const atomIdx = builderContext.locantToAtomIndex(
-            loc,
-            chainAtoms,
-            false,
-          );
+          const atomIdx = builderContext.locantToAtomIndex(loc, chainAtoms, false);
           if (atomIdx !== null) {
             this.applySubstituent(builder, atomIdx, subst.value);
           }
@@ -179,15 +159,9 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
         ctx.locantTokens,
       );
 
-      const attachIdx = builderContext.locantToAtomIndex(
-        attachPosition,
-        chainAtoms,
-        false,
-      );
+      const attachIdx = builderContext.locantToAtomIndex(attachPosition, chainAtoms, false);
       if (attachIdx !== null) {
-        this.log(
-          `Built alkyl chain ${parentValue} with ${chainAtoms.length} carbons`,
-        );
+        this.log(`Built alkyl chain ${parentValue} with ${chainAtoms.length} carbons`);
         return {
           fragmentAtoms: chainAtoms,
           attachmentPoint: attachIdx,
@@ -198,11 +172,7 @@ export class AlkylStrategy extends BaseSubstituentStrategy {
     return null;
   }
 
-  private applySubstituent(
-    builder: MoleculeGraphBuilder,
-    atomIdx: number,
-    value: string,
-  ): void {
+  private applySubstituent(builder: MoleculeGraphBuilder, atomIdx: number, value: string): void {
     if (value === "hydroxy" || value === "hydroxyl") {
       builder.addHydroxyl(atomIdx);
     } else if (value === "methyl") {

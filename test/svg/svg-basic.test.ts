@@ -12,19 +12,13 @@ describe("SVG Basic Rendering", () => {
 
     const molecule = parseResult.molecules[0]!;
 
-    const aromaticBonds = molecule.bonds.filter(
-      (b: Bond) => b.type === BondType.AROMATIC,
-    ).length;
+    const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
     expect(aromaticBonds).toBe(6);
 
     const kekulized = kekulize(molecule);
 
-    const singleBonds = kekulized.bonds.filter(
-      (b: Bond) => b.type === BondType.SINGLE,
-    ).length;
-    const doubleBonds = kekulized.bonds.filter(
-      (b: Bond) => b.type === BondType.DOUBLE,
-    ).length;
+    const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+    const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
     const aromaticBondsAfter = kekulized.bonds.filter(
       (b: Bond) => b.type === BondType.AROMATIC,
     ).length;
@@ -96,19 +90,13 @@ describe("SVG Basic Rendering", () => {
 
     expect(molecule.bonds.length).toBe(11);
 
-    const aromaticBonds = molecule.bonds.filter(
-      (b: Bond) => b.type === BondType.AROMATIC,
-    ).length;
+    const aromaticBonds = molecule.bonds.filter((b: Bond) => b.type === BondType.AROMATIC).length;
     expect(aromaticBonds).toBe(11);
 
     const kekulized = kekulize(molecule);
 
-    const singleBonds = kekulized.bonds.filter(
-      (b: Bond) => b.type === BondType.SINGLE,
-    ).length;
-    const doubleBonds = kekulized.bonds.filter(
-      (b: Bond) => b.type === BondType.DOUBLE,
-    ).length;
+    const singleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.SINGLE).length;
+    const doubleBonds = kekulized.bonds.filter((b: Bond) => b.type === BondType.DOUBLE).length;
     const aromaticBondsAfter = kekulized.bonds.filter(
       (b: Bond) => b.type === BondType.AROMATIC,
     ).length;
@@ -222,12 +210,8 @@ describe("SVG Aromatic Ring Rendering", () => {
       const outerPath = bond.paths[0]!;
       const innerPath = bond.paths[1]!;
 
-      const outerCoords = outerPath.match(
-        /M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)/,
-      );
-      const innerCoords = innerPath.match(
-        /M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)/,
-      );
+      const outerCoords = outerPath.match(/M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)/);
+      const innerCoords = innerPath.match(/M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)/);
 
       expect(outerCoords).not.toBeNull();
       expect(innerCoords).not.toBeNull();
@@ -252,12 +236,10 @@ describe("SVG Aromatic Ring Rendering", () => {
         const ringCenterY = 170;
 
         const outerDist = Math.sqrt(
-          Math.pow(outerMidX - ringCenterX, 2) +
-            Math.pow(outerMidY - ringCenterY, 2),
+          Math.pow(outerMidX - ringCenterX, 2) + Math.pow(outerMidY - ringCenterY, 2),
         );
         const innerDist = Math.sqrt(
-          Math.pow(innerMidX - ringCenterX, 2) +
-            Math.pow(innerMidY - ringCenterY, 2),
+          Math.pow(innerMidX - ringCenterX, 2) + Math.pow(innerMidY - ringCenterY, 2),
         );
 
         expect(innerDist).toBeLessThan(outerDist);
@@ -383,8 +365,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
     expect(result.errors).toEqual([]);
 
     const svg = result.svg;
-    const bondPathRegex =
-      /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
+    const bondPathRegex = /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
     const bonds: Array<{
       index: number;
       x1: number;
@@ -422,9 +403,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
         const mid2X = (bond2.x1 + bond2.x2) / 2;
         const mid2Y = (bond2.y1 + bond2.y2) / 2;
 
-        const spacing = Math.sqrt(
-          Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2),
-        );
+        const spacing = Math.sqrt(Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2));
 
         expect(spacing).toBeGreaterThan(3);
       }
@@ -440,8 +419,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
     expect(result.errors).toEqual([]);
 
     const svg = result.svg;
-    const bondPathRegex =
-      /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
+    const bondPathRegex = /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
     const bonds: Array<{
       index: number;
       x1: number;
@@ -480,9 +458,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
         const mid2X = (bond2.x1 + bond2.x2) / 2;
         const mid2Y = (bond2.y1 + bond2.y2) / 2;
 
-        const spacing = Math.sqrt(
-          Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2),
-        );
+        const spacing = Math.sqrt(Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2));
 
         if (spacing > 3) {
           aromaticDoubleBondCount++;
@@ -502,8 +478,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
     expect(result.errors).toEqual([]);
 
     const svg = result.svg;
-    const bondPathRegex =
-      /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
+    const bondPathRegex = /<path class='bond-(\d+).*?d='M ([\d.]+),([\d.]+) L ([\d.]+),([\d.]+)'/g;
     const bonds: Array<{
       index: number;
       x1: number;
@@ -542,9 +517,7 @@ describe("SVG Aromatic Ring Double Bond Spacing", () => {
         const mid2X = (bond2.x1 + bond2.x2) / 2;
         const mid2Y = (bond2.y1 + bond2.y2) / 2;
 
-        const spacing = Math.sqrt(
-          Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2),
-        );
+        const spacing = Math.sqrt(Math.pow(mid2X - mid1X, 2) + Math.pow(mid2Y - mid1Y, 2));
 
         if (spacing > 3) {
           aromaticDoubleBondCount++;

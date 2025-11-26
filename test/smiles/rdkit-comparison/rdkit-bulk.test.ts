@@ -12,9 +12,7 @@ for (let i = 1; i <= 40; i++) {
 
 // 2) Alkenes (30 variants)
 for (let i = 1; i <= 30; i++) {
-  TEST_SMILES.push(
-    "C".repeat(Math.max(1, i)) + "=C" + (i % 5 === 0 ? "C" : ""),
-  );
+  TEST_SMILES.push("C".repeat(Math.max(1, i)) + "=C" + (i % 5 === 0 ? "C" : ""));
 }
 
 // 3) Alkynes (10)
@@ -261,9 +259,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
   it(`compares our SMILES generation with RDKit for ${EXPECTED_COUNT} SMILES`, async () => {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     const RDKit: any = await (initRDKitModule as any)();
@@ -292,8 +288,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
           const d = mol.get_descriptors();
           try {
             const obj = typeof d === "string" ? JSON.parse(d) : d;
-            if (obj && typeof obj === "object" && obj.formula)
-              return String(obj.formula);
+            if (obj && typeof obj === "object" && obj.formula) return String(obj.formula);
           } catch (e) {}
         }
       } catch (e) {}
@@ -356,14 +351,8 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
         .map((m) => Descriptors.formula(m))
         .sort()
         .join(".");
-      const ourMass = parsed.molecules.reduce(
-        (sum, m) => sum + Descriptors.mass(m),
-        0,
-      );
-      const ourExact = parsed.molecules.reduce(
-        (sum, m) => sum + Descriptors.basic(m).exactMass,
-        0,
-      );
+      const ourMass = parsed.molecules.reduce((sum, m) => sum + Descriptors.mass(m), 0);
+      const ourExact = parsed.molecules.reduce((sum, m) => sum + Descriptors.basic(m).exactMass, 0);
 
       const openchemOutput = generateSMILES(parsed.molecules);
 
@@ -377,27 +366,12 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
       }
 
       // Check semantic equivalence: the generated molecule should have same atom/bond count (total across all components)
-      const originalAtoms = parsed.molecules.reduce(
-        (sum, m) => sum + m.atoms.length,
-        0,
-      );
-      const originalBonds = parsed.molecules.reduce(
-        (sum, m) => sum + m.bonds.length,
-        0,
-      );
-      const generatedAtoms = roundTrip.molecules.reduce(
-        (sum, m) => sum + m.atoms.length,
-        0,
-      );
-      const generatedBonds = roundTrip.molecules.reduce(
-        (sum, m) => sum + m.bonds.length,
-        0,
-      );
+      const originalAtoms = parsed.molecules.reduce((sum, m) => sum + m.atoms.length, 0);
+      const originalBonds = parsed.molecules.reduce((sum, m) => sum + m.bonds.length, 0);
+      const generatedAtoms = roundTrip.molecules.reduce((sum, m) => sum + m.atoms.length, 0);
+      const generatedBonds = roundTrip.molecules.reduce((sum, m) => sum + m.bonds.length, 0);
 
-      if (
-        originalAtoms !== generatedAtoms ||
-        originalBonds !== generatedBonds
-      ) {
+      if (originalAtoms !== generatedAtoms || originalBonds !== generatedBonds) {
         generationFailures.push(
           `${smiles} -> ${openchemOutput} (structure mismatch: ${originalAtoms}/${originalBonds} vs ${generatedAtoms}/${generatedBonds})`,
         );
@@ -429,9 +403,7 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
         const tol = 0.01;
         // RDKit descriptors prefer exact monoisotopic mass; compare to our exact mass
         if (Math.abs(rdMass - ourExact) > tol) {
-          generationFailures.push(
-            `${smiles} (mass mismatch) our:${ourExact} rdkit:${rdMass}`,
-          );
+          generationFailures.push(`${smiles} (mass mismatch) our:${ourExact} rdkit:${rdMass}`);
         }
       }
 
@@ -493,13 +465,9 @@ describe(`RDKit Bulk Comparison (${EXPECTED_COUNT} SMILES)`, () => {
       console.log("Parse failures:", parseFailures.length);
       console.log("Generation/round-trip failures:", generationFailures.length);
 
-      if (parseFailures.length > 0)
-        console.log("First parse failures:", parseFailures.slice(0, 5));
+      if (parseFailures.length > 0) console.log("First parse failures:", parseFailures.slice(0, 5));
       if (generationFailures.length > 0)
-        console.log(
-          "First generation failures:",
-          generationFailures.slice(0, 5),
-        );
+        console.log("First generation failures:", generationFailures.slice(0, 5));
     }
 
     // Fail the test if openchem cannot properly parse or generate SMILES

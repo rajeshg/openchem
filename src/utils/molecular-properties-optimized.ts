@@ -13,11 +13,7 @@
 import type { MoleculeOrPacked } from "src/utils/molecule-adapter";
 import { getMolecule } from "src/utils/molecule-adapter";
 import { computeLogP as computeLogPBase } from "src/utils/logp";
-import type {
-  LipinskiResult,
-  VeberResult,
-  BBBResult,
-} from "src/utils/molecular-properties";
+import type { LipinskiResult, VeberResult, BBBResult } from "src/utils/molecular-properties";
 import {
   checkLipinskiRuleOfFive as checkLipinskiBase,
   checkVeberRules as checkVeberBase,
@@ -39,10 +35,7 @@ import {
 /**
  * Compute LogP for molecule (accepts both Molecule and PackedMolecule)
  */
-export function computeLogPOptimized(
-  molecule: MoleculeOrPacked,
-  includeHs?: boolean,
-): number {
+export function computeLogPOptimized(molecule: MoleculeOrPacked, includeHs?: boolean): number {
   const mol = getMolecule(molecule);
   return computeLogPBase(mol, includeHs);
 }
@@ -50,9 +43,7 @@ export function computeLogPOptimized(
 /**
  * Check Lipinski's Rule of Five
  */
-export function checkLipinskiOptimized(
-  molecule: MoleculeOrPacked,
-): LipinskiResult {
+export function checkLipinskiOptimized(molecule: MoleculeOrPacked): LipinskiResult {
   const mol = getMolecule(molecule);
   return checkLipinskiBase(mol);
 }
@@ -76,9 +67,7 @@ export function checkBBBOptimized(molecule: MoleculeOrPacked): BBBResult {
 /**
  * Get molecular formula
  */
-export function getMolecularFormulaOptimized(
-  molecule: MoleculeOrPacked,
-): string {
+export function getMolecularFormulaOptimized(molecule: MoleculeOrPacked): string {
   const mol = getMolecule(molecule);
   return getFormulaBase(mol);
 }
@@ -110,9 +99,7 @@ export function getHeavyAtomCountOptimized(molecule: MoleculeOrPacked): number {
 /**
  * Get heteroatom count
  */
-export function getHeteroAtomCountOptimized(
-  molecule: MoleculeOrPacked,
-): number {
+export function getHeteroAtomCountOptimized(molecule: MoleculeOrPacked): number {
   const mol = getMolecule(molecule);
   return getHeteroBase(mol);
 }
@@ -128,9 +115,7 @@ export function getRingCountOptimized(molecule: MoleculeOrPacked): number {
 /**
  * Get aromatic ring count
  */
-export function getAromaticRingCountOptimized(
-  molecule: MoleculeOrPacked,
-): number {
+export function getAromaticRingCountOptimized(molecule: MoleculeOrPacked): number {
   const mol = getMolecule(molecule);
   return getAromaticBase(mol);
 }
@@ -146,9 +131,7 @@ export function getFractionCSP3Optimized(molecule: MoleculeOrPacked): number {
 /**
  * Get H-bond acceptor count
  */
-export function getHBondAcceptorCountOptimized(
-  molecule: MoleculeOrPacked,
-): number {
+export function getHBondAcceptorCountOptimized(molecule: MoleculeOrPacked): number {
   const mol = getMolecule(molecule);
   return getHBondAcceptorBase(mol);
 }
@@ -156,9 +139,7 @@ export function getHBondAcceptorCountOptimized(
 /**
  * Get H-bond donor count
  */
-export function getHBondDonorCountOptimized(
-  molecule: MoleculeOrPacked,
-): number {
+export function getHBondDonorCountOptimized(molecule: MoleculeOrPacked): number {
   const mol = getMolecule(molecule);
   return getHBondDonorBase(mol);
 }
@@ -174,9 +155,7 @@ export function getTPSAOptimized(molecule: MoleculeOrPacked): number {
 /**
  * Get rotatable bond count
  */
-export function getRotatableBondCountOptimized(
-  molecule: MoleculeOrPacked,
-): number {
+export function getRotatableBondCountOptimized(molecule: MoleculeOrPacked): number {
   const mol = getMolecule(molecule);
   return getRotatableBase(mol);
 }

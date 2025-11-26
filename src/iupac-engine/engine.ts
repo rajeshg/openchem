@@ -7,11 +7,7 @@ import type {
   ParentStructure,
   FunctionalGroup,
 } from "./types";
-import {
-  ImmutableNamingContext,
-  ExecutionPhase,
-  type ContextServices,
-} from "./immutable-context";
+import { ImmutableNamingContext, ExecutionPhase, type ContextServices } from "./immutable-context";
 import { LAYER_ORDER, LAYER_DEFINITIONS } from "./layer-config";
 import { getSharedNameGenerator } from "./opsin-name-generator";
 import { getAromaticRings } from "src/utils/ring-analysis";
@@ -49,9 +45,7 @@ export class RuleEngine {
     try {
       // Execute layers in order
       if (process.env.VERBOSE) {
-        console.log(
-          `[ENGINE] Starting layer execution for ${LAYER_ORDER.length} layers`,
-        );
+        console.log(`[ENGINE] Starting layer execution for ${LAYER_ORDER.length} layers`);
       }
       for (const layerName of LAYER_ORDER) {
         if (process.env.VERBOSE) {
@@ -206,10 +200,7 @@ export class RuleEngine {
   /**
    * Check if a layer's dependencies are satisfied
    */
-  private checkLayerDependencies(
-    layer: Layer,
-    _context: ImmutableNamingContext,
-  ): boolean {
+  private checkLayerDependencies(layer: Layer, _context: ImmutableNamingContext): boolean {
     if (!layer.dependencies || layer.dependencies.length === 0) {
       return true;
     }
@@ -222,20 +213,13 @@ export class RuleEngine {
   /**
    * Execute all rules in a layer
    */
-  private executeLayer(
-    layer: Layer,
-    context: ImmutableNamingContext,
-  ): ImmutableNamingContext {
+  private executeLayer(layer: Layer, context: ImmutableNamingContext): ImmutableNamingContext {
     // Sort rules by priority within the layer (higher priority = execute first) (higher priority = execute first)
-    const sortedRules = [...layer.rules].sort(
-      (a, b) => b.priority - a.priority,
-    );
+    const sortedRules = [...layer.rules].sort((a, b) => b.priority - a.priority);
     let updatedContext = context;
     for (const rule of sortedRules) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[ENGINE] Checking rule: ${rule.id} (priority: ${rule.priority})`,
-        );
+        console.log(`[ENGINE] Checking rule: ${rule.id} (priority: ${rule.priority})`);
       }
       // Check if rule can be executed
       if (this.canExecuteRule(rule, updatedContext)) {
@@ -279,10 +263,7 @@ export class RuleEngine {
   /**
    * Check if a rule can be executed
    */
-  private canExecuteRule(
-    rule: IUPACRule,
-    context: ImmutableNamingContext,
-  ): boolean {
+  private canExecuteRule(rule: IUPACRule, context: ImmutableNamingContext): boolean {
     // For demonstration, be less strict about dependencies
     // Real implementation would check proper dependency satisfaction
 
@@ -290,9 +271,7 @@ export class RuleEngine {
     try {
       const canExecute = rule.conditions(context);
       if (process.env.VERBOSE) {
-        console.log(
-          `[ENGINE] Rule ${rule.id} conditions evaluated to: ${canExecute}`,
-        );
+        console.log(`[ENGINE] Rule ${rule.id} conditions evaluated to: ${canExecute}`);
       }
       return canExecute;
     } catch (_error) {
@@ -313,9 +292,7 @@ export class RuleEngine {
     // For now, just log conflicts
     // In the future, we could implement conflict resolution strategies
     if (process.env.VERBOSE) {
-      const allConflicts = context
-        .getHistory()
-        .flatMap((trace) => trace.conflicts || []);
+      const allConflicts = context.getHistory().flatMap((trace) => trace.conflicts || []);
       if (allConflicts.length > 0) {
         console.warn("Rule conflicts detected:", allConflicts);
       }
@@ -367,11 +344,7 @@ export class RuleEngine {
 
     // Prefer parent structure assembled name if available
     const parent = context.getState().parentStructure;
-    if (
-      parent &&
-      typeof parent.assembledName === "string" &&
-      parent.assembledName.length > 0
-    ) {
+    if (parent && typeof parent.assembledName === "string" && parent.assembledName.length > 0) {
       return parent.assembledName;
     }
 
@@ -384,10 +357,7 @@ export class RuleEngine {
     const ringInfo = context.getState().cachedRingInfo!;
     if (ringInfo.rings.length > 0) {
       const ringSize = ringInfo.rings[0]!.length;
-      const aromaticRings = getAromaticRings(
-        ringInfo.rings,
-        context.getState().molecule.atoms,
-      );
+      const aromaticRings = getAromaticRings(ringInfo.rings, context.getState().molecule.atoms);
       if (aromaticRings.length > 0) {
         const aromaticNames: { [key: number]: string } = {
           5: "cyclopentadiene",
@@ -462,15 +432,7 @@ export class RuleEngine {
    * Get base ring name
    */
   private getRingBaseName(size: number): string {
-    const ringNames = [
-      "",
-      "",
-      "",
-      "",
-      "cyclobutane",
-      "cyclopentane",
-      "cyclohexane",
-    ];
+    const ringNames = ["", "", "", "", "cyclobutane", "cyclopentane", "cyclohexane"];
 
     if (size < ringNames.length) {
       return ringNames[size] || `cyclo${this.getChainBaseName(size)}ane`;
@@ -546,17 +508,8 @@ export class RuleEngine {
     context: ImmutableNamingContext,
     _group: FunctionalGroup,
   ): string {
-    const carbonCount = context
-      .getState()
-      .molecule.atoms.filter((a) => a.symbol === "C").length;
-    const acidNames = [
-      "",
-      "methanoic",
-      "ethanoic",
-      "propanoic",
-      "butanoic",
-      "pentanoic",
-    ];
+    const carbonCount = context.getState().molecule.atoms.filter((a) => a.symbol === "C").length;
+    const acidNames = ["", "methanoic", "ethanoic", "propanoic", "butanoic", "pentanoic"];
     let baseName: string;
     if (carbonCount <= 5) {
       baseName = acidNames[carbonCount] || "alkanoic";
@@ -564,9 +517,7 @@ export class RuleEngine {
       baseName = `${this.getChainBaseName(carbonCount)}oic`;
     }
     if (process.env.VERBOSE) {
-      console.log(
-        `[buildCarboxylicAcidName] carbonCount=${carbonCount}, baseName=${baseName}`,
-      );
+      console.log(`[buildCarboxylicAcidName] carbonCount=${carbonCount}, baseName=${baseName}`);
     }
     return `${baseName} acid`;
   }
@@ -574,21 +525,9 @@ export class RuleEngine {
   /**
    * Build alcohol name
    */
-  private buildAlcoholName(
-    context: ImmutableNamingContext,
-    _group: FunctionalGroup,
-  ): string {
-    const carbonCount = context
-      .getState()
-      .molecule.atoms.filter((a) => a.symbol === "C").length;
-    const alcoholNames = [
-      "",
-      "methanol",
-      "ethanol",
-      "propanol",
-      "butanol",
-      "pentanol",
-    ];
+  private buildAlcoholName(context: ImmutableNamingContext, _group: FunctionalGroup): string {
+    const carbonCount = context.getState().molecule.atoms.filter((a) => a.symbol === "C").length;
+    const alcoholNames = ["", "methanol", "ethanol", "propanol", "butanol", "pentanol"];
     let baseName: string;
     if (carbonCount <= 5) {
       baseName = alcoholNames[carbonCount] || "alkanol";
@@ -601,21 +540,9 @@ export class RuleEngine {
   /**
    * Build ketone name
    */
-  private buildKetoneName(
-    context: ImmutableNamingContext,
-    _group: FunctionalGroup,
-  ): string {
-    const carbonCount = context
-      .getState()
-      .molecule.atoms.filter((a) => a.symbol === "C").length;
-    const ketoneNames = [
-      "",
-      "methanone",
-      "ethanone",
-      "propanone",
-      "butanone",
-      "pentanone",
-    ];
+  private buildKetoneName(context: ImmutableNamingContext, _group: FunctionalGroup): string {
+    const carbonCount = context.getState().molecule.atoms.filter((a) => a.symbol === "C").length;
+    const ketoneNames = ["", "methanone", "ethanone", "propanone", "butanone", "pentanone"];
     let baseName: string;
     if (carbonCount <= 5) {
       baseName = ketoneNames[carbonCount] || "alkanone";
@@ -628,13 +555,8 @@ export class RuleEngine {
   /**
    * Build amine name
    */
-  private buildAmineName(
-    context: ImmutableNamingContext,
-    _group: FunctionalGroup,
-  ): string {
-    const carbonCount = context
-      .getState()
-      .molecule.atoms.filter((a) => a.symbol === "C").length;
+  private buildAmineName(context: ImmutableNamingContext, _group: FunctionalGroup): string {
+    const carbonCount = context.getState().molecule.atoms.filter((a) => a.symbol === "C").length;
     const amineNames = [
       "",
       "methanamine",
@@ -661,10 +583,7 @@ export class RuleEngine {
     // Reduce confidence for conflicts
     const conflictCount = context
       .getHistory()
-      .reduce(
-        (acc, trace) => acc + (trace.conflicts ? trace.conflicts.length : 0),
-        0,
-      );
+      .reduce((acc, trace) => acc + (trace.conflicts ? trace.conflicts.length : 0), 0);
     confidence -= conflictCount * 0.1;
 
     // Increase confidence if rules were executed
@@ -688,10 +607,7 @@ export class RuleEngine {
   /**
    * Generate a fallback name when errors occur
    */
-  private generateFallbackName(
-    context: ImmutableNamingContext,
-    _error: unknown,
-  ): NamingResult {
+  private generateFallbackName(context: ImmutableNamingContext, _error: unknown): NamingResult {
     return {
       name: "Error: Unable to generate IUPAC name",
       method: "substitutive" as NomenclatureMethod,

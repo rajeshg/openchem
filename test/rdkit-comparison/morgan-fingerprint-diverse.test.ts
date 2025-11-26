@@ -1,9 +1,6 @@
 import { it, expect, describe } from "bun:test";
 import { parseSMILES } from "index";
-import {
-  computeMorganFingerprint,
-  getBitsSet,
-} from "src/utils/morgan-fingerprint";
+import { computeMorganFingerprint, getBitsSet } from "src/utils/morgan-fingerprint";
 
 /**
  * Enhanced Morgan Fingerprint Validation Test
@@ -40,10 +37,7 @@ function fpToHex(fp: Uint8Array): string {
   let hex = "";
   for (let i = 0; i < fp.length; i += 4) {
     const nibble =
-      ((fp[i] ?? 0) << 3) |
-      ((fp[i + 1] ?? 0) << 2) |
-      ((fp[i + 2] ?? 0) << 1) |
-      (fp[i + 3] ?? 0);
+      ((fp[i] ?? 0) << 3) | ((fp[i + 1] ?? 0) << 2) | ((fp[i + 2] ?? 0) << 1) | (fp[i + 3] ?? 0);
     hex += nibble.toString(16);
   }
   return hex;
@@ -237,9 +231,7 @@ describe("Morgan Fingerprints - Diverse Chemical Structures", () => {
       console.log(
         `    ${smiles2.padEnd(20)} bits=${bits2.toString().padStart(3)} (${bitDensity2.toFixed(2)}%)`,
       );
-      console.log(
-        `    Tanimoto similarity: ${tanimoto.toFixed(3)}, Hamming: ${hamming}`,
-      );
+      console.log(`    Tanimoto similarity: ${tanimoto.toFixed(3)}, Hamming: ${hamming}`);
     }
   });
 

@@ -8,11 +8,7 @@ import { buildFunctionalClassName } from "./special-naming";
 import { getMultiplicativePrefix } from "./utils";
 import { buildRingName, buildHeteroatomName } from "./ring-naming";
 import { buildSubstitutiveName } from "./substitutive-naming";
-import {
-  validateIUPACName,
-  applyFinalFormatting,
-  calculateNameConfidence,
-} from "./validation";
+import { validateIUPACName, applyFinalFormatting, calculateNameConfidence } from "./validation";
 
 /**
  * Name Assembly Layer Rules
@@ -36,13 +32,11 @@ export const SUBSTITUENT_ALPHABETIZATION_RULE: IUPACRule = {
   blueBookReference: "P-14.3 - Alphabetization of substituents",
   priority: RulePriority.TEN, // 100 - Run first in assembly phase
   conditions: (context: ImmutableNamingContext) => {
-    const functionalGroups = context.getState()
-      .functionalGroups as FunctionalGroup[];
+    const functionalGroups = context.getState().functionalGroups as FunctionalGroup[];
     return functionalGroups && functionalGroups.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
-    const functionalGroups = context.getState()
-      .functionalGroups as FunctionalGroup[];
+    const functionalGroups = context.getState().functionalGroups as FunctionalGroup[];
 
     if (!functionalGroups || functionalGroups.length === 0) {
       return context;
@@ -61,9 +55,7 @@ export const SUBSTITUENT_ALPHABETIZATION_RULE: IUPACRule = {
     }
 
     // Separate principal groups from substituents
-    const principalGroups = functionalGroups.filter(
-      (group: FunctionalGroup) => group.isPrincipal,
-    );
+    const principalGroups = functionalGroups.filter((group: FunctionalGroup) => group.isPrincipal);
     const substituentGroups = functionalGroups.filter(
       (group: FunctionalGroup) => !group.isPrincipal,
     );
@@ -80,24 +72,19 @@ export const SUBSTITUENT_ALPHABETIZATION_RULE: IUPACRule = {
     if (process.env.VERBOSE) {
       console.log(
         "[SUBSTITUENT_ALPHABETIZATION_RULE] Output functionalGroups:",
-        [...principalGroups, ...alphabetizedStructuralSubstituents].map(
-          (g) => ({
-            type: g.type,
-            isPrincipal: g.isPrincipal,
-            locants: g.locants,
-            locant: g.locant,
-          }),
-        ),
+        [...principalGroups, ...alphabetizedStructuralSubstituents].map((g) => ({
+          type: g.type,
+          isPrincipal: g.isPrincipal,
+          locants: g.locants,
+          locant: g.locant,
+        })),
       );
     }
 
     return context.withStateUpdate(
       (state: ContextState) => ({
         ...state,
-        functionalGroups: [
-          ...principalGroups,
-          ...alphabetizedStructuralSubstituents,
-        ],
+        functionalGroups: [...principalGroups, ...alphabetizedStructuralSubstituents],
       }),
       "substituent-alphabetization",
       "StructuralSubstituent Alphabetization",
@@ -120,13 +107,11 @@ export const LOCANT_ASSIGNMENT_ASSEMBLY_RULE: IUPACRule = {
   blueBookReference: "P-14 - Locant assignment assembly",
   priority: RulePriority.NINE, // 90 - After alphabetization
   conditions: (context: ImmutableNamingContext) => {
-    const functionalGroups = context.getState()
-      .functionalGroups as FunctionalGroup[];
+    const functionalGroups = context.getState().functionalGroups as FunctionalGroup[];
     return functionalGroups && functionalGroups.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
-    const functionalGroups = context.getState()
-      .functionalGroups as FunctionalGroup[];
+    const functionalGroups = context.getState().functionalGroups as FunctionalGroup[];
     const parentStructure = context.getState().parentStructure;
 
     if (!functionalGroups || !parentStructure) {
@@ -152,16 +137,14 @@ export const LOCANT_ASSIGNMENT_ASSEMBLY_RULE: IUPACRule = {
 
       // Check if we can omit locant "1" for C1 chains (methane)
       const isC1Chain =
-        parentStructure.type === "chain" &&
-        (parentStructure.chain?.length ?? 0) === 1;
+        parentStructure.type === "chain" && (parentStructure.chain?.length ?? 0) === 1;
       const shouldOmitC1Locant = isC1Chain && locants === "1";
 
       // Check if we can omit locant "1" for terminal positions on short chains
       // Per IUPAC: for unbranched chains with a single terminal substituent, omit locant "1"
       // Only omit for C1 (methane) and C2 (ethane); C3+ chains MUST keep terminal locants
       const chainLength = parentStructure.chain?.length ?? 0;
-      const isShortChain =
-        parentStructure.type === "chain" && chainLength === 2;
+      const isShortChain = parentStructure.type === "chain" && chainLength === 2;
       const nonPrincipalSubstituentCount = functionalGroups.filter(
         (fg: FunctionalGroup) => !fg.isPrincipal,
       ).length;
@@ -178,15 +161,12 @@ export const LOCANT_ASSIGNMENT_ASSEMBLY_RULE: IUPACRule = {
       // Check if we can omit locant "1" for single substituent on symmetric rings
       // Per IUPAC P-14.3.4.1: For symmetric rings (benzene, cyclohexane, etc.),
       // a single substituent at position 1 doesn't need a locant
-      const parentName =
-        parentStructure.assembledName || parentStructure.name || "";
+      const parentName = parentStructure.assembledName || parentStructure.name || "";
       const isSymmetricRing =
         parentStructure.type === "ring" &&
         (parentName.includes("benzene") || parentName.includes("cyclo"));
       const shouldOmitRingLocant =
-        isSymmetricRing &&
-        locants === "1" &&
-        nonPrincipalSubstituentCount === 1;
+        isSymmetricRing && locants === "1" && nonPrincipalSubstituentCount === 1;
 
       let name = "";
 
@@ -194,10 +174,7 @@ export const LOCANT_ASSIGNMENT_ASSEMBLY_RULE: IUPACRule = {
       // Example: alcohol (non-principal) → "hydroxy" not "hydroxyalcoholol"
       if (!group.isPrincipal && prefix) {
         name =
-          locants &&
-          !shouldOmitC1Locant &&
-          !shouldOmitTerminalLocant &&
-          !shouldOmitRingLocant
+          locants && !shouldOmitC1Locant && !shouldOmitTerminalLocant && !shouldOmitRingLocant
             ? `${locants}-${prefix}`
             : prefix;
       }
@@ -205,21 +182,13 @@ export const LOCANT_ASSIGNMENT_ASSEMBLY_RULE: IUPACRule = {
       // So we don't append the type 'alkoxy'
       else if (type === "alkoxy" && prefix) {
         name =
-          locants &&
-          !shouldOmitC1Locant &&
-          !shouldOmitTerminalLocant &&
-          !shouldOmitRingLocant
+          locants && !shouldOmitC1Locant && !shouldOmitTerminalLocant && !shouldOmitRingLocant
             ? `${locants}-${prefix}`
             : prefix;
       }
       // For PRINCIPAL functional groups, use the full name assembly
       else {
-        if (
-          locants &&
-          !shouldOmitC1Locant &&
-          !shouldOmitTerminalLocant &&
-          !shouldOmitRingLocant
-        ) {
+        if (locants && !shouldOmitC1Locant && !shouldOmitTerminalLocant && !shouldOmitRingLocant) {
           name = `${locants}-${prefix}${type}${suffix}`;
         } else {
           name = `${prefix}${type}${suffix}`;
@@ -265,15 +234,12 @@ export const MULTIPLICATIVE_PREFIXES_RULE: IUPACRule = {
   blueBookReference: "P-16.1 - Multiplicative prefixes",
   priority: RulePriority.EIGHT, // 80 - After locant assembly
   conditions: (context: ImmutableNamingContext) => {
-    const functionalGroups = context.getState()
-      .functionalGroups as FunctionalGroup[];
+    const functionalGroups = context.getState().functionalGroups as FunctionalGroup[];
     if (!functionalGroups || functionalGroups.length === 0) return false;
 
     // Check for duplicate group types
     const groupTypes = functionalGroups.map((group) => group.type);
-    return groupTypes.some(
-      (type) => groupTypes.filter((t) => t === type).length > 1,
-    );
+    return groupTypes.some((type) => groupTypes.filter((t) => t === type).length > 1);
   },
   action: (context) => {
     const functionalGroups = context.getState().functionalGroups;
@@ -299,9 +265,7 @@ export const MULTIPLICATIVE_PREFIXES_RULE: IUPACRule = {
     // This rule should only handle non-principal substituents (e.g., multiple methyl groups).
 
     // Separate principal groups from non-principal substituents
-    const principalGroups = functionalGroups.filter(
-      (group: FunctionalGroup) => group.isPrincipal,
-    );
+    const principalGroups = functionalGroups.filter((group: FunctionalGroup) => group.isPrincipal);
     const nonPrincipalGroups = functionalGroups.filter(
       (group: FunctionalGroup) => !group.isPrincipal,
     );
@@ -347,12 +311,7 @@ export const MULTIPLICATIVE_PREFIXES_RULE: IUPACRule = {
         // Remove individual locants and apply multiplicative prefix
         const cleanName = baseName.replace(/^\d+,?-/, ""); // Remove leading locants
         const nextChar = cleanName.charAt(0);
-        const prefix = getMultiplicativePrefix(
-          count,
-          false,
-          opsinService,
-          nextChar,
-        );
+        const prefix = getMultiplicativePrefix(count, false, opsinService, nextChar);
         const finalName = `${prefix}${cleanName}`;
 
         // Collect all locants from all groups
@@ -422,11 +381,7 @@ export const PARENT_NAME_ASSEMBLY_RULE: IUPACRule = {
     let parentName = "";
 
     if (parentStructure.type === "chain") {
-      parentName = buildChainName(
-        parentStructure,
-        functionalGroups,
-        opsinService,
-      );
+      parentName = buildChainName(parentStructure, functionalGroups, opsinService);
     } else if (parentStructure.type === "ring") {
       parentName = buildRingName(parentStructure, functionalGroups);
     } else if (parentStructure.type === "heteroatom") {
@@ -475,15 +430,9 @@ export const COMPLETE_NAME_ASSEMBLY_RULE: IUPACRule = {
     const opsinService = context.getOPSIN();
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[COMPLETE_NAME_ASSEMBLY_RULE] nomenclatureMethod:",
-        nomenclatureMethod,
-      );
+      console.log("[COMPLETE_NAME_ASSEMBLY_RULE] nomenclatureMethod:", nomenclatureMethod);
       if (process.env.VERBOSE) {
-        console.log(
-          "[COMPLETE_NAME_ASSEMBLY_RULE] parentStructure:",
-          parentStructure?.type,
-        );
+        console.log("[COMPLETE_NAME_ASSEMBLY_RULE] parentStructure:", parentStructure?.type);
       }
       if (process.env.VERBOSE) {
         console.log(
@@ -514,9 +463,7 @@ export const COMPLETE_NAME_ASSEMBLY_RULE: IUPACRule = {
 
     if (nomenclatureMethod === "functional_class") {
       if (process.env.VERBOSE)
-        console.log(
-          "[COMPLETE_NAME_ASSEMBLY_RULE] Building functional class name",
-        );
+        console.log("[COMPLETE_NAME_ASSEMBLY_RULE] Building functional class name");
       finalName = buildFunctionalClassName(
         parentStructure,
         functionalGroups,
@@ -527,16 +474,10 @@ export const COMPLETE_NAME_ASSEMBLY_RULE: IUPACRule = {
     } else {
       if (process.env.VERBOSE)
         console.log("[COMPLETE_NAME_ASSEMBLY_RULE] Building substitutive name");
-      finalName = buildSubstitutiveName(
-        parentStructure,
-        functionalGroups,
-        molecule,
-        opsinService,
-      );
+      finalName = buildSubstitutiveName(parentStructure, functionalGroups, molecule, opsinService);
     }
 
-    if (process.env.VERBOSE)
-      console.log("[COMPLETE_NAME_ASSEMBLY_RULE] finalName:", finalName);
+    if (process.env.VERBOSE) console.log("[COMPLETE_NAME_ASSEMBLY_RULE] finalName:", finalName);
 
     return context.withStateUpdate(
       (state: ContextState) => ({

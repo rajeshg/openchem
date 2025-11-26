@@ -82,9 +82,7 @@ describe("Glycosides and Acetals - SMILES Round-Trip Validation", () => {
       .forEach((testCase) => {
         it(`${testCase.name} should contain ${testCase.expectedOxygens} oxygens`, () => {
           const mol = parseSMILES(testCase.smiles).molecules[0]!;
-          const oxygenCount = mol.atoms.filter(
-            (a) => a.atomicNumber === 8,
-          ).length;
+          const oxygenCount = mol.atoms.filter((a) => a.atomicNumber === 8).length;
           expect(oxygenCount).toBe(testCase.expectedOxygens);
         });
       });
@@ -140,12 +138,8 @@ describe("Glycosides and Acetals - SMILES Round-Trip Validation", () => {
 
       // Orthoformate: 7 atoms, 3 oxygens
       // Dioxolane: 5 atoms, 2 oxygens
-      const orthoformatOxygens = orthoformate.atoms.filter(
-        (a) => a.atomicNumber === 8,
-      ).length;
-      const dioxolaneOxygens = dioxolane.atoms.filter(
-        (a) => a.atomicNumber === 8,
-      ).length;
+      const orthoformatOxygens = orthoformate.atoms.filter((a) => a.atomicNumber === 8).length;
+      const dioxolaneOxygens = dioxolane.atoms.filter((a) => a.atomicNumber === 8).length;
 
       expect(orthoformatOxygens).toBe(3);
       expect(dioxolaneOxygens).toBe(2);

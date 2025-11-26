@@ -17,9 +17,7 @@ export function detectRingInAlkoxyGroup(
   const ringsInAlkoxy: number[][] = [];
 
   for (const ring of rings) {
-    const ringIntersection = ring.filter((atomId) =>
-      alkoxyCarbonIds.has(atomId),
-    );
+    const ringIntersection = ring.filter((atomId) => alkoxyCarbonIds.has(atomId));
     if (ringIntersection.length >= 3) {
       ringsInAlkoxy.push(ring);
     }
@@ -34,9 +32,7 @@ export function nameRingSubstituent(
   molecule: Molecule,
 ): RingSubstituentInfo | null {
   const ringSize = ring.length;
-  const ringAtoms = ring
-    .map((id) => molecule.atoms[id])
-    .filter((a): a is Atom => a !== undefined);
+  const ringAtoms = ring.map((id) => molecule.atoms[id]).filter((a): a is Atom => a !== undefined);
 
   const heteroatomCounts: Record<string, number> = {};
   for (const atom of ringAtoms) {
@@ -62,10 +58,7 @@ export function nameRingSubstituent(
       const heteroIndex = ring.indexOf(heteroAtomId);
       if (heteroIndex > 0) {
         // Rotate the ring so heteroatom is first
-        orderedRing = [
-          ...ring.slice(heteroIndex),
-          ...ring.slice(0, heteroIndex),
-        ];
+        orderedRing = [...ring.slice(heteroIndex), ...ring.slice(0, heteroIndex)];
         if (process.env.VERBOSE) {
           console.log(
             `[nameRingSubstituent] Reordered ring to start with heteroatom: ${ring} -> ${orderedRing}`,
@@ -77,8 +70,7 @@ export function nameRingSubstituent(
 
   let isSaturated = true;
   for (const bond of molecule.bonds) {
-    const isInRing =
-      orderedRing.includes(bond.atom1) && orderedRing.includes(bond.atom2);
+    const isInRing = orderedRing.includes(bond.atom1) && orderedRing.includes(bond.atom2);
     if (isInRing && bond.type === "double") {
       isSaturated = false;
       break;
@@ -121,18 +113,10 @@ export function nameRingSubstituent(
     return null;
   }
 
-  const attachmentPosition = getAttachmentPosition(
-    orderedRing,
-    attachmentAtomId,
-    molecule,
-  );
+  const attachmentPosition = getAttachmentPosition(orderedRing, attachmentAtomId, molecule);
 
   // Check if there's an exocyclic double bond from the ring attachment point
-  const hasExocyclicDoubleBond = checkExocyclicDoubleBond(
-    orderedRing,
-    attachmentAtomId,
-    molecule,
-  );
+  const hasExocyclicDoubleBond = checkExocyclicDoubleBond(orderedRing, attachmentAtomId, molecule);
 
   const suffix = hasExocyclicDoubleBond ? "ylidene" : "yl";
   const fullName =
@@ -259,11 +243,7 @@ export function buildRingSubstituentAlkylName(
           const otherId = bond.atom1 === currentId ? bond.atom2 : bond.atom1;
           const otherAtom = molecule.atoms[otherId];
 
-          if (
-            otherAtom?.symbol === "C" &&
-            !visited.has(otherId) &&
-            otherId !== esterOxygenId
-          ) {
+          if (otherAtom?.symbol === "C" && !visited.has(otherId) && otherId !== esterOxygenId) {
             queue.push(otherId);
           }
         }
@@ -272,26 +252,18 @@ export function buildRingSubstituentAlkylName(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildRingSubstituentAlkylName] alkoxyCarbonIds:",
-      Array.from(alkoxyCarbonIds),
-    );
+    console.log("[buildRingSubstituentAlkylName] alkoxyCarbonIds:", Array.from(alkoxyCarbonIds));
   }
 
   const ringsInAlkoxy = detectRingInAlkoxyGroup(alkoxyCarbonIds, molecule);
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildRingSubstituentAlkylName] ringsInAlkoxy:",
-      ringsInAlkoxy,
-    );
+    console.log("[buildRingSubstituentAlkylName] ringsInAlkoxy:", ringsInAlkoxy);
   }
 
   if (ringsInAlkoxy.length === 0) {
     if (process.env.VERBOSE) {
-      console.log(
-        "[buildRingSubstituentAlkylName] No rings found, returning null",
-      );
+      console.log("[buildRingSubstituentAlkylName] No rings found, returning null");
     }
     return null;
   }
@@ -355,10 +327,7 @@ export function buildRingSubstituentAlkylName(
                 pos2 = polycyclicResult.vonBaeyerNumbering.get(bond.atom2)!;
               }
             }
-            aromaticBondPositions.push([
-              Math.min(pos1, pos2),
-              Math.max(pos1, pos2),
-            ]);
+            aromaticBondPositions.push([Math.min(pos1, pos2), Math.max(pos1, pos2)]);
           }
         }
 
@@ -403,17 +372,10 @@ export function buildRingSubstituentAlkylName(
               const remaining = bonds.slice(i + 1);
               const availableRemaining = remaining.filter(
                 (b) =>
-                  b &&
-                  b[0] !== bond[0] &&
-                  b[1] !== bond[1] &&
-                  b[0] !== bond[1] &&
-                  b[1] !== bond[0],
+                  b && b[0] !== bond[0] && b[1] !== bond[1] && b[0] !== bond[1] && b[1] !== bond[0],
               );
 
-              const subResult = findNonOverlappingSet(
-                availableRemaining,
-                count - 1,
-              );
+              const subResult = findNonOverlappingSet(availableRemaining, count - 1);
               if (subResult !== null) {
                 return [bond, ...subResult];
               }
@@ -421,10 +383,7 @@ export function buildRingSubstituentAlkylName(
             return null;
           }
 
-          const nonOverlappingSet = findNonOverlappingSet(
-            aromaticBondPositions,
-            doubleBondCount,
-          );
+          const nonOverlappingSet = findNonOverlappingSet(aromaticBondPositions, doubleBondCount);
 
           if (nonOverlappingSet) {
             selectedBonds.push(...nonOverlappingSet);
@@ -432,8 +391,7 @@ export function buildRingSubstituentAlkylName(
             // Fallback: use greedy selection
             for (const bond of aromaticBondPositions) {
               if (selectedBonds.length >= doubleBondCount) break;
-              const hasOverlap =
-                usedPositions.has(bond[0]) || usedPositions.has(bond[1]);
+              const hasOverlap = usedPositions.has(bond[0]) || usedPositions.has(bond[1]);
               if (!hasOverlap) {
                 selectedBonds.push(bond);
                 usedPositions.add(bond[0]);
@@ -445,11 +403,7 @@ export function buildRingSubstituentAlkylName(
             if (selectedBonds.length < doubleBondCount) {
               for (const bond of aromaticBondPositions) {
                 if (selectedBonds.length >= doubleBondCount) break;
-                if (
-                  !selectedBonds.some(
-                    (b) => b[0] === bond[0] && b[1] === bond[1],
-                  )
-                ) {
+                if (!selectedBonds.some((b) => b[0] === bond[0] && b[1] === bond[1])) {
                   selectedBonds.push(bond);
                 }
               }
@@ -503,10 +457,7 @@ export function buildRingSubstituentAlkylName(
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          "[buildRingSubstituentAlkylName] attachmentAtomId:",
-          attachmentAtomId,
-        );
+        console.log("[buildRingSubstituentAlkylName] attachmentAtomId:", attachmentAtomId);
       }
 
       // Find any substituents on the ring system that need to be named
@@ -531,12 +482,8 @@ export function buildRingSubstituentAlkylName(
               let acetoxyCarbon: number | null = null;
 
               for (const bond2 of molecule.bonds) {
-                if (
-                  bond2.atom1 === otherAtomId ||
-                  bond2.atom2 === otherAtomId
-                ) {
-                  const carbonylId =
-                    bond2.atom1 === otherAtomId ? bond2.atom2 : bond2.atom1;
+                if (bond2.atom1 === otherAtomId || bond2.atom2 === otherAtomId) {
+                  const carbonylId = bond2.atom1 === otherAtomId ? bond2.atom2 : bond2.atom1;
                   const carbonylAtom = molecule.atoms[carbonylId];
 
                   if (
@@ -548,10 +495,8 @@ export function buildRingSubstituentAlkylName(
                     const hasDoubleBond = molecule.bonds.some(
                       (b) =>
                         b.type === "double" &&
-                        ((b.atom1 === carbonylId &&
-                          molecule.atoms[b.atom2]?.symbol === "O") ||
-                          (b.atom2 === carbonylId &&
-                            molecule.atoms[b.atom1]?.symbol === "O")),
+                        ((b.atom1 === carbonylId && molecule.atoms[b.atom2]?.symbol === "O") ||
+                          (b.atom2 === carbonylId && molecule.atoms[b.atom1]?.symbol === "O")),
                     );
 
                     if (hasDoubleBond) {
@@ -572,8 +517,7 @@ export function buildRingSubstituentAlkylName(
                   polycyclicResult.vonBaeyerNumbering &&
                   polycyclicResult.vonBaeyerNumbering.has(atomId)
                 ) {
-                  vonBaeyerPos =
-                    polycyclicResult.vonBaeyerNumbering.get(atomId)!;
+                  vonBaeyerPos = polycyclicResult.vonBaeyerNumbering.get(atomId)!;
                 }
 
                 substituentParts.push(`${vonBaeyerPos}-acetyloxy`);
@@ -610,8 +554,7 @@ export function buildRingSubstituentAlkylName(
           for (const extAtomId of externalRing) {
             for (const bond of molecule.bonds) {
               if (bond.atom1 === extAtomId || bond.atom2 === extAtomId) {
-                const otherAtomId =
-                  bond.atom1 === extAtomId ? bond.atom2 : bond.atom1;
+                const otherAtomId = bond.atom1 === extAtomId ? bond.atom2 : bond.atom1;
 
                 // Check if the other atom is in the bicyclic system
                 if (ringAtomSet.has(otherAtomId)) {
@@ -646,18 +589,13 @@ export function buildRingSubstituentAlkylName(
                   // Check for C=O
                   for (const bond of molecule.bonds) {
                     if (
-                      (bond.atom1 === ringAtomId ||
-                        bond.atom2 === ringAtomId) &&
+                      (bond.atom1 === ringAtomId || bond.atom2 === ringAtomId) &&
                       bond.type === "double"
                     ) {
-                      const otherAtomId =
-                        bond.atom1 === ringAtomId ? bond.atom2 : bond.atom1;
+                      const otherAtomId = bond.atom1 === ringAtomId ? bond.atom2 : bond.atom1;
                       const otherAtom = molecule.atoms[otherAtomId];
 
-                      if (
-                        otherAtom?.symbol === "O" &&
-                        !externalRing.includes(otherAtomId)
-                      ) {
+                      if (otherAtom?.symbol === "O" && !externalRing.includes(otherAtomId)) {
                         // Found ketone - position is i+1 (1-based)
                         ketonePosition = i + 1;
                         break;
@@ -671,8 +609,7 @@ export function buildRingSubstituentAlkylName(
               // Generate azacycle name
               const ruleEngine = new IUPACRuleEngine();
               const alkaneName = ruleEngine.getAlkaneName(ringSize);
-              const cycleName =
-                alkaneName?.replace(/ane$/, "") || `C${ringSize}`;
+              const cycleName = alkaneName?.replace(/ane$/, "") || `C${ringSize}`;
 
               let azacycleName = `azacyclo${cycleName}-1-yl`;
 
@@ -688,8 +625,7 @@ export function buildRingSubstituentAlkylName(
                 polycyclicResult.vonBaeyerNumbering &&
                 polycyclicResult.vonBaeyerNumbering.has(connectionPoint)
               ) {
-                connectionPos =
-                  polycyclicResult.vonBaeyerNumbering.get(connectionPoint)!;
+                connectionPos = polycyclicResult.vonBaeyerNumbering.get(connectionPoint)!;
               }
 
               substituentParts.push(`${connectionPos}-(${azacycleName})`);
@@ -711,8 +647,7 @@ export function buildRingSubstituentAlkylName(
           // Find attached groups on nitrogen
           for (const bond of molecule.bonds) {
             if (bond.atom1 === atomId || bond.atom2 === atomId) {
-              const otherAtomId =
-                bond.atom1 === atomId ? bond.atom2 : bond.atom1;
+              const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
 
               if (!ringAtomSet.has(otherAtomId)) {
                 // This is an exocyclic attachment - could be part of an azacycle
@@ -746,8 +681,7 @@ export function buildRingSubstituentAlkylName(
           polycyclicResult.vonBaeyerNumbering &&
           polycyclicResult.vonBaeyerNumbering.has(attachmentAtomId)
         ) {
-          attachmentPos =
-            polycyclicResult.vonBaeyerNumbering.get(attachmentAtomId)!;
+          attachmentPos = polycyclicResult.vonBaeyerNumbering.get(attachmentAtomId)!;
         }
         radicalName = `${attachmentPos}-${radicalName}`;
       }
@@ -761,10 +695,7 @@ export function buildRingSubstituentAlkylName(
       radicalName = `[${radicalName}]`;
 
       if (process.env.VERBOSE) {
-        console.log(
-          "[buildRingSubstituentAlkylName] Final polycyclic radical name:",
-          radicalName,
-        );
+        console.log("[buildRingSubstituentAlkylName] Final polycyclic radical name:", radicalName);
       }
 
       return radicalName;
@@ -772,9 +703,7 @@ export function buildRingSubstituentAlkylName(
   }
 
   const ring = ringsInAlkoxy[0]!;
-  const chainCarbons = Array.from(alkoxyCarbonIds).filter(
-    (id) => !ring.includes(id),
-  );
+  const chainCarbons = Array.from(alkoxyCarbonIds).filter((id) => !ring.includes(id));
 
   if (process.env.VERBOSE) {
     console.log("[buildRingSubstituentAlkylName] ring:", ring);
@@ -803,10 +732,7 @@ export function buildRingSubstituentAlkylName(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildRingSubstituentAlkylName] attachmentToRing:",
-      attachmentToRing,
-    );
+    console.log("[buildRingSubstituentAlkylName] attachmentToRing:", attachmentToRing);
   }
 
   if (!attachmentToRing) {
@@ -841,11 +767,7 @@ export function buildRingSubstituentAlkylName(
     return null;
   }
 
-  const ringSubInfo = nameRingSubstituent(
-    ring,
-    chainCarbonAttachedToRing,
-    molecule,
-  );
+  const ringSubInfo = nameRingSubstituent(ring, chainCarbonAttachedToRing, molecule);
   if (!ringSubInfo) {
     return null;
   }
@@ -865,9 +787,7 @@ export function buildRingSubstituentAlkylName(
     "dec",
   ];
   const chainName =
-    chainLength < alkylPrefixes.length
-      ? alkylPrefixes[chainLength]
-      : `C${chainLength}-alk`;
+    chainLength < alkylPrefixes.length ? alkylPrefixes[chainLength] : `C${chainLength}-alk`;
 
   if (process.env.VERBOSE) {
     console.log(
@@ -891,14 +811,8 @@ export function buildRingSubstituentAlkylName(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildRingSubstituentAlkylName] chainPositionOnRing:",
-      chainPositionOnRing,
-    );
-    console.log(
-      "[buildRingSubstituentAlkylName] ringSubInfo.fullName:",
-      ringSubInfo.fullName,
-    );
+    console.log("[buildRingSubstituentAlkylName] chainPositionOnRing:", chainPositionOnRing);
+    console.log("[buildRingSubstituentAlkylName] ringSubInfo.fullName:", ringSubInfo.fullName);
     console.log(
       "[buildRingSubstituentAlkylName] result:",
       `${chainPositionOnRing}-(${ringSubInfo.fullName})${chainName}yl`,

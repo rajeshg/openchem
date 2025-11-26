@@ -1,9 +1,6 @@
 import type { IUPACRule } from "../../types";
 import { BLUE_BOOK_RULES, RulePriority } from "../../types";
-import {
-  canonicalizeCitationList,
-  compareCitationArrays,
-} from "../../citation-normalizer";
+import { canonicalizeCitationList, compareCitationArrays } from "../../citation-normalizer";
 import type { ImmutableNamingContext } from "../../immutable-context";
 import { ExecutionPhase } from "../../immutable-context";
 import type { Chain, StructuralSubstituent } from "../../types";
@@ -32,8 +29,7 @@ export const P44_3_8_ALPHABETICAL_LOCANT_RULE: IUPACRule = {
         {
           ruleId: "P-44.3.8",
           conflictType: "state_inconsistency",
-          description:
-            "No candidate chains found for alphabetical locant selection",
+          description: "No candidate chains found for alphabetical locant selection",
           context: { chains },
         },
         "P-44.3.8",

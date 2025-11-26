@@ -1,9 +1,6 @@
 import type { IUPACRule } from "../../types";
 import { BLUE_BOOK_RULES, RulePriority } from "../../types";
-import type {
-  ImmutableNamingContext,
-  ContextState,
-} from "../../immutable-context";
+import type { ImmutableNamingContext, ContextState } from "../../immutable-context";
 import { ExecutionPhase } from "../../immutable-context";
 import type { RingSystem } from "../../types";
 import type { Atom, Bond, MultipleBond, Chain } from "types";
@@ -67,10 +64,7 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
 
       // Local require to avoid circular imports
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const {
-        findMainChain,
-        findSubstituents,
-      } = require("../../naming/iupac-chains");
+      const { findMainChain, findSubstituents } = require("../../naming/iupac-chains");
 
       // Pass functional groups from context if available (includes expanded acyl groups)
       const functionalGroups = context.getState().functionalGroups;
@@ -79,16 +73,10 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
           `[P-44.3.1] Passing ${functionalGroups.length} functional groups to findMainChain`,
         );
         functionalGroups.forEach((fg, i) => {
-          console.log(
-            `[P-44.3.1]   FG ${i}: name="${fg.name}", atoms=[${fg.atoms.join(",")}]`,
-          );
+          console.log(`[P-44.3.1]   FG ${i}: name="${fg.name}", atoms=[${fg.atoms.join(",")}]`);
         });
       }
-      const mainChain = findMainChain(
-        molecule,
-        functionalGroups,
-        context.getDetector(),
-      );
+      const mainChain = findMainChain(molecule, functionalGroups, context.getDetector());
       console.log(
         `[initial-structure-layer] findMainChain returned: ${mainChain?.join(",") || "empty"}`,
       );
@@ -106,9 +94,7 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
       // Use only the main chain (already optimally oriented by findMainChain)
       const main = mainChain;
       if (main.length >= 1) {
-        const atoms = main
-          .map((idx: number) => molecule.atoms[idx])
-          .filter(Boolean) as Atom[];
+        const atoms = main.map((idx: number) => molecule.atoms[idx]).filter(Boolean) as Atom[];
         const bonds: Bond[] = [];
         const multipleBonds: MultipleBond[] = [];
 
@@ -116,9 +102,7 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
           const a = main[i]!;
           const b = main[i + 1]!;
           const bond = molecule.bonds.find(
-            (bb: Bond) =>
-              (bb.atom1 === a && bb.atom2 === b) ||
-              (bb.atom1 === b && bb.atom2 === a),
+            (bb: Bond) => (bb.atom1 === a && bb.atom2 === b) || (bb.atom1 === b && bb.atom2 === a),
           );
           if (bond) {
             bonds.push(bond);
@@ -133,11 +117,7 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
           }
         }
 
-        const subsRaw = findSubstituents(
-          molecule,
-          main as number[],
-          context.getDetector(),
-        );
+        const subsRaw = findSubstituents(molecule, main as number[], context.getDetector());
         const substituents = subsRaw.map((s: NamingSubstituent) => ({
           atoms: [],
           bonds: [],
@@ -147,9 +127,7 @@ export const INITIAL_STRUCTURE_ANALYSIS_RULE: IUPACRule = {
           name: s.name,
         }));
 
-        console.log(
-          `Candidate chain: ${main.join(",")}, length: ${atoms.length}`,
-        );
+        console.log(`Candidate chain: ${main.join(",")}, length: ${atoms.length}`);
         candidates.push({
           atoms,
           bonds,

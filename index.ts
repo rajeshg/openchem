@@ -11,10 +11,7 @@ export type {
 export { parseSMILES } from "src/parsers/smiles-parser";
 export { parseIUPACName } from "src/parsers/iupac-parser/iupac-parser";
 export { IUPACTokenizer } from "src/parsers/iupac-parser/iupac-tokenizer";
-export type {
-  IUPACToken,
-  IUPACParseResult,
-} from "src/parsers/iupac-parser/iupac-types";
+export type { IUPACToken, IUPACParseResult } from "src/parsers/iupac-parser/iupac-types";
 export { generateSMILES } from "src/generators/smiles-generator";
 export { generateMolfile } from "src/generators/mol-generator";
 export { parseMolfile } from "src/parsers/molfile-parser";
@@ -23,10 +20,7 @@ export { writeSDF } from "src/generators/sdf-writer";
 export { parseSMARTS } from "src/parsers/smarts-parser";
 export { matchSMARTS } from "src/matchers/smarts-matcher";
 export { renderSVG } from "src/generators/svg-renderer";
-export type {
-  SVGRendererOptions,
-  SVGRenderResult,
-} from "src/generators/svg-renderer";
+export type { SVGRendererOptions, SVGRenderResult } from "src/generators/svg-renderer";
 export { kekulize } from "src/utils/kekulize";
 export { computeLogP, logP, crippenLogP } from "src/utils/logp";
 export { getRingInfo } from "src/utils/ring-information";
@@ -78,10 +72,7 @@ export {
   getNumAtomStereoCenters,
   getNumUnspecifiedAtomStereoCenters,
 } from "src/utils/molecular-properties";
-export {
-  generateInChI,
-  generateInChIKey,
-} from "src/generators/inchi-generator";
+export { generateInChI, generateInChIKey } from "src/generators/inchi-generator";
 export {
   bulkMatchSMARTS,
   bulkComputeProperties,
@@ -143,9 +134,7 @@ export function generateIUPACName(
 /**
  * Generate IUPAC name from SMILES string
  */
-export function generateIUPACNameFromSMILES(
-  smiles: string,
-): IUPACGenerationResult {
+export function generateIUPACNameFromSMILES(smiles: string): IUPACGenerationResult {
   try {
     const result = getIUPACNamer().generateNameFromSMILES(smiles);
     return {
@@ -169,9 +158,7 @@ export function generateIUPACNameFromSMILES(
 /**
  * Generate IUPAC name from MOL file content
  */
-export function generateIUPACNameFromMolfile(
-  molfile: string,
-): IUPACGenerationResult {
+export function generateIUPACNameFromMolfile(molfile: string): IUPACGenerationResult {
   try {
     const parseResult = parseMolfile(molfile);
     if (!parseResult.molecule) {

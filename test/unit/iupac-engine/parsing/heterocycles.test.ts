@@ -194,9 +194,7 @@ describe("New Heterocycle Parsing (IUPAC → SMILES)", () => {
       const result = parseIUPACName("tetrazole");
       const molecule = result.molecule!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b) => b.type === BondType.AROMATIC,
-      );
+      const aromaticBonds = molecule.bonds.filter((b) => b.type === BondType.AROMATIC);
       expect(aromaticBonds.length).toBe(5); // 5-membered aromatic ring
     });
 
@@ -204,9 +202,7 @@ describe("New Heterocycle Parsing (IUPAC → SMILES)", () => {
       const result = parseIUPACName("pyrimidine");
       const molecule = result.molecule!;
 
-      const aromaticBonds = molecule.bonds.filter(
-        (b) => b.type === BondType.AROMATIC,
-      );
+      const aromaticBonds = molecule.bonds.filter((b) => b.type === BondType.AROMATIC);
       expect(aromaticBonds.length).toBe(6); // 6-membered aromatic ring
     });
 
@@ -215,9 +211,7 @@ describe("New Heterocycle Parsing (IUPAC → SMILES)", () => {
       const molecule = result.molecule!;
 
       const oxygenCount = molecule.atoms.filter((a) => a.symbol === "O").length;
-      const nitrogenCount = molecule.atoms.filter(
-        (a) => a.symbol === "N",
-      ).length;
+      const nitrogenCount = molecule.atoms.filter((a) => a.symbol === "N").length;
       const carbonCount = molecule.atoms.filter((a) => a.symbol === "C").length;
 
       expect(oxygenCount).toBe(1);
@@ -230,9 +224,7 @@ describe("New Heterocycle Parsing (IUPAC → SMILES)", () => {
       const molecule = result.molecule!;
 
       const sulfurCount = molecule.atoms.filter((a) => a.symbol === "S").length;
-      const nitrogenCount = molecule.atoms.filter(
-        (a) => a.symbol === "N",
-      ).length;
+      const nitrogenCount = molecule.atoms.filter((a) => a.symbol === "N").length;
       const carbonCount = molecule.atoms.filter((a) => a.symbol === "C").length;
 
       expect(sulfurCount).toBe(1);
@@ -244,9 +236,7 @@ describe("New Heterocycle Parsing (IUPAC → SMILES)", () => {
       const result = parseIUPACName("tetrazole");
       const molecule = result.molecule!;
 
-      const nitrogenCount = molecule.atoms.filter(
-        (a) => a.symbol === "N",
-      ).length;
+      const nitrogenCount = molecule.atoms.filter((a) => a.symbol === "N").length;
       const carbonCount = molecule.atoms.filter((a) => a.symbol === "C").length;
 
       expect(nitrogenCount).toBe(4);

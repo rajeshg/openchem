@@ -1,11 +1,4 @@
-import type {
-  Atom,
-  Bond,
-  BondType,
-  Molecule,
-  ParseError,
-  StereoType,
-} from "types";
+import type { Atom, Bond, BondType, Molecule, ParseError, StereoType } from "types";
 import { BondType as BT, StereoType as ST } from "types";
 import { ATOMIC_NUMBERS } from "src/constants";
 import { enrichMolecule } from "src/utils/molecule-enrichment";
@@ -361,26 +354,16 @@ function parseV2000(lines: string[]): {
   const countsLine = lines[countsLineIndex] || "";
   const counts = parseV2000CountsLine(countsLine, errors);
 
-  const atomLines = lines.slice(
-    countsLineIndex + 1,
-    countsLineIndex + 1 + counts.numAtoms,
-  );
+  const atomLines = lines.slice(countsLineIndex + 1, countsLineIndex + 1 + counts.numAtoms);
   const atoms = parseV2000AtomBlock(atomLines, counts.numAtoms, errors);
 
   const bondLines = lines.slice(
     countsLineIndex + 1 + counts.numAtoms,
     countsLineIndex + 1 + counts.numAtoms + counts.numBonds,
   );
-  const bonds = parseV2000BondBlock(
-    bondLines,
-    counts.numBonds,
-    atoms.length,
-    errors,
-  );
+  const bonds = parseV2000BondBlock(bondLines, counts.numBonds, atoms.length, errors);
 
-  const propLines = lines.slice(
-    countsLineIndex + 1 + counts.numAtoms + counts.numBonds,
-  );
+  const propLines = lines.slice(countsLineIndex + 1 + counts.numAtoms + counts.numBonds);
   const properties = parseV2000PropertyBlock(propLines);
 
   return {
@@ -527,12 +510,7 @@ function parseV3000(lines: string[]): {
         continue;
       }
 
-      if (
-        atom1 < 1 ||
-        atom1 > atoms.length ||
-        atom2 < 1 ||
-        atom2 > atoms.length
-      ) {
+      if (atom1 < 1 || atom1 > atoms.length || atom2 < 1 || atom2 > atoms.length) {
         errors.push({
           message: `V3000 bond references non-existent atom (atom1: ${atom1}, atom2: ${atom2}, numAtoms: ${atoms.length})`,
           position: i,

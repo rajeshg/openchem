@@ -38,17 +38,13 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
     }
 
     if (!candidateRings || candidateRings.length <= 1) {
-      if (process.env.VERBOSE)
-        console.log("[P-44.2.3] Skipping - not enough rings");
+      if (process.env.VERBOSE) console.log("[P-44.2.3] Skipping - not enough rings");
       return context;
     }
 
     // Check if rings are connected (bonded to each other but not sharing atoms)
     // If rings are connected, they form a polycyclic parent and should NOT be filtered by ring size
-    const areRingsConnected = (
-      ring1: RingSystem,
-      ring2: RingSystem,
-    ): boolean => {
+    const areRingsConnected = (ring1: RingSystem, ring2: RingSystem): boolean => {
       const ring1AtomIds = new Set(ring1.atoms.map((a: Atom) => a.id));
       const ring2AtomIds = new Set(ring2.atoms.map((a: Atom) => a.id));
 
@@ -69,11 +65,7 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
     // If any two rings are connected, keep all rings (they form a polycyclic parent)
     let hasConnectedRings = false;
     for (let i = 0; i < candidateRings.length && !hasConnectedRings; i++) {
-      for (
-        let j = i + 1;
-        j < candidateRings.length && !hasConnectedRings;
-        j++
-      ) {
+      for (let j = i + 1; j < candidateRings.length && !hasConnectedRings; j++) {
         if (areRingsConnected(candidateRings[i]!, candidateRings[j]!)) {
           hasConnectedRings = true;
         }
@@ -92,9 +84,7 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
     const functionalGroups = state.functionalGroups || [];
 
     // Get principal functional groups (P-44.1 takes precedence over P-44.2)
-    const principalFGs = functionalGroups.filter(
-      (fg: FunctionalGroup) => fg.isPrincipal,
-    );
+    const principalFGs = functionalGroups.filter((fg: FunctionalGroup) => fg.isPrincipal);
 
     if (process.env.VERBOSE) {
       console.log("[P-44.2.3] Principal FGs:", principalFGs.length);
@@ -120,9 +110,7 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
 
       for (const fg of principalFGs) {
         // Check if any FG atom is in the ring
-        const fgInRing = (fg.atoms || []).some((atom: Atom) =>
-          ringAtomIds.has(atom.id),
-        );
+        const fgInRing = (fg.atoms || []).some((atom: Atom) => ringAtomIds.has(atom.id));
 
         // Check if any FG atom is bonded to a ring atom
         let fgAttachedToRing = false;
@@ -133,8 +121,7 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
             );
 
             for (const bond of bonds) {
-              const neighborId =
-                bond.atom1 === fgAtom.id ? bond.atom2 : bond.atom1;
+              const neighborId = bond.atom1 === fgAtom.id ? bond.atom2 : bond.atom1;
               if (ringAtomIds.has(neighborId)) {
                 fgAttachedToRing = true;
                 break;
@@ -151,9 +138,7 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
             highestPriority = fg.priority;
           }
           if (process.env.VERBOSE) {
-            console.log(
-              `[P-44.2.3]   FG ${fg.type} attached (priority ${fg.priority})`,
-            );
+            console.log(`[P-44.2.3]   FG ${fg.type} attached (priority ${fg.priority})`);
           }
         }
       }
@@ -179,17 +164,13 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
       const ringsWithFGs = ringFGScores.filter((r) => r.fgCount === maxFGCount);
 
       // If there's a tie, use highest priority functional group
-      const highestPriority = Math.min(
-        ...ringsWithFGs.map((r) => r.highestPriority),
-      );
+      const highestPriority = Math.min(...ringsWithFGs.map((r) => r.highestPriority));
       const ringsWithHighestPriorityFG = ringsWithFGs.filter(
         (r) => r.highestPriority === highestPriority,
       );
 
       // If still tied, use smallest ring size
-      const smallestSize = Math.min(
-        ...ringsWithHighestPriorityFG.map((r) => r.size),
-      );
+      const smallestSize = Math.min(...ringsWithHighestPriorityFG.map((r) => r.size));
       const selectedRings = ringsWithHighestPriorityFG
         .filter((r) => r.size === smallestSize)
         .map((r) => r.ring);
@@ -211,17 +192,11 @@ export const P44_2_3_RING_SIZE_SENIORITY_RULE: IUPACRule = {
     }
 
     // No functional groups attached - use original logic (smallest ring size)
-    const smallestSize = Math.min(
-      ...candidateRings.map((ring: RingSystem) => ring.size),
-    );
-    const smallestRings = candidateRings.filter(
-      (ring: RingSystem) => ring.size === smallestSize,
-    );
+    const smallestSize = Math.min(...candidateRings.map((ring: RingSystem) => ring.size));
+    const smallestRings = candidateRings.filter((ring: RingSystem) => ring.size === smallestSize);
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.2.3] No FGs attached - selecting smallest ring size: ${smallestSize}`,
-      );
+      console.log(`[P-44.2.3] No FGs attached - selecting smallest ring size: ${smallestSize}`);
     }
 
     return context.withUpdatedRings(

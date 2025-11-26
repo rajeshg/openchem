@@ -10,9 +10,7 @@ for (let i = 1; i <= 40; i++) {
 }
 
 for (let i = 1; i <= 30; i++) {
-  TEST_SMILES.push(
-    "C".repeat(Math.max(1, i)) + "=C" + (i % 5 === 0 ? "C" : ""),
-  );
+  TEST_SMILES.push("C".repeat(Math.max(1, i)) + "=C" + (i % 5 === 0 ? "C" : ""));
 }
 
 for (let i = 1; i <= 10; i++) {
@@ -390,15 +388,13 @@ const KNOWN_AROMATICITY_DIFFERENCES: KnownDifference[] = [
   {
     pattern: "N",
     smiles: "n1cccc1",
-    reason:
-      "openchem marks all atoms in pyrrole as aromatic; RDKit marks nitrogen differently",
+    reason: "openchem marks all atoms in pyrrole as aromatic; RDKit marks nitrogen differently",
     category: "aromaticity-aliphatic",
   },
   {
     pattern: "[a]",
     smiles: "n1c2ccccc2c1",
-    reason:
-      "openchem marks all atoms in indole as aromatic; RDKit uses extended aromaticity model",
+    reason: "openchem marks all atoms in indole as aromatic; RDKit uses extended aromaticity model",
     category: "aromaticity-aromatic",
   },
   {
@@ -550,20 +546,7 @@ function isKnownDifference(
 
   // Kekulé-form fused aromatic rings (uppercase SMILES with explicit double bonds)
   // openchem doesn't fully perceive aromaticity in Kekulé form for fused heterocycles
-  if (
-    [
-      "C",
-      "N",
-      "O",
-      "C-C",
-      "C=C",
-      "C(=O)O",
-      "[a]",
-      "[A]",
-      "[C&D2]",
-      "[C,N]",
-    ].includes(pattern)
-  ) {
+  if (["C", "N", "O", "C-C", "C=C", "C(=O)O", "[a]", "[A]", "[C&D2]", "[C,N]"].includes(pattern)) {
     // Check for Kekulé-form indole, benzofuran, or other fused heteroaromatic systems
     // Patterns: C1=CNc2, O1C=C...c2, etc.
     if (
@@ -604,9 +587,7 @@ describe("RDKit SMARTS Bulk Comparison", () => {
       const smartsPattern = parseSMARTS(pattern);
       if (smartsPattern.errors && smartsPattern.errors.length > 0) {
         if (process.env.RUN_VERBOSE)
-          console.log(
-            `Failed to parse SMARTS pattern ${pattern}: ${smartsPattern.errors}`,
-          );
+          console.log(`Failed to parse SMARTS pattern ${pattern}: ${smartsPattern.errors}`);
         continue;
       }
 
@@ -636,12 +617,7 @@ describe("RDKit SMARTS Bulk Comparison", () => {
         const openchemMatches = allopenchemMatches;
 
         try {
-          assertMatchesEqual(
-            openchemMatches,
-            rdkitResult.matches,
-            pattern,
-            smiles,
-          );
+          assertMatchesEqual(openchemMatches, rdkitResult.matches, pattern, smiles);
           successCount++;
         } catch (e) {
           const knownDiff = isKnownDifference(
@@ -651,9 +627,7 @@ describe("RDKit SMARTS Bulk Comparison", () => {
             rdkitResult.matches.length,
           );
           if (knownDiff) {
-            knownDifferences.push(
-              `${pattern} vs ${smiles}: ${knownDiff.reason}`,
-            );
+            knownDifferences.push(`${pattern} vs ${smiles}: ${knownDiff.reason}`);
             successCount++;
           } else {
             failures.push(`${pattern} vs ${smiles}: ${e}`);
@@ -664,17 +638,14 @@ describe("RDKit SMARTS Bulk Comparison", () => {
 
     if (knownDifferences.length > 0) {
       if (process.env.RUN_VERBOSE)
-        console.log(
-          `\nKnown differences (expected): ${knownDifferences.length}`,
-        );
+        console.log(`\nKnown differences (expected): ${knownDifferences.length}`);
       knownDifferences.forEach((d) => {
         if (process.env.RUN_VERBOSE) console.log(`  - ${d}`);
       });
     }
 
     if (failures.length > 0) {
-      if (process.env.RUN_VERBOSE)
-        console.log(`\nUnexpected failures: ${failures.length}`);
+      if (process.env.RUN_VERBOSE) console.log(`\nUnexpected failures: ${failures.length}`);
       if (process.env.RUN_VERBOSE) console.log("First 10 failures:");
       failures.slice(0, 10).forEach((f) => {
         if (process.env.RUN_VERBOSE) console.log(f);
@@ -682,17 +653,11 @@ describe("RDKit SMARTS Bulk Comparison", () => {
     }
 
     if (process.env.RUN_VERBOSE)
-      console.log(
-        `\nSuccess: ${successCount}/${SMARTS_PATTERNS.length * TEST_SMILES.length}`,
-      );
+      console.log(`\nSuccess: ${successCount}/${SMARTS_PATTERNS.length * TEST_SMILES.length}`);
     if (process.env.RUN_VERBOSE)
-      console.log(
-        `  - Perfect matches: ${successCount - knownDifferences.length}`,
-      );
-    if (process.env.RUN_VERBOSE)
-      console.log(`  - Known differences: ${knownDifferences.length}`);
-    if (process.env.RUN_VERBOSE)
-      console.log(`  - Unexpected failures: ${failures.length}`);
+      console.log(`  - Perfect matches: ${successCount - knownDifferences.length}`);
+    if (process.env.RUN_VERBOSE) console.log(`  - Known differences: ${knownDifferences.length}`);
+    if (process.env.RUN_VERBOSE) console.log(`  - Unexpected failures: ${failures.length}`);
 
     expect(failures.length).toBe(0);
   }, 600000);

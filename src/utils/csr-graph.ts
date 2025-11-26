@@ -169,12 +169,7 @@ export class CSRGraph {
    * @returns Bond or undefined if not connected
    */
   getBond(atom1: number, atom2: number): Bond | undefined {
-    if (
-      atom1 < 0 ||
-      atom1 >= this.numAtoms ||
-      atom2 < 0 ||
-      atom2 >= this.numAtoms
-    ) {
+    if (atom1 < 0 || atom1 >= this.numAtoms || atom2 < 0 || atom2 >= this.numAtoms) {
       return undefined;
     }
 
@@ -212,12 +207,7 @@ export class CSRGraph {
    * @returns True if connected
    */
   isConnected(atom1: number, atom2: number): boolean {
-    if (
-      atom1 < 0 ||
-      atom1 >= this.numAtoms ||
-      atom2 < 0 ||
-      atom2 >= this.numAtoms
-    ) {
+    if (atom1 < 0 || atom1 >= this.numAtoms || atom2 < 0 || atom2 >= this.numAtoms) {
       return false;
     }
 

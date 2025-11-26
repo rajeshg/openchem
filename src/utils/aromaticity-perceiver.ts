@@ -51,9 +51,7 @@ function findFusedSystems(rings: number[][]): FusedSystem[] {
         const otherRing = rings[j];
         if (!otherRing) continue;
 
-        const hasSharedAtom = otherRing.some((atomId) =>
-          system.atoms.has(atomId),
-        );
+        const hasSharedAtom = otherRing.some((atomId) => system.atoms.has(atomId));
 
         if (hasSharedAtom) {
           system.rings.push(otherRing);
@@ -103,9 +101,7 @@ function hasExocyclicDoubleBondToElectronegative(
       if (otherAtom) {
         // Only consider double bonds to electronegative atoms (O=8, N=7, S=16, F=9, Cl=17, Br=35, I=53)
         // Carbon=6 is not electronegative, so C=C exocyclic bonds don't disqualify aromaticity
-        const isElectronegative = [7, 8, 9, 16, 17, 35, 53].includes(
-          otherAtom.atomicNumber,
-        );
+        const isElectronegative = [7, 8, 9, 16, 17, 35, 53].includes(otherAtom.atomicNumber);
         if (!isElectronegative) continue; // Skip non-electronegative atoms
       }
     }
@@ -233,11 +229,7 @@ function countPiElectronsRDKit(
       // If carbon was marked aromatic in SMILES input and has 2 ring bonds,
       // it should contribute 1 π electron (e.g., tetrazole: n1nncn1)
       // NOTE: Only apply this in fully aromatic context to avoid mixing aromatic/non-aromatic rings
-      if (
-        allAtomsWereAromatic &&
-        originalAromaticFlags[atom.id] &&
-        ringBonds.length === 2
-      ) {
+      if (allAtomsWereAromatic && originalAromaticFlags[atom.id] && ringBonds.length === 2) {
         return 1;
       }
 
@@ -344,9 +336,7 @@ function hasConjugatedSystem(
     const atom = map.get(atomId);
     if (!atom) return false;
 
-    const isConjugatable = ["C", "N", "O", "S", "P", "As", "Se", "B"].includes(
-      atom.symbol,
-    );
+    const isConjugatable = ["C", "N", "O", "S", "P", "As", "Se", "B"].includes(atom.symbol);
 
     if (!isConjugatable) {
       return false;
@@ -361,9 +351,7 @@ function hasConjugatedSystem(
     const hasDoubleBond = ringBonds.some((b) => {
       const key = bondKeyFn(b.atom1, b.atom2);
       const originalType = originalBondTypes[key];
-      return (
-        originalType === BondType.DOUBLE || originalType === BondType.AROMATIC
-      );
+      return originalType === BondType.DOUBLE || originalType === BondType.AROMATIC;
     });
 
     if (atom.symbol === "C") {
@@ -387,17 +375,13 @@ function isRingHuckelAromatic(
 ): boolean {
   const ringSet = new Set(ring);
   const map = atomMap || new Map(atoms.map((a) => [a.id, a]));
-  const bondsMap =
-    atomBondsMap ||
-    new Map(atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]));
+  const bondsMap = atomBondsMap || new Map(atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]));
 
   if (!hasConjugatedSystem(ringSet, atoms, bonds, originalBondTypes, map)) {
     return false;
   }
 
-  const allAtomsWereAromatic = ring.every(
-    (atomId) => originalAromaticFlags[atomId],
-  );
+  const allAtomsWereAromatic = ring.every((atomId) => originalAromaticFlags[atomId]);
 
   let totalPiElectrons = 0;
   let debugLog = [];
@@ -440,17 +424,9 @@ function isFusedSystemAromatic(
   const systemAtoms = Array.from(fusedSystem.atoms);
   const systemAtomSet = new Set(systemAtoms);
   const map = atomMap || new Map(atoms.map((a) => [a.id, a]));
-  const bondsMap =
-    atomBondsMap ||
-    new Map(atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]));
+  const bondsMap = atomBondsMap || new Map(atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]));
 
-  const hasConj = hasConjugatedSystem(
-    systemAtomSet,
-    atoms,
-    bonds,
-    originalBondTypes,
-    map,
-  );
+  const hasConj = hasConjugatedSystem(systemAtomSet, atoms, bonds, originalBondTypes, map);
   if (process.env.VERBOSE && systemAtomSet.has(14)) {
     console.log(`[AROM DEBUG] Fused system has conjugation: ${hasConj}`);
   }
@@ -458,9 +434,7 @@ function isFusedSystemAromatic(
     return false;
   }
 
-  const allAtomsWereAromatic = systemAtoms.every(
-    (atomId) => originalAromaticFlags[atomId],
-  );
+  const allAtomsWereAromatic = systemAtoms.every((atomId) => originalAromaticFlags[atomId]);
 
   let totalPiElectrons = 0;
   let debugLog = [];
@@ -488,9 +462,7 @@ function isFusedSystemAromatic(
 
   const isAromatic = totalPiElectrons >= 6 && (totalPiElectrons - 2) % 4 === 0;
   if (process.env.VERBOSE && systemAtomSet.has(14)) {
-    console.log(
-      `[AROM DEBUG] Fused π electrons: ${totalPiElectrons}, aromatic: ${isAromatic}`,
-    );
+    console.log(`[AROM DEBUG] Fused π electrons: ${totalPiElectrons}, aromatic: ${isAromatic}`);
     if (debugLog.length > 0) {
       console.log(`[AROM DEBUG] Atom contributions: ${debugLog.join(", ")}`);
     }
@@ -534,9 +506,7 @@ function perceiveAromaticityMutable(
   const atomBondsMap = new Map<number, Bond[]>(
     atoms.map((a) => [a.id, getBondsForAtom(bonds, a.id)]),
   );
-  const bondMap = new Map<string, MutableBond>(
-    bonds.map((b) => [bondKey(b.atom1, b.atom2), b]),
-  );
+  const bondMap = new Map<string, MutableBond>(bonds.map((b) => [bondKey(b.atom1, b.atom2), b]));
 
   for (const b of bonds) {
     const key = bondKey(b.atom1, b.atom2);
@@ -547,9 +517,7 @@ function perceiveAromaticityMutable(
     originalAromaticFlags[atom.id] = atom.aromatic;
   }
 
-  const aromaticityCheckRings = allRings.filter(
-    (r) => r.length >= 5 && r.length <= 7,
-  );
+  const aromaticityCheckRings = allRings.filter((r) => r.length >= 5 && r.length <= 7);
 
   if (aromaticityCheckRings.length === 0) {
     for (const atom of atoms) {
@@ -587,14 +555,10 @@ function perceiveAromaticityMutable(
       );
       // DEBUG: Log thiazole ring check
       if (process.env.VERBOSE && ring.length === 5 && ring[0] === 0) {
-        console.log(
-          `[AROM DEBUG] Ring [${ring.join(",")}] Hückel check: ${isAromatic}`,
-        );
+        console.log(`[AROM DEBUG] Ring [${ring.join(",")}] Hückel check: ${isAromatic}`);
       }
       if (process.env.VERBOSE && (ring.includes(12) || ring.includes(14))) {
-        console.log(
-          `[AROM DEBUG] Single ring [${ring.join(",")}] Hückel check: ${isAromatic}`,
-        );
+        console.log(`[AROM DEBUG] Single ring [${ring.join(",")}] Hückel check: ${isAromatic}`);
       }
       if (isAromatic) {
         aromaticRings.push(ring);
@@ -624,9 +588,7 @@ function perceiveAromaticityMutable(
         }
       } else {
         if (process.env.VERBOSE && system.atoms.has(14)) {
-          console.log(
-            `[AROM DEBUG] Fused system not aromatic, checking individual rings...`,
-          );
+          console.log(`[AROM DEBUG] Fused system not aromatic, checking individual rings...`);
         }
         for (const ring of system.rings) {
           const isAromatic = isRingHuckelAromatic(
@@ -638,14 +600,8 @@ function perceiveAromaticityMutable(
             atomMap,
             atomBondsMap,
           );
-          if (
-            process.env.VERBOSE &&
-            system.atoms.has(14) &&
-            ring.includes(14)
-          ) {
-            console.log(
-              `[AROM DEBUG] Ring [${ring.join(",")}] individual check: ${isAromatic}`,
-            );
+          if (process.env.VERBOSE && system.atoms.has(14) && ring.includes(14)) {
+            console.log(`[AROM DEBUG] Ring [${ring.join(",")}] individual check: ${isAromatic}`);
           }
           if (isAromatic) {
             aromaticRings.push(ring);
@@ -706,9 +662,7 @@ function perceiveAromaticityMutable(
     }
 
     const ringSet = new Set(ring);
-    const ringAtoms = getRingAtoms(ring, atoms as Atom[]).map(
-      (a) => a as MutableAtom,
-    );
+    const ringAtoms = getRingAtoms(ring, atoms as Atom[]).map((a) => a as MutableAtom);
 
     for (const atom of ringAtoms) {
       const exoDouble = hasExocyclicDoubleBondToElectronegative(
@@ -726,10 +680,7 @@ function perceiveAromaticityMutable(
           }
         }
 
-        const allRingBonds = getRingBonds(
-          ring,
-          bonds as Bond[],
-        ) as MutableBond[];
+        const allRingBonds = getRingBonds(ring, bonds as Bond[]) as MutableBond[];
         for (const bond of allRingBonds) {
           const k = bondKey(bond.atom1, bond.atom2);
           bond.type = originalBondTypes[k] ?? BondType.SINGLE;
@@ -772,13 +723,7 @@ function perceiveAromaticityMutable(
     }
   }
 
-  kekulizeNonAromaticRings(
-    allRings,
-    aromaticRings,
-    atoms,
-    bonds,
-    originalBondTypes,
-  );
+  kekulizeNonAromaticRings(allRings, aromaticRings, atoms, bonds, originalBondTypes);
 }
 
 function kekulizeNonAromaticRings(
@@ -837,9 +782,7 @@ function kekulizeRing(
       return !ringSet.has(otherId);
     });
 
-    const hasExocyclicDouble = exocyclicBonds.some(
-      (b) => b.type === BondType.DOUBLE,
-    );
+    const hasExocyclicDouble = exocyclicBonds.some((b) => b.type === BondType.DOUBLE);
 
     if (hasExocyclicDouble) {
       availableDoubleBonds = 0;
@@ -920,9 +863,7 @@ export function kekulize(molecule: Molecule): Molecule {
   const mutableAtoms: MutableAtom[] = molecule.atoms.map((a) => ({ ...a }));
   const mutableBonds: MutableBond[] = molecule.bonds.map((b) => ({ ...b }));
 
-  const aromaticBonds = mutableBonds.filter(
-    (b) => b.type === BondType.AROMATIC,
-  );
+  const aromaticBonds = mutableBonds.filter((b) => b.type === BondType.AROMATIC);
   if (aromaticBonds.length === 0) {
     return molecule;
   }
@@ -931,9 +872,7 @@ export function kekulize(molecule: Molecule): Molecule {
     atoms: mutableAtoms as Atom[],
     bonds: mutableBonds as Bond[],
   });
-  const kekulizationRings = mg.sssr.filter(
-    (r) => r.length >= 5 && r.length <= 7,
-  );
+  const kekulizationRings = mg.sssr.filter((r) => r.length >= 5 && r.length <= 7);
 
   const ringBondMap = new Map<string, number[][]>();
   for (const ring of kekulizationRings) {
@@ -970,13 +909,7 @@ export function kekulize(molecule: Molecule): Molecule {
   }
 
   for (const ring of aromaticRings) {
-    kekulizeRing(
-      ring,
-      mutableAtoms,
-      mutableBonds,
-      originalBondTypes,
-      aromaticBondSet,
-    );
+    kekulizeRing(ring, mutableAtoms, mutableBonds, originalBondTypes, aromaticBondSet);
   }
 
   return { atoms: mutableAtoms, bonds: mutableBonds };

@@ -111,11 +111,7 @@ describe("Comprehensive Canonicalization Tests", () => {
     });
 
     it("should canonicalize indole consistently with heteroatom priority", () => {
-      const inputs = [
-        "c1ccc2[nH]ccc2c1",
-        "c2c1ccccc1[nH]c2",
-        "[nH]1ccc2ccccc12",
-      ];
+      const inputs = ["c1ccc2[nH]ccc2c1", "c2c1ccccc1[nH]c2", "[nH]1ccc2ccccc12"];
       const results = inputs.map((smiles) => {
         const parsed = parseSMILES(smiles);
         expect(parsed.errors).toHaveLength(0);
@@ -257,10 +253,7 @@ describe("Comprehensive Canonicalization Tests", () => {
 
     it("should handle empty molecule", () => {
       const parsed = parseSMILES("");
-      const canonical = generateSMILES(
-        parsed.molecules[0] || { atoms: [], bonds: [] },
-        true,
-      );
+      const canonical = generateSMILES(parsed.molecules[0] || { atoms: [], bonds: [] }, true);
       expect(canonical).toBe("");
     });
 

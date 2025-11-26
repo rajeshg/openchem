@@ -167,9 +167,7 @@ describe("Isotope Support", () => {
       const result2 = parseSMILES(output);
       expect(result2.errors).toEqual([]);
 
-      const deuteriumCount = result2.molecules[0]!.atoms.filter(
-        (a) => a.isotope === 2,
-      ).length;
+      const deuteriumCount = result2.molecules[0]!.atoms.filter((a) => a.isotope === 2).length;
       expect(deuteriumCount).toBe(6);
     });
 

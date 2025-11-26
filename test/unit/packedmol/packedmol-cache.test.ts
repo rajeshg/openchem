@@ -1,10 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
 import { encodePackedMol } from "src/generators/packedmol-encoder";
-import {
-  getCachedPackedMol,
-  clearCachedPackedMol,
-} from "src/utils/packedmol-cache";
+import { getCachedPackedMol, clearCachedPackedMol } from "src/utils/packedmol-cache";
 
 describe("PackedMol Caching", () => {
   it("caches PackedMol on first encode", () => {

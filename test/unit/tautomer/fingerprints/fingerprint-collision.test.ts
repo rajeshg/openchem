@@ -13,13 +13,11 @@ describe("tautomer: fingerprint collision handling", () => {
     // Run with fingerprint dedup forced to tiny size to cause collisions
     const withFp = enumerateTautomers(mol, {
       maxTautomers: 128,
-      phases: [1, 2, 3],
       useFingerprintDedup: true,
       fpSize: 1,
     });
     const withoutFp = enumerateTautomers(mol, {
       maxTautomers: 128,
-      phases: [1, 2, 3],
       useFingerprintDedup: false,
     });
 

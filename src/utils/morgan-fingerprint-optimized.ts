@@ -56,9 +56,7 @@ export function bulkComputeFingerprintsOptimized(
   radius?: number,
   fpSize?: number,
 ): Uint8Array[] {
-  return molecules.map((mol) =>
-    computeMorganFingerprintOptimized(mol, radius, fpSize),
-  );
+  return molecules.map((mol) => computeMorganFingerprintOptimized(mol, radius, fpSize));
 }
 
 /**
@@ -78,12 +76,7 @@ export function findSimilarOptimized(
   const similarities: number[] = [];
 
   for (let i = 0; i < targetMols.length; i++) {
-    const similarity = tanimotoSimilarityOptimized(
-      queryMol,
-      targetMols[i]!,
-      radius,
-      fpSize,
-    );
+    const similarity = tanimotoSimilarityOptimized(queryMol, targetMols[i]!, radius, fpSize);
     if (similarity >= threshold) {
       indices.push(i);
       similarities.push(similarity);
@@ -101,11 +94,7 @@ export function computeSimilarityMatrixOptimized(
   radius?: number,
   fpSize?: number,
 ): number[][] {
-  const fingerprints = bulkComputeFingerprintsOptimized(
-    molecules,
-    radius,
-    fpSize,
-  );
+  const fingerprints = bulkComputeFingerprintsOptimized(molecules, radius, fpSize);
   const n = molecules.length;
   const matrix: number[][] = Array(n)
     .fill(null)

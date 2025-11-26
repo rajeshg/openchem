@@ -43,11 +43,7 @@ function isFunctionalGroupOnRing(
     if (fgAtom.symbol !== "C") {
       for (const bond of molecule.bonds) {
         const bondedIdx =
-          bond.atom1 === fgAtomIdx
-            ? bond.atom2
-            : bond.atom2 === fgAtomIdx
-              ? bond.atom1
-              : -1;
+          bond.atom1 === fgAtomIdx ? bond.atom2 : bond.atom2 === fgAtomIdx ? bond.atom1 : -1;
 
         if (bondedIdx !== -1 && ringAtomIndices.has(bondedIdx)) {
           // The carbon bonded to this heteroatom is in the ring
@@ -80,11 +76,7 @@ function isFunctionalGroupAttachedToRing(
   for (const fgAtomIdx of fgAtomIndices) {
     for (const bond of molecule.bonds) {
       const bondedTo =
-        bond.atom1 === fgAtomIdx
-          ? bond.atom2
-          : bond.atom2 === fgAtomIdx
-            ? bond.atom1
-            : -1;
+        bond.atom1 === fgAtomIdx ? bond.atom2 : bond.atom2 === fgAtomIdx ? bond.atom1 : -1;
 
       if (bondedTo !== -1 && ringAtomIndices.has(bondedTo)) {
         // FG atom is directly bonded to a ring atom
@@ -99,16 +91,14 @@ function isFunctionalGroupAttachedToRing(
 export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
   id: "P-44.1.1",
   name: "Maximum Number of Principal Characteristic Groups",
-  description:
-    "Select parent with maximum number of principal characteristic groups",
+  description: "Select parent with maximum number of principal characteristic groups",
   blueBookReference: BLUE_BOOK_RULES.P44_1,
   priority: RulePriority.EIGHT, // Higher than P2_3 (75) to run before ring parent selection
   conditions: (context) => {
     const state = context.getState();
     // Skip if parent structure already selected
     if (state.parentStructure) {
-      if (process.env.VERBOSE)
-        console.log("[P-44.1.1] Skipping - parent already selected");
+      if (process.env.VERBOSE) console.log("[P-44.1.1] Skipping - parent already selected");
       return false;
     }
     // Apply if we have both chains and rings, OR if we have rings and might be able to find chains
@@ -150,9 +140,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
       "phosphanyl", // P - treat phosphanyl substituents as non-principal here
       "P", // pattern name for phosphanyl
     ];
-    const principalFGs = functionalGroups.filter(
-      (fg) => !NON_PRINCIPAL_TYPES.includes(fg.type),
-    );
+    const principalFGs = functionalGroups.filter((fg) => !NON_PRINCIPAL_TYPES.includes(fg.type));
 
     if (process.env.VERBOSE) {
       console.log(`[P-44.1.1] principalFGs.length=${principalFGs.length}`);
@@ -160,10 +148,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
         `[P-44.1.1] principal FG types:`,
         principalFGs.map((fg) => fg.type),
       );
-      console.log(
-        `[P-44.1.1] principal FGs full:`,
-        JSON.stringify(principalFGs, null, 2),
-      );
+      console.log(`[P-44.1.1] principal FGs full:`, JSON.stringify(principalFGs, null, 2));
     }
 
     // Track which functional groups are part of chains
@@ -197,9 +182,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
         allRingAtomIndices.has(idx),
       ).length;
       const ringAtomPercentage =
-        chainAtomIndices.size > 0
-          ? ringAtomCountInChain / chainAtomIndices.size
-          : 0;
+        chainAtomIndices.size > 0 ? ringAtomCountInChain / chainAtomIndices.size : 0;
 
       if (process.env.VERBOSE && ringAtomPercentage > 0) {
         console.log(
@@ -228,27 +211,17 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
 
         // Check if this FG is on a ring (considering carbon bearing the FG for alcohols/ethers)
         // (allRingAtomIndices was already computed above for the ring atom percentage check)
-        const isOnRing = isFunctionalGroupOnRing(
-          fg,
-          molecule,
-          allRingAtomIndices,
-        );
+        const isOnRing = isFunctionalGroupOnRing(fg, molecule, allRingAtomIndices);
 
         // Check if FG atom is in chain
-        const hasAtomInChain = fgAtomIndices.some((atomIdx) =>
-          chainAtomIndices.has(atomIdx),
-        );
+        const hasAtomInChain = fgAtomIndices.some((atomIdx) => chainAtomIndices.has(atomIdx));
 
         // Check if FG atom is attached to chain (directly or through short carbon bridge)
         // BUT only if it's not already part of a ring
         const isAttachedToChain =
           !isOnRing &&
           !hasAtomInChain &&
-          isFunctionalGroupAttachedToRing(
-            fgAtomIndices,
-            chainAtomIndices,
-            molecule,
-          );
+          isFunctionalGroupAttachedToRing(fgAtomIndices, chainAtomIndices, molecule);
 
         if (process.env.VERBOSE) {
           console.log(
@@ -313,12 +286,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
 
         // Check if FG is attached to ring (directly or through short carbon bridge)
         const isAttachedToRing =
-          !isOnRing &&
-          isFunctionalGroupAttachedToRing(
-            fgAtomIndices,
-            ringAtomIndices,
-            molecule,
-          );
+          !isOnRing && isFunctionalGroupAttachedToRing(fgAtomIndices, ringAtomIndices, molecule);
 
         if (isOnRing || isAttachedToRing) {
           ringFGCount++;
@@ -331,9 +299,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.1.1] Rings have ${ringFGCount} principal functional groups`,
-        );
+        console.log(`[P-44.1.1] Rings have ${ringFGCount} principal functional groups`);
       }
     }
 
@@ -341,9 +307,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
     const maxChainFGCount = Math.max(...chainFGCounts.map((c) => c.fgCount), 0);
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.1.1] maxChainFGCount=${maxChainFGCount}, ringFGCount=${ringFGCount}`,
-      );
+      console.log(`[P-44.1.1] maxChainFGCount=${maxChainFGCount}, ringFGCount=${ringFGCount}`);
     }
 
     // If chains have more principal functional groups than rings, select those chains
@@ -357,9 +321,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
 
       // IUPAC P-44.1 seniority order: carboxylic_acid (100) > ester (97) > heterocycles > alcohol (90) > amine (89)
       // Find functional groups on the chains that have more FGs than rings
-      const chainsWithMaxFGs = chainFGCounts.filter(
-        (c) => c.fgCount === maxChainFGCount,
-      );
+      const chainsWithMaxFGs = chainFGCounts.filter((c) => c.fgCount === maxChainFGCount);
       const chainAtomIndicesSet = new Set<number>();
       for (const c of chainsWithMaxFGs) {
         for (const atom of c.chain.atoms) {
@@ -375,23 +337,18 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
           .map((atom) => molecule.atoms.findIndex((a) => a === atom))
           .filter((idx) => idx !== -1);
 
-        const hasAtomInChain = fgAtomIndices.some((idx) =>
-          chainAtomIndicesSet.has(idx),
-        );
+        const hasAtomInChain = fgAtomIndices.some((idx) => chainAtomIndicesSet.has(idx));
         const isAttachedToChain = fgAtomIndices.some((atomIdx) => {
           // Find bonds containing this FG atom
           const neighbors = molecule.bonds
             .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx)
             .map((b) => (b.atom1 === atomIdx ? b.atom2 : b.atom1));
           // Check if any neighbor is in the chain
-          return neighbors.some((neighborIdx) =>
-            chainAtomIndicesSet.has(neighborIdx),
-          );
+          return neighbors.some((neighborIdx) => chainAtomIndicesSet.has(neighborIdx));
         });
 
         const isOnChain = hasAtomInChain || isAttachedToChain;
-        const isHighPriority =
-          fg.type === "carboxylic_acid" || fg.type === "ester";
+        const isHighPriority = fg.type === "carboxylic_acid" || fg.type === "ester";
 
         return isOnChain && isHighPriority;
       });
@@ -404,11 +361,7 @@ export const P44_1_1_PRINCIPAL_CHARACTERISTIC_GROUPS_RULE: IUPACRule = {
       // Heterocycle seniority only applies when FG counts are EQUAL:
       // - If chain has carboxylic acid or ester: chain wins (these are senior to heterocycles)
       // - If chain has only amines/alcohols AND ring has FGs: heterocycle wins (heterocycles are senior)
-      if (
-        hasHeterocyclicRing &&
-        ringFGCount > 0 &&
-        maxChainFGCount === ringFGCount
-      ) {
+      if (hasHeterocyclicRing && ringFGCount > 0 && maxChainFGCount === ringFGCount) {
         if (hasHighPriorityFGOnChain) {
           if (process.env.VERBOSE) {
             console.log(

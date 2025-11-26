@@ -1,10 +1,7 @@
 import type { Molecule, Bond } from "types";
 import type { FunctionalGroup } from "../../../types";
 import { buildRingSubstituentAlkylName } from "../ring-substituent-naming";
-import {
-  getComplexMultiplier,
-  getSimpleMultiplier,
-} from "../../../opsin-adapter";
+import { getComplexMultiplier, getSimpleMultiplier } from "../../../opsin-adapter";
 import { getSharedOPSINService } from "../../../opsin-service";
 import type { OPSINService } from "../../../opsin-service";
 
@@ -19,9 +16,7 @@ function detectAmideGroup(
   // Prevent infinite recursion
   if (visited.has(atomId)) {
     if (process.env.VERBOSE) {
-      console.log(
-        `[detectAmideGroup] Already visited atom ${atomId}, skipping`,
-      );
+      console.log(`[detectAmideGroup] Already visited atom ${atomId}, skipping`);
     }
     return null;
   }
@@ -37,8 +32,7 @@ function detectAmideGroup(
     for (const bond of molecule.bonds) {
       if (bond.type === "double") {
         if (
-          (bond.atom1 === atomId &&
-            molecule.atoms[bond.atom2]?.symbol === "O") ||
+          (bond.atom1 === atomId && molecule.atoms[bond.atom2]?.symbol === "O") ||
           (bond.atom2 === atomId && molecule.atoms[bond.atom1]?.symbol === "O")
         ) {
           hasDoubleBondToO = true;
@@ -57,24 +51,14 @@ function detectAmideGroup(
     if (hasDoubleBondToO) {
       for (const bond of molecule.bonds) {
         if (bond.type === "single") {
-          if (
-            bond.atom1 === atomId &&
-            molecule.atoms[bond.atom2]?.symbol === "N"
-          ) {
+          if (bond.atom1 === atomId && molecule.atoms[bond.atom2]?.symbol === "N") {
             if (process.env.VERBOSE) {
-              console.log(
-                `[detectAmideGroup] Found amide: C=${atomId}, N=${bond.atom2}`,
-              );
+              console.log(`[detectAmideGroup] Found amide: C=${atomId}, N=${bond.atom2}`);
             }
             return { carbonylC: atomId, nitrogen: bond.atom2 };
-          } else if (
-            bond.atom2 === atomId &&
-            molecule.atoms[bond.atom1]?.symbol === "N"
-          ) {
+          } else if (bond.atom2 === atomId && molecule.atoms[bond.atom1]?.symbol === "N") {
             if (process.env.VERBOSE) {
-              console.log(
-                `[detectAmideGroup] Found amide: C=${atomId}, N=${bond.atom1}`,
-              );
+              console.log(`[detectAmideGroup] Found amide: C=${atomId}, N=${bond.atom1}`);
             }
             return { carbonylC: atomId, nitrogen: bond.atom1 };
           }
@@ -102,9 +86,7 @@ function detectAmideGroup(
           }
           if (neighbor?.symbol === "C") {
             if (process.env.VERBOSE) {
-              console.log(
-                `[detectAmideGroup] Recursing to neighbor ${neighborId}`,
-              );
+              console.log(`[detectAmideGroup] Recursing to neighbor ${neighborId}`);
             }
             const check = detectAmideGroup(neighborId, molecule, visited);
             if (check) return check;
@@ -123,10 +105,7 @@ function detectAmideGroup(
   return null;
 }
 
-function findAromaticRingAtoms(
-  startAtomId: number,
-  molecule: Molecule,
-): number[] {
+function findAromaticRingAtoms(startAtomId: number, molecule: Molecule): number[] {
   const ringAtoms: number[] = [];
   const visited = new Set<number>();
   const queue = [startAtomId];
@@ -257,15 +236,8 @@ function findRingSubstituents(
         for (const b2 of molecule.bonds) {
           if (b2.type === "single") {
             let fId: number | undefined;
-            if (
-              b2.atom1 === neighborId &&
-              molecule.atoms[b2.atom2]?.symbol === "F"
-            )
-              fId = b2.atom2;
-            else if (
-              b2.atom2 === neighborId &&
-              molecule.atoms[b2.atom1]?.symbol === "F"
-            )
+            if (b2.atom1 === neighborId && molecule.atoms[b2.atom2]?.symbol === "F") fId = b2.atom2;
+            else if (b2.atom2 === neighborId && molecule.atoms[b2.atom1]?.symbol === "F")
               fId = b2.atom1;
             if (fId !== undefined) fluorines.push(fId);
           }
@@ -285,9 +257,7 @@ function findRingSubstituents(
   return substituents;
 }
 
-function buildAnilinoPart(
-  substituents: Array<{ position: number; name: string }>,
-): string {
+function buildAnilinoPart(substituents: Array<{ position: number; name: string }>): string {
   if (substituents.length === 0) {
     return "anilino";
   }
@@ -321,10 +291,7 @@ function buildComplexAlkoxyWithAmide(
   molecule: Molecule,
 ): string | null {
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildComplexAlkoxyWithAmide] alkoxyCarbonId:",
-      alkoxyCarbonId,
-    );
+    console.log("[buildComplexAlkoxyWithAmide] alkoxyCarbonId:", alkoxyCarbonId);
     if (process.env.VERBOSE) {
       console.log("[buildComplexAlkoxyWithAmide] amideInfo:", amideInfo);
     }
@@ -346,20 +313,14 @@ function buildComplexAlkoxyWithAmide(
     if (bond.type === "single") {
       if (bond.atom1 === alkoxyCarbonId && bond.atom2 !== esterOxygenId) {
         neighbors.push(bond.atom2);
-      } else if (
-        bond.atom2 === alkoxyCarbonId &&
-        bond.atom1 !== esterOxygenId
-      ) {
+      } else if (bond.atom2 === alkoxyCarbonId && bond.atom1 !== esterOxygenId) {
         neighbors.push(bond.atom1);
       }
     }
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[buildComplexAlkoxyWithAmide] neighbors of alkoxyCarbonId:",
-      neighbors,
-    );
+    console.log("[buildComplexAlkoxyWithAmide] neighbors of alkoxyCarbonId:", neighbors);
   }
 
   // Classify neighbors: methyl branches, amide carbonyl, etc.
@@ -378,9 +339,7 @@ function buildComplexAlkoxyWithAmide(
         chainLength++; // The amide carbonyl is part of the main chain
       } else {
         // Check if it's a terminal methyl (degree 1 or only connected to alkoxy carbon)
-        const degree = molecule.bonds.filter(
-          (b) => b.atom1 === nId || b.atom2 === nId,
-        ).length;
+        const degree = molecule.bonds.filter((b) => b.atom1 === nId || b.atom2 === nId).length;
         if (degree === 1) {
           methylGroups.push(nId);
         } else {
@@ -399,9 +358,7 @@ function buildComplexAlkoxyWithAmide(
 
   if (!amideCarbonylId) {
     if (process.env.VERBOSE) {
-      console.log(
-        "[buildComplexAlkoxyWithAmide] No amide carbonyl found as direct neighbor",
-      );
+      console.log("[buildComplexAlkoxyWithAmide] No amide carbonyl found as direct neighbor");
     }
     return null;
   }
@@ -436,11 +393,7 @@ function buildComplexAlkoxyWithAmide(
   }
 
   // Find ring substituents
-  const ringSubstituents = findRingSubstituents(
-    aromaticRingAtomId,
-    nitrogenId,
-    molecule,
-  );
+  const ringSubstituents = findRingSubstituents(aromaticRingAtomId, nitrogenId, molecule);
 
   // Build the anilino part: [4-nitro-3-(trifluoromethyl)anilino]
   const anilinoPart = buildAnilinoPart(ringSubstituents);
@@ -469,8 +422,7 @@ function buildComplexAlkoxyWithAmide(
   // Actually: alkoxy carbon + amide carbon = 2 carbons in main chain, plus the connection point
   // Wait, let's reconsider: position 1 = amide C, position 2 = alkoxy C
   // So we have a 2-carbon chain + 1 for connection = propan
-  const baseName =
-    chainLength === 1 ? "methan" : chainLength === 2 ? "ethan" : "propan";
+  const baseName = chainLength === 1 ? "methan" : chainLength === 2 ? "ethan" : "propan";
 
   // Alphabetical order for substituents
   parts.sort((a, b) => {
@@ -549,28 +501,10 @@ function addBranchToAlkoxyCarbonIds(
     const atom1 = molecule.atoms[bond.atom1];
     const atom2 = molecule.atoms[bond.atom2];
 
-    if (
-      bond.atom1 === branchId &&
-      atom2?.symbol === "C" &&
-      !visited.has(bond.atom2)
-    ) {
-      addBranchToAlkoxyCarbonIds(
-        bond.atom2,
-        molecule,
-        alkoxyCarbonIds,
-        visited,
-      );
-    } else if (
-      bond.atom2 === branchId &&
-      atom1?.symbol === "C" &&
-      !visited.has(bond.atom1)
-    ) {
-      addBranchToAlkoxyCarbonIds(
-        bond.atom1,
-        molecule,
-        alkoxyCarbonIds,
-        visited,
-      );
+    if (bond.atom1 === branchId && atom2?.symbol === "C" && !visited.has(bond.atom2)) {
+      addBranchToAlkoxyCarbonIds(bond.atom2, molecule, alkoxyCarbonIds, visited);
+    } else if (bond.atom2 === branchId && atom1?.symbol === "C" && !visited.has(bond.atom1)) {
+      addBranchToAlkoxyCarbonIds(bond.atom1, molecule, alkoxyCarbonIds, visited);
     }
   }
 }
@@ -595,10 +529,8 @@ export function getAlkoxyGroupName(
         const hasDoubleBondToO = molecule.bonds.some(
           (bond: Bond) =>
             bond.type === "double" &&
-            ((bond.atom1 === atomId &&
-              molecule.atoms[bond.atom2]?.symbol === "O") ||
-              (bond.atom2 === atomId &&
-                molecule.atoms[bond.atom1]?.symbol === "O")),
+            ((bond.atom1 === atomId && molecule.atoms[bond.atom2]?.symbol === "O") ||
+              (bond.atom2 === atomId && molecule.atoms[bond.atom1]?.symbol === "O")),
         );
         if (hasDoubleBondToO) {
           carbonylCarbonId = atomId;
@@ -669,10 +601,7 @@ export function getAlkoxyGroupName(
     // Found an amide group attached to the alkoxy carbon
     // This requires complex nomenclature: [substituents-anilino-oxo-yl]alkanoate
     if (process.env.VERBOSE) {
-      console.log(
-        "[getAlkoxyGroupName] Detected amide group at alkoxy carbon:",
-        amideCheck,
-      );
+      console.log("[getAlkoxyGroupName] Detected amide group at alkoxy carbon:", amideCheck);
     }
 
     const complexName = buildComplexAlkoxyWithAmide(
@@ -697,10 +626,7 @@ export function getAlkoxyGroupName(
   const alkoxyCarbonIds = new Set<number>();
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[getAlkoxyGroupName] Starting BFS from alkoxyCarbonId:",
-      alkoxyCarbonId,
-    );
+    console.log("[getAlkoxyGroupName] Starting BFS from alkoxyCarbonId:", alkoxyCarbonId);
   }
 
   while (queue.length > 0) {
@@ -746,10 +672,7 @@ export function getAlkoxyGroupName(
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[getAlkoxyGroupName] Found ${neighbors.length} neighbors:`,
-          neighbors,
-        );
+        console.log(`[getAlkoxyGroupName] Found ${neighbors.length} neighbors:`, neighbors);
       }
 
       // If more than 1 neighbor, we need to choose the longest chain continuation
@@ -760,12 +683,7 @@ export function getAlkoxyGroupName(
 
         for (const neighborId of neighbors) {
           if (neighborId !== undefined) {
-            const depth = getChainDepth(
-              neighborId!,
-              currentId,
-              molecule,
-              visited,
-            );
+            const depth = getChainDepth(neighborId!, currentId, molecule, visited);
             if (depth > maxDepth) {
               maxDepth = depth;
               longestNeighbor = neighborId;
@@ -780,21 +698,13 @@ export function getAlkoxyGroupName(
 
         // Record other neighbors as branches (don't add to queue to keep carbonChain accurate)
         for (const branchNeighbor of neighbors) {
-          if (
-            branchNeighbor !== undefined &&
-            branchNeighbor !== longestNeighbor
-          ) {
+          if (branchNeighbor !== undefined && branchNeighbor !== longestNeighbor) {
             if (!branches.has(carbonChain.length)) {
               branches.set(carbonChain.length, []);
             }
             branches.get(carbonChain.length)!.push(branchNeighbor);
             // Also add branch carbons to alkoxyCarbonIds for substituent detection
-            addBranchToAlkoxyCarbonIds(
-              branchNeighbor,
-              molecule,
-              alkoxyCarbonIds,
-              visited,
-            );
+            addBranchToAlkoxyCarbonIds(branchNeighbor, molecule, alkoxyCarbonIds, visited);
 
             if (process.env.VERBOSE) {
               console.log(
@@ -818,15 +728,9 @@ export function getAlkoxyGroupName(
   const ringsInAlkoxy: number[][] = [];
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[getAlkoxyGroupName] BFS complete. alkoxyCarbonIds:",
-      Array.from(alkoxyCarbonIds),
-    );
+    console.log("[getAlkoxyGroupName] BFS complete. alkoxyCarbonIds:", Array.from(alkoxyCarbonIds));
     if (process.env.VERBOSE) {
-      console.log(
-        "[getAlkoxyGroupName] Total rings in molecule:",
-        rings.length,
-      );
+      console.log("[getAlkoxyGroupName] Total rings in molecule:", rings.length);
     }
     for (let i = 0; i < rings.length; i++) {
       if (process.env.VERBOSE) {
@@ -836,9 +740,7 @@ export function getAlkoxyGroupName(
   }
 
   for (const ring of rings) {
-    const ringIntersection = ring.filter((atomId) =>
-      alkoxyCarbonIds.has(atomId),
-    );
+    const ringIntersection = ring.filter((atomId) => alkoxyCarbonIds.has(atomId));
     if (process.env.VERBOSE) {
       console.log(
         `[getAlkoxyGroupName] Ring ${rings.indexOf(ring)} intersection:`,
@@ -857,11 +759,7 @@ export function getAlkoxyGroupName(
 
   // If rings detected, use ring-based naming
   if (ringsInAlkoxy.length > 0) {
-    const ringName = buildRingSubstituentAlkylName(
-      alkoxyCarbonId,
-      esterOxygenId,
-      molecule,
-    );
+    const ringName = buildRingSubstituentAlkylName(alkoxyCarbonId, esterOxygenId, molecule);
     if (ringName) {
       if (process.env.VERBOSE) {
         console.log("[getAlkoxyGroupName] Using ring-based name:", ringName);
@@ -902,10 +800,7 @@ export function getAlkoxyGroupName(
       }
     }
     if (process.env.VERBOSE) {
-      console.log(
-        "[getAlkoxyGroupName] alkoxyCarbonIds:",
-        Array.from(alkoxyCarbonIds),
-      );
+      console.log("[getAlkoxyGroupName] alkoxyCarbonIds:", Array.from(alkoxyCarbonIds));
     }
     if (process.env.VERBOSE) {
       console.log("[getAlkoxyGroupName] carbonChain:", carbonChain);
@@ -919,23 +814,16 @@ export function getAlkoxyGroupName(
         // Find the attachment point: oxygen atom connected to alkoxy chain
         for (const fgAtomObj of fg.atoms) {
           // Extract atom ID from Atom object or use directly if it's a number
-          const fgAtomId =
-            typeof fgAtomObj === "number" ? fgAtomObj : fgAtomObj.id;
+          const fgAtomId = typeof fgAtomObj === "number" ? fgAtomObj : fgAtomObj.id;
           const fgAtom = molecule.atoms[fgAtomId];
           if (fgAtom?.symbol === "O") {
             // Check if this oxygen is bonded to any carbon in the alkoxy chain
             for (const bond of molecule.bonds) {
               if (bond.type === "single") {
                 let alkoxyChainCarbon: number | undefined;
-                if (
-                  bond.atom1 === fgAtomId &&
-                  alkoxyCarbonIds.has(bond.atom2)
-                ) {
+                if (bond.atom1 === fgAtomId && alkoxyCarbonIds.has(bond.atom2)) {
                   alkoxyChainCarbon = bond.atom2;
-                } else if (
-                  bond.atom2 === fgAtomId &&
-                  alkoxyCarbonIds.has(bond.atom1)
-                ) {
+                } else if (bond.atom2 === fgAtomId && alkoxyCarbonIds.has(bond.atom1)) {
                   alkoxyChainCarbon = bond.atom1;
                 }
 
@@ -971,23 +859,16 @@ export function getAlkoxyGroupName(
         // Find the attachment point: oxygen atom connected to alkoxy chain
         for (const fgAtomObj of fg.atoms) {
           // Extract atom ID from Atom object or use directly if it's a number
-          const fgAtomId =
-            typeof fgAtomObj === "number" ? fgAtomObj : fgAtomObj.id;
+          const fgAtomId = typeof fgAtomObj === "number" ? fgAtomObj : fgAtomObj.id;
           const fgAtom = molecule.atoms[fgAtomId];
           if (fgAtom?.symbol === "O") {
             // Check if this oxygen is bonded to any carbon in the alkoxy chain
             for (const bond of molecule.bonds) {
               if (bond.type === "single") {
                 let alkoxyChainCarbon: number | undefined;
-                if (
-                  bond.atom1 === fgAtomId &&
-                  alkoxyCarbonIds.has(bond.atom2)
-                ) {
+                if (bond.atom1 === fgAtomId && alkoxyCarbonIds.has(bond.atom2)) {
                   alkoxyChainCarbon = bond.atom2;
-                } else if (
-                  bond.atom2 === fgAtomId &&
-                  alkoxyCarbonIds.has(bond.atom1)
-                ) {
+                } else if (bond.atom2 === fgAtomId && alkoxyCarbonIds.has(bond.atom1)) {
                   alkoxyChainCarbon = bond.atom1;
                 }
 
@@ -1029,9 +910,7 @@ export function getAlkoxyGroupName(
     if (carbonId === undefined) continue;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[getAlkoxyGroupName] 2b. Checking carbon ${carbonId} at position ${i + 1}`,
-      );
+      console.log(`[getAlkoxyGroupName] 2b. Checking carbon ${carbonId} at position ${i + 1}`);
     }
 
     // Find oxygen atoms connected to this carbon (excluding ester oxygen and already-detected acyloxy)
@@ -1039,15 +918,9 @@ export function getAlkoxyGroupName(
       if (bond.type === "single") {
         let oxygenId: number | undefined;
 
-        if (
-          bond.atom1 === carbonId &&
-          molecule.atoms[bond.atom2]?.symbol === "O"
-        ) {
+        if (bond.atom1 === carbonId && molecule.atoms[bond.atom2]?.symbol === "O") {
           oxygenId = bond.atom2;
-        } else if (
-          bond.atom2 === carbonId &&
-          molecule.atoms[bond.atom1]?.symbol === "O"
-        ) {
+        } else if (bond.atom2 === carbonId && molecule.atoms[bond.atom1]?.symbol === "O") {
           oxygenId = bond.atom1;
         }
 
@@ -1088,10 +961,8 @@ export function getAlkoxyGroupName(
             for (const bond3 of molecule.bonds) {
               if (bond3.type === "double") {
                 if (
-                  (bond3.atom1 === etherCarbonId &&
-                    molecule.atoms[bond3.atom2]?.symbol === "O") ||
-                  (bond3.atom2 === etherCarbonId &&
-                    molecule.atoms[bond3.atom1]?.symbol === "O")
+                  (bond3.atom1 === etherCarbonId && molecule.atoms[bond3.atom2]?.symbol === "O") ||
+                  (bond3.atom2 === etherCarbonId && molecule.atoms[bond3.atom1]?.symbol === "O")
                 ) {
                   isAcyloxy = true;
                   if (process.env.VERBOSE) {
@@ -1163,8 +1034,7 @@ export function getAlkoxyGroupName(
               ];
 
               const alkoxyName =
-                etherCarbonCount < alkoxyNames.length &&
-                alkoxyNames[etherCarbonCount]
+                etherCarbonCount < alkoxyNames.length && alkoxyNames[etherCarbonCount]
                   ? alkoxyNames[etherCarbonCount]!
                   : `C${etherCarbonCount}-oxy`;
 
@@ -1199,9 +1069,7 @@ export function getAlkoxyGroupName(
     if (carbonId === undefined) continue;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[getAlkoxyGroupName] 2c. Checking carbon ${carbonId} at position ${i + 1}`,
-      );
+      console.log(`[getAlkoxyGroupName] 2c. Checking carbon ${carbonId} at position ${i + 1}`);
     }
 
     // Find oxygen atoms connected to this carbon (excluding ester oxygen)
@@ -1209,15 +1077,9 @@ export function getAlkoxyGroupName(
       if (bond.type === "single") {
         let oxygenId: number | undefined;
 
-        if (
-          bond.atom1 === carbonId &&
-          molecule.atoms[bond.atom2]?.symbol === "O"
-        ) {
+        if (bond.atom1 === carbonId && molecule.atoms[bond.atom2]?.symbol === "O") {
           oxygenId = bond.atom2;
-        } else if (
-          bond.atom2 === carbonId &&
-          molecule.atoms[bond.atom1]?.symbol === "O"
-        ) {
+        } else if (bond.atom2 === carbonId && molecule.atoms[bond.atom1]?.symbol === "O") {
           oxygenId = bond.atom1;
         }
 
@@ -1260,11 +1122,7 @@ export function getAlkoxyGroupName(
           }
 
           // If oxygen has 1 hydrogen and is not bonded to C or Si, it's a hydroxyl
-          if (
-            oxygenAtom.hydrogens === 1 &&
-            !isBondedToCarbon &&
-            !isBondedToSilicon
-          ) {
+          if (oxygenAtom.hydrogens === 1 && !isBondedToCarbon && !isBondedToSilicon) {
             const position = i + 1;
             alkoxySubstituents.push({
               position,
@@ -1272,9 +1130,7 @@ export function getAlkoxyGroupName(
               type: "hydroxyl",
             });
             if (process.env.VERBOSE) {
-              console.log(
-                `[getAlkoxyGroupName] 2c. Found hydroxyl at position ${position}`,
-              );
+              console.log(`[getAlkoxyGroupName] 2c. Found hydroxyl at position ${position}`);
             }
             break; // Only one hydroxyl per carbon
           }
@@ -1302,15 +1158,9 @@ export function getAlkoxyGroupName(
       if (bond.type === "single") {
         let oxygenId: number | undefined;
 
-        if (
-          bond.atom1 === carbonId &&
-          molecule.atoms[bond.atom2]?.symbol === "O"
-        ) {
+        if (bond.atom1 === carbonId && molecule.atoms[bond.atom2]?.symbol === "O") {
           oxygenId = bond.atom2;
-        } else if (
-          bond.atom2 === carbonId &&
-          molecule.atoms[bond.atom1]?.symbol === "O"
-        ) {
+        } else if (bond.atom2 === carbonId && molecule.atoms[bond.atom1]?.symbol === "O") {
           oxygenId = bond.atom1;
         }
 
@@ -1320,15 +1170,9 @@ export function getAlkoxyGroupName(
           for (const bond2 of molecule.bonds) {
             let siliconId: number | undefined;
 
-            if (
-              bond2.atom1 === oxygenId &&
-              molecule.atoms[bond2.atom2]?.symbol === "Si"
-            ) {
+            if (bond2.atom1 === oxygenId && molecule.atoms[bond2.atom2]?.symbol === "Si") {
               siliconId = bond2.atom2;
-            } else if (
-              bond2.atom2 === oxygenId &&
-              molecule.atoms[bond2.atom1]?.symbol === "Si"
-            ) {
+            } else if (bond2.atom2 === oxygenId && molecule.atoms[bond2.atom1]?.symbol === "Si") {
               siliconId = bond2.atom1;
             }
 
@@ -1338,10 +1182,7 @@ export function getAlkoxyGroupName(
               for (const bond3 of molecule.bonds) {
                 let carbonIdOnSi: number | undefined;
 
-                if (
-                  bond3.atom1 === siliconId &&
-                  molecule.atoms[bond3.atom2]?.symbol === "C"
-                ) {
+                if (bond3.atom1 === siliconId && molecule.atoms[bond3.atom2]?.symbol === "C") {
                   carbonIdOnSi = bond3.atom2;
                 } else if (
                   bond3.atom2 === siliconId &&
@@ -1353,16 +1194,11 @@ export function getAlkoxyGroupName(
                 if (carbonIdOnSi !== undefined) {
                   // Check if this carbon is a methyl (no other carbons attached)
                   const carbonNeighbors = molecule.bonds.filter(
-                    (b: Bond) =>
-                      b.atom1 === carbonIdOnSi || b.atom2 === carbonIdOnSi,
+                    (b: Bond) => b.atom1 === carbonIdOnSi || b.atom2 === carbonIdOnSi,
                   );
                   const hasOtherCarbons = carbonNeighbors.some((b: Bond) => {
-                    const otherId =
-                      b.atom1 === carbonIdOnSi ? b.atom2 : b.atom1;
-                    return (
-                      otherId !== siliconId &&
-                      molecule.atoms[otherId]?.symbol === "C"
-                    );
+                    const otherId = b.atom1 === carbonIdOnSi ? b.atom2 : b.atom1;
+                    return otherId !== siliconId && molecule.atoms[otherId]?.symbol === "C";
                   });
 
                   if (!hasOtherCarbons) {
@@ -1453,13 +1289,10 @@ export function getAlkoxyGroupName(
         // For complex substituent names (containing hyphens or being compound),
         // wrap in parentheses: "2,3-bis(trimethylsilyloxy)"
         // For simple names, no parentheses needed
-        const needsParentheses =
-          name.includes("-") || name.includes("oxy") || name.length > 6;
+        const needsParentheses = name.includes("-") || name.includes("oxy") || name.length > 6;
 
         if (needsParentheses) {
-          prefixParts.push(
-            `${positionString}-${multiplicativePrefix}(${name})`,
-          );
+          prefixParts.push(`${positionString}-${multiplicativePrefix}(${name})`);
         } else {
           prefixParts.push(`${positionString}-${multiplicativePrefix}${name}`);
         }
@@ -1469,10 +1302,7 @@ export function getAlkoxyGroupName(
     substituentsPrefix = prefixParts.join("-");
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[getAlkoxyGroupName] Built substituentsPrefix:",
-        substituentsPrefix,
-      );
+      console.log("[getAlkoxyGroupName] Built substituentsPrefix:", substituentsPrefix);
     }
   }
 
@@ -1509,14 +1339,11 @@ export function getAlkoxyGroupName(
       // Check if any position has multiple substituents
       const positionCounts = new Map<number, number>();
       for (const sub of allSubstituents) {
-        positionCounts.set(
-          sub.position,
-          (positionCounts.get(sub.position) || 0) + 1,
-        );
+        positionCounts.set(sub.position, (positionCounts.get(sub.position) || 0) + 1);
       }
-      const hasMultipleAtSamePosition = Array.from(
-        positionCounts.values(),
-      ).some((count) => count > 1);
+      const hasMultipleAtSamePosition = Array.from(positionCounts.values()).some(
+        (count) => count > 1,
+      );
 
       // Use parentheses for complex cases (mixed types or multiple at same position)
       const needsParentheses = hasMultipleTypes || hasMultipleAtSamePosition;
@@ -1574,9 +1401,7 @@ export function getAlkoxyGroupName(
           multiplicity,
           opsinService ?? getSharedOPSINService(),
         );
-        branchPrefixParts.push(
-          `${positionString}-${multiplicativePrefix}${name}`,
-        );
+        branchPrefixParts.push(`${positionString}-${multiplicativePrefix}${name}`);
       }
     }
 
@@ -1596,9 +1421,7 @@ export function getAlkoxyGroupName(
       "dec",
     ];
     const baseName =
-      chainLength < alkylPrefixes.length
-        ? alkylPrefixes[chainLength]
-        : `C${chainLength}-alk`;
+      chainLength < alkylPrefixes.length ? alkylPrefixes[chainLength] : `C${chainLength}-alk`;
 
     const allSubstituents = substituentsPrefix
       ? `${substituentsPrefix}-${branchesPrefix}`

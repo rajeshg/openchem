@@ -18,8 +18,7 @@ export const P44_3_5_DOUBLE_BOND_LOCANTS_RULE: IUPACRule = {
   priority: RulePriority.FIVE,
   conditions: (context: ImmutableNamingContext) => {
     const chains = context.getState().candidateChains as Chain[];
-    const lowestMultipleBondLocants =
-      context.getState().lowest_multiple_bond_locants;
+    const lowestMultipleBondLocants = context.getState().lowest_multiple_bond_locants;
     return (
       chains.length > 1 &&
       !!context.getState().p44_3_4_applied &&
@@ -36,8 +35,7 @@ export const P44_3_5_DOUBLE_BOND_LOCANTS_RULE: IUPACRule = {
         {
           ruleId: "P-44.3.5",
           conflictType: "state_inconsistency",
-          description:
-            "No candidate chains found for double bond locant selection",
+          description: "No candidate chains found for double bond locant selection",
           context: { chains },
         },
         "P-44.3.5",
@@ -56,21 +54,16 @@ export const P44_3_5_DOUBLE_BOND_LOCANTS_RULE: IUPACRule = {
         .sort((a, b) => a - b);
     });
     // Find the lexicographically smallest double bond locant set
-    const lowestDoubleBondLocantSet =
-      lexicographicallySmallest(doubleBondLocantSets);
+    const lowestDoubleBondLocantSet = lexicographicallySmallest(doubleBondLocantSets);
     // Find chains with this locant set
-    const chainsWithLowestDoubleBondLocants = chains.filter(
-      (chain: Chain, index: number) => {
-        const chainLocants = doubleBondLocantSets[index] || [];
-        return (
-          lowestDoubleBondLocantSet !== null &&
-          chainLocants.length === lowestDoubleBondLocantSet.length &&
-          chainLocants.every(
-            (locant, i) => locant === lowestDoubleBondLocantSet[i],
-          )
-        );
-      },
-    );
+    const chainsWithLowestDoubleBondLocants = chains.filter((chain: Chain, index: number) => {
+      const chainLocants = doubleBondLocantSets[index] || [];
+      return (
+        lowestDoubleBondLocantSet !== null &&
+        chainLocants.length === lowestDoubleBondLocantSet.length &&
+        chainLocants.every((locant, i) => locant === lowestDoubleBondLocantSet[i])
+      );
+    });
     updatedContext = updatedContext.withUpdatedCandidates(
       chainsWithLowestDoubleBondLocants,
       "P-44.3.5",

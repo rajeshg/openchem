@@ -17,9 +17,7 @@ export class AlkoxyStrategy extends BaseSubstituentStrategy {
       ctx.suffixTokens.some((s) => s.value === "yl");
 
     // Don't match if phenyl is one of the substituents (e.g., "methoxy" + "phenyl")
-    const hasPhenyl = ctx.substituentTokens.some((s) =>
-      s.value.toLowerCase().endsWith("phenyl"),
-    );
+    const hasPhenyl = ctx.substituentTokens.some((s) => s.value.toLowerCase().endsWith("phenyl"));
 
     // Don't match if there's a parent ring system
     const hasParent = ctx.parentTokens.length > 0;
@@ -69,9 +67,7 @@ export class AlkoxyStrategy extends BaseSubstituentStrategy {
     else if (alkoxyValue.startsWith("pent")) chainLength = 5;
     else if (alkoxyValue.startsWith("hex")) chainLength = 6;
 
-    this.log(
-      `Building alkoxy substituent: ${alkoxyValue} (${chainLength} carbons)`,
-    );
+    this.log(`Building alkoxy substituent: ${alkoxyValue} (${chainLength} carbons)`);
 
     // Build the alkyl chain
     const alkylAtoms = builder.createLinearChain(chainLength);
@@ -79,16 +75,9 @@ export class AlkoxyStrategy extends BaseSubstituentStrategy {
     // Apply substituents to the alkyl chain
     const otherSubsts = ctx.substituentTokens.filter((s) => s !== alkoxySubst);
     for (const subst of otherSubsts) {
-      const substLocants = builderContext.getLocantsBeforeSubstituent(
-        subst,
-        ctx.locantTokens,
-      );
+      const substLocants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
       for (const loc of substLocants) {
-        const atomIdx = builderContext.locantToAtomIndex(
-          loc,
-          alkylAtoms,
-          false,
-        );
+        const atomIdx = builderContext.locantToAtomIndex(loc, alkylAtoms, false);
         if (atomIdx !== null) {
           if (subst.value === "methyl") {
             builder.addMethyl(atomIdx);

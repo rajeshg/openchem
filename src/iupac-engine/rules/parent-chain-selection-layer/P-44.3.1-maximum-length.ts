@@ -44,9 +44,7 @@ export const P44_3_1_MAX_LENGTH_RULE: IUPACRule = {
     }
     const lengths = chains.map((chain) => chain.length);
     const maxLength = Math.max(...lengths);
-    const selectedChains = chains.filter(
-      (chain, index) => lengths[index] === maxLength,
-    );
+    const selectedChains = chains.filter((chain, index) => lengths[index] === maxLength);
     updatedContext = updatedContext.withUpdatedCandidates(
       selectedChains,
       "P-44.3.1",

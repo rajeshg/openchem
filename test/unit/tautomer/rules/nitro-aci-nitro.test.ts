@@ -11,9 +11,7 @@ describe("tautomer: nitro-aci-nitro", () => {
     expect(tautomers.length).toBeGreaterThanOrEqual(1);
     const smilesList = tautomers.map((t) => t.smiles);
     // aci-nitro often contains N-O single and an OH; check for presence of 'O' and changed bond patterns
-    const hasAciLike = smilesList.some(
-      (s) => /O/.test(s) && /N/.test(s) && /O/.test(s),
-    );
+    const hasAciLike = smilesList.some((s) => /O/.test(s) && /N/.test(s) && /O/.test(s));
     expect(hasAciLike).toBe(true);
   });
 });

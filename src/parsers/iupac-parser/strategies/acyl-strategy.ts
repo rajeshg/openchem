@@ -34,23 +34,14 @@ export class AcylStrategy extends BaseSubstituentStrategy {
 
     // Apply any substituents to the chain (e.g., "methyl" in "2-methylpropanoyl")
     // Separate amino from other substituents as it requires special handling
-    const hasAminoSubst = ctx.substituentTokens.some(
-      (s) => s.value === "amino",
-    );
+    const hasAminoSubst = ctx.substituentTokens.some((s) => s.value === "amino");
 
     for (const subst of ctx.substituentTokens) {
       if (subst.value === "amino") continue; // Handle separately below
 
-      const substLocants = builderContext.getLocantsBeforeSubstituent(
-        subst,
-        ctx.locantTokens,
-      );
+      const substLocants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
       for (const loc of substLocants) {
-        const atomIdx = builderContext.locantToAtomIndex(
-          loc,
-          chainAtoms,
-          false,
-        );
+        const atomIdx = builderContext.locantToAtomIndex(loc, chainAtoms, false);
         if (atomIdx !== null) {
           if (subst.value === "methyl") {
             builder.addMethyl(atomIdx);
@@ -77,9 +68,7 @@ export class AcylStrategy extends BaseSubstituentStrategy {
       attachmentPoint = nIdx;
       fragmentAtoms.push(nIdx);
 
-      this.log(
-        `Built acylamino group with ${acylChainLength} carbons + carbonyl + N`,
-      );
+      this.log(`Built acylamino group with ${acylChainLength} carbons + carbonyl + N`);
     } else {
       this.log(`Built acyl group with ${acylChainLength} carbons + carbonyl`);
     }

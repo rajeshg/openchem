@@ -4,11 +4,7 @@ import type { Molecule, Atom } from "types";
  * Determines if an atom should be excluded from the parent chain based on
  * functional group classification.
  */
-export function shouldExcludeAtomFromChain(
-  atom: Atom,
-  fgName: string,
-  fgType: string,
-): boolean {
+export function shouldExcludeAtomFromChain(atom: Atom, fgName: string, fgType: string): boolean {
   const symbol = atom.symbol;
   const lowerName = fgName.toLowerCase();
 
@@ -16,11 +12,7 @@ export function shouldExcludeAtomFromChain(
   // More specific patterns first to prevent false matches
 
   // Thiocyanates: exclude entire S-C≡N group
-  if (
-    lowerName.includes("thiocyanate") ||
-    lowerName.includes("thiocyano") ||
-    fgType === "SC#N"
-  ) {
+  if (lowerName.includes("thiocyanate") || lowerName.includes("thiocyano") || fgType === "SC#N") {
     return true; // Exclude all atoms in thiocyanate group
   }
 
@@ -33,11 +25,7 @@ export function shouldExcludeAtomFromChain(
 
   // N-acyl groups (N-formyl, N-acetyl, etc.): exclude entire C(=O) group
   // These are substituents on nitrogen, not part of the parent chain
-  if (
-    lowerName.includes("n-acyl") ||
-    lowerName.includes("acyl") ||
-    fgType === "C(=O)N<"
-  ) {
+  if (lowerName.includes("n-acyl") || lowerName.includes("acyl") || fgType === "C(=O)N<") {
     return true; // Exclude both C and O atoms in N-acyl groups
   }
 
@@ -102,11 +90,7 @@ export function countDirectFunctionalGroupAttachments(
       // Check bonds from sulfur to see if any connect to chain atoms
       for (const bond of molecule.bonds) {
         const otherAtomIdx =
-          bond.atom1 === sulfurIdx
-            ? bond.atom2
-            : bond.atom2 === sulfurIdx
-              ? bond.atom1
-              : null;
+          bond.atom1 === sulfurIdx ? bond.atom2 : bond.atom2 === sulfurIdx ? bond.atom1 : null;
 
         if (otherAtomIdx !== null && chainSet.has(otherAtomIdx)) {
           // Sulfur is directly bonded to a chain atom
@@ -127,11 +111,7 @@ export function countDirectFunctionalGroupAttachments(
       // Check bonds from sulfur to see if any connect to chain atoms
       for (const bond of molecule.bonds) {
         const otherAtomIdx =
-          bond.atom1 === sulfurIdx
-            ? bond.atom2
-            : bond.atom2 === sulfurIdx
-              ? bond.atom1
-              : null;
+          bond.atom1 === sulfurIdx ? bond.atom2 : bond.atom2 === sulfurIdx ? bond.atom1 : null;
 
         if (otherAtomIdx !== null && chainSet.has(otherAtomIdx)) {
           // Sulfur is directly bonded to a chain atom
@@ -148,13 +128,8 @@ export function countDirectFunctionalGroupAttachments(
 /**
  * Check if chain is a pure hydrocarbon (all carbon atoms).
  */
-export function isHydrocarbonChain(
-  chain: number[],
-  molecule: Molecule,
-): boolean {
-  return chain.every(
-    (idx) => molecule.atoms[idx] && molecule.atoms[idx].symbol === "C",
-  );
+export function isHydrocarbonChain(chain: number[], molecule: Molecule): boolean {
+  return chain.every((idx) => molecule.atoms[idx] && molecule.atoms[idx].symbol === "C");
 }
 
 /**
@@ -164,9 +139,7 @@ export function isHydrocarbonChain(
 export function containsHalogen(chain: number[], molecule: Molecule): boolean {
   return chain.some((idx) => {
     const symbol = molecule.atoms[idx]?.symbol;
-    return (
-      symbol === "F" || symbol === "Cl" || symbol === "Br" || symbol === "I"
-    );
+    return symbol === "F" || symbol === "Cl" || symbol === "Br" || symbol === "I";
   });
 }
 
@@ -195,9 +168,7 @@ export function isValidChain(chain: number[], molecule: Molecule): boolean {
     const a1 = chain[i]!;
     const a2 = chain[i + 1]!;
     const bonded = molecule.bonds.some(
-      (b) =>
-        (b.atom1 === a1 && b.atom2 === a2) ||
-        (b.atom1 === a2 && b.atom2 === a1),
+      (b) => (b.atom1 === a1 && b.atom2 === a2) || (b.atom1 === a2 && b.atom2 === a1),
     );
     if (!bonded) return false;
   }

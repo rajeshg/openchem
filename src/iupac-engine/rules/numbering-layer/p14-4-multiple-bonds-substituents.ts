@@ -1,15 +1,8 @@
-import type {
-  IUPACRule,
-  MultipleBond,
-  StructuralSubstituent,
-} from "../../types";
+import type { IUPACRule, MultipleBond, StructuralSubstituent } from "../../types";
 import { RulePriority } from "../../types";
 import type { Atom } from "types";
 
-import {
-  ExecutionPhase,
-  ImmutableNamingContext,
-} from "../../immutable-context";
+import { ExecutionPhase, ImmutableNamingContext } from "../../immutable-context";
 import type { ContextState } from "../../immutable-context";
 
 export const P14_4_MULTIPLE_BONDS_SUBSTITUENTS_RULE: IUPACRule = {
@@ -44,20 +37,17 @@ export const P14_4_MULTIPLE_BONDS_SUBSTITUENTS_RULE: IUPACRule = {
           atomLocants.push(chain.locants[atomIndex]);
         }
       }
-      const minLocant =
-        atomLocants.length > 0 ? Math.min(...atomLocants) : bond.locant || 1;
+      const minLocant = atomLocants.length > 0 ? Math.min(...atomLocants) : bond.locant || 1;
       return {
         ...bond,
         locant: minLocant,
       };
     });
 
-    const numberedSubstituents = chain.substituents.map(
-      (substituent: StructuralSubstituent) => ({
-        ...substituent,
-        locant: typeof substituent.locant === "number" ? substituent.locant : 1,
-      }),
-    );
+    const numberedSubstituents = chain.substituents.map((substituent: StructuralSubstituent) => ({
+      ...substituent,
+      locant: typeof substituent.locant === "number" ? substituent.locant : 1,
+    }));
 
     return context.withStateUpdate(
       (state: ContextState) => ({

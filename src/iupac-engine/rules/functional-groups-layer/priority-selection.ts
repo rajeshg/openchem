@@ -24,40 +24,33 @@ export function detectAllFunctionalGroups(
 ): FunctionalGroup[] {
   const detected = detector.detectFunctionalGroups(mol);
 
-  const normalized: FunctionalGroup[] = detected.map(
-    (d: DetectedFunctionalGroup) => {
-      const rawName = (d.name || d.type || d.pattern || "")
-        .toString()
-        .toLowerCase();
-      const type = rawName.replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
-      const atomIds = d.atoms || [];
-      const bonds = d.bonds || [];
-      const rawPriority2 =
-        typeof d.priority === "number"
-          ? d.priority
-          : detector.getFunctionalGroupPriority(d.pattern || d.type) || 0;
-      const priority = normalizePriority(rawPriority2);
+  const normalized: FunctionalGroup[] = detected.map((d: DetectedFunctionalGroup) => {
+    const rawName = (d.name || d.type || d.pattern || "").toString().toLowerCase();
+    const type = rawName.replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+    const atomIds = d.atoms || [];
+    const bonds = d.bonds || [];
+    const rawPriority2 =
+      typeof d.priority === "number"
+        ? d.priority
+        : detector.getFunctionalGroupPriority(d.pattern || d.type) || 0;
+    const priority = normalizePriority(rawPriority2);
 
-      // Convert atom IDs to Atom objects
-      const atoms = atomIds
-        .map((id) => mol.atoms.find((a) => a.id === id))
-        .filter((a): a is Atom => a !== undefined);
+    // Convert atom IDs to Atom objects
+    const atoms = atomIds
+      .map((id) => mol.atoms.find((a) => a.id === id))
+      .filter((a): a is Atom => a !== undefined);
 
-      return {
-        type,
-        atoms,
-        bonds,
-        suffix:
-          d.suffix ||
-          detector.getFunctionalGroupSuffix(d.pattern || d.type) ||
-          undefined,
-        prefix: d.prefix || undefined,
-        priority,
-        isPrincipal: false,
-        locants: atoms.map((a) => a.id),
-      } as FunctionalGroup;
-    },
-  );
+    return {
+      type,
+      atoms,
+      bonds,
+      suffix: d.suffix || detector.getFunctionalGroupSuffix(d.pattern || d.type) || undefined,
+      prefix: d.prefix || undefined,
+      priority,
+      isPrincipal: false,
+      locants: atoms.map((a) => a.id),
+    } as FunctionalGroup;
+  });
 
   // Sort descending: higher numeric value means higher priority
   normalized.sort((a, b) => (b.priority || 0) - (a.priority || 0));
@@ -129,12 +122,7 @@ export function selectPrincipalGroup(
     const sulfinylGroup = groupsToConsider.find((g) => g.type === "sulfinyl");
     const sulfonylGroup = groupsToConsider.find((g) => g.type === "sulfonyl");
 
-    if (
-      sulfinylGroup &&
-      sulfonylGroup &&
-      sulfinylGroup.locants &&
-      sulfonylGroup.locants
-    ) {
+    if (sulfinylGroup && sulfonylGroup && sulfinylGroup.locants && sulfonylGroup.locants) {
       const sulfinylAtom = sulfinylGroup.locants[0];
       const sulfonylAtom = sulfonylGroup.locants[0];
 
@@ -194,9 +182,7 @@ export function selectPrincipalGroup(
 
     if (totalAmineNitrogens >= 2) {
       // Diamine detected - check if it should override other functional groups
-      const alcoholGroups = groupsToConsider.filter(
-        (g) => g.type === "alcohol",
-      );
+      const alcoholGroups = groupsToConsider.filter((g) => g.type === "alcohol");
       const amideGroups = groupsToConsider.filter((g) => g.type === "amide");
 
       // Diamine takes precedence over alcohols or when amides are present

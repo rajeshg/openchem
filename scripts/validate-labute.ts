@@ -47,6 +47,4 @@ console.log("=".repeat(60));
 console.log(
   `Matches: ${matches}/${testMolecules.length} (${((matches / testMolecules.length) * 100).toFixed(1)}%)`,
 );
-console.log(
-  `Average absolute difference: ${(totalDiff / testMolecules.length).toFixed(2)} Ų`,
-);
+console.log(`Average absolute difference: ${(totalDiff / testMolecules.length).toFixed(2)} Ų`);

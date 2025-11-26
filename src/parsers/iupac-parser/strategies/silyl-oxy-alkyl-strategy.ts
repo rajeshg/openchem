@@ -70,9 +70,7 @@ export class SilylOxyAlkylStrategy extends BaseSubstituentStrategy {
 
     if (chainAtoms.length > 0) {
       builder.addBond(oIdx, chainAtoms[0]!);
-      this.log(
-        `Connected silyl-O to ${remainingSubsts.map((s) => s.value).join("-")} chain`,
-      );
+      this.log(`Connected silyl-O to ${remainingSubsts.map((s) => s.value).join("-")} chain`);
 
       return {
         fragmentAtoms: [siIdx, oIdx, ...chainAtoms],

@@ -125,8 +125,7 @@ describe("Regression: heteroatom-containing molecules", () => {
   it("handles sulfonyl-sulfinyl example", () => {
     const engine = new RuleEngine();
     const smiles = "CC(C)(C)CS(=O)S(=O)(=O)CC(C)(C)C";
-    const expected =
-      "1-(2,2-dimethylpropylsulfonylsulfinyl)-2,2-dimethylpropane";
+    const expected = "1-(2,2-dimethylpropylsulfonylsulfinyl)-2,2-dimethylpropane";
 
     const parsed = parseSMILES(smiles);
     expect(parsed.errors).toHaveLength(0);

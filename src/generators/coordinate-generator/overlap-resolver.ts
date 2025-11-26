@@ -160,8 +160,7 @@ export function getOverlapStats(
   }
 
   const maxOverlap = Math.max(...overlaps.map((o) => o.overlap));
-  const avgOverlap =
-    overlaps.reduce((sum, o) => sum + o.overlap, 0) / overlaps.length;
+  const avgOverlap = overlaps.reduce((sum, o) => sum + o.overlap, 0) / overlaps.length;
 
   return { count: overlaps.length, maxOverlap, avgOverlap };
 }

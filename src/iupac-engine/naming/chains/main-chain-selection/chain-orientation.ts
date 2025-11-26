@@ -14,9 +14,7 @@ export function getPriorityLocants(
   const substituentLocants = findSubstituents(molecule, chain)
     .map((s) => parseInt(s.position))
     .sort((a, b) => a - b);
-  const heteroLocants = getHeteroPositions(chain, molecule).sort(
-    (a, b) => a - b,
-  );
+  const heteroLocants = getHeteroPositions(chain, molecule).sort((a, b) => a - b);
   return [unsaturationLocants, substituentLocants, heteroLocants];
 }
 
@@ -99,10 +97,7 @@ function hasTerminusAmine(chain: number[], molecule: Molecule): boolean {
  * For amine-derived chains (where nitrogen is bonded to chain terminus),
  * returns [1] to indicate the terminus should be numbered as position 1
  */
-export function getFunctionalGroupPositions(
-  chain: number[],
-  molecule: Molecule,
-): number[] {
+export function getFunctionalGroupPositions(chain: number[], molecule: Molecule): number[] {
   const positions: number[] = [];
 
   // Special case: if chain terminus is bonded to amine, orient toward that terminus
@@ -115,10 +110,7 @@ export function getFunctionalGroupPositions(
     for (const bond of molecule.bonds) {
       const atom1 = bond.atom1;
       const atom2 = bond.atom2;
-      if (
-        (atom1 === firstAtom || atom2 === firstAtom) &&
-        bond.type === BondType.SINGLE
-      ) {
+      if ((atom1 === firstAtom || atom2 === firstAtom) && bond.type === BondType.SINGLE) {
         const neighbor = atom1 === firstAtom ? atom2 : atom1;
         const neighborAtom = molecule.atoms[neighbor];
         if (neighborAtom?.symbol === "N" && !chain.includes(neighbor)) {
@@ -186,10 +178,7 @@ export function getFunctionalGroupPositions(
  * Get positions of heteroatoms (non-carbon) in a chain
  * Returns 1-indexed positions
  */
-export function getHeteroPositions(
-  chain: number[],
-  molecule: Molecule,
-): number[] {
+export function getHeteroPositions(chain: number[], molecule: Molecule): number[] {
   const positions: number[] = [];
   for (let i = 0; i < chain.length; i++) {
     const atom = molecule.atoms[chain[i]!];
@@ -202,10 +191,7 @@ export function getHeteroPositions(
  * Get positions of unsaturated bonds (double/triple) in a chain
  * Returns 1-indexed bond positions (bond between atom i and i+1 is position i+1)
  */
-export function getUnsaturationPositions(
-  chain: number[],
-  molecule: Molecule,
-): number[] {
+export function getUnsaturationPositions(chain: number[], molecule: Molecule): number[] {
   const positions: number[] = [];
   for (let i = 0; i < chain.length - 1; i++) {
     const bond = molecule.bonds.find(
@@ -213,10 +199,7 @@ export function getUnsaturationPositions(
         (b.atom1 === chain[i] && b.atom2 === chain[i + 1]) ||
         (b.atom1 === chain[i + 1] && b.atom2 === chain[i]),
     );
-    if (
-      bond &&
-      (bond.type === BondType.DOUBLE || bond.type === BondType.TRIPLE)
-    ) {
+    if (bond && (bond.type === BondType.DOUBLE || bond.type === BondType.TRIPLE)) {
       positions.push(i + 1);
     }
   }
@@ -233,16 +216,10 @@ export function renumberPriorityLocants(
 ): [number[], number[], number[]] {
   const [unsaturation, substituents, hetero] = locants;
   // Unsaturation positions are bond-locants (1..chainLength-1). Reverse mapping uses chainLength - p.
-  const renumberedUnsaturation = unsaturation
-    .map((p) => chainLength - p)
-    .sort((a, b) => a - b);
+  const renumberedUnsaturation = unsaturation.map((p) => chainLength - p).sort((a, b) => a - b);
   // Substituent and hetero atom locants are atom positions (1..chainLength). Reverse mapping uses chainLength - p + 1.
-  const renumberedSubstituents = substituents
-    .map((p) => chainLength - p + 1)
-    .sort((a, b) => a - b);
-  const renumberedHetero = hetero
-    .map((p) => chainLength - p + 1)
-    .sort((a, b) => a - b);
+  const renumberedSubstituents = substituents.map((p) => chainLength - p + 1).sort((a, b) => a - b);
+  const renumberedHetero = hetero.map((p) => chainLength - p + 1).sort((a, b) => a - b);
   return [renumberedUnsaturation, renumberedSubstituents, renumberedHetero];
 }
 
@@ -250,10 +227,7 @@ export function renumberPriorityLocants(
  * Renumber unsaturation locants to get the lowest possible values
  * Compares forward vs. reversed numbering and returns the lexicographically lower set
  */
-export function renumberUnsaturationToLowest(
-  positions: number[],
-  chainLength: number,
-): number[] {
+export function renumberUnsaturationToLowest(positions: number[], chainLength: number): number[] {
   if (positions.length === 0) return positions;
   const original = positions.slice().sort((a, b) => a - b);
   const reversed = original.map((p) => chainLength - p).sort((a, b) => a - b);

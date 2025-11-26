@@ -19,9 +19,7 @@ describe("IUPAC Engine Validation", () => {
 
     // Check that we have our atomic and functional group rules
     const atomicRules = rules.filter((r) => r.id.startsWith("atomic-"));
-    const functionalGroupRules = rules.filter((r) =>
-      r.id.includes("detection"),
-    );
+    const functionalGroupRules = rules.filter((r) => r.id.includes("detection"));
 
     expect(atomicRules.length).toBeGreaterThan(0);
     expect(functionalGroupRules.length).toBeGreaterThan(0);
@@ -43,9 +41,7 @@ describe("IUPAC Engine Validation", () => {
     expect(result.confidence).toBeGreaterThan(0);
     expect(result.method).toBeDefined();
 
-    console.log(
-      `✓ Methane name: ${result.name} (confidence: ${result.confidence})`,
-    );
+    console.log(`✓ Methane name: ${result.name} (confidence: ${result.confidence})`);
   });
 
   test("should handle ethane", () => {
@@ -63,9 +59,7 @@ describe("IUPAC Engine Validation", () => {
     expect(result.name).toBeDefined();
     expect(result.confidence).toBeGreaterThan(0);
 
-    console.log(
-      `✓ Ethane name: ${result.name} (confidence: ${result.confidence})`,
-    );
+    console.log(`✓ Ethane name: ${result.name} (confidence: ${result.confidence})`);
   });
 
   test("should detect functional groups", () => {
@@ -84,9 +78,7 @@ describe("IUPAC Engine Validation", () => {
     expect(result.functionalGroups.length).toBeGreaterThanOrEqual(0); // May or may not detect OH depending on implementation
     expect(result.rules.length).toBeGreaterThan(0);
 
-    console.log(
-      `✓ Ethanol name: ${result.name} (confidence: ${result.confidence})`,
-    );
+    console.log(`✓ Ethanol name: ${result.name} (confidence: ${result.confidence})`);
   });
 
   test("should handle carboxylic acids", () => {
@@ -104,9 +96,7 @@ describe("IUPAC Engine Validation", () => {
     expect(result.name).toBeDefined();
     expect(result.confidence).toBeGreaterThan(0);
 
-    console.log(
-      `✓ Acetic acid name: ${result.name} (confidence: ${result.confidence})`,
-    );
+    console.log(`✓ Acetic acid name: ${result.name} (confidence: ${result.confidence})`);
   });
 
   test("should handle ketones", () => {
@@ -124,9 +114,7 @@ describe("IUPAC Engine Validation", () => {
     expect(result.name).toBeDefined();
     expect(result.confidence).toBeGreaterThan(0);
 
-    console.log(
-      `✓ Acetone name: ${result.name} (confidence: ${result.confidence})`,
-    );
+    console.log(`✓ Acetone name: ${result.name} (confidence: ${result.confidence})`);
   });
 
   test("should run atomic layer rules", () => {
@@ -143,9 +131,7 @@ describe("IUPAC Engine Validation", () => {
 
     // Check that atomic rules were executed
     console.log("DEBUG: executed rules for ethane:", result.rules);
-    expect(result.rules.some((ruleId) => ruleId.startsWith("atomic-"))).toBe(
-      true,
-    );
+    expect(result.rules.some((ruleId) => ruleId.startsWith("atomic-"))).toBe(true);
     expect(result.confidence).toBeGreaterThan(0);
 
     console.log(`✓ Executed rules: ${result.rules.join(", ")}`);

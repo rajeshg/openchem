@@ -264,9 +264,7 @@ $$$$
       const record = result.records[0];
       if (!record) throw new Error("Expected record");
       expect(record.properties["SMILES"]).toBe("C(=O)O");
-      expect(record.properties["INCHI"]).toBe(
-        "InChI=1S/CH2O2/c2-1-3/h1H,(H,2,3)",
-      );
+      expect(record.properties["INCHI"]).toBe("InChI=1S/CH2O2/c2-1-3/h1H,(H,2,3)");
     });
 
     it("should handle duplicate property names (last one wins)", () => {

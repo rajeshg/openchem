@@ -36,9 +36,7 @@ describe("Hydrogen utils - addExplicitHydrogensWithMapping", () => {
       expect(res.augmentedToOriginal[i]).toBe(0);
       // bond connecting H should reference nitrogen id
       const hId = res.molecule.atoms[i]!.id;
-      const bond = res.molecule.bonds.find(
-        (b) => b.atom1 === hId || b.atom2 === hId,
-      );
+      const bond = res.molecule.bonds.find((b) => b.atom1 === hId || b.atom2 === hId);
       expect(bond).toBeTruthy();
       const heavyId = bond!.atom1 === hId ? bond!.atom2 : bond!.atom1;
       // heavy atom should be the nitrogen and present in original atoms
@@ -90,9 +88,7 @@ describe("Hydrogen utils - addExplicitHydrogensWithMapping", () => {
     // there should be a bond between heavyId and h atom id
     const hId = res.molecule.atoms[firstHIndex]!.id;
     const bond = res.molecule.bonds.find(
-      (b) =>
-        (b.atom1 === hId && b.atom2 === heavyId) ||
-        (b.atom2 === hId && b.atom1 === heavyId),
+      (b) => (b.atom1 === hId && b.atom2 === heavyId) || (b.atom2 === hId && b.atom1 === heavyId),
     );
     expect(bond).toBeTruthy();
   });
@@ -173,9 +169,7 @@ describe("Hydrogen utils - addExplicitHydrogensWithMapping", () => {
     expect(res.molecule.atoms.length).toBe(res.originalAtomCount + 2);
     for (let i = res.originalAtomCount; i < res.molecule.atoms.length; i++) {
       const hId = res.molecule.atoms[i]!.id;
-      const bond = res.molecule.bonds.find(
-        (b) => b.atom1 === hId || b.atom2 === hId,
-      );
+      const bond = res.molecule.bonds.find((b) => b.atom1 === hId || b.atom2 === hId);
       expect(bond).toBeTruthy();
       expect(bond!.type).toBe(BondType.SINGLE);
     }

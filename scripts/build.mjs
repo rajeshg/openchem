@@ -18,13 +18,10 @@ try {
 
 // Generate type definitions
 console.log("Generating type definitions...");
-execSync(
-  "bunx tsc -p tsconfig.decl.json --declaration --emitDeclarationOnly --outDir dist",
-  {
-    cwd,
-    stdio: "inherit",
-  },
-);
+execSync("bunx tsc -p tsconfig.decl.json --declaration --emitDeclarationOnly --outDir dist", {
+  cwd,
+  stdio: "inherit",
+});
 
 // Build bundle
 console.log("Building JavaScript bundle...");

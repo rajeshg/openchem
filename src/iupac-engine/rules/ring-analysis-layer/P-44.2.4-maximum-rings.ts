@@ -30,11 +30,7 @@ export const P44_2_4_MAXIMUM_RINGS_RULE: IUPACRule = {
     const molecule = context.getState().molecule;
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-44.2.4] Starting maximum rings rule with",
-        candidateRings?.length,
-        "rings",
-      );
+      console.log("[P-44.2.4] Starting maximum rings rule with", candidateRings?.length, "rings");
     }
 
     if (!candidateRings || candidateRings.length <= 1) {
@@ -43,10 +39,7 @@ export const P44_2_4_MAXIMUM_RINGS_RULE: IUPACRule = {
 
     // Check if rings are connected (bonded to each other but not sharing atoms)
     // If rings are connected, they form a polycyclic parent and should NOT be filtered
-    const areRingsConnected = (
-      ring1: RingSystem,
-      ring2: RingSystem,
-    ): boolean => {
+    const areRingsConnected = (ring1: RingSystem, ring2: RingSystem): boolean => {
       const ring1AtomIds = new Set(ring1.atoms.map((a: Atom) => a.id));
       const ring2AtomIds = new Set(ring2.atoms.map((a: Atom) => a.id));
 
@@ -66,11 +59,7 @@ export const P44_2_4_MAXIMUM_RINGS_RULE: IUPACRule = {
     // If any two rings are connected, keep all rings (they form a polycyclic parent)
     let hasConnectedRings = false;
     for (let i = 0; i < candidateRings.length && !hasConnectedRings; i++) {
-      for (
-        let j = i + 1;
-        j < candidateRings.length && !hasConnectedRings;
-        j++
-      ) {
+      for (let j = i + 1; j < candidateRings.length && !hasConnectedRings; j++) {
         if (
           candidateRings[i] &&
           candidateRings[j] &&
@@ -101,24 +90,18 @@ export const P44_2_4_MAXIMUM_RINGS_RULE: IUPACRule = {
       ringGroups.get(size)!.push(ring);
     });
 
-    const maxRingsCount = Math.max(
-      ...Array.from(ringGroups.values()).map((group) => group.length),
-    );
+    const maxRingsCount = Math.max(...Array.from(ringGroups.values()).map((group) => group.length));
     const bestGroups = Array.from(ringGroups.values()).filter(
       (group) => group.length === maxRingsCount,
     );
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-44.2.4] maxRingsCount: ${maxRingsCount}, bestGroups: ${bestGroups.length}`,
-      );
+      console.log(`[P-44.2.4] maxRingsCount: ${maxRingsCount}, bestGroups: ${bestGroups.length}`);
     }
 
     // If multiple groups have same number of rings, prefer smaller size
     if (bestGroups.length > 1) {
-      const smallestSize = Math.min(
-        ...bestGroups.map((group) => group[0]?.size || 0),
-      );
+      const smallestSize = Math.min(...bestGroups.map((group) => group[0]?.size || 0));
       return context.withUpdatedRings(
         ringGroups.get(smallestSize)!,
         "P-44.2.4",

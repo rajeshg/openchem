@@ -21,9 +21,7 @@ describe("tautomer: keto-enol", () => {
     // Expect enol: C/C(=C)O or similar canonical form; ensure at least two distinct tautomers
     expect(tautomers.length).toBeGreaterThanOrEqual(1);
     // There should be a tautomer with an OH (contains "O" and a double bond adjacent)
-    const hasEnolLike = smilesList.some(
-      (s: string) => /O/.test(s) && /=/.test(s),
-    );
+    const hasEnolLike = smilesList.some((s: string) => /O/.test(s) && /=/.test(s));
     expect(hasEnolLike).toBe(true);
   });
 });

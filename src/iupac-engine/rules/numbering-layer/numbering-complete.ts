@@ -1,9 +1,6 @@
 import type { IUPACRule, Chain } from "../../types";
 import { RulePriority } from "../../types";
-import {
-  ExecutionPhase,
-  ImmutableNamingContext,
-} from "../../immutable-context";
+import { ExecutionPhase, ImmutableNamingContext } from "../../immutable-context";
 import type { ContextState } from "../../immutable-context";
 import { validateNumbering } from "./helpers";
 import { generateChainName } from "../parent-chain-selection-layer";
@@ -46,10 +43,7 @@ export const NUMBERING_COMPLETE_RULE: IUPACRule = {
     }
 
     // Validate numbering consistency
-    const validationResult = validateNumbering(
-      parentStructure,
-      functionalGroups,
-    );
+    const validationResult = validateNumbering(parentStructure, functionalGroups);
 
     if (!validationResult.isValid) {
       return context.withConflict(
@@ -71,16 +65,9 @@ export const NUMBERING_COMPLETE_RULE: IUPACRule = {
     // multiple-bond locants (assigned in P-14.4) are included in the parent name
     // Pass false to exclude substituents - they will be added in name assembly layer
     let updatedParent = parentStructure;
-    if (
-      validationResult.isValid &&
-      parentStructure.type === "chain" &&
-      parentStructure.chain
-    ) {
+    if (validationResult.isValid && parentStructure.type === "chain" && parentStructure.chain) {
       try {
-        const newName = generateChainName(
-          parentStructure.chain as Chain,
-          false,
-        );
+        const newName = generateChainName(parentStructure.chain as Chain, false);
         updatedParent = { ...parentStructure, name: newName };
       } catch (_err) {
         // If name generation fails, keep existing name

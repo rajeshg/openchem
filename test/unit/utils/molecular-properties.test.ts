@@ -42,8 +42,7 @@ function tryCallMolFormula(mol: any): string | null {
       const d = mol.get_descriptors();
       try {
         const obj = typeof d === "string" ? JSON.parse(d) : d;
-        if (obj && typeof obj === "object" && obj.formula)
-          return String(obj.formula);
+        if (obj && typeof obj === "object" && obj.formula) return String(obj.formula);
       } catch (e) {}
     }
   } catch (e) {}
@@ -441,9 +440,7 @@ describe("molecular properties", () => {
       expect(result.errors).toEqual([]);
       const lipinski = checkLipinskiRuleOfFive(result.molecules[0]!);
       expect(lipinski.passes).toBe(false);
-      expect(lipinski.violations.some((v) => v.includes("H-bond donors"))).toBe(
-        true,
-      );
+      expect(lipinski.violations.some((v) => v.includes("H-bond donors"))).toBe(true);
       expect(lipinski.properties.hbondDonors).toBeGreaterThan(5);
     });
 
@@ -456,9 +453,7 @@ describe("molecular properties", () => {
       expect(result.errors).toEqual([]);
       const lipinski = checkLipinskiRuleOfFive(result.molecules[0]!);
       expect(lipinski.passes).toBe(false);
-      expect(
-        lipinski.violations.some((v) => v.includes("H-bond acceptors")),
-      ).toBe(true);
+      expect(lipinski.violations.some((v) => v.includes("H-bond acceptors"))).toBe(true);
       expect(lipinski.properties.hbondAcceptors).toBeGreaterThan(10);
     });
 
@@ -491,9 +486,7 @@ describe("molecular properties", () => {
       const lipinski = checkLipinskiRuleOfFive(result.molecules[0]!);
       expect(lipinski.passes).toBe(false);
       expect(lipinski.violations.length).toBeGreaterThan(1);
-      expect(
-        lipinski.violations.some((v) => v.includes("Molecular weight")),
-      ).toBe(true);
+      expect(lipinski.violations.some((v) => v.includes("Molecular weight"))).toBe(true);
       expect(lipinski.violations.some((v) => v.includes("LogP"))).toBe(true);
     });
   });

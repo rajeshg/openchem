@@ -115,9 +115,7 @@ export class OPSINService {
       }
 
       const priority =
-        (entry.priority as number | undefined) ||
-        this.priorityMap[name.toLowerCase()] ||
-        999;
+        (entry.priority as number | undefined) || this.priorityMap[name.toLowerCase()] || 999;
       const prefix = entry.prefix as string | undefined;
 
       map.set(pattern, { name, priority, suffix, prefix });
@@ -188,10 +186,7 @@ export class OPSINService {
    * @param count - Number to convert to prefix
    * @param type - 'basic' for simple (di, tri), 'group' for complex (bis, tris)
    */
-  getMultiplicativePrefix(
-    count: number,
-    type: "basic" | "group" = "basic",
-  ): string | undefined {
+  getMultiplicativePrefix(count: number, type: "basic" | "group" = "basic"): string | undefined {
     const multipliers = this.rules.multipliers?.[type];
     if (!multipliers) {
       return undefined;

@@ -26,10 +26,7 @@ interface Coordinates {
  * Generate a MOL file (V2000 format) from a openchem Molecule.
  * Matches RDKit output structure for compatibility.
  */
-export function generateMolfile(
-  molecule: Molecule,
-  options?: MolGeneratorOptions,
-): string {
+export function generateMolfile(molecule: Molecule, options?: MolGeneratorOptions): string {
   const opts = {
     title: "",
     programName: "openchem",
@@ -211,10 +208,7 @@ function formatCountsLine(molecule: Molecule): string {
 /**
  * Format the atom block (one line per atom).
  */
-function formatAtomBlock(
-  atoms: readonly Atom[],
-  coordinates: Map<number, Coordinates>,
-): string[] {
+function formatAtomBlock(atoms: readonly Atom[], coordinates: Map<number, Coordinates>): string[] {
   return atoms.map((atom) => {
     const coord = coordinates.get(atom.id)!;
     const symbol = atom.symbol.padEnd(3);
@@ -240,10 +234,7 @@ function getStereoParity(chiral: string | null): number {
 /**
  * Format the bond block (one line per bond).
  */
-function formatBondBlock(
-  bonds: readonly Bond[],
-  atomIndexMap: Map<number, number>,
-): string[] {
+function formatBondBlock(bonds: readonly Bond[], atomIndexMap: Map<number, number>): string[] {
   return bonds.map((bond) => {
     const atom1Idx = atomIndexMap.get(bond.atom1)!;
     const atom2Idx = atomIndexMap.get(bond.atom2)!;
@@ -301,16 +292,12 @@ function formatPropertiesBlock(
   const lines: string[] = [];
 
   // Handle charges
-  const chargedAtoms = atoms.filter(
-    (atom) => atom.charge !== 0 && atom.charge !== undefined,
-  );
+  const chargedAtoms = atoms.filter((atom) => atom.charge !== 0 && atom.charge !== undefined);
   if (chargedAtoms.length > 0) {
     const chargeEntries: string[] = [];
     for (const atom of chargedAtoms) {
       const idx = atomIndexMap.get(atom.id)!;
-      chargeEntries.push(
-        `${idx.toString().padStart(3)} ${atom.charge!.toString().padStart(3)}`,
-      );
+      chargeEntries.push(`${idx.toString().padStart(3)} ${atom.charge!.toString().padStart(3)}`);
     }
 
     // Group in chunks of 8 (MOL format limit)
@@ -320,16 +307,12 @@ function formatPropertiesBlock(
   }
 
   // Handle isotopes
-  const isotopeAtoms = atoms.filter(
-    (atom) => atom.isotope !== null && atom.isotope !== undefined,
-  );
+  const isotopeAtoms = atoms.filter((atom) => atom.isotope !== null && atom.isotope !== undefined);
   if (isotopeAtoms.length > 0) {
     const isotopeEntries: string[] = [];
     for (const atom of isotopeAtoms) {
       const idx = atomIndexMap.get(atom.id)!;
-      isotopeEntries.push(
-        `${idx.toString().padStart(3)} ${atom.isotope!.toString().padStart(3)}`,
-      );
+      isotopeEntries.push(`${idx.toString().padStart(3)} ${atom.isotope!.toString().padStart(3)}`);
     }
 
     // Group in chunks of 8

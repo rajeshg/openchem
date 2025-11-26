@@ -19,9 +19,7 @@ describe("Molecule #4 - Von Baeyer Numbering & Double Bond", () => {
     expect(iupacName).toContain("-5-en");
 
     // Test full pentacyclic descriptor
-    expect(iupacName).toContain(
-      "pentacyclo[12.3.2.01,13.02,10.06,10]nonadec-5-en",
-    );
+    expect(iupacName).toContain("pentacyclo[12.3.2.01,13.02,10.06,10]nonadec-5-en");
   });
 
   it("should handle secondary bridges correctly in pentacyclic systems", () => {

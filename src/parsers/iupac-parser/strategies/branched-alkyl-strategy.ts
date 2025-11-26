@@ -41,8 +41,7 @@ export class BranchedAlkylStrategy extends BaseSubstituentStrategy {
     const len2 = getChainLen(subst2!.value);
 
     // Longer chain is the parent, shorter is the substituent
-    const [parentSubst, branchSubst] =
-      len1 > len2 ? [subst1!, subst2!] : [subst2!, subst1!];
+    const [parentSubst, branchSubst] = len1 > len2 ? [subst1!, subst2!] : [subst2!, subst1!];
     const parentLen = Math.max(len1, len2);
     const branchLen = Math.min(len1, len2);
 
@@ -58,19 +57,13 @@ export class BranchedAlkylStrategy extends BaseSubstituentStrategy {
     const parentAtoms = builder.createLinearChain(parentLen);
 
     // Get locant for branch attachment
-    const branchLocants = ctx.locantTokens.filter(
-      (l) => l.position < branchSubst.position,
-    );
+    const branchLocants = ctx.locantTokens.filter((l) => l.position < branchSubst.position);
     const branchPos =
       branchLocants.length > 0
         ? ((branchLocants[0]?.metadata?.positions as number[]) || [1])[0]!
         : 1;
 
-    const attachIdx = builderContext.locantToAtomIndex(
-      branchPos,
-      parentAtoms,
-      false,
-    );
+    const attachIdx = builderContext.locantToAtomIndex(branchPos, parentAtoms, false);
 
     if (attachIdx === null) {
       return null;

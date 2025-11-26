@@ -29,10 +29,7 @@ export function dfsCountBranch(
   const neighbors = getNeighbors(atomIdx, molecule);
   for (const neighbor of neighbors) {
     if (!visited.has(neighbor) && !chainSet.has(neighbor)) {
-      maxLength = Math.max(
-        maxLength,
-        1 + dfsCountBranch(neighbor, molecule, chainSet, visited),
-      );
+      maxLength = Math.max(maxLength, 1 + dfsCountBranch(neighbor, molecule, chainSet, visited));
     }
   }
   return maxLength;
@@ -65,11 +62,7 @@ export function findParentChain(molecule: Molecule): number[] {
     .filter((idx) => idx !== -1);
 
   // Helper: DFS to find all chains starting from a given atom
-  function dfsChain(
-    atomIdx: number,
-    visited: Set<number>,
-    chain: number[],
-  ): number[][] {
+  function dfsChain(atomIdx: number, visited: Set<number>, chain: number[]): number[][] {
     visited.add(atomIdx);
     chain.push(atomIdx);
     const neighbors = getNeighbors(atomIdx, molecule).filter(
@@ -80,9 +73,7 @@ export function findParentChain(molecule: Molecule): number[] {
     for (const neighbor of neighbors) {
       if (!visited.has(neighbor)) {
         extended = true;
-        chains = chains.concat(
-          dfsChain(neighbor, new Set(visited), [...chain]),
-        );
+        chains = chains.concat(dfsChain(neighbor, new Set(visited), [...chain]));
       }
     }
     if (!extended) chains.push([...chain]);
@@ -119,12 +110,9 @@ export function findParentChain(molecule: Molecule): number[] {
       const atomA = chain[i];
       const atomB = chain[i + 1];
       const bond = molecule.bonds.find(
-        (b) =>
-          (b.atom1 === atomA && b.atom2 === atomB) ||
-          (b.atom2 === atomA && b.atom1 === atomB),
+        (b) => (b.atom1 === atomA && b.atom2 === atomB) || (b.atom2 === atomA && b.atom1 === atomB),
       );
-      if (bond && (bond.type === "double" || bond.type === "triple"))
-        unsaturations++;
+      if (bond && (bond.type === "double" || bond.type === "triple")) unsaturations++;
     }
     // 3. Principal functional groups (placeholder: count O/N/S attached to chain)
     let principalGroups = 0;
@@ -161,10 +149,7 @@ export function findParentChain(molecule: Molecule): number[] {
 export function detectBasicChains(molecule: Molecule): Chain[] {
   const chains: Chain[] = [];
   // For now, just create a simple chain from all atoms if it's acyclic
-  if (
-    !molecule.atoms.some((atom) => atom.isInRing ?? false) &&
-    molecule.atoms.length >= 2
-  ) {
+  if (!molecule.atoms.some((atom) => atom.isInRing ?? false) && molecule.atoms.length >= 2) {
     const atoms = molecule.atoms.slice().sort((a, b) => a.id - b.id);
     const bonds: Bond[] = [];
     const multipleBonds: MultipleBond[] = [];

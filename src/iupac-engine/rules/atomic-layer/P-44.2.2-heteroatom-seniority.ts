@@ -16,17 +16,14 @@ export const P_44_2_2_HETEROATOM_SENIORITY: IUPACRule = {
   priority: RulePriority.SEVEN,
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    return (
-      Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0
-    );
+    return Array.isArray(state.molecule?.atoms) && state.molecule.atoms.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
     const state = context.getState();
     if (!Array.isArray(state.molecule?.atoms)) {
       return context;
     }
-    const heteroatoms: Array<{ id: number; element: string; type: string }> =
-      [];
+    const heteroatoms: Array<{ id: number; element: string; type: string }> = [];
     state.molecule.atoms.forEach((atom: Atom) => {
       if (atom.symbol !== "C") {
         heteroatoms.push({
@@ -72,8 +69,5 @@ function getHeteroatomType(element: string): string {
     Te: "tellurium",
   };
 
-  return (
-    heteroatomCategories[element as keyof typeof heteroatomCategories] ||
-    "other"
-  );
+  return heteroatomCategories[element as keyof typeof heteroatomCategories] || "other";
 }

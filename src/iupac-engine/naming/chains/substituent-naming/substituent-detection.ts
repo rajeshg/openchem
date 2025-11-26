@@ -24,9 +24,7 @@ export function findSubstituents(
   const chainSet = new Set(mainChain);
 
   // Detect functional groups to exclude their atoms from being classified as substituents
-  const functionalGroups = (
-    detector || getSharedDetector()
-  ).detectFunctionalGroups(molecule);
+  const functionalGroups = (detector || getSharedDetector()).detectFunctionalGroups(molecule);
   const fgAtomIds = new Set<number>();
   for (const fg of functionalGroups) {
     if (fg.atoms && Array.isArray(fg.atoms)) {
@@ -50,8 +48,7 @@ export function findSubstituents(
   if (!isAmineChainWithNitrogen && firstAtom !== undefined) {
     const lastAtom = mainChain[mainChain.length - 1];
     const firstAtomObj = molecule.atoms[firstAtom];
-    const lastAtomObj =
-      lastAtom !== undefined ? molecule.atoms[lastAtom] : undefined;
+    const lastAtomObj = lastAtom !== undefined ? molecule.atoms[lastAtom] : undefined;
 
     if (firstAtomObj?.symbol === "C" || lastAtomObj?.symbol === "C") {
       // Check if any amine FG nitrogen is bonded to either the first or last carbon
@@ -107,9 +104,7 @@ export function findSubstituents(
           detector,
         );
         if (substituent) {
-          const position = isAmineChainWithNitrogen
-            ? i.toString()
-            : (i + 1).toString();
+          const position = isAmineChainWithNitrogen ? i.toString() : (i + 1).toString();
           if (process.env.VERBOSE)
             console.log(
               `[findSubstituents] i=${i}, chainAtomIdx=${chainAtomIdx}, substituentAtomIdx=${substituentAtomIdx}, position=${position}, type=${substituent.name}`,
@@ -127,10 +122,7 @@ export function findSubstituents(
   // Special handling for ether functional groups
   // After regular substituents are found, check for ether oxygens that connect to carbon chains
   const etherGroups = functionalGroups.filter(
-    (fg) =>
-      (fg.name === "ether" || fg.type === "alkoxy") &&
-      fg.atoms &&
-      fg.atoms.length === 1,
+    (fg) => (fg.name === "ether" || fg.type === "alkoxy") && fg.atoms && fg.atoms.length === 1,
   );
   for (const etherGroup of etherGroups) {
     const oxygenIdx = etherGroup.atoms![0]!;
@@ -191,11 +183,7 @@ export function findSubstituents(
       }
 
       // Name the alkoxy substituent
-      const alkoxyName = nameAlkoxySubstituent(
-        molecule,
-        substituentAtoms,
-        oxygenIdx,
-      );
+      const alkoxyName = nameAlkoxySubstituent(molecule, substituentAtoms, oxygenIdx);
       const position = isAmineChainWithNitrogen
         ? attachedToChainAt.toString()
         : (attachedToChainAt + 1).toString();
@@ -220,9 +208,7 @@ export function findSubstituents(
   // Pattern: chain-S-P(=O)(OR)(R') where S should be named as "[phosphoryl]sulfanyl"
   const phosphorylGroups = functionalGroups.filter(
     (fg) =>
-      (fg.name === "phosphoryl" || fg.name === "phosphanyl") &&
-      fg.atoms &&
-      fg.atoms.length >= 2,
+      (fg.name === "phosphoryl" || fg.name === "phosphanyl") && fg.atoms && fg.atoms.length >= 2,
   );
 
   for (const phosphorylGroup of phosphorylGroups) {
@@ -233,8 +219,7 @@ export function findSubstituents(
     // Check if phosphorus is bonded to a sulfur that's attached to the main chain
     for (const bond of molecule.bonds) {
       if (bond.atom1 === phosphorusIdx || bond.atom2 === phosphorusIdx) {
-        const neighborIdx =
-          bond.atom1 === phosphorusIdx ? bond.atom2 : bond.atom1;
+        const neighborIdx = bond.atom1 === phosphorusIdx ? bond.atom2 : bond.atom1;
         const neighborAtom = molecule.atoms[neighborIdx];
 
         if (neighborAtom && neighborAtom.symbol === "S") {
@@ -242,14 +227,9 @@ export function findSubstituents(
           let attachedToChainAt = -1;
 
           for (const chainBond of molecule.bonds) {
-            if (
-              chainBond.atom1 === neighborIdx ||
-              chainBond.atom2 === neighborIdx
-            ) {
+            if (chainBond.atom1 === neighborIdx || chainBond.atom2 === neighborIdx) {
               const chainNeighbor =
-                chainBond.atom1 === neighborIdx
-                  ? chainBond.atom2
-                  : chainBond.atom1;
+                chainBond.atom1 === neighborIdx ? chainBond.atom2 : chainBond.atom1;
 
               if (chainSet.has(chainNeighbor)) {
                 attachedToChainAt = mainChain.indexOf(chainNeighbor);
@@ -266,10 +246,7 @@ export function findSubstituents(
 
             // Add the P=O oxygen
             for (const atomId of phosphorylGroup.atoms!) {
-              if (
-                molecule.atoms[atomId]?.symbol === "O" &&
-                !chainSet.has(atomId)
-              ) {
+              if (molecule.atoms[atomId]?.symbol === "O" && !chainSet.has(atomId)) {
                 phosphorylSubstituentAtoms.add(atomId);
               }
             }
@@ -332,10 +309,7 @@ export function findSubstituents(
   // Special handling for sulfonyl and sulfinyl functional groups
   // These can form bridges like R-S(=O)-S(=O)(=O)-R' where we need to detect the full substituent
   const sulfurGroups = functionalGroups.filter(
-    (fg) =>
-      (fg.name === "sulfonyl" || fg.name === "sulfinyl") &&
-      fg.atoms &&
-      fg.atoms.length > 0,
+    (fg) => (fg.name === "sulfonyl" || fg.name === "sulfinyl") && fg.atoms && fg.atoms.length > 0,
   );
 
   for (const sulfurGroup of sulfurGroups) {
@@ -413,10 +387,7 @@ export function findSubstituents(
     // This ensures consistent naming regardless of BFS traversal order
     if (sulfurBridge.length === 2) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[DEBUG normalize] Before normalization: sulfurBridge =",
-          sulfurBridge,
-        );
+        console.log("[DEBUG normalize] Before normalization: sulfurBridge =", sulfurBridge);
       }
 
       const s0AttachedToChain = molecule.bonds.some(
@@ -441,16 +412,10 @@ export function findSubstituents(
 
       // Swap if needed so that sulfurBridge[0] is always the one attached to chain
       if (!s0AttachedToChain && s1AttachedToChain) {
-        [sulfurBridge[0], sulfurBridge[1]] = [
-          sulfurBridge[1]!,
-          sulfurBridge[0]!,
-        ];
+        [sulfurBridge[0], sulfurBridge[1]] = [sulfurBridge[1]!, sulfurBridge[0]!];
 
         if (process.env.VERBOSE) {
-          console.log(
-            "[DEBUG normalize] After swap: sulfurBridge =",
-            sulfurBridge,
-          );
+          console.log("[DEBUG normalize] After swap: sulfurBridge =", sulfurBridge);
         }
       }
     }
@@ -492,14 +457,8 @@ export function findSubstituents(
         "nonChainSulfurs:",
         nonChainSulfurs,
       );
-      console.log(
-        "[DEBUG sulfur bridge] sulfurToSubstituentStarts:",
-        sulfurToSubstituentStarts,
-      );
-      console.log(
-        "[DEBUG sulfur bridge] substituentStarts:",
-        substituentStarts,
-      );
+      console.log("[DEBUG sulfur bridge] sulfurToSubstituentStarts:", sulfurToSubstituentStarts);
+      console.log("[DEBUG sulfur bridge] substituentStarts:", substituentStarts);
     }
 
     for (const startAtom of substituentStarts) {
@@ -551,8 +510,7 @@ export function findSubstituents(
             (b.atom1 === cIdx || b.atom2 === cIdx) &&
             substituentAtoms.has(b.atom1) &&
             substituentAtoms.has(b.atom2) &&
-            molecule.atoms[b.atom1 === cIdx ? b.atom2 : b.atom1]?.symbol ===
-              "C",
+            molecule.atoms[b.atom1 === cIdx ? b.atom2 : b.atom1]?.symbol === "C",
         );
         if (cNeighbors.length === 3) {
           foundTertButyl = true;
@@ -570,11 +528,7 @@ export function findSubstituents(
         for (const sIdx of sulfurBridge) {
           for (const bond of molecule.bonds) {
             const neighbor =
-              bond.atom1 === sIdx
-                ? bond.atom2
-                : bond.atom2 === sIdx
-                  ? bond.atom1
-                  : -1;
+              bond.atom1 === sIdx ? bond.atom2 : bond.atom2 === sIdx ? bond.atom1 : -1;
             if (
               neighbor >= 0 &&
               substituentAtoms.has(neighbor) &&
@@ -640,21 +594,13 @@ export function findSubstituents(
       const s1 = sulfurBridge[1]!;
 
       if (process.env.VERBOSE) {
-        console.log(
-          "[DEBUG] Sulfur bridge:",
-          sulfurBridge,
-          "s0=",
-          s0,
-          "s1=",
-          s1,
-        );
+        console.log("[DEBUG] Sulfur bridge:", sulfurBridge, "s0=", s0, "s1=", s1);
       }
 
       // Determine which is attached to chain
       const s0AttachedToChain = molecule.bonds.some(
         (b) =>
-          (b.atom1 === s0 || b.atom2 === s0) &&
-          chainSet.has(b.atom1 === s0 ? b.atom2 : b.atom1),
+          (b.atom1 === s0 || b.atom2 === s0) && chainSet.has(b.atom1 === s0 ? b.atom2 : b.atom1),
       );
 
       // Also determine which is attached to substituent
@@ -681,11 +627,9 @@ export function findSubstituents(
 
       // Determine the functional group types
       const s0Type =
-        functionalGroups.find((g) => g.atoms && g.atoms.includes(s0))?.name ||
-        "sulfanyl";
+        functionalGroups.find((g) => g.atoms && g.atoms.includes(s0))?.name || "sulfanyl";
       const s1Type =
-        functionalGroups.find((g) => g.atoms && g.atoms.includes(s1))?.name ||
-        "sulfanyl";
+        functionalGroups.find((g) => g.atoms && g.atoms.includes(s1))?.name || "sulfanyl";
 
       // Count oxygen atoms attached to each sulfur
       const s0OxygenCount = molecule.bonds.filter(
@@ -715,49 +659,37 @@ export function findSubstituents(
       if (s0OxygenCount > s1OxygenCount) {
         // s0 has more oxygens, name it first
         if (process.env.VERBOSE) {
-          console.log(
-            "[DEBUG] Pushing order: s0Type, s1Type (s0 has more oxygens)",
-          );
+          console.log("[DEBUG] Pushing order: s0Type, s1Type (s0 has more oxygens)");
         }
         fgNames.push(s0Type, s1Type);
       } else if (s1OxygenCount > s0OxygenCount) {
         // s1 has more oxygens, name it first
         if (process.env.VERBOSE) {
-          console.log(
-            "[DEBUG] Pushing order: s1Type, s0Type (s1 has more oxygens)",
-          );
+          console.log("[DEBUG] Pushing order: s1Type, s0Type (s1 has more oxygens)");
         }
         fgNames.push(s1Type, s0Type);
       } else {
         // Equal oxygen counts: use substituent attachment as tiebreaker
         if (s1AttachedToSubst) {
           if (process.env.VERBOSE) {
-            console.log(
-              "[DEBUG] Pushing order: s1Type, s0Type (equal O, s1 attached to subst)",
-            );
+            console.log("[DEBUG] Pushing order: s1Type, s0Type (equal O, s1 attached to subst)");
           }
           fgNames.push(s1Type, s0Type);
         } else if (s0AttachedToSubst) {
           if (process.env.VERBOSE) {
-            console.log(
-              "[DEBUG] Pushing order: s0Type, s1Type (equal O, s0 attached to subst)",
-            );
+            console.log("[DEBUG] Pushing order: s0Type, s1Type (equal O, s0 attached to subst)");
           }
           fgNames.push(s0Type, s1Type);
         } else {
           // Final fallback: use chain attachment
           if (s0AttachedToChain) {
             if (process.env.VERBOSE) {
-              console.log(
-                "[DEBUG] Pushing order: s0Type, s1Type (equal O, s0 attached to chain)",
-              );
+              console.log("[DEBUG] Pushing order: s0Type, s1Type (equal O, s0 attached to chain)");
             }
             fgNames.push(s0Type, s1Type);
           } else {
             if (process.env.VERBOSE) {
-              console.log(
-                "[DEBUG] Pushing order: s1Type, s0Type (equal O, s1 attached to chain)",
-              );
+              console.log("[DEBUG] Pushing order: s1Type, s0Type (equal O, s1 attached to chain)");
             }
             fgNames.push(s1Type, s0Type);
           }
@@ -765,9 +697,8 @@ export function findSubstituents(
       }
     } else if (sulfurBridge.length === 1) {
       const sType =
-        functionalGroups.find(
-          (g) => g.atoms && g.atoms.includes(sulfurBridge[0]!),
-        )?.name || "sulfur";
+        functionalGroups.find((g) => g.atoms && g.atoms.includes(sulfurBridge[0]!))?.name ||
+        "sulfur";
       fgNames.push(sType);
     }
 
@@ -815,9 +746,7 @@ export function findSubstituents(
     const carbonylCarbonIdx = ketoneGroup.atoms!.find(
       (atomIdx) => molecule.atoms[atomIdx]?.symbol === "C",
     );
-    const oxygenIdx = ketoneGroup.atoms!.find(
-      (atomIdx) => molecule.atoms[atomIdx]?.symbol === "O",
-    );
+    const oxygenIdx = ketoneGroup.atoms!.find((atomIdx) => molecule.atoms[atomIdx]?.symbol === "O");
 
     if (carbonylCarbonIdx === undefined || oxygenIdx === undefined) continue;
 
@@ -832,12 +761,8 @@ export function findSubstituents(
     let chainCarbonIdx = -1;
 
     for (const bond of molecule.bonds) {
-      if (
-        bond.atom1 === carbonylCarbonIdx ||
-        bond.atom2 === carbonylCarbonIdx
-      ) {
-        const otherAtom =
-          bond.atom1 === carbonylCarbonIdx ? bond.atom2 : bond.atom1;
+      if (bond.atom1 === carbonylCarbonIdx || bond.atom2 === carbonylCarbonIdx) {
+        const otherAtom = bond.atom1 === carbonylCarbonIdx ? bond.atom2 : bond.atom1;
         const otherAtomObj = molecule.atoms[otherAtom];
 
         // Skip the oxygen (that's the C=O bond)
@@ -885,9 +810,7 @@ export function findSubstituents(
 
     // Name the acyl group
     // Count carbons (excluding oxygen)
-    const acylCarbons = Array.from(acylAtoms).filter(
-      (idx) => molecule.atoms[idx]?.symbol === "C",
-    );
+    const acylCarbons = Array.from(acylAtoms).filter((idx) => molecule.atoms[idx]?.symbol === "C");
     const carbonCount = acylCarbons.length;
 
     if (process.env.VERBOSE) {
@@ -915,11 +838,7 @@ export function findSubstituents(
       let longestChain: number[] = [];
 
       // Simple DFS to find longest path
-      const dfs = (
-        current: number,
-        path: number[],
-        visited: Set<number>,
-      ): void => {
+      const dfs = (current: number, path: number[], visited: Set<number>): void => {
         if (path.length > longestChain.length) {
           longestChain = [...path];
         }
@@ -960,18 +879,12 @@ export function findSubstituents(
         for (let i = 0; i < longestChain.length; i++) {
           const carbonIdx = longestChain[i]!;
           const carbonNeighbors = molecule.bonds
-            .filter(
-              (b) =>
-                (b.atom1 === carbonIdx || b.atom2 === carbonIdx) &&
-                b.type === "single",
-            )
+            .filter((b) => (b.atom1 === carbonIdx || b.atom2 === carbonIdx) && b.type === "single")
             .map((b) => (b.atom1 === carbonIdx ? b.atom2 : b.atom1))
             .filter((idx) => acylCarbonSet.has(idx) && idx !== oxygenIdx);
 
           // Count how many are in the main chain
-          const inChainCount = carbonNeighbors.filter((idx) =>
-            longestChain.includes(idx),
-          ).length;
+          const inChainCount = carbonNeighbors.filter((idx) => longestChain.includes(idx)).length;
 
           if (carbonNeighbors.length > inChainCount) {
             // This carbon has branches
@@ -1002,9 +915,7 @@ export function findSubstituents(
       : (attachedToChainAt + 1).toString();
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[findSubstituents] Acyl substituent at position ${position}: ${acylName}`,
-      );
+      console.log(`[findSubstituents] Acyl substituent at position ${position}: ${acylName}`);
     }
 
     substituents.push({

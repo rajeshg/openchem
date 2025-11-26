@@ -8,9 +8,7 @@ export function nameAlkylSubstituent(
   parentAtomIds: Set<number>,
   _opsinService: OPSINService,
 ): string {
-  const substituentAtom = molecule.atoms.find(
-    (a) => a.id === substituentAtomId,
-  );
+  const substituentAtom = molecule.atoms.find((a) => a.id === substituentAtomId);
   if (!substituentAtom || substituentAtom.symbol !== "C") {
     return "methyl";
   }
@@ -21,8 +19,7 @@ export function nameAlkylSubstituent(
       (bond.atom1 === substituentAtomId || bond.atom2 === substituentAtomId) &&
       bond.type === "double"
     ) {
-      const otherAtomId =
-        bond.atom1 === substituentAtomId ? bond.atom2 : bond.atom1;
+      const otherAtomId = bond.atom1 === substituentAtomId ? bond.atom2 : bond.atom1;
       const otherAtom = molecule.atoms.find((a) => a.id === otherAtomId);
       return otherAtom?.symbol === "O";
     }
@@ -35,18 +32,15 @@ export function nameAlkylSubstituent(
 
   // Check what else is bonded to this carbon (besides the nitrogen)
   const bonds = molecule.bonds.filter(
-    (bond) =>
-      bond.atom1 === substituentAtomId || bond.atom2 === substituentAtomId,
+    (bond) => bond.atom1 === substituentAtomId || bond.atom2 === substituentAtomId,
   );
 
   let hasOH = false;
   let carbonCount = 1;
 
   for (const bond of bonds) {
-    const otherAtomId =
-      bond.atom1 === substituentAtomId ? bond.atom2 : bond.atom1;
-    if (otherAtomId === nitrogenAtomId || parentAtomIds.has(otherAtomId))
-      continue;
+    const otherAtomId = bond.atom1 === substituentAtomId ? bond.atom2 : bond.atom1;
+    if (otherAtomId === nitrogenAtomId || parentAtomIds.has(otherAtomId)) continue;
 
     const otherAtom = molecule.atoms.find((a) => a.id === otherAtomId);
     if (!otherAtom) continue;

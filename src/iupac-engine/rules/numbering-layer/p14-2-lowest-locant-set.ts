@@ -1,9 +1,6 @@
 import type { IUPACRule, FunctionalGroup } from "../../types";
 import { RulePriority } from "../../types";
-import {
-  ExecutionPhase,
-  ImmutableNamingContext,
-} from "../../immutable-context";
+import { ExecutionPhase, ImmutableNamingContext } from "../../immutable-context";
 import type { ContextState } from "../../immutable-context";
 import { normalizeFunctionalGroupLocants, optimizeLocantSet } from "./helpers";
 
@@ -18,22 +15,14 @@ export const P14_2_LOWEST_LOCANT_SET_RULE: IUPACRule = {
     const parentStructure = state.parentStructure;
     const functionalGroups = state.functionalGroups;
 
-    return !!(
-      parentStructure &&
-      functionalGroups &&
-      functionalGroups.length > 0
-    );
+    return !!(parentStructure && functionalGroups && functionalGroups.length > 0);
   },
   action: (context: ImmutableNamingContext) => {
     const state = context.getState();
     const parentStructure = state.parentStructure;
     const functionalGroups = state.functionalGroups;
 
-    if (
-      !parentStructure ||
-      !functionalGroups ||
-      functionalGroups.length === 0
-    ) {
+    if (!parentStructure || !functionalGroups || functionalGroups.length === 0) {
       return context;
     }
 

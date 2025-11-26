@@ -29,11 +29,7 @@ export class IUPACNamer {
    */
   generateNameFromSMILES(smiles: string): NamingResult {
     const parseResult = parseSMILES(smiles);
-    if (
-      !parseResult ||
-      !parseResult.molecules ||
-      parseResult.molecules.length === 0
-    ) {
+    if (!parseResult || !parseResult.molecules || parseResult.molecules.length === 0) {
       throw new Error("Failed to parse SMILES for IUPAC naming");
     }
 
@@ -49,11 +45,7 @@ export class IUPACNamer {
     context: import("./immutable-context").ImmutableNamingContext;
   } {
     const parseResult = parseSMILES(smiles);
-    if (
-      !parseResult ||
-      !parseResult.molecules ||
-      parseResult.molecules.length === 0
-    ) {
+    if (!parseResult || !parseResult.molecules || parseResult.molecules.length === 0) {
       throw new Error("Failed to parse SMILES for IUPAC naming");
     }
 

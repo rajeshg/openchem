@@ -12,15 +12,12 @@ import { NomenclatureMethod, ExecutionPhase } from "../../immutable-context";
 export const P51_4_MULTIPLICATIVE_RULE: IUPACRule = {
   id: "P-51.4",
   name: "Multiplicative Nomenclature Method",
-  description:
-    "Select multiplicative nomenclature for identical substituents (P-51.4)",
+  description: "Select multiplicative nomenclature for identical substituents (P-51.4)",
   blueBookReference: BLUE_BOOK_RULES.P51_4,
   priority: RulePriority.SEVEN, // 70 - Mid-high priority for duplicates
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    const functionalGroups = Array.isArray(state.functionalGroups)
-      ? state.functionalGroups
-      : [];
+    const functionalGroups = Array.isArray(state.functionalGroups) ? state.functionalGroups : [];
 
     // Don't override if a method has already been selected
     if (state.nomenclatureMethod) {
@@ -32,9 +29,7 @@ export const P51_4_MULTIPLICATIVE_RULE: IUPACRule = {
     }
 
     // Check for identical functional groups that could use multiplicative nomenclature
-    const groupTypes = functionalGroups.map(
-      (group: FunctionalGroup) => group.type,
-    );
+    const groupTypes = functionalGroups.map((group: FunctionalGroup) => group.type);
     const hasDuplicates = groupTypes.some(
       (type: string) => groupTypes.filter((t: string) => t === type).length > 1,
     );

@@ -10,11 +10,7 @@ import {
   AMINE_DETECTION_RULE,
   KETONE_DETECTION_RULE,
 } from "./simple-detectors";
-import {
-  normalizePriority,
-  findAcylChain,
-  expandKetoneToAcylGroup,
-} from "./utils";
+import { normalizePriority, findAcylChain, expandKetoneToAcylGroup } from "./utils";
 import {
   ESTER_DETECTION_RULE,
   LACTONE_TO_KETONE_RULE,
@@ -65,12 +61,10 @@ type DetectedFunctionalGroup = {
 export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
   id: "functional-group-priority",
   name: "Functional Group Priority Detection",
-  description:
-    "Detect and prioritize functional groups per Blue Book Table 5.1",
+  description: "Detect and prioritize functional groups per Blue Book Table 5.1",
   blueBookReference: "P-44.1 - Principal characteristic group selection",
   priority: RulePriority.SIX, // 60 - Consolidate all FG detections (runs after individual detections)
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().molecule.atoms.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().molecule.atoms.length > 0,
   action: (context: ImmutableNamingContext) => {
     // Use OPSIN detector directly so we can capture pattern metadata for traceability
     const mol = context.getState().molecule;
@@ -80,10 +74,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
     const previousFunctionalGroups = context.getState().functionalGroups || [];
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[FUNCTIONAL_GROUP_PRIORITY_RULE] Molecule has rings?",
-        mol.rings?.length || 0,
-      );
+      console.log("[FUNCTIONAL_GROUP_PRIORITY_RULE] Molecule has rings?", mol.rings?.length || 0);
       if (process.env.VERBOSE) {
         console.log(
           "[FUNCTIONAL_GROUP_PRIORITY_RULE] Detected functional groups (raw):",
@@ -118,16 +109,12 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
     // but we need separate entries to match the structure from detectAmines()
     const expandedDetected: DetectedFunctionalGroup[] = [];
     for (const d of detected) {
-      const rawName = (d.name || d.type || d.pattern || "")
-        .toString()
-        .toLowerCase();
+      const rawName = (d.name || d.type || d.pattern || "").toString().toLowerCase();
       const type = rawName.replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
 
       if (type === "amine" && d.atoms && d.atoms.length > 1) {
         // Check if we have multiple nitrogen atoms
-        const nitrogenAtoms = d.atoms.filter(
-          (idx: number) => mol.atoms[idx]?.symbol === "N",
-        );
+        const nitrogenAtoms = d.atoms.filter((idx: number) => mol.atoms[idx]?.symbol === "N");
 
         if (nitrogenAtoms.length > 1) {
           // Split into separate amine entries, one per nitrogen
@@ -152,9 +139,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
 
     const functionalGroups: FunctionalGroup[] = expandedDetected.map(
       (d: DetectedFunctionalGroup) => {
-        const rawName = (d.name || d.type || d.pattern || "")
-          .toString()
-          .toLowerCase();
+        const rawName = (d.name || d.type || d.pattern || "").toString().toLowerCase();
         const type = rawName.replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
 
         // d.atoms contains atom indices (numbers), convert to Atom objects
@@ -182,9 +167,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
         const rawPriority =
           typeof d.priority === "number"
             ? d.priority
-            : context
-                .getDetector()
-                .getFunctionalGroupPriority(d.pattern || d.type) || 0;
+            : context.getDetector().getFunctionalGroupPriority(d.pattern || d.type) || 0;
         const priority = normalizePriority(rawPriority);
 
         traceMeta.push({
@@ -211,51 +194,45 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
           const atomIds = atoms.map((a: Atom) => a.id);
           const atomIdSet = new Set(atomIds);
 
-          const matchingPrevious = previousFunctionalGroups.find(
-            (prev: FunctionalGroup) => {
-              // Must match by type first
-              if (prev.type !== type) return false;
+          const matchingPrevious = previousFunctionalGroups.find((prev: FunctionalGroup) => {
+            // Must match by type first
+            if (prev.type !== type) return false;
 
-              const prevAtomIds =
-                prev.atoms?.map((a: Atom | number) =>
-                  typeof a === "number" ? a : a.id,
-                ) || [];
+            const prevAtomIds =
+              prev.atoms?.map((a: Atom | number) => (typeof a === "number" ? a : a.id)) || [];
 
-              // Match by overlapping atom IDs
-              let matches = prevAtomIds.some((id: number) => atomIdSet.has(id));
+            // Match by overlapping atom IDs
+            let matches = prevAtomIds.some((id: number) => atomIdSet.has(id));
 
-              // If no direct overlap, check if atoms are bonded
-              // This handles cases like alcohols where previous detection stores carbon (C)
-              // and SMARTS detection finds oxygen (O), but they're bonded via C-O bond
-              if (!matches && prev.bonds && prev.bonds.length > 0) {
-                const prevBonds = prev.bonds;
-                matches = prevAtomIds.some((prevAtomId: number) =>
-                  atomIds.some((currentAtomId: number) =>
-                    prevBonds.some(
-                      (bond: Bond) =>
-                        (bond.atom1 === prevAtomId &&
-                          bond.atom2 === currentAtomId) ||
-                        (bond.atom2 === prevAtomId &&
-                          bond.atom1 === currentAtomId),
-                    ),
+            // If no direct overlap, check if atoms are bonded
+            // This handles cases like alcohols where previous detection stores carbon (C)
+            // and SMARTS detection finds oxygen (O), but they're bonded via C-O bond
+            if (!matches && prev.bonds && prev.bonds.length > 0) {
+              const prevBonds = prev.bonds;
+              matches = prevAtomIds.some((prevAtomId: number) =>
+                atomIds.some((currentAtomId: number) =>
+                  prevBonds.some(
+                    (bond: Bond) =>
+                      (bond.atom1 === prevAtomId && bond.atom2 === currentAtomId) ||
+                      (bond.atom2 === prevAtomId && bond.atom1 === currentAtomId),
                   ),
+                ),
+              );
+            }
+
+            if (process.env.VERBOSE && type === "ketone") {
+              if (process.env.VERBOSE) {
+                console.log(
+                  `[FUNCTIONAL_GROUP_PRIORITY_RULE] Checking prev.type=${prev.type} prevAtomIds=`,
+                  prevAtomIds,
+                  "matches=",
+                  matches,
                 );
               }
+            }
 
-              if (process.env.VERBOSE && type === "ketone") {
-                if (process.env.VERBOSE) {
-                  console.log(
-                    `[FUNCTIONAL_GROUP_PRIORITY_RULE] Checking prev.type=${prev.type} prevAtomIds=`,
-                    prevAtomIds,
-                    "matches=",
-                    matches,
-                  );
-                }
-              }
-
-              return matches;
-            },
-          );
+            return matches;
+          });
 
           if (matchingPrevious) {
             // Preserve bonds if available
@@ -272,11 +249,9 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
             // Preserve atoms if available from previous detection
             // BUT: for ketones, if we expanded the atom list to include acyl chains, don't preserve
             // ALSO: for ketones, don't preserve if previous detection had different atom count (e.g., LACTONE_TO_KETONE only stores carbonyl C)
-            const wasExpanded =
-              type === "ketone" && atoms.length > (d.atoms?.length || 0);
+            const wasExpanded = type === "ketone" && atoms.length > (d.atoms?.length || 0);
             const isDifferentAtomCount =
-              type === "ketone" &&
-              matchingPrevious.atoms?.length !== atoms.length;
+              type === "ketone" && matchingPrevious.atoms?.length !== atoms.length;
             if (
               matchingPrevious.atoms &&
               matchingPrevious.atoms.length > 0 &&
@@ -287,9 +262,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
               if (process.env.VERBOSE) {
                 console.log(
                   `[FUNCTIONAL_GROUP_PRIORITY_RULE] Preserved atoms for ${type} from previous detection:`,
-                  preservedAtoms.map((a: Atom | number) =>
-                    typeof a === "number" ? a : a.id,
-                  ),
+                  preservedAtoms.map((a: Atom | number) => (typeof a === "number" ? a : a.id)),
                 );
               }
             } else if (wasExpanded && process.env.VERBOSE) {
@@ -302,11 +275,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
 
             // Preserve locants if explicitly set (e.g., alcohol detection sets carbon atom ID)
             // BUT: for expanded ketones, use only carbonyl carbon as locant
-            if (
-              matchingPrevious.locants &&
-              matchingPrevious.locants.length > 0 &&
-              !wasExpanded
-            ) {
+            if (matchingPrevious.locants && matchingPrevious.locants.length > 0 && !wasExpanded) {
               preservedLocants = matchingPrevious.locants;
               if (process.env.VERBOSE) {
                 console.log(
@@ -324,9 +293,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
           bonds: preservedBonds,
           suffix:
             d.suffix ||
-            context
-              .getDetector()
-              .getFunctionalGroupSuffix(d.pattern || d.type) ||
+            context.getDetector().getFunctionalGroupSuffix(d.pattern || d.type) ||
             undefined,
           prefix: d.prefix || undefined,
           priority,
@@ -392,11 +359,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
     // sort by priority (higher numeric value = higher priority)
     functionalGroups.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 
-    const principalGroup = selectPrincipalGroup(
-      functionalGroups,
-      mol,
-      context.getDetector(),
-    );
+    const principalGroup = selectPrincipalGroup(functionalGroups, mol, context.getDetector());
     const priorityScore = calculateFunctionalGroupPriority(
       functionalGroups,
       mol,
@@ -466,10 +429,8 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
             const nitrogen = amideAtoms[2];
 
             if (carbonylC && nitrogen) {
-              const carbonylCId =
-                typeof carbonylC === "number" ? carbonylC : carbonylC.id;
-              const nitrogenId =
-                typeof nitrogen === "number" ? nitrogen : nitrogen.id;
+              const carbonylCId = typeof carbonylC === "number" ? carbonylC : carbonylC.id;
+              const nitrogenId = typeof nitrogen === "number" ? nitrogen : nitrogen.id;
 
               // If both C and N are in ring → it's a lactam → demote
               if (ringAtomIds.has(carbonylCId) && ringAtomIds.has(nitrogenId)) {
@@ -492,10 +453,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
               .filter((bond) => bond.atom1 === locant || bond.atom2 === locant)
               .map((bond) => (bond.atom1 === locant ? bond.atom2 : bond.atom1))
               .map((atomId) => mol.atoms.find((a) => a.id === atomId))
-              .filter(
-                (atom): atom is Atom =>
-                  atom !== undefined && atom.symbol === "O",
-              );
+              .filter((atom): atom is Atom => atom !== undefined && atom.symbol === "O");
 
             // Check if any of these oxygens are part of the ring
             for (const oxygen of oxygenAtoms) {
@@ -541,19 +499,13 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
     let updatedFunctionalGroups =
       principalGroup && !shouldDemotePrincipalGroup
         ? functionalGroups.map((g) => {
-            if (
-              g.type === principalGroup.type &&
-              g.priority === principalGroup.priority
-            ) {
+            if (g.type === principalGroup.type && g.priority === principalGroup.priority) {
               if (process.env.VERBOSE) {
-                console.log(
-                  "[FUNCTIONAL_GROUP_PRIORITY_RULE] Marking as principal:",
-                  {
-                    type: g.type,
-                    priority: g.priority,
-                    locants: g.locants,
-                  },
-                );
+                console.log("[FUNCTIONAL_GROUP_PRIORITY_RULE] Marking as principal:", {
+                  type: g.type,
+                  priority: g.priority,
+                  locants: g.locants,
+                });
               }
               return {
                 ...g,
@@ -567,15 +519,10 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
     // Special handling for hierarchical esters
     // If we have multiple esters and they're hierarchical, only mark the primary ester as principal
     if (principalGroup?.type === "ester") {
-      const esters = updatedFunctionalGroups.filter(
-        (fg) => fg.type === "ester",
-      );
+      const esters = updatedFunctionalGroups.filter((fg) => fg.type === "ester");
       if (esters.length >= 2) {
         const hierarchyResult = analyzeEsterHierarchy(context, esters);
-        if (
-          hierarchyResult.isHierarchical &&
-          hierarchyResult.primaryEsterAtoms
-        ) {
+        if (hierarchyResult.isHierarchical && hierarchyResult.primaryEsterAtoms) {
           if (process.env.VERBOSE) {
             console.log(
               "[FUNCTIONAL_GROUP_PRIORITY_RULE] Detected hierarchical esters - marking only primary ester as principal",
@@ -595,9 +542,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
               const fgAtomIds = fg.atoms.map((a: Atom | number) =>
                 typeof a === "number" ? a : a.id,
               );
-              const isPrimaryEster = fgAtomIds.some((id) =>
-                primaryAtomSet.has(id),
-              );
+              const isPrimaryEster = fgAtomIds.some((id) => primaryAtomSet.has(id));
               return {
                 ...fg,
                 isPrincipal: isPrimaryEster,
@@ -636,9 +581,7 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
         }
 
         // Find the carbonyl carbon and build the acyl chain name
-        const esterAtomIds = fg.atoms.map((a: Atom | number) =>
-          typeof a === "number" ? a : a.id,
-        );
+        const esterAtomIds = fg.atoms.map((a: Atom | number) => (typeof a === "number" ? a : a.id));
         let carbonylCarbon: number | undefined;
 
         // Find C=O bond
@@ -741,12 +684,10 @@ export const FUNCTIONAL_GROUP_PRIORITY_RULE: IUPACRule = {
 export const FUNCTIONAL_CLASS_RULE: IUPACRule = {
   id: "functional-class-nomenclature",
   name: "Functional Class Nomenclature Detection",
-  description:
-    "Detect if functional class nomenclature should be used (P-51.2)",
+  description: "Detect if functional class nomenclature should be used (P-51.2)",
   blueBookReference: "P-51.2 - Functional class nomenclature",
   priority: RulePriority.ONE, // 10 - Functional class runs last (lowest priority)
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().functionalGroups.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().functionalGroups.length > 0,
   action: (context: ImmutableNamingContext) => {
     // If a nomenclature method has already been chosen by an earlier rule
     // (for example ESTER_DETECTION_RULE), do not overwrite it here. This
@@ -774,10 +715,7 @@ export const FUNCTIONAL_CLASS_RULE: IUPACRule = {
     );
 
     let updatedContext: ImmutableNamingContext;
-    if (
-      hasFunctionalClassGroup ||
-      isFunctionalClassPreferred(principalGroup, molecule)
-    ) {
+    if (hasFunctionalClassGroup || isFunctionalClassPreferred(principalGroup, molecule)) {
       updatedContext = context.withNomenclatureMethod(
         NomenclatureMethod.FUNCTIONAL_CLASS,
         "functional-class-nomenclature",
@@ -841,9 +779,7 @@ export const ETHER_TO_ALKOXY_RULE: IUPACRule = {
     const functionalGroups = context.getState().functionalGroups;
     const principalGroup = context.getState().principalGroup;
     const hasEther = functionalGroups.some(
-      (g) =>
-        g.type === "ether" &&
-        (!principalGroup || g.type !== principalGroup.type),
+      (g) => g.type === "ether" && (!principalGroup || g.type !== principalGroup.type),
     );
 
     return hasEther;
@@ -856,19 +792,12 @@ export const ETHER_TO_ALKOXY_RULE: IUPACRule = {
     // Get main chain info if available to help identify which carbon is on main chain
     const parentStructure = context.getState().parentStructure;
     const _mainChainAtoms = parentStructure?.chain?.atoms
-      ? new Set(
-          parentStructure.chain.atoms.map((a) =>
-            typeof a === "number" ? a : a.id,
-          ),
-        )
+      ? new Set(parentStructure.chain.atoms.map((a) => (typeof a === "number" ? a : a.id)))
       : null;
 
     const updatedGroups = functionalGroups.map((fg) => {
       // Only convert ethers that are NOT the principal group
-      if (
-        fg.type === "ether" &&
-        (!principalGroup || fg.type !== principalGroup.type)
-      ) {
+      if (fg.type === "ether" && (!principalGroup || fg.type !== principalGroup.type)) {
         // Convert ether to alkoxy type
         // The actual alkoxy name (methoxy, ethoxy, etc.) will be determined later
         // during name assembly when the main chain is known
@@ -902,8 +831,7 @@ export const ETHER_TO_ALKOXY_RULE: IUPACRule = {
 export const ANALYZE_ALKOXY_RULE: IUPACRule = {
   id: "analyze-alkoxy-groups",
   name: "Analyze Alkoxy Groups",
-  description:
-    "Determine specific alkoxy names (methoxy, ethoxy, propoxy, etc.)",
+  description: "Determine specific alkoxy names (methoxy, ethoxy, propoxy, etc.)",
   blueBookReference: "P-63.2.2 - Ethers as substituents",
   priority: RulePriority.TWO, // 20 - After ether-to-alkoxy (30), before name assembly
   conditions: (context: ImmutableNamingContext) => {
@@ -917,11 +845,7 @@ export const ANALYZE_ALKOXY_RULE: IUPACRule = {
 
     // Get main chain/ring atoms to help identify substituents
     const _mainChainAtoms = parentStructure?.chain?.atoms
-      ? new Set(
-          parentStructure.chain.atoms.map((a) =>
-            typeof a === "number" ? a : a.id,
-          ),
-        )
+      ? new Set(parentStructure.chain.atoms.map((a) => (typeof a === "number" ? a : a.id)))
       : null;
 
     // If no parent structure yet, mark as pending and defer analysis
@@ -952,12 +876,7 @@ export const ANALYZE_ALKOXY_RULE: IUPACRule = {
     }
 
     const updatedGroups = functionalGroups.map((fg) => {
-      if (
-        fg.type === "alkoxy" &&
-        !fg.prefix &&
-        fg.atoms &&
-        fg.atoms.length > 0
-      ) {
+      if (fg.type === "alkoxy" && !fg.prefix && fg.atoms && fg.atoms.length > 0) {
         // Find the oxygen atom in the alkoxy group
         const oxygenAtom = fg.atoms.find((atomOrId) => {
           const atomId = typeof atomOrId === "number" ? atomOrId : atomOrId.id;
@@ -965,8 +884,7 @@ export const ANALYZE_ALKOXY_RULE: IUPACRule = {
         });
 
         if (oxygenAtom) {
-          const oxygenId =
-            typeof oxygenAtom === "number" ? oxygenAtom : oxygenAtom.id;
+          const oxygenId = typeof oxygenAtom === "number" ? oxygenAtom : oxygenAtom.id;
           const oxyAtom = _mol.atoms[oxygenId];
 
           if (!oxyAtom) return fg; // Safety check
@@ -975,8 +893,7 @@ export const ANALYZE_ALKOXY_RULE: IUPACRule = {
           const bondedCarbons = _mol.bonds
             .filter(
               (bond) =>
-                (bond.atom1 === oxygenId || bond.atom2 === oxygenId) &&
-                bond.type === "single",
+                (bond.atom1 === oxygenId || bond.atom2 === oxygenId) && bond.type === "single",
             )
             .map((bond) => {
               const otherId = bond.atom1 === oxygenId ? bond.atom2 : bond.atom1;
@@ -994,9 +911,7 @@ export const ANALYZE_ALKOXY_RULE: IUPACRule = {
             );
 
             if (process.env.VERBOSE) {
-              console.log(
-                `[ANALYZE_ALKOXY_RULE] Oxygen ${oxygenId} → ${alkoxyName}`,
-              );
+              console.log(`[ANALYZE_ALKOXY_RULE] Oxygen ${oxygenId} → ${alkoxyName}`);
             }
 
             return {
@@ -1053,10 +968,7 @@ function analyzeAlkoxySubstituent(
       );
     }
     if (process.env.VERBOSE) {
-      console.log(
-        `  MainChainAtoms:`,
-        mainChainAtoms ? Array.from(mainChainAtoms) : "null",
-      );
+      console.log(`  MainChainAtoms:`, mainChainAtoms ? Array.from(mainChainAtoms) : "null");
     }
   }
 
@@ -1069,34 +981,23 @@ function analyzeAlkoxySubstituent(
     const carbon2OnMainChain = mainChainAtoms.has(carbon2.id);
 
     if (process.env.VERBOSE) {
-      console.log(
-        `  Carbon ${carbon1.id} on main chain: ${carbon1OnMainChain}`,
-      );
+      console.log(`  Carbon ${carbon1.id} on main chain: ${carbon1OnMainChain}`);
       if (process.env.VERBOSE) {
-        console.log(
-          `  Carbon ${carbon2.id} on main chain: ${carbon2OnMainChain}`,
-        );
+        console.log(`  Carbon ${carbon2.id} on main chain: ${carbon2OnMainChain}`);
       }
     }
 
     if (carbon1OnMainChain && !carbon2OnMainChain) {
       substituent = chain2Info;
       if (process.env.VERBOSE)
-        console.log(
-          `  → Chose carbon ${carbon2.id} as substituent (C${carbon1.id} on main)`,
-        );
+        console.log(`  → Chose carbon ${carbon2.id} as substituent (C${carbon1.id} on main)`);
     } else if (carbon2OnMainChain && !carbon1OnMainChain) {
       substituent = chain1Info;
       if (process.env.VERBOSE)
-        console.log(
-          `  → Chose carbon ${carbon1.id} as substituent (C${carbon2.id} on main)`,
-        );
+        console.log(`  → Chose carbon ${carbon1.id} as substituent (C${carbon2.id} on main)`);
     } else {
       // Both or neither on main chain - fall back to size heuristic
-      substituent =
-        chain1Info.carbonCount <= chain2Info.carbonCount
-          ? chain1Info
-          : chain2Info;
+      substituent = chain1Info.carbonCount <= chain2Info.carbonCount ? chain1Info : chain2Info;
       if (process.env.VERBOSE)
         console.log(
           `  → Fell back to size heuristic, chose ${substituent === chain1Info ? carbon1.id : carbon2.id}`,
@@ -1104,10 +1005,7 @@ function analyzeAlkoxySubstituent(
     }
   } else {
     // No main chain info - use simple heuristic: the smaller chain is the substituent
-    substituent =
-      chain1Info.carbonCount <= chain2Info.carbonCount
-        ? chain1Info
-        : chain2Info;
+    substituent = chain1Info.carbonCount <= chain2Info.carbonCount ? chain1Info : chain2Info;
     if (process.env.VERBOSE)
       console.log(
         `  → No main chain info, chose smaller: ${substituent === chain1Info ? carbon1.id : carbon2.id}`,

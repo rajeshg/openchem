@@ -23,9 +23,7 @@ export function transformPartiallySaturatedHeterocycle(
 
   // Get heteroatoms from ring atoms
   const ringAtoms = ring.atoms || [];
-  const heteroAtomsList = ringAtoms.filter(
-    (a) => a.symbol !== "C" && a.symbol !== "H",
-  );
+  const heteroAtomsList = ringAtoms.filter((a) => a.symbol !== "C" && a.symbol !== "H");
 
   // Get locants for heteroatoms
   const locants = parentStructure.locants || [];
@@ -41,9 +39,7 @@ export function transformPartiallySaturatedHeterocycle(
     .sort((a, b) => a.locant - b.locant);
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[transformPartiallySaturatedHeterocycle] Checking for transformation`,
-    );
+    console.log(`[transformPartiallySaturatedHeterocycle] Checking for transformation`);
     console.log(`[transformPartiallySaturatedHeterocycle]   name="${name}"`);
     console.log(
       `[transformPartiallySaturatedHeterocycle]   ringAtoms:`,
@@ -59,21 +55,15 @@ export function transformPartiallySaturatedHeterocycle(
         .map((h) => `${h.atom.symbol}@${h.locant}(idx:${h.atomIndex})`)
         .join(", "),
     );
-    console.log(
-      `[transformPartiallySaturatedHeterocycle]   ring.size=${ring.size}`,
-    );
+    console.log(`[transformPartiallySaturatedHeterocycle]   ring.size=${ring.size}`);
   }
 
   // Check if this is a partially saturated 5-membered heterocycle
-  const partiallySaturatedPattern =
-    /^(.+?)(thiazoline|imidazoline|oxazoline|pyrazoline)$/;
+  const partiallySaturatedPattern = /^(.+?)(thiazoline|imidazoline|oxazoline|pyrazoline)$/;
   const match = name.match(partiallySaturatedPattern);
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[transformPartiallySaturatedHeterocycle]   pattern match:`,
-      match,
-    );
+    console.log(`[transformPartiallySaturatedHeterocycle]   pattern match:`, match);
   }
 
   if (!match || heteroatomsWithLocants.length < 2) {
@@ -161,10 +151,8 @@ function renumberSubstituentLocants(
   const locantMapping: Map<number, number> = new Map();
 
   // Calculate forward and backward distances from S to N
-  const forwardDist =
-    (nitrogenIndex - sulfurIndex + ringAtoms.length) % ringAtoms.length;
-  const backwardDist =
-    (sulfurIndex - nitrogenIndex + ringAtoms.length) % ringAtoms.length;
+  const forwardDist = (nitrogenIndex - sulfurIndex + ringAtoms.length) % ringAtoms.length;
+  const backwardDist = (sulfurIndex - nitrogenIndex + ringAtoms.length) % ringAtoms.length;
 
   // Choose direction that puts N at position 3 (i.e., 2 steps away from S)
   const goBackward = backwardDist === 2;
@@ -176,9 +164,7 @@ function renumberSubstituentLocants(
     console.log(
       `[renumberSubstituentLocants] Forward dist: ${forwardDist}, Backward dist: ${backwardDist}`,
     );
-    console.log(
-      `[renumberSubstituentLocants] Direction: ${goBackward ? "backward" : "forward"}`,
-    );
+    console.log(`[renumberSubstituentLocants] Direction: ${goBackward ? "backward" : "forward"}`);
   }
 
   // Map each old locant to new locant based on chosen direction
@@ -237,9 +223,7 @@ function renumberSubstituentLocants(
   const transformedName = `${updatedPrefix}${sep}${hydrogenPosition}H-${heteroLocantStr}-${baseName}`;
 
   if (updatedPrefix !== prefix && process.env.VERBOSE) {
-    console.log(
-      `[renumberSubstituentLocants] Name after locant renumbering: "${transformedName}"`,
-    );
+    console.log(`[renumberSubstituentLocants] Name after locant renumbering: "${transformedName}"`);
   }
 
   return transformedName;

@@ -13,8 +13,7 @@ describe("Thiazoline Locant Renumbering", () => {
     }
 
     const iupacName = generateIUPACName(mol);
-    const expected =
-      "N-(3-chloro-4-fluorophenyl)-5-methylidene-4H-1,3-thiazol-2-amine";
+    const expected = "N-(3-chloro-4-fluorophenyl)-5-methylidene-4H-1,3-thiazol-2-amine";
 
     expect(iupacName).toBe(expected);
   });

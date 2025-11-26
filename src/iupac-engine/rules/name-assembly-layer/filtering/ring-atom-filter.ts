@@ -90,9 +90,7 @@ export function filterFunctionalGroupsByRingAtoms(
     }
 
     // Check for overlap: if ANY atom in this FG is part of the ring, filter it out
-    const hasOverlap = fgAtomIds.some((atomId: number) =>
-      parentRingAtomIds.has(atomId),
-    );
+    const hasOverlap = fgAtomIds.some((atomId: number) => parentRingAtomIds.has(atomId));
     if (hasOverlap) {
       // EXCEPTION: For unsaturated heterocycles (azirine, oxirene), the imine/enol
       // functional group IS part of the ring but should NOT be filtered out

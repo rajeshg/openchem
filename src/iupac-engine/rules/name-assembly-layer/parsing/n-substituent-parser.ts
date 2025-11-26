@@ -18,9 +18,7 @@ export interface NSubstituentEntry {
  * @param nSubstituentsPrefix - N-substituent prefix string (e.g., "N,N'-diformyl")
  * @returns Array of parsed N-substituent entries
  */
-export function parseNSubstituentsMultiplicative(
-  nSubstituentsPrefix: string,
-): NSubstituentEntry[] {
+export function parseNSubstituentsMultiplicative(nSubstituentsPrefix: string): NSubstituentEntry[] {
   const entries: NSubstituentEntry[] = [];
 
   // Split by the pattern that separates different substituent groups
@@ -61,19 +59,13 @@ export function parseNSubstituentsMultiplicative(
  * @param nSubstituentsPrefix - N-substituent prefix string (e.g., "N,N-dimethyl")
  * @returns Array of parsed N-substituent entries
  */
-export function parseNSubstituentsSingle(
-  nSubstituentsPrefix: string,
-): NSubstituentEntry[] {
+export function parseNSubstituentsSingle(nSubstituentsPrefix: string): NSubstituentEntry[] {
   const entries: NSubstituentEntry[] = [];
 
   // Match patterns like "N-methyl", "N,N-dimethyl", etc.
   // Pattern 1: N,N-dimethyl → locants ["N", "N"], name "dimethyl"
   const multipleIdenticalMatch = nSubstituentsPrefix.match(/^(N(?:,N)+)-(.+)$/);
-  if (
-    multipleIdenticalMatch &&
-    multipleIdenticalMatch[1] &&
-    multipleIdenticalMatch[2]
-  ) {
+  if (multipleIdenticalMatch && multipleIdenticalMatch[1] && multipleIdenticalMatch[2]) {
     const locantsPart = multipleIdenticalMatch[1]; // "N,N"
     const namePart = multipleIdenticalMatch[2]; // "dimethyl"
     const locants = locantsPart.split(","); // ["N", "N"]
@@ -98,10 +90,7 @@ export function parseNSubstituentsSingle(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[parseNSubstituentsSingle] Parsed N-substituents:`,
-      JSON.stringify(entries),
-    );
+    console.log(`[parseNSubstituentsSingle] Parsed N-substituents:`, JSON.stringify(entries));
   }
 
   return entries;

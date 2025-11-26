@@ -48,11 +48,7 @@ export function analyzeEsterHierarchy(
   const mol = context.getState().molecule;
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[analyzeEsterHierarchy] Starting analysis with",
-      esters.length,
-      "esters",
-    );
+    console.log("[analyzeEsterHierarchy] Starting analysis with", esters.length, "esters");
   }
 
   // For each ester, identify:
@@ -83,10 +79,7 @@ export function analyzeEsterHierarchy(
         ester.atoms.map((a) => (typeof a === "number" ? a : (a?.id ?? -1))),
       );
       if (process.env.VERBOSE) {
-        console.log(
-          `[analyzeEsterHierarchy] Ester ${idx} atom IDs:`,
-          Array.from(esterAtomIds),
-        );
+        console.log(`[analyzeEsterHierarchy] Ester ${idx} atom IDs:`, Array.from(esterAtomIds));
       }
       let carbonylCarbon: number | undefined;
       let carbonylOxygen: number | undefined;
@@ -99,11 +92,7 @@ export function analyzeEsterHierarchy(
           const atom1 = mol.atoms[bond.atom1];
           const atom2 = mol.atoms[bond.atom2];
 
-          if (
-            atom1?.symbol === "C" &&
-            atom2?.symbol === "O" &&
-            esterAtomIds.has(bond.atom1)
-          ) {
+          if (atom1?.symbol === "C" && atom2?.symbol === "O" && esterAtomIds.has(bond.atom1)) {
             carbonylCarbon = bond.atom1;
             carbonylOxygen = bond.atom2;
             break;
@@ -127,11 +116,7 @@ export function analyzeEsterHierarchy(
           const atom1 = mol.atoms[bond.atom1];
           const atom2 = mol.atoms[bond.atom2];
 
-          if (
-            bond.atom1 === carbonylCarbon &&
-            atom1?.symbol === "C" &&
-            atom2?.symbol === "O"
-          ) {
+          if (bond.atom1 === carbonylCarbon && atom1?.symbol === "C" && atom2?.symbol === "O") {
             esterOxygen = bond.atom2;
           } else if (
             bond.atom2 === carbonylCarbon &&
@@ -255,10 +240,7 @@ export function analyzeEsterHierarchy(
  * For esters detected by OPSIN, esterGroup.atoms contains:
  * [carbonyl C id, carbonyl O id, ester O id] (3 atom IDs as numbers)
  */
-export function isEsterInRing(
-  mol: Molecule,
-  esters: FunctionalGroup[],
-): boolean {
+export function isEsterInRing(mol: Molecule, esters: FunctionalGroup[]): boolean {
   // First detect all rings in the molecule
   const rings = findAllRings(mol);
   if (rings.length === 0) return false;
@@ -282,8 +264,7 @@ export function isEsterInRing(
 
     // Check if both atoms are in the same ring
     for (const ring of rings) {
-      const inRing =
-        ring.includes(carbonylCarbon) && ring.includes(esterOxygen);
+      const inRing = ring.includes(carbonylCarbon) && ring.includes(esterOxygen);
       if (inRing) {
         if (process.env.VERBOSE) {
           console.log(
@@ -359,10 +340,7 @@ function findAllRings(mol: Molecule): number[][] {
  * Returns information about the alkoxy group: set of carbon atom IDs, whether chain is branched,
  * and whether any other functional groups are attached to the alkoxy carbons.
  */
-export function getAlkoxyGroupInfo(
-  context: ImmutableNamingContext,
-  ester: FunctionalGroup,
-) {
+export function getAlkoxyGroupInfo(context: ImmutableNamingContext, ester: FunctionalGroup) {
   const mol = context.getState().molecule;
   const esterAtomIds = (ester.atoms || []).map((a: Atom | number) =>
     typeof a === "number" ? a : (a?.id ?? -1),
@@ -374,19 +352,11 @@ export function getAlkoxyGroupInfo(
     if (bond.type === "double") {
       const a1 = mol.atoms[bond.atom1];
       const a2 = mol.atoms[bond.atom2];
-      if (
-        a1?.symbol === "C" &&
-        a2?.symbol === "O" &&
-        esterAtomIds.includes(bond.atom1)
-      ) {
+      if (a1?.symbol === "C" && a2?.symbol === "O" && esterAtomIds.includes(bond.atom1)) {
         carbonylCarbon = bond.atom1;
         break;
       }
-      if (
-        a2?.symbol === "C" &&
-        a1?.symbol === "O" &&
-        esterAtomIds.includes(bond.atom2)
-      ) {
+      if (a2?.symbol === "C" && a1?.symbol === "O" && esterAtomIds.includes(bond.atom2)) {
         carbonylCarbon = bond.atom2;
         break;
       }
@@ -404,16 +374,10 @@ export function getAlkoxyGroupInfo(
   let esterOxygen: number | undefined;
   for (const bond of mol.bonds) {
     if (bond.type === "single") {
-      if (
-        bond.atom1 === carbonylCarbon &&
-        mol.atoms[bond.atom2]?.symbol === "O"
-      ) {
+      if (bond.atom1 === carbonylCarbon && mol.atoms[bond.atom2]?.symbol === "O") {
         esterOxygen = bond.atom2;
         break;
-      } else if (
-        bond.atom2 === carbonylCarbon &&
-        mol.atoms[bond.atom1]?.symbol === "O"
-      ) {
+      } else if (bond.atom2 === carbonylCarbon && mol.atoms[bond.atom1]?.symbol === "O") {
         esterOxygen = bond.atom1;
         break;
       }
@@ -471,10 +435,8 @@ export function getAlkoxyGroupInfo(
     const neighborCarbons: number[] = [];
     for (const b of mol.bonds) {
       if (b.type !== "single") continue;
-      if (b.atom1 === cur && mol.atoms[b.atom2]?.symbol === "C")
-        neighborCarbons.push(b.atom2);
-      if (b.atom2 === cur && mol.atoms[b.atom1]?.symbol === "C")
-        neighborCarbons.push(b.atom1);
+      if (b.atom1 === cur && mol.atoms[b.atom2]?.symbol === "C") neighborCarbons.push(b.atom2);
+      if (b.atom2 === cur && mol.atoms[b.atom1]?.symbol === "C") neighborCarbons.push(b.atom1);
     }
 
     // Exclude going back through the ester oxygen
@@ -497,16 +459,10 @@ export function getAlkoxyGroupInfo(
 
         // Find oxygen neighbors of this side-branch carbon
         const oxyNeighbors = mol.bonds
-          .filter(
-            (bb: Bond) =>
-              (bb.atom1 === sb || bb.atom2 === sb) && bb.type === "single",
-          )
+          .filter((bb: Bond) => (bb.atom1 === sb || bb.atom2 === sb) && bb.type === "single")
           .map((bb: Bond) => (bb.atom1 === sb ? bb.atom2 : bb.atom1))
           .map((id: number) => mol.atoms[id])
-          .filter(
-            (a: Atom | undefined): a is Atom =>
-              a !== undefined && a.symbol === "O",
-          );
+          .filter((a: Atom | undefined): a is Atom => a !== undefined && a.symbol === "O");
 
         if (oxyNeighbors.length === 0) {
           nonSilylFound = true;
@@ -516,16 +472,10 @@ export function getAlkoxyGroupInfo(
         // For each oxygen neighbor, check if it connects to silicon
         const connectsToSi = oxyNeighbors.some((o: Atom) => {
           const neigh = mol.bonds
-            .filter(
-              (bb: Bond) =>
-                (bb.atom1 === o.id || bb.atom2 === o.id) &&
-                bb.type === "single",
-            )
+            .filter((bb: Bond) => (bb.atom1 === o.id || bb.atom2 === o.id) && bb.type === "single")
             .map((bb: Bond) => (bb.atom1 === o.id ? bb.atom2 : bb.atom1))
             .map((id: number) => mol.atoms[id]);
-          return neigh.some(
-            (na: Atom | undefined) => na !== undefined && na.symbol === "Si",
-          );
+          return neigh.some((na: Atom | undefined) => na !== undefined && na.symbol === "Si");
         });
 
         if (!connectsToSi) {
@@ -557,8 +507,7 @@ export function getAlkoxyGroupInfo(
   let hasAttachedFG = false;
   for (const cid of Array.from(alkoxyCarbonIds)) {
     for (const b of mol.bonds) {
-      const other =
-        b.atom1 === cid ? b.atom2 : b.atom2 === cid ? b.atom1 : undefined;
+      const other = b.atom1 === cid ? b.atom2 : b.atom2 === cid ? b.atom1 : undefined;
       if (other === undefined) continue;
       if (other === esterOxygen) continue;
       const otherAtom = mol.atoms[other];
@@ -573,9 +522,7 @@ export function getAlkoxyGroupInfo(
           // Look for a silicon neighbor of this oxygen (excluding the alkoxy carbon)
           const neighs = mol.bonds
             .filter(
-              (bb: Bond) =>
-                (bb.atom1 === other || bb.atom2 === other) &&
-                bb.type === "single",
+              (bb: Bond) => (bb.atom1 === other || bb.atom2 === other) && bb.type === "single",
             )
             .map((bb: Bond) => (bb.atom1 === other ? bb.atom2 : bb.atom1))
             .filter((id: number) => id !== cid);
@@ -633,9 +580,7 @@ export function checkIfSimpleEster(
   const isLactone = isEsterInRing(mol, esters);
   if (isLactone) {
     if (process.env.VERBOSE)
-      console.log(
-        "[checkIfSimpleEster] Ester is lactone (in ring) → use substitutive",
-      );
+      console.log("[checkIfSimpleEster] Ester is lactone (in ring) → use substitutive");
     return false;
   }
 
@@ -643,9 +588,7 @@ export function checkIfSimpleEster(
     const hasRings = detectSimpleRings(mol);
     if (hasRings) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[checkIfSimpleEster] Has rings but ester NOT in ring → use functional class",
-        );
+        console.log("[checkIfSimpleEster] Has rings but ester NOT in ring → use functional class");
       }
     }
   }
@@ -664,8 +607,7 @@ export function checkIfSimpleEster(
       fg.type !== "ester" &&
       fg.type !== "ether" &&
       fg.type !== "alkoxy" &&
-      (fg.priority || detector.getFunctionalGroupPriority(fg.type) || 0) >
-        esterPriority,
+      (fg.priority || detector.getFunctionalGroupPriority(fg.type) || 0) > esterPriority,
   );
 
   // Has higher-priority functional groups → use substitutive nomenclature
@@ -680,8 +622,7 @@ export function checkIfSimpleEster(
 
   if (process.env.VERBOSE) {
     const otherFunctionalGroups = allFunctionalGroups.filter(
-      (fg) =>
-        fg.type !== "ester" && fg.type !== "ether" && fg.type !== "alkoxy",
+      (fg) => fg.type !== "ester" && fg.type !== "ether" && fg.type !== "alkoxy",
     );
     if (otherFunctionalGroups.length > 0) {
       if (process.env.VERBOSE) {
@@ -696,16 +637,11 @@ export function checkIfSimpleEster(
   // Check for hierarchical esters (nested esters) → use substitutive nomenclature
   if (esters.length >= 2) {
     if (process.env.VERBOSE)
-      console.log(
-        "[checkIfSimpleEster] Checking for hierarchical esters, count:",
-        esters.length,
-      );
+      console.log("[checkIfSimpleEster] Checking for hierarchical esters, count:", esters.length);
     const hierarchy = analyzeEsterHierarchy(context, esters);
     if (hierarchy.isHierarchical) {
       if (process.env.VERBOSE)
-        console.log(
-          "[checkIfSimpleEster] Hierarchical ester detected → complex",
-        );
+        console.log("[checkIfSimpleEster] Hierarchical ester detected → complex");
       return false;
     }
   }
@@ -718,8 +654,7 @@ export function checkIfSimpleEster(
   for (const ester of esters) {
     try {
       const info = getAlkoxyGroupInfo(context, ester as FunctionalGroup);
-      if (process.env.VERBOSE)
-        console.log("[checkIfSimpleEster] Alkoxy info:", info);
+      if (process.env.VERBOSE) console.log("[checkIfSimpleEster] Alkoxy info:", info);
 
       // Allow branched and substituted alkoxy chains - functional class can handle these
       // The naming logic in ester-naming.ts will generate proper bracketed names
@@ -740,9 +675,7 @@ export function checkIfSimpleEster(
   }
 
   if (process.env.VERBOSE)
-    console.log(
-      "[checkIfSimpleEster] Suitable for functional class nomenclature",
-    );
+    console.log("[checkIfSimpleEster] Suitable for functional class nomenclature");
   // All checks passed → use functional class nomenclature
   return true;
 }
@@ -824,10 +757,7 @@ export const ESTER_DETECTION_RULE: IUPACRule = {
     const functionalGroups = context.getState().functionalGroups;
     const esters = functionalGroups.filter((fg) => fg.type === "ester");
     if (process.env.VERBOSE)
-      console.log(
-        "[ESTER_DETECTION_RULE] Checking conditions, esters found:",
-        esters.length,
-      );
+      console.log("[ESTER_DETECTION_RULE] Checking conditions, esters found:", esters.length);
     return esters.length > 0;
   },
   action: (context: ImmutableNamingContext) => {
@@ -836,10 +766,7 @@ export const ESTER_DETECTION_RULE: IUPACRule = {
     const esters = functionalGroups.filter((fg) => fg.type === "ester");
 
     if (process.env.VERBOSE)
-      console.log(
-        "[ESTER_DETECTION_RULE] Found esters in functional groups:",
-        esters.length,
-      );
+      console.log("[ESTER_DETECTION_RULE] Found esters in functional groups:", esters.length);
 
     let updatedContext = context;
 
@@ -847,8 +774,7 @@ export const ESTER_DETECTION_RULE: IUPACRule = {
     // Complex molecules should use substitutive nomenclature
     const isSimpleEster = checkIfSimpleEster(context, esters);
 
-    if (process.env.VERBOSE)
-      console.log("[ESTER_DETECTION_RULE] isSimpleEster:", isSimpleEster);
+    if (process.env.VERBOSE) console.log("[ESTER_DETECTION_RULE] isSimpleEster:", isSimpleEster);
 
     if (isSimpleEster) {
       updatedContext = updatedContext.withNomenclatureMethod(
@@ -887,8 +813,7 @@ export const ESTER_DETECTION_RULE: IUPACRule = {
 export const LACTONE_TO_KETONE_RULE: IUPACRule = {
   id: "lactone-to-ketone",
   name: "Lactone to Ketone Conversion",
-  description:
-    "Convert cyclic esters (lactones) to ketones for heterocycle naming",
+  description: "Convert cyclic esters (lactones) to ketones for heterocycle naming",
   blueBookReference: "P-66.1.1.4 - Lactones",
   priority: RulePriority.FOUR, // 40 - Must run AFTER ESTER_DETECTION_RULE (priority FIVE = 50)
   conditions: (context: ImmutableNamingContext) => {
@@ -901,9 +826,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
     const rings = mol.rings || [];
 
     if (process.env.VERBOSE) {
-      const esters = functionalGroups.filter(
-        (fg: FunctionalGroup) => fg.type === "ester",
-      );
+      const esters = functionalGroups.filter((fg: FunctionalGroup) => fg.type === "ester");
       if (process.env.VERBOSE) {
         console.log(
           "[LACTONE_TO_KETONE] Checking conditions: esters=",
@@ -915,8 +838,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
     }
 
     if (!rings || rings.length === 0) {
-      if (process.env.VERBOSE)
-        console.log("[LACTONE_TO_KETONE] No rings in molecule");
+      if (process.env.VERBOSE) console.log("[LACTONE_TO_KETONE] No rings in molecule");
       return false;
     }
 
@@ -931,10 +853,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
       const carbonylCarbon = getCarbonFromCarbonyl(a1, a2);
 
       if (process.env.VERBOSE)
-        console.log(
-          "[LACTONE_TO_KETONE] Examining carbonyl at",
-          carbonylCarbon.id,
-        );
+        console.log("[LACTONE_TO_KETONE] Examining carbonyl at", carbonylCarbon.id);
 
       // Check which rings contain this carbonyl carbon
       for (let ringIdx = 0; ringIdx < ringAtomSets.length; ringIdx++) {
@@ -945,11 +864,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         for (const b of mol.bonds) {
           if (b.type !== "single") continue;
           const oxId =
-            b.atom1 === carbonylCarbon.id
-              ? b.atom2
-              : b.atom2 === carbonylCarbon.id
-                ? b.atom1
-                : -1;
+            b.atom1 === carbonylCarbon.id ? b.atom2 : b.atom2 === carbonylCarbon.id ? b.atom1 : -1;
           if (oxId === -1) continue;
           const oxAtom = mol.atoms[oxId];
 
@@ -983,11 +898,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         for (const b of mol.bonds) {
           if (b.type !== "single") continue;
           const otherId =
-            b.atom1 === carbonylCarbon.id
-              ? b.atom2
-              : b.atom2 === carbonylCarbon.id
-                ? b.atom1
-                : -1;
+            b.atom1 === carbonylCarbon.id ? b.atom2 : b.atom2 === carbonylCarbon.id ? b.atom1 : -1;
           if (otherId === -1) continue;
           const otherAtom = mol.atoms[otherId];
           if (otherAtom?.symbol === "C" && ringSet.has(otherId)) {
@@ -996,21 +907,13 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         }
 
         if (process.env.VERBOSE)
-          console.log(
-            "[LACTONE_TO_KETONE]   Alpha carbons in ring:",
-            alphaAtomIds,
-          );
+          console.log("[LACTONE_TO_KETONE]   Alpha carbons in ring:", alphaAtomIds);
 
         // For each alpha carbon, check if it's bonded to an ester oxygen in the same ring
         for (const alphaId of alphaAtomIds) {
           for (const b of mol.bonds) {
             if (b.type !== "single") continue;
-            const oxId =
-              b.atom1 === alphaId
-                ? b.atom2
-                : b.atom2 === alphaId
-                  ? b.atom1
-                  : -1;
+            const oxId = b.atom1 === alphaId ? b.atom2 : b.atom2 === alphaId ? b.atom1 : -1;
             if (oxId === -1) continue;
             const oxAtom = mol.atoms[oxId];
 
@@ -1044,8 +947,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
       }
     }
 
-    if (process.env.VERBOSE)
-      console.log("[LACTONE_TO_KETONE] No lactone patterns found");
+    if (process.env.VERBOSE) console.log("[LACTONE_TO_KETONE] No lactone patterns found");
     return false;
   },
   action: (context: ImmutableNamingContext) => {
@@ -1054,17 +956,13 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
     const rings = mol.rings || [];
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[LACTONE_TO_KETONE] Converting cyclic esters to ketones (if any)",
-      );
+      console.log("[LACTONE_TO_KETONE] Converting cyclic esters to ketones (if any)");
       if (process.env.VERBOSE) {
         console.log(
           "[LACTONE_TO_KETONE] Current functionalGroups:",
           functionalGroups.map((fg: FunctionalGroup) => ({
             type: fg.type,
-            atoms: fg.atoms?.map((a: Atom | number) =>
-              typeof a === "number" ? a : a.id,
-            ),
+            atoms: fg.atoms?.map((a: Atom | number) => (typeof a === "number" ? a : a.id)),
           })),
         );
       }
@@ -1074,9 +972,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
     // Pattern can be:
     // 1. C(=O)-O (oxygen directly bonded to carbonyl carbon) - simple lactones
     // 2. C(=O)-C-...-O (oxygen connected through alpha carbon) - bicyclic lactones
-    const ringAtomSets = (rings || []).map(
-      (r: readonly number[]) => new Set(r),
-    );
+    const ringAtomSets = (rings || []).map((r: readonly number[]) => new Set(r));
     const lactoneCarbonIds = new Set<number>();
 
     for (const bond of mol.bonds) {
@@ -1094,11 +990,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         for (const b of mol.bonds) {
           if (b.type !== "single") continue;
           const oxId =
-            b.atom1 === carbonylCarbon.id
-              ? b.atom2
-              : b.atom2 === carbonylCarbon.id
-                ? b.atom1
-                : -1;
+            b.atom1 === carbonylCarbon.id ? b.atom2 : b.atom2 === carbonylCarbon.id ? b.atom1 : -1;
           if (oxId === -1) continue;
           const oxAtom = mol.atoms[oxId];
 
@@ -1132,11 +1024,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         for (const b of mol.bonds) {
           if (b.type !== "single") continue;
           const otherId =
-            b.atom1 === carbonylCarbon.id
-              ? b.atom2
-              : b.atom2 === carbonylCarbon.id
-                ? b.atom1
-                : -1;
+            b.atom1 === carbonylCarbon.id ? b.atom2 : b.atom2 === carbonylCarbon.id ? b.atom1 : -1;
           if (otherId === -1) continue;
           const otherAtom = mol.atoms[otherId];
           if (otherAtom?.symbol === "C" && ringSet.has(otherId)) {
@@ -1148,12 +1036,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
         for (const alphaId of alphaAtomIds) {
           for (const b of mol.bonds) {
             if (b.type !== "single") continue;
-            const oxId =
-              b.atom1 === alphaId
-                ? b.atom2
-                : b.atom2 === alphaId
-                  ? b.atom1
-                  : -1;
+            const oxId = b.atom1 === alphaId ? b.atom2 : b.atom2 === alphaId ? b.atom1 : -1;
             if (oxId === -1) continue;
             const oxAtom = mol.atoms[oxId];
 
@@ -1189,9 +1072,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
 
     // If we found any lactone carbonyls, ensure they're present as ketone functional groups
     const detector = context.getDetector();
-    const ketonePriority = normalizePriority(
-      detector.getFunctionalGroupPriority("ketone") || 0,
-    );
+    const ketonePriority = normalizePriority(detector.getFunctionalGroupPriority("ketone") || 0);
     let updatedFunctionalGroups = functionalGroups.slice();
     if (lactoneCarbonIds.size > 0) {
       // Remove any existing ester entries that correspond to these lactones and replace with ketone entries
@@ -1223,9 +1104,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
       // For any lactone carbonyls not represented by an ester FG, add ketone FG entries
       for (const cid of Array.from(lactoneCarbonIds)) {
         const exists = updatedFunctionalGroups.some(
-          (fg) =>
-            fg.type === "ketone" &&
-            (fg.atoms || []).some((a) => (a?.id || a) === cid),
+          (fg) => fg.type === "ketone" && (fg.atoms || []).some((a) => (a?.id || a) === cid),
         );
         if (!exists) {
           const carbonAtom = mol.atoms.find((a) => a.id === cid);
@@ -1268,17 +1147,8 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
                 const atomId = typeof a === "number" ? a : a?.id;
                 return atomId !== undefined && lactoneCarbonIds.has(atomId);
               }),
-          ) ||
-          selectPrincipalGroup(
-            updatedFunctionalGroups,
-            mol,
-            context.getDetector(),
-          )
-        : selectPrincipalGroup(
-            updatedFunctionalGroups,
-            mol,
-            context.getDetector(),
-          );
+          ) || selectPrincipalGroup(updatedFunctionalGroups, mol, context.getDetector())
+        : selectPrincipalGroup(updatedFunctionalGroups, mol, context.getDetector());
 
     if (process.env.VERBOSE) {
       console.log(
@@ -1297,10 +1167,7 @@ export const LACTONE_TO_KETONE_RULE: IUPACRule = {
     // Leave other groups' isPrincipal status unchanged (don't reset to false)
     const finalFunctionalGroups = newPrincipalGroup
       ? updatedFunctionalGroups.map((g) => {
-          if (
-            g.type === newPrincipalGroup.type &&
-            g.priority === newPrincipalGroup.priority
-          ) {
+          if (g.type === newPrincipalGroup.type && g.priority === newPrincipalGroup.priority) {
             return { ...g, isPrincipal: true };
           }
           return g; // Keep existing isPrincipal status

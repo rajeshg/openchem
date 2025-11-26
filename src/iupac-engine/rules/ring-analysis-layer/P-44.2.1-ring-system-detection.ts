@@ -16,8 +16,7 @@ import { findSubstituents } from "../../naming/chains/substituent-naming";
 export const P44_2_1_RING_SYSTEM_DETECTION_RULE: IUPACRule = {
   id: "P-44.2.1",
   name: "Ring System Detection",
-  description:
-    "Detect and classify all ring systems (P-44.2.1) and seed candidate chains",
+  description: "Detect and classify all ring systems (P-44.2.1) and seed candidate chains",
   blueBookReference: BLUE_BOOK_RULES.P44_2,
   priority: RulePriority.TEN,
   conditions: () => {
@@ -32,11 +31,8 @@ export const P44_2_1_RING_SYSTEM_DETECTION_RULE: IUPACRule = {
       console.log(`[P-44.2.1] Detected ${ringSystems.length} ring systems`);
       ringSystems.forEach((ring: unknown, idx: number) => {
         const ringObj = ring as { atoms?: Atom[]; size?: number };
-        const atomSymbols =
-          ringObj.atoms?.map((a) => a.symbol).join("") || "unknown";
-        console.log(
-          `[P-44.2.1]   Ring ${idx}: size=${ringObj.size}, atoms=${atomSymbols}`,
-        );
+        const atomSymbols = ringObj.atoms?.map((a) => a.symbol).join("") || "unknown";
+        console.log(`[P-44.2.1]   Ring ${idx}: size=${ringObj.size}, atoms=${atomSymbols}`);
       });
     }
 
@@ -45,9 +41,7 @@ export const P44_2_1_RING_SYSTEM_DETECTION_RULE: IUPACRule = {
     try {
       // Local require to avoid circular imports - use specific module paths
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const {
-        findMainChain,
-      } = require("../../naming/chains/main-chain-selection/index");
+      const { findMainChain } = require("../../naming/chains/main-chain-selection/index");
 
       // Pass functional groups from context if available
       const functionalGroups = context.getState().functionalGroups;
@@ -57,23 +51,15 @@ export const P44_2_1_RING_SYSTEM_DETECTION_RULE: IUPACRule = {
         );
       }
 
-      const mainChain = findMainChain(
-        molecule,
-        functionalGroups,
-        context.getDetector(),
-      );
+      const mainChain = findMainChain(molecule, functionalGroups, context.getDetector());
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-44.2.1] findMainChain returned: ${mainChain?.join(",") || "empty"}`,
-        );
+        console.log(`[P-44.2.1] findMainChain returned: ${mainChain?.join(",") || "empty"}`);
       }
 
       // If main chain found, create candidate chain
       if (mainChain && mainChain.length > 0) {
-        const atoms = mainChain
-          .map((idx: number) => molecule.atoms[idx])
-          .filter(Boolean) as Atom[];
+        const atoms = mainChain.map((idx: number) => molecule.atoms[idx]).filter(Boolean) as Atom[];
         const bonds: Bond[] = [];
         const multipleBonds: MultipleBond[] = [];
 
@@ -81,9 +67,7 @@ export const P44_2_1_RING_SYSTEM_DETECTION_RULE: IUPACRule = {
           const a = mainChain[i]!;
           const b = mainChain[i + 1]!;
           const bond = molecule.bonds.find(
-            (bb: Bond) =>
-              (bb.atom1 === a && bb.atom2 === b) ||
-              (bb.atom1 === b && bb.atom2 === a),
+            (bb: Bond) => (bb.atom1 === a && bb.atom2 === b) || (bb.atom1 === b && bb.atom2 === a),
           );
           if (bond) {
             bonds.push(bond);

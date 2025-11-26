@@ -35,10 +35,7 @@ export function getHeteroatomType(element: string): string {
     Te: "tellurium",
   };
 
-  return (
-    heteroatomCategories[element as keyof typeof heteroatomCategories] ||
-    "other"
-  );
+  return heteroatomCategories[element as keyof typeof heteroatomCategories] || "other";
 }
 
 /**

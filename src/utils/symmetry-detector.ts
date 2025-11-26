@@ -3,10 +3,7 @@ import { BondType, StereoType } from "types";
 import { getBondsForAtom, getOtherAtomId } from "./bond-utils";
 import { MoleculeGraph } from "./molecular-graph";
 
-function getNeighbors(
-  atomId: number,
-  molecule: Molecule,
-): Array<[number, Bond]> {
+function getNeighbors(atomId: number, molecule: Molecule): Array<[number, Bond]> {
   const bonds = getBondsForAtom(molecule.bonds, atomId);
   return bonds.map((bond: Bond) => [getOtherAtomId(bond, atomId), bond]);
 }
@@ -40,16 +37,13 @@ function computeCanonicalLabels(mol: Molecule): Map<number, string> {
 
     const labelMap = new Map<string, number>();
     let counter = 1;
-    const uniqueLabels = Array.from(
-      new Set(mol.atoms.map((a) => newLabels.get(a.id)!)),
-    );
+    const uniqueLabels = Array.from(new Set(mol.atoms.map((a) => newLabels.get(a.id)!)));
     uniqueLabels.sort();
     for (const lbl of uniqueLabels) {
       labelMap.set(lbl, counter++);
     }
     const normalized = new Map<number, string>();
-    for (const a of mol.atoms)
-      normalized.set(a.id, String(labelMap.get(newLabels.get(a.id)!)!));
+    for (const a of mol.atoms) normalized.set(a.id, String(labelMap.get(newLabels.get(a.id)!)!));
 
     let same = true;
     for (const a of mol.atoms) {
@@ -90,8 +84,7 @@ function hasSymmetricSubstituents(
         const [nid2] = neighbors[j]!;
 
         const inSameRing = rings.some(
-          (ring: number[]) =>
-            ring.includes(nid1) && ring.includes(nid2) && ring.includes(atomId),
+          (ring: number[]) => ring.includes(nid1) && ring.includes(nid2) && ring.includes(atomId),
         );
 
         if (!inSameRing) {
@@ -110,9 +103,7 @@ function getDoubleBondSubstituents(
   molecule: Molecule,
 ): number[] {
   const neighbors = getNeighbors(atomId, molecule);
-  const explicitSubs = neighbors
-    .filter(([nid]) => nid !== doubleBondAtomId)
-    .map(([nid]) => nid);
+  const explicitSubs = neighbors.filter(([nid]) => nid !== doubleBondAtomId).map(([nid]) => nid);
 
   const atom = molecule.atoms.find((a) => a.id === atomId);
   const implicitH = atom?.hydrogens || 0;
@@ -174,26 +165,19 @@ export function removeInvalidStereo(molecule: Molecule): Molecule {
           }
         }
       } else {
-        const inRings = rings.filter((ring: number[]) =>
-          ring.includes(atom.id),
-        );
+        const inRings = rings.filter((ring: number[]) => ring.includes(atom.id));
         if (inRings.length > 0) {
           const neighbors = getNeighbors(atom.id, molecule);
           const outsideRingNeighbors = neighbors.filter(
             ([nid]) =>
-              !inRings.some(
-                (ring: number[]) =>
-                  ring.includes(nid) && ring.includes(atom.id),
-              ),
+              !inRings.some((ring: number[]) => ring.includes(nid) && ring.includes(atom.id)),
           );
 
           if (outsideRingNeighbors.length <= 1) {
             const otherChiralInRing = inRings.some((ring: number[]) =>
               ring.some((ringAtomId: number) => {
                 if (ringAtomId === atom.id) return false;
-                const ringAtom = molecule.atoms.find(
-                  (a) => a.id === ringAtomId,
-                );
+                const ringAtom = molecule.atoms.find((a) => a.id === ringAtomId);
                 return (
                   ringAtom &&
                   ringAtom.chiral &&
@@ -229,10 +213,7 @@ export function removeInvalidStereo(molecule: Molecule): Molecule {
           b.stereo !== StereoType.NONE,
       );
 
-      if (
-        stereoBonds.length > 0 &&
-        hasGeminalIdenticalGroups(bond, molecule, labels)
-      ) {
+      if (stereoBonds.length > 0 && hasGeminalIdenticalGroups(bond, molecule, labels)) {
         for (const b of stereoBonds) {
           const bondKey = `${Math.min(b.atom1, b.atom2)}-${Math.max(b.atom1, b.atom2)}`;
           bondsToRemoveStereo.add(bondKey);

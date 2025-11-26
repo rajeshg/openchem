@@ -23,9 +23,7 @@ describe("Mismatch fixes", () => {
     if (!result.molecule) return;
 
     const generated = generateSMILES(result.molecule);
-    console.log(
-      "\n=== N,N,3-trimethyl-3-propan-2-ylsulfanylazirin-2-amine ===",
-    );
+    console.log("\n=== N,N,3-trimethyl-3-propan-2-ylsulfanylazirin-2-amine ===");
     console.log("Generated SMILES:", generated);
     console.log("Expected SMILES: ", expected);
 
@@ -49,9 +47,7 @@ describe("Mismatch fixes", () => {
     if (!result.molecule) return;
 
     const generated = generateSMILES(result.molecule);
-    console.log(
-      "\n=== 2,3-bis(trimethylsilyloxy)propyl 2-methylpropanoate ===",
-    );
+    console.log("\n=== 2,3-bis(trimethylsilyloxy)propyl 2-methylpropanoate ===");
     console.log("Generated SMILES:", generated);
     console.log("Expected SMILES: ", expected);
 
@@ -146,9 +142,7 @@ describe("Mismatch fixes", () => {
       expect(JSON.stringify(genCounts)).toBe(JSON.stringify(expCounts));
 
       // Same aromatic atom count
-      const genAromatic = result.molecule.atoms.filter(
-        (a) => a.aromatic,
-      ).length;
+      const genAromatic = result.molecule.atoms.filter((a) => a.aromatic).length;
       const expAromatic = expectedMol.atoms.filter((a) => a.aromatic).length;
       expect(genAromatic).toBe(expAromatic);
     }

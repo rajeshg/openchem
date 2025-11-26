@@ -41,15 +41,9 @@ export function filterAcylKetones(
         if (molecule?.bonds) {
           for (const bond of molecule.bonds) {
             let chainAtomId: number | undefined;
-            if (
-              bond.atom1 === carbonylCarbon.id &&
-              chainAtomIds.includes(bond.atom2)
-            ) {
+            if (bond.atom1 === carbonylCarbon.id && chainAtomIds.includes(bond.atom2)) {
               chainAtomId = bond.atom2;
-            } else if (
-              bond.atom2 === carbonylCarbon.id &&
-              chainAtomIds.includes(bond.atom1)
-            ) {
+            } else if (bond.atom2 === carbonylCarbon.id && chainAtomIds.includes(bond.atom1)) {
               chainAtomId = bond.atom1;
             }
 
@@ -78,9 +72,7 @@ export function filterAcylKetones(
       const parentSubs = parentStructure.substituents || [];
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[ACYL FILTER] Checking ${parentSubs.length} parent substituents`,
-        );
+        console.log(`[ACYL FILTER] Checking ${parentSubs.length} parent substituents`);
       }
 
       const isAlreadyAcyl = parentSubs.some((sub) => {
@@ -127,9 +119,7 @@ export function filterAcylKetones(
       });
 
       if (process.env.VERBOSE) {
-        console.log(
-          `[ACYL FILTER] isAlreadyAcyl=${isAlreadyAcyl}, returning ${!isAlreadyAcyl}`,
-        );
+        console.log(`[ACYL FILTER] isAlreadyAcyl=${isAlreadyAcyl}, returning ${!isAlreadyAcyl}`);
       }
 
       return !isAlreadyAcyl;

@@ -14,15 +14,11 @@ describe("SMILES Stereo Extras", () => {
     const r2 = parseSMILES(input2);
     expect(r1.errors).toHaveLength(0);
     expect(r2.errors).toHaveLength(0);
-    const dbl1 = r1.molecules[0]!.bonds.find(
-      (b) => b.type === BondType.DOUBLE,
-    )!;
+    const dbl1 = r1.molecules[0]!.bonds.find((b) => b.type === BondType.DOUBLE)!;
     expect(dbl1.stereo).toBe(StereoType.UP);
     // second case mixes markers; ensure we parse without crashing and molecule structure is correct
     expect(r2.molecules[0]!.atoms).toHaveLength(4);
-    expect(
-      r2.molecules[0]!.bonds.filter((b) => b.type === BondType.DOUBLE),
-    ).toHaveLength(1);
+    expect(r2.molecules[0]!.bonds.filter((b) => b.type === BondType.DOUBLE)).toHaveLength(1);
     const gen1 = generateSMILES(r1.molecules[0]!);
     expect(gen1).toBe("F/C=C/F");
     const gen2 = generateSMILES(r2.molecules[0]!);

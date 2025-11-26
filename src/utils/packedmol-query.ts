@@ -25,30 +25,21 @@ export function getPackedBondCount(packed: PackedMol): number {
 /**
  * Get atomic number of atom at index
  */
-export function getPackedAtomicNumber(
-  packed: PackedMol,
-  atomIndex: number,
-): number {
+export function getPackedAtomicNumber(packed: PackedMol, atomIndex: number): number {
   return packed.atoms.atomicNumber[atomIndex] ?? 0;
 }
 
 /**
  * Get formal charge of atom at index
  */
-export function getPackedFormalCharge(
-  packed: PackedMol,
-  atomIndex: number,
-): number {
+export function getPackedFormalCharge(packed: PackedMol, atomIndex: number): number {
   return packed.atoms.formalCharge[atomIndex] ?? 0;
 }
 
 /**
  * Get hydrogen count for atom at index
  */
-export function getPackedHydrogens(
-  packed: PackedMol,
-  atomIndex: number,
-): number {
+export function getPackedHydrogens(packed: PackedMol, atomIndex: number): number {
   return packed.atoms.hydrogens[atomIndex] ?? 0;
 }
 
@@ -63,10 +54,7 @@ export function getPackedDegree(packed: PackedMol, atomIndex: number): number {
  * Get neighbors of atom at index using CSR graph
  * Returns array of [neighborAtomIndex, neighborBondIndex]
  */
-export function getPackedNeighbors(
-  packed: PackedMol,
-  atomIndex: number,
-): Array<[number, number]> {
+export function getPackedNeighbors(packed: PackedMol, atomIndex: number): Array<[number, number]> {
   const N = getPackedAtomCount(packed);
   if (atomIndex < 0 || atomIndex >= N) {
     return [];
@@ -91,23 +79,15 @@ export function getPackedNeighbors(
 /**
  * Check if atom is aromatic
  */
-export function isPackedAtomAromatic(
-  packed: PackedMol,
-  atomIndex: number,
-): boolean {
+export function isPackedAtomAromatic(packed: PackedMol, atomIndex: number): boolean {
   const AROMATIC_FLAG = 1; // ATOM_FLAG.AROMATIC = 1
-  return (packed.atoms.atomFlags[atomIndex] ?? 0) & AROMATIC_FLAG
-    ? true
-    : false;
+  return (packed.atoms.atomFlags[atomIndex] ?? 0) & AROMATIC_FLAG ? true : false;
 }
 
 /**
  * Check if atom is chiral
  */
-export function isPackedAtomChiral(
-  packed: PackedMol,
-  atomIndex: number,
-): boolean {
+export function isPackedAtomChiral(packed: PackedMol, atomIndex: number): boolean {
   const CHIRAL_FLAG = 2; // ATOM_FLAG.CHIRAL = 2
   return (packed.atoms.atomFlags[atomIndex] ?? 0) & CHIRAL_FLAG ? true : false;
 }
@@ -115,10 +95,7 @@ export function isPackedAtomChiral(
 /**
  * Check if atom is dummy (*) atom
  */
-export function isPackedAtomDummy(
-  packed: PackedMol,
-  atomIndex: number,
-): boolean {
+export function isPackedAtomDummy(packed: PackedMol, atomIndex: number): boolean {
   const DUMMY_FLAG = 4; // ATOM_FLAG.DUMMY = 4
   return (packed.atoms.atomFlags[atomIndex] ?? 0) & DUMMY_FLAG ? true : false;
 }
@@ -126,24 +103,15 @@ export function isPackedAtomDummy(
 /**
  * Get bond type code
  */
-export function getPackedBondType(
-  packed: PackedMol,
-  bondIndex: number,
-): number {
+export function getPackedBondType(packed: PackedMol, bondIndex: number): number {
   return packed.bonds.order[bondIndex] ?? 0;
 }
 
 /**
  * Get atoms connected by bond
  */
-export function getPackedBondAtoms(
-  packed: PackedMol,
-  bondIndex: number,
-): [number, number] {
-  return [
-    packed.bonds.atomA[bondIndex] ?? 0,
-    packed.bonds.atomB[bondIndex] ?? 0,
-  ];
+export function getPackedBondAtoms(packed: PackedMol, bondIndex: number): [number, number] {
+  return [packed.bonds.atomA[bondIndex] ?? 0, packed.bonds.atomB[bondIndex] ?? 0];
 }
 
 /**
@@ -165,10 +133,7 @@ export function getPackedBondDirection(
 /**
  * Count atoms with specific atomic number
  */
-export function countPackedAtomType(
-  packed: PackedMol,
-  atomicNumber: number,
-): number {
+export function countPackedAtomType(packed: PackedMol, atomicNumber: number): number {
   let count = 0;
   const N = getPackedAtomCount(packed);
   for (let i = 0; i < N; i++) {
@@ -210,10 +175,7 @@ export function countPackedChiralAtoms(packed: PackedMol): number {
 /**
  * Find all atoms with specific atomic number
  */
-export function findPackedAtomsByType(
-  packed: PackedMol,
-  atomicNumber: number,
-): number[] {
+export function findPackedAtomsByType(packed: PackedMol, atomicNumber: number): number[] {
   const result: number[] = [];
   const N = getPackedAtomCount(packed);
   for (let i = 0; i < N; i++) {
@@ -251,9 +213,7 @@ export function getPackedTotalHydrogens(packed: PackedMol): number {
 /**
  * Get molecular formula (counts of each atom type)
  */
-export function getPackedMolecularFormula(
-  packed: PackedMol,
-): Record<number, number> {
+export function getPackedMolecularFormula(packed: PackedMol): Record<number, number> {
   const formula: Record<number, number> = {};
   const N = getPackedAtomCount(packed);
 

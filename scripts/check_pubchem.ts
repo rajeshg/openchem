@@ -21,9 +21,7 @@
 
 console.log("Let me verify which atom is the attachment point...");
 console.log("Atom 8 is attached to atom 11 (the CH2 of the ethanoic acid)");
-console.log(
-  "So the attachment point on the thiazole ring is definitely atom 8",
-);
+console.log("So the attachment point on the thiazole ring is definitely atom 8");
 console.log("");
 console.log("Current mapping says: atom 8 (relativePos 1) → position 5");
 console.log("Expected says: atom 8 should be at position 4");
@@ -42,10 +40,6 @@ console.log("Our thiazole: C(6)-N(7)-C(8)-C(9)-S(10)");
 console.log("If we number starting from N and going the SHORTER path to S:");
 console.log("  N(7)=1 → C(6)=2 → S(10)=3 → C(9)=4 → C(8)=5");
 console.log("");
-console.log(
-  "But wait... what if we need to consider the substituent position?",
-);
+console.log("But wait... what if we need to consider the substituent position?");
 console.log("The phenyl group is attached to C(6).");
-console.log(
-  "Maybe the rule is to number such that substituents get the lowest locants?",
-);
+console.log("Maybe the rule is to number such that substituents get the lowest locants?");

@@ -35,9 +35,7 @@ async function main() {
   }
   console.log(`Generated ${results.length} tautomers:`);
   for (const r of results) {
-    console.log(
-      `- SMILES: ${r.smiles} | score=${r.score} | rules=${(r.ruleIds || []).join(",")}`,
-    );
+    console.log(`- SMILES: ${r.smiles} | score=${r.score} | rules=${(r.ruleIds || []).join(",")}`);
   }
 }
 

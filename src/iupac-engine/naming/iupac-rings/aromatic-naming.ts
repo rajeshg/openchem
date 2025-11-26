@@ -22,9 +22,7 @@ export function isRingAromatic(ring: number[], molecule: Molecule): boolean {
     const a = ring[i]!;
     const b = ring[(i + 1) % ring.length]!;
     const bond = molecule.bonds.find(
-      (bb) =>
-        (bb.atom1 === a && bb.atom2 === b) ||
-        (bb.atom1 === b && bb.atom2 === a),
+      (bb) => (bb.atom1 === a && bb.atom2 === b) || (bb.atom1 === b && bb.atom2 === a),
     );
     if (!bond) continue;
     if (bond.type === BondType.AROMATIC) {
@@ -41,9 +39,7 @@ export function isRingAromatic(ring: number[], molecule: Molecule): boolean {
     }
   }
 
-  const aromaticAtomCount = ringAtoms.filter(
-    (atom) => atom.aromatic === true,
-  ).length;
+  const aromaticAtomCount = ringAtoms.filter((atom) => atom.aromatic === true).length;
   const atomAromaticFraction = aromaticAtomCount / ring.length;
 
   if (process.env.VERBOSE) {
@@ -66,18 +62,13 @@ export function isRingAromatic(ring: number[], molecule: Molecule): boolean {
   // - OR if many bonds are explicitly aromatic (BondType.AROMATIC) require atom fraction >= 0.5
   // - Otherwise mark non-aromatic.
   const minAromaticLike = Math.ceil(ring.length / 2);
-  if (aromaticLikeBondCount >= minAromaticLike && atomAromaticFraction >= 0.6)
-    return true;
-  if (aromaticBondCount >= minAromaticLike && atomAromaticFraction >= 0.5)
-    return true;
+  if (aromaticLikeBondCount >= minAromaticLike && atomAromaticFraction >= 0.6) return true;
+  if (aromaticBondCount >= minAromaticLike && atomAromaticFraction >= 0.5) return true;
 
   return false;
 }
 
-export function generateAromaticRingName(
-  ring: number[],
-  molecule: Molecule,
-): string {
+export function generateAromaticRingName(ring: number[], molecule: Molecule): string {
   const ringSize = ring.length;
   const ringAtoms = ring
     .map((idx) => molecule.atoms[idx])
@@ -91,8 +82,7 @@ export function generateAromaticRingName(
     );
   }
 
-  if (ringSize === 6 && ringAtoms.every((atom) => atom.symbol === "C"))
-    return "benzene";
+  if (ringSize === 6 && ringAtoms.every((atom) => atom.symbol === "C")) return "benzene";
   if (ringSize === 6) {
     const heteroAtoms = findHeteroatomsInRing(ring, molecule);
 
@@ -108,8 +98,7 @@ export function generateAromaticRingName(
       const nitrogenIndices: number[] = [];
       for (let i = 0; i < ring.length; i++) {
         const atomIdx = ring[i];
-        const atom =
-          atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
+        const atom = atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
         if (atom && atom.symbol === "N") {
           nitrogenIndices.push(i);
         }
@@ -131,13 +120,11 @@ export function generateAromaticRingName(
         // diff = 2 or 4 → separated by 1 carbon → pyrimidine (1,3-diazine)
         // diff = 3 → opposite positions → pyrazine (1,4-diazine)
         if (diff === 1 || diff === 5) {
-          if (process.env.VERBOSE)
-            console.log("[VERBOSE] Returning: pyridazine");
+          if (process.env.VERBOSE) console.log("[VERBOSE] Returning: pyridazine");
           return "pyridazine";
         }
         if (diff === 2 || diff === 4) {
-          if (process.env.VERBOSE)
-            console.log("[VERBOSE] Returning: pyrimidine");
+          if (process.env.VERBOSE) console.log("[VERBOSE] Returning: pyrimidine");
           return "pyrimidine";
         }
         if (diff === 3) {
@@ -167,8 +154,7 @@ export function generateAromaticRingName(
       const nitrogenIndices: number[] = [];
       for (let i = 0; i < ring.length; i++) {
         const atomIdx = ring[i];
-        const atom =
-          atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
+        const atom = atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
         if (atom && atom.symbol === "N") {
           nitrogenIndices.push(i + 1); // 1-based position
         }
@@ -184,12 +170,11 @@ export function generateAromaticRingName(
         const gap3 = ringSize - nitrogenIndices[2]! + nitrogenIndices[0]!;
 
         if (process.env.VERBOSE) {
-          console.log(
-            "[VERBOSE] Triazine nitrogen positions:",
-            nitrogenIndices,
-            "gaps:",
-            [gap1, gap2, gap3],
-          );
+          console.log("[VERBOSE] Triazine nitrogen positions:", nitrogenIndices, "gaps:", [
+            gap1,
+            gap2,
+            gap3,
+          ]);
         }
 
         // Determine isomer type:
@@ -230,8 +215,7 @@ export function generateAromaticRingName(
 
     // Check for mixed heteroatoms with multiple types
     if (heteroAtoms.length === 3) {
-      if (totalNitrogenCount === 2 && totalOxygenCount === 1)
-        return "triazinone";
+      if (totalNitrogenCount === 2 && totalOxygenCount === 1) return "triazinone";
     }
   }
   if (ringSize === 5) {
@@ -257,8 +241,7 @@ export function generateAromaticRingName(
       const nitrogenIndices: number[] = [];
       for (let i = 0; i < ring.length; i++) {
         const atomIdx = ring[i];
-        const atom =
-          atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
+        const atom = atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
         if (atom && atom.symbol === "N") {
           nitrogenIndices.push(i);
         }
@@ -293,8 +276,7 @@ export function generateAromaticRingName(
       const oxygenIndices: number[] = [];
       for (let i = 0; i < ring.length; i++) {
         const atomIdx = ring[i];
-        const atom =
-          atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
+        const atom = atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
         if (atom && atom.symbol === "N") {
           nitrogenIndices.push(i);
         } else if (atom && atom.symbol === "O") {
@@ -318,8 +300,7 @@ export function generateAromaticRingName(
       const sulfurIndices: number[] = [];
       for (let i = 0; i < ring.length; i++) {
         const atomIdx = ring[i];
-        const atom =
-          atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
+        const atom = atomIdx !== undefined ? molecule.atoms[atomIdx] : undefined;
         if (atom && atom.symbol === "N") {
           nitrogenIndices.push(i);
         } else if (atom && atom.symbol === "S") {

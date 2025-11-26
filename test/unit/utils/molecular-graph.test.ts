@@ -33,9 +33,7 @@ describe("Molecular Graph", () => {
           atomClass: 0,
         },
       ],
-      bonds: [
-        { atom1: 1, atom2: 2, type: BondType.SINGLE, stereo: StereoType.NONE },
-      ],
+      bonds: [{ atom1: 1, atom2: 2, type: BondType.SINGLE, stereo: StereoType.NONE }],
     };
 
     const mg = new MoleculeGraph(mol);
@@ -369,9 +367,7 @@ describe("Molecular Graph", () => {
           atomClass: 0,
         },
       ],
-      bonds: [
-        { atom1: 1, atom2: 2, type: BondType.SINGLE, stereo: StereoType.NONE },
-      ],
+      bonds: [{ atom1: 1, atom2: 2, type: BondType.SINGLE, stereo: StereoType.NONE }],
     };
 
     const mg = new MoleculeGraph(mol);

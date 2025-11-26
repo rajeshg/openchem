@@ -6,8 +6,7 @@ describe("Session improvements - Regression fixes and enhancements", () => {
   describe("Case 1: Complex ester with substituted anilino (FIXED)", () => {
     it("should handle complex ester with substituted anilino correctly", () => {
       const engine = new RuleEngine();
-      const smiles =
-        "CCCC(=O)OC(C)(C)C(=O)NC1=CC(=C(C=C1)[N+](=O)[O-])C(F)(F)F";
+      const smiles = "CCCC(=O)OC(C)(C)C(=O)NC1=CC(=C(C=C1)[N+](=O)[O-])C(F)(F)F";
       const expected =
         "[2-methyl-1-[4-nitro-3-(trifluoromethyl)anilino]-1-oxopropan-2-yl] butanoate";
 

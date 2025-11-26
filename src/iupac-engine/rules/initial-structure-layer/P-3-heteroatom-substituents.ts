@@ -8,10 +8,7 @@
  * This includes detection and naming of substituents attached to parent structures.
  */
 
-import {
-  ImmutableNamingContext,
-  ExecutionPhase,
-} from "../../immutable-context";
+import { ImmutableNamingContext, ExecutionPhase } from "../../immutable-context";
 import type { ContextState } from "../../immutable-context";
 import { RulePriority } from "../../types";
 import type { IUPACRule } from "../../types";
@@ -36,10 +33,7 @@ export const P3_1_HETEROATOM_SUBSTITUENT_RULE: IUPACRule = {
   conditions: (context: ImmutableNamingContext) => {
     const parentStructure = context.getState().parentStructure;
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-3.1] Checking conditions: parentStructure=",
-        parentStructure?.type,
-      );
+      console.log("[P-3.1] Checking conditions: parentStructure=", parentStructure?.type);
     }
     return parentStructure?.type === "heteroatom";
   },
@@ -48,10 +42,7 @@ export const P3_1_HETEROATOM_SUBSTITUENT_RULE: IUPACRule = {
     const parentStructure = context.getState().parentStructure;
 
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-3.1] Action running for heteroatom parent:",
-        parentStructure,
-      );
+      console.log("[P-3.1] Action running for heteroatom parent:", parentStructure);
     }
 
     if (!parentStructure || parentStructure.type !== "heteroatom") {
@@ -63,15 +54,13 @@ export const P3_1_HETEROATOM_SUBSTITUENT_RULE: IUPACRule = {
 
     // Find bonds connected to the heteroatom
     const connectedBonds = molecule.bonds.filter(
-      (bond) =>
-        bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
+      (bond) => bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
     );
 
     const substituents: IUPACSubstituent[] = [];
 
     for (const bond of connectedBonds) {
-      const otherAtomIndex =
-        bond.atom1 === heteroatomIndex ? bond.atom2 : bond.atom1;
+      const otherAtomIndex = bond.atom1 === heteroatomIndex ? bond.atom2 : bond.atom1;
       const otherAtom = molecule.atoms[otherAtomIndex];
 
       if (!otherAtom) continue;
@@ -80,11 +69,7 @@ export const P3_1_HETEROATOM_SUBSTITUENT_RULE: IUPACRule = {
       if (otherAtom.symbol === "H") continue;
 
       // Determine substituent name based on the attached atom/group
-      const substituentName = getSubstituentName(
-        otherAtom,
-        molecule,
-        heteroatomIndex,
-      );
+      const substituentName = getSubstituentName(otherAtom, molecule, heteroatomIndex);
 
       if (substituentName) {
         if (process.env.VERBOSE) {
@@ -147,11 +132,7 @@ function getSubstituentName(
   if (symbol === "C") {
     // Traverse the substituent chain starting from this carbon (use indices)
     const startIdx = getAtomIndex(attachedAtom);
-    const chainIndices = traverseSubstituentChainByIndex(
-      startIdx,
-      molecule,
-      fromIndex,
-    );
+    const chainIndices = traverseSubstituentChainByIndex(startIdx, molecule, fromIndex);
 
     // If traversal produced no carbons, bail
     if (!chainIndices || chainIndices.length === 0) return null;
@@ -194,15 +175,9 @@ function getSubstituentName(
     let branched = false;
     for (const idx of chainIndices) {
       const carbonNeighbors = molecule.bonds
-        .filter(
-          (b: Bond) =>
-            (b.atom1 === idx || b.atom2 === idx) && b.type === "single",
-        )
+        .filter((b: Bond) => (b.atom1 === idx || b.atom2 === idx) && b.type === "single")
         .map((b: Bond) => (b.atom1 === idx ? b.atom2 : b.atom1))
-        .filter(
-          (nid: number) =>
-            molecule.atoms[nid]?.symbol === "C" && nid !== fromIndex,
-        );
+        .filter((nid: number) => molecule.atoms[nid]?.symbol === "C" && nid !== fromIndex);
       if (carbonNeighbors.length > 2) {
         branched = true;
         break;
@@ -279,8 +254,7 @@ function traverseSubstituentChainByIndex(
     // push neighboring carbon atoms (single bonds), excluding the heteroatom index
     for (const b of molecule.bonds) {
       if (b.type !== BondType.SINGLE) continue;
-      const other =
-        b.atom1 === idx ? b.atom2 : b.atom2 === idx ? b.atom1 : undefined;
+      const other = b.atom1 === idx ? b.atom2 : b.atom2 === idx ? b.atom1 : undefined;
       if (other === undefined) continue;
       if (other === excludeIndex) continue;
       const otherAtom = molecule.atoms[other];
@@ -303,9 +277,7 @@ function findRingContainingAtom(atom: Atom, molecule: Molecule): Atom[] | null {
   if (molecule.rings) {
     for (const ring of molecule.rings) {
       if (ring.includes(atomIndex)) {
-        return ring
-          .map((i: number) => molecule.atoms[i])
-          .filter((a): a is Atom => a !== undefined);
+        return ring.map((i: number) => molecule.atoms[i]).filter((a): a is Atom => a !== undefined);
       }
     }
   }
@@ -333,11 +305,7 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
     const molecule = context.getState().molecule;
     const parentStructure = context.getState().parentStructure;
 
-    if (
-      !parentStructure ||
-      parentStructure.type !== "ring" ||
-      !parentStructure.ring
-    ) {
+    if (!parentStructure || parentStructure.type !== "ring" || !parentStructure.ring) {
       return context;
     }
 
@@ -346,9 +314,7 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
     const vonBaeyerNumbering = parentStructure.vonBaeyerNumbering;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[P-3.2] Ring atom IDs in order: [${ring.atoms.map((a) => a.id).join(", ")}]`,
-      );
+      console.log(`[P-3.2] Ring atom IDs in order: [${ring.atoms.map((a) => a.id).join(", ")}]`);
       if (vonBaeyerNumbering) {
         console.log(
           `[P-3.2] Using von Baeyer numbering:`,
@@ -371,9 +337,7 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
             `${s.name} at position ${"position" in s ? s.position : "locant" in s ? s.locant : "unknown"}`,
         ),
       );
-      console.log(
-        `[P-3.2] ringNumberingApplied: ${parentStructure.ringNumberingApplied}`,
-      );
+      console.log(`[P-3.2] ringNumberingApplied: ${parentStructure.ringNumberingApplied}`);
     }
 
     // If ring numbering has been applied, we MUST preserve the existing substituent positions
@@ -389,8 +353,7 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
 
     // Only preserve substituents that are non-alkyl (e.g., alkoxy, halogen) or complex alkyl names
     // Simple alkyl names like "methyl", "ethyl", "propyl", "butyl", etc. should be re-analyzed
-    const simpleAlkylNames =
-      /^(methyl|ethyl|propyl|butyl|pentyl|hexyl|heptyl|octyl|nonyl|decyl)$/;
+    const simpleAlkylNames = /^(methyl|ethyl|propyl|butyl|pentyl|hexyl|heptyl|octyl|nonyl|decyl)$/;
     const shouldPreserve =
       existingSubstituents.length > 0 &&
       existingSubstituents.every(
@@ -399,17 +362,13 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
 
     if (shouldPreserve) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-3.2] Preserving existing non-alkyl or complex substituents`,
-        );
+        console.log(`[P-3.2] Preserving existing non-alkyl or complex substituents`);
       }
       return context; // No changes needed
     }
 
     if (existingSubstituents.length > 0 && process.env.VERBOSE) {
-      console.log(
-        `[P-3.2] Re-analyzing existing substituents to detect branching`,
-      );
+      console.log(`[P-3.2] Re-analyzing existing substituents to detect branching`);
     }
 
     const substituents: IUPACSubstituent[] = [];
@@ -419,23 +378,17 @@ export const P3_2_RING_SUBSTITUENT_RULE: IUPACRule = {
 
       // Find bonds from this ring atom to non-ring atoms
       const bonds = molecule.bonds.filter(
-        (bond: Bond) =>
-          bond.atom1 === ringAtom.id || bond.atom2 === ringAtom.id,
+        (bond: Bond) => bond.atom1 === ringAtom.id || bond.atom2 === ringAtom.id,
       );
 
       for (const bond of bonds) {
-        const otherAtomId =
-          bond.atom1 === ringAtom.id ? bond.atom2 : bond.atom1;
+        const otherAtomId = bond.atom1 === ringAtom.id ? bond.atom2 : bond.atom1;
         if (!ringAtomIds.has(otherAtomId)) {
           // This is a substituent attached to the ring
           const substituentAtom = molecule.atoms[otherAtomId];
           if (substituentAtom && substituentAtom.symbol !== "H") {
             // Determine substituent type
-            const substituentName = getRingSubstituentName(
-              substituentAtom,
-              molecule,
-              ringAtom.id,
-            );
+            const substituentName = getRingSubstituentName(substituentAtom, molecule, ringAtom.id);
 
             // Use von Baeyer numbering if available, otherwise use ring position
             let position: number;
@@ -510,13 +463,11 @@ function analyzeSubstituentStructure(
   // The chain can extend in both directions from the attachment atom
   // For example: CH3-C(I)(CH3)-C(ring) forms a propyl group with the attachment in the middle
 
-  const findPathsFromAtom = (
-    startId: number,
-    excludeIds: Set<number>,
-  ): number[][] => {
+  const findPathsFromAtom = (startId: number, excludeIds: Set<number>): number[][] => {
     const paths: number[][] = [];
-    const stack: { currentId: number; path: number[]; visited: Set<number> }[] =
-      [{ currentId: startId, path: [startId], visited: new Set([startId]) }];
+    const stack: { currentId: number; path: number[]; visited: Set<number> }[] = [
+      { currentId: startId, path: [startId], visited: new Set([startId]) },
+    ];
 
     while (stack.length > 0) {
       const { currentId, path, visited: localVisited } = stack.pop()!;
@@ -529,9 +480,7 @@ function analyzeSubstituentStructure(
         .map((b: Bond) => (b.atom1 === currentId ? b.atom2 : b.atom1))
         .filter(
           (id: number) =>
-            !excludeIds.has(id) &&
-            !localVisited.has(id) &&
-            molecule.atoms[id]?.symbol === "C",
+            !excludeIds.has(id) && !localVisited.has(id) && molecule.atoms[id]?.symbol === "C",
         );
 
       if (neighbors.length === 0) {
@@ -553,10 +502,7 @@ function analyzeSubstituentStructure(
   };
 
   // Find all paths from the attached atom (excluding the ring atom we came from)
-  const pathsFromAttached = findPathsFromAtom(
-    attachedAtomId,
-    new Set([fromRingAtomId]),
-  );
+  const pathsFromAttached = findPathsFromAtom(attachedAtomId, new Set([fromRingAtomId]));
 
   // The longest chain should go through the attachment point
   // Find the two longest paths in opposite directions, then combine them
@@ -600,10 +546,7 @@ function analyzeSubstituentStructure(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[SubstituentAnalysis] Paths from attached:`,
-      pathsFromAttached,
-    );
+    console.log(`[SubstituentAnalysis] Paths from attached:`, pathsFromAttached);
     console.log(`[SubstituentAnalysis] Main chain:`, mainChain);
   }
 
@@ -611,10 +554,7 @@ function analyzeSubstituentStructure(
   const attachmentIdx = mainChain.indexOf(attachedAtomId);
 
   // Find branches and substituents on each main chain atom
-  const branches = new Map<
-    number,
-    { atoms: number[]; substituents: string[] }
-  >();
+  const branches = new Map<number, { atoms: number[]; substituents: string[] }>();
 
   for (let i = 0; i < mainChain.length; i++) {
     const chainAtomId = mainChain[i];
@@ -624,10 +564,7 @@ function analyzeSubstituentStructure(
     const neighbors = molecule.bonds
       .filter((b: Bond) => b.atom1 === chainAtomId || b.atom2 === chainAtomId)
       .map((b: Bond) => (b.atom1 === chainAtomId ? b.atom2 : b.atom1))
-      .filter(
-        (id: number) =>
-          id !== fromRingAtomId && id !== prevAtomId && id !== nextAtomId,
-      );
+      .filter((id: number) => id !== fromRingAtomId && id !== prevAtomId && id !== nextAtomId);
 
     if (neighbors.length > 0) {
       const branchAtoms: number[] = [];
@@ -648,15 +585,9 @@ function analyzeSubstituentStructure(
           substituents.push("chloro");
         } else if (neighborAtom.symbol === "F") {
           substituents.push("fluoro");
-        } else if (
-          neighborAtom.symbol === "O" &&
-          neighborAtom.hydrogens === 1
-        ) {
+        } else if (neighborAtom.symbol === "O" && neighborAtom.hydrogens === 1) {
           substituents.push("hydroxy");
-        } else if (
-          neighborAtom.symbol === "N" &&
-          neighborAtom.hydrogens === 2
-        ) {
+        } else if (neighborAtom.symbol === "N" && neighborAtom.hydrogens === 2) {
           substituents.push("amino");
         }
       }
@@ -678,18 +609,7 @@ function analyzeSubstituentStructure(
  * Get parent chain name based on carbon count
  */
 function getParentChainName(carbonCount: number): string | null {
-  const names = [
-    "meth",
-    "eth",
-    "prop",
-    "but",
-    "pent",
-    "hex",
-    "hept",
-    "oct",
-    "non",
-    "dec",
-  ];
+  const names = ["meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"];
   if (carbonCount <= 0 || carbonCount > names.length) return null;
   const name = names[carbonCount - 1];
   return name || null;
@@ -705,9 +625,7 @@ function detectHeterocyclicRing(
   fromAtomId: number,
 ): string | null {
   if (process.env.VERBOSE) {
-    console.log(
-      `[detectHeterocyclicRing] Checking atomId=${atomId}, fromAtomId=${fromAtomId}`,
-    );
+    console.log(`[detectHeterocyclicRing] Checking atomId=${atomId}, fromAtomId=${fromAtomId}`);
   }
 
   // Find which ring(s) contain this atom
@@ -789,9 +707,7 @@ function detectHeterocyclicRing(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[detectHeterocyclicRing] Matched heterocycle: ${heterocycleName}`,
-    );
+    console.log(`[detectHeterocyclicRing] Matched heterocycle: ${heterocycleName}`);
   }
 
   // Determine attachment locant (position number in the ring)
@@ -817,10 +733,8 @@ function detectHeterocyclicRing(
     const firstHeteroIndex = heteroatomIndices[0];
     if (firstHeteroIndex !== undefined) {
       // Try both directions from the heteroatom and choose the one giving lower locant
-      const clockwise =
-        ((attachmentIndex - firstHeteroIndex + ringSize) % ringSize) + 1;
-      const counterclockwise =
-        ((firstHeteroIndex - attachmentIndex + ringSize) % ringSize) + 1;
+      const clockwise = ((attachmentIndex - firstHeteroIndex + ringSize) % ringSize) + 1;
+      const counterclockwise = ((firstHeteroIndex - attachmentIndex + ringSize) % ringSize) + 1;
 
       // Choose the direction that gives the lower locant
       locant = Math.min(clockwise, counterclockwise);
@@ -837,9 +751,7 @@ function detectHeterocyclicRing(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[detectHeterocyclicRing] Returning: ${heterocycleName}-${locant}-yl`,
-    );
+    console.log(`[detectHeterocyclicRing] Returning: ${heterocycleName}-${locant}-yl`);
   }
   return `${heterocycleName}-${locant}-yl`;
 }
@@ -888,10 +800,7 @@ function detectMacrocyclicRingSubstituent(
     }
   }
 
-  const totalHeteroatoms = Object.values(heteroatomCounts).reduce(
-    (a, b) => a + b,
-    0,
-  );
+  const totalHeteroatoms = Object.values(heteroatomCounts).reduce((a, b) => a + b, 0);
 
   if (process.env.VERBOSE) {
     console.log(
@@ -927,9 +836,7 @@ function detectMacrocyclicRingSubstituent(
   // Check if the ring is saturated
   let _isSaturated = true;
   for (const bond of molecule.bonds) {
-    const isInRing =
-      containingRing.includes(bond.atom1) &&
-      containingRing.includes(bond.atom2);
+    const isInRing = containingRing.includes(bond.atom1) && containingRing.includes(bond.atom2);
     if (isInRing && bond.type === "double") {
       _isSaturated = false;
       break;
@@ -952,10 +859,7 @@ function detectMacrocyclicRingSubstituent(
           const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
           if (bond.atom1 === atomId || bond.atom2 === atomId) {
             const otherAtom = molecule.atoms[otherAtomId];
-            if (
-              otherAtom?.symbol === "O" &&
-              !containingRing.includes(otherAtomId)
-            ) {
+            if (otherAtom?.symbol === "O" && !containingRing.includes(otherAtomId)) {
               // This is a ketone attached to the ring
               ringSubstituents.push({ locant: i + 1, name: "oxo" });
             }
@@ -969,9 +873,7 @@ function detectMacrocyclicRingSubstituent(
   let attachmentPosition = 1; // Default to position 1
 
   // The attachment point should be at the heteroatom (position 1 after reordering)
-  const heteroatomIndex = containingRing.findIndex(
-    (atomId) => atomId === attachedAtomId,
-  );
+  const heteroatomIndex = containingRing.findIndex((atomId) => atomId === attachedAtomId);
   if (heteroatomIndex >= 0) {
     // Reorder ring so heteroatom is at position 1
     attachmentPosition = 1;
@@ -986,9 +888,7 @@ function detectMacrocyclicRingSubstituent(
 
   // Add substituents
   if (ringSubstituents.length > 0) {
-    const substituentParts = ringSubstituents.map(
-      (sub) => `${sub.locant}-${sub.name}`,
-    );
+    const substituentParts = ringSubstituents.map((sub) => `${sub.locant}-${sub.name}`);
     name += substituentParts.join(",") + "-";
   }
 
@@ -1037,27 +937,17 @@ function getRingSubstituentName(
   // Carbon-based substituents
   if (symbol === "C") {
     // First, check if this carbon is part of a heterocyclic ring
-    const heterocycleName = detectHeterocyclicRing(
-      attachedAtomId,
-      molecule,
-      fromIndex,
-    );
+    const heterocycleName = detectHeterocyclicRing(attachedAtomId, molecule, fromIndex);
 
     if (heterocycleName) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[P-3.2] Detected heterocyclic ring substituent: ${heterocycleName}`,
-        );
+        console.log(`[P-3.2] Detected heterocyclic ring substituent: ${heterocycleName}`);
       }
       return heterocycleName;
     }
 
     // Analyze the substituent structure
-    const structure = analyzeSubstituentStructure(
-      attachedAtomId,
-      molecule,
-      fromIndex,
-    );
+    const structure = analyzeSubstituentStructure(attachedAtomId, molecule, fromIndex);
 
     if (!structure) {
       if (process.env.VERBOSE) {
@@ -1117,13 +1007,11 @@ function getRingSubstituentName(
 
     // Build substituent list with locants
     const substituentParts: string[] = [];
-    const sortedPositions = Array.from(structure.branches.keys()).sort(
-      (a, b) => {
-        const locantA = locantMap.get(a) || 0;
-        const locantB = locantMap.get(b) || 0;
-        return locantA - locantB;
-      },
-    );
+    const sortedPositions = Array.from(structure.branches.keys()).sort((a, b) => {
+      const locantA = locantMap.get(a) || 0;
+      const locantB = locantMap.get(b) || 0;
+      return locantA - locantB;
+    });
 
     for (const position of sortedPositions) {
       const branch = structure.branches.get(position);
@@ -1143,10 +1031,7 @@ function getRingSubstituentName(
       );
       for (const [subName, count] of sortedSubs) {
         if (count > 1) {
-          const multiplier = getSimpleMultiplier(
-            count,
-            getSharedOPSINService(),
-          );
+          const multiplier = getSimpleMultiplier(count, getSharedOPSINService());
           substituentParts.push(`${locant},${locant}-${multiplier}${subName}`);
         } else {
           substituentParts.push(`${locant}-${subName}`);
@@ -1183,14 +1068,11 @@ function getRingSubstituentName(
     );
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[getSubstituentNameFromIndex] Found ${sulfurBonds.length} sulfur bonds`,
-      );
+      console.log(`[getSubstituentNameFromIndex] Found ${sulfurBonds.length} sulfur bonds`);
     }
 
     for (const bond of sulfurBonds) {
-      const otherAtomId =
-        bond.atom1 === attachedAtomId ? bond.atom2 : bond.atom1;
+      const otherAtomId = bond.atom1 === attachedAtomId ? bond.atom2 : bond.atom1;
 
       // Skip the ring atom we came from
       if (otherAtomId === fromIndex) {
@@ -1221,9 +1103,7 @@ function getRingSubstituentName(
             );
           }
           // Find which ring contains this carbon
-          const ringContainingCarbon = molecule.rings?.find((ring) =>
-            ring.includes(otherAtomId),
-          );
+          const ringContainingCarbon = molecule.rings?.find((ring) => ring.includes(otherAtomId));
 
           if (ringContainingCarbon) {
             const ringSize = ringContainingCarbon.length;
@@ -1235,24 +1115,18 @@ function getRingSubstituentName(
             // Check if it's a 6-membered aromatic ring (phenyl)
             if (ringSize === 6) {
               // Check if all atoms in ring are carbons (not heteroaromatic)
-              const allCarbons = ringContainingCarbon.every(
-                (atomId: number) => {
-                  const atom = molecule.atoms[atomId];
-                  return atom?.symbol === "C";
-                },
-              );
+              const allCarbons = ringContainingCarbon.every((atomId: number) => {
+                const atom = molecule.atoms[atomId];
+                return atom?.symbol === "C";
+              });
 
               if (process.env.VERBOSE) {
-                console.log(
-                  `[getSubstituentNameFromIndex] All carbons in ring: ${allCarbons}`,
-                );
+                console.log(`[getSubstituentNameFromIndex] All carbons in ring: ${allCarbons}`);
               }
 
               if (allCarbons) {
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `[getSubstituentNameFromIndex] ✓ RETURNING phenylsulfanyl`,
-                  );
+                  console.log(`[getSubstituentNameFromIndex] ✓ RETURNING phenylsulfanyl`);
                 }
                 return "phenylsulfanyl";
               }
@@ -1261,11 +1135,7 @@ function getRingSubstituentName(
         }
 
         // Traverse the carbon chain attached to sulfur
-        const chainIndices = traverseSubstituentChainByIndex(
-          otherAtomId,
-          molecule,
-          attachedAtomId,
-        );
+        const chainIndices = traverseSubstituentChainByIndex(otherAtomId, molecule, attachedAtomId);
 
         if (chainIndices.length === 1) {
           // Single carbon: methylsulfanyl, ethylsulfanyl, etc.

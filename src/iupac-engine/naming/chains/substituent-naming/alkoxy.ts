@@ -1,10 +1,6 @@
 import type { Molecule } from "types";
 import { BondType } from "types";
-import {
-  getAlkaneBaseName,
-  getAlkylName,
-  getGreekNumeral,
-} from "../../iupac-helpers";
+import { getAlkaneBaseName, getAlkylName, getGreekNumeral } from "../../iupac-helpers";
 import { getSharedOPSINService } from "../../../opsin-service";
 import { getSimpleMultiplier } from "../../../opsin-adapter";
 
@@ -39,9 +35,7 @@ export function nameComplexAlkoxySubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameComplexAlkoxySubstituent] primaryCarbon=${primaryCarbon}`,
-    );
+    console.log(`[nameComplexAlkoxySubstituent] primaryCarbon=${primaryCarbon}`);
   }
 
   // Find the nearest nested oxygen (the first oxygen in the ether chain)
@@ -52,9 +46,7 @@ export function nameComplexAlkoxySubstituent(
   for (const oIdx of oxygenAtoms) {
     // BFS to find shortest path from primaryCarbon to this nested oxygen
     const visited = new Set<number>();
-    const queue: Array<{ atom: number; dist: number }> = [
-      { atom: primaryCarbon, dist: 0 },
-    ];
+    const queue: Array<{ atom: number; dist: number }> = [{ atom: primaryCarbon, dist: 0 }];
     visited.add(primaryCarbon);
 
     let foundDist = Number.POSITIVE_INFINITY;
@@ -124,18 +116,11 @@ export function nameComplexAlkoxySubstituent(
       let neighbor = -1;
       if (bond.atom1 === currentAtom && substituentAtoms.has(bond.atom2)) {
         neighbor = bond.atom2;
-      } else if (
-        bond.atom2 === currentAtom &&
-        substituentAtoms.has(bond.atom1)
-      ) {
+      } else if (bond.atom2 === currentAtom && substituentAtoms.has(bond.atom1)) {
         neighbor = bond.atom1;
       }
 
-      if (
-        neighbor >= 0 &&
-        neighbor !== oxygenAtomIdx &&
-        !linkerAtoms.has(neighbor)
-      ) {
+      if (neighbor >= 0 && neighbor !== oxygenAtomIdx && !linkerAtoms.has(neighbor)) {
         collectLinker(neighbor);
       }
     }
@@ -152,18 +137,11 @@ export function nameComplexAlkoxySubstituent(
       let neighbor = -1;
       if (bond.atom1 === currentAtom && substituentAtoms.has(bond.atom2)) {
         neighbor = bond.atom2;
-      } else if (
-        bond.atom2 === currentAtom &&
-        substituentAtoms.has(bond.atom1)
-      ) {
+      } else if (bond.atom2 === currentAtom && substituentAtoms.has(bond.atom1)) {
         neighbor = bond.atom1;
       }
 
-      if (
-        neighbor >= 0 &&
-        !tailAtoms.has(neighbor) &&
-        !linkerAtoms.has(neighbor)
-      ) {
+      if (neighbor >= 0 && !tailAtoms.has(neighbor) && !linkerAtoms.has(neighbor)) {
         collectTail(neighbor);
       }
     }
@@ -188,9 +166,7 @@ export function nameComplexAlkoxySubstituent(
     console.log(
       `  Complex ether debug: primaryO=${oxygenAtomIdx}, nestedO=${firstNestedOxygen}, tailStartC=${tailStartCarbon}`,
     );
-    console.log(
-      `  substituentAtoms: [${Array.from(substituentAtoms).join(",")}]`,
-    );
+    console.log(`  substituentAtoms: [${Array.from(substituentAtoms).join(",")}]`);
   }
 
   if (tailStartCarbon >= 0) {
@@ -198,9 +174,7 @@ export function nameComplexAlkoxySubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `  Complex ether - Linker carbons: [${Array.from(linkerAtoms).join(",")}]`,
-    );
+    console.log(`  Complex ether - Linker carbons: [${Array.from(linkerAtoms).join(",")}]`);
     console.log(
       `  Complex ether - Tail carbons: [${Array.from(tailAtoms)
         .filter((i) => molecule.atoms[i]?.symbol === "C")
@@ -211,17 +185,12 @@ export function nameComplexAlkoxySubstituent(
   // Name the tail portion - need to build it as a complete substituent
   let tailName = "";
   if (tailAtoms.size > 0) {
-    const tailCarbons = Array.from(tailAtoms).filter(
-      (idx) => molecule.atoms[idx]?.symbol === "C",
-    );
+    const tailCarbons = Array.from(tailAtoms).filter((idx) => molecule.atoms[idx]?.symbol === "C");
     const tailOxygens = Array.from(tailAtoms).filter((idx) => {
       const atom = molecule.atoms[idx];
-      if (!atom || atom.symbol !== "O" || idx === firstNestedOxygen)
-        return false;
+      if (!atom || atom.symbol !== "O" || idx === firstNestedOxygen) return false;
       // Only include ether-like oxygens (single bonds, not carbonyl)
-      const bondsToO = molecule.bonds.filter(
-        (b) => b.atom1 === idx || b.atom2 === idx,
-      );
+      const bondsToO = molecule.bonds.filter((b) => b.atom1 === idx || b.atom2 === idx);
       const hasSingle = bondsToO.some((b) => b.type === BondType.SINGLE);
       if (!hasSingle) return false;
       const hasDoubleToC = bondsToO.some(
@@ -251,17 +220,11 @@ export function nameComplexAlkoxySubstituent(
       // Find the carbon directly bonded to the nested oxygen (attachment point)
       let tailAttachmentCarbon = -1;
       for (const bond of molecule.bonds) {
-        if (
-          bond.atom1 === firstNestedOxygen &&
-          tailCarbons.includes(bond.atom2)
-        ) {
+        if (bond.atom1 === firstNestedOxygen && tailCarbons.includes(bond.atom2)) {
           tailAttachmentCarbon = bond.atom2;
           break;
         }
-        if (
-          bond.atom2 === firstNestedOxygen &&
-          tailCarbons.includes(bond.atom1)
-        ) {
+        if (bond.atom2 === firstNestedOxygen && tailCarbons.includes(bond.atom1)) {
           tailAttachmentCarbon = bond.atom1;
           break;
         }
@@ -272,11 +235,7 @@ export function nameComplexAlkoxySubstituent(
       } else {
         // Build the tail structure and name it properly
         // For now, use a simplified approach - build the longest chain and detect branching
-        const tailChain = buildLongestChainFrom(
-          molecule,
-          tailAttachmentCarbon,
-          tailAtoms,
-        );
+        const tailChain = buildLongestChainFrom(molecule, tailAttachmentCarbon, tailAtoms);
         const tailChainSet = new Set(tailChain);
 
         if (process.env.VERBOSE) {
@@ -345,10 +304,7 @@ export function nameComplexAlkoxySubstituent(
             locants.sort((a, b) => a - b);
             const locantStr = locants.join(",");
             if (locants.length > 1) {
-              const multiplier = getSimpleMultiplier(
-                locants.length,
-                getSharedOPSINService(),
-              );
+              const multiplier = getSimpleMultiplier(locants.length, getSharedOPSINService());
               prefixParts.push(`${locantStr}-${multiplier}${type}`);
             } else {
               prefixParts.push(`${locantStr}-${type}`);
@@ -486,20 +442,14 @@ export function buildLongestChainFrom(
     if (path.length > longestChain.length) {
       longestChain = [...path];
       if (process.env.VERBOSE) {
-        console.log(
-          `    [DFS] Updated longest chain: [${longestChain.join(",")}]`,
-        );
+        console.log(`    [DFS] Updated longest chain: [${longestChain.join(",")}]`);
       }
     }
 
     // Find all unvisited carbon neighbors
     for (const bond of molecule.bonds) {
       let neighborIdx = -1;
-      if (
-        bond.atom1 === current &&
-        allowedAtoms.has(bond.atom2) &&
-        !visited.has(bond.atom2)
-      ) {
+      if (bond.atom1 === current && allowedAtoms.has(bond.atom2) && !visited.has(bond.atom2)) {
         neighborIdx = bond.atom2;
       } else if (
         bond.atom2 === current &&
@@ -595,9 +545,7 @@ export function buildLongestChainFrom(
   // Also try single-direction chains (original behavior for cases with only 1 neighbor)
   for (const firstNeighbor of startNeighbors) {
     if (process.env.VERBOSE) {
-      console.log(
-        `  [buildLongestChainFrom] Trying single-direction chain from ${firstNeighbor}`,
-      );
+      console.log(`  [buildLongestChainFrom] Trying single-direction chain from ${firstNeighbor}`);
     }
     const visited = new Set<number>([startCarbon, firstNeighbor]);
     const path = [startCarbon, firstNeighbor];
@@ -631,14 +579,11 @@ export function nameAryloxySubstituent(
 
   // Find all aromatic carbons in the substituent
   const aromaticCarbons = Array.from(substituentAtoms).filter(
-    (idx) =>
-      molecule.atoms[idx]?.symbol === "C" && molecule.atoms[idx]?.aromatic,
+    (idx) => molecule.atoms[idx]?.symbol === "C" && molecule.atoms[idx]?.aromatic,
   );
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameAryloxySubstituent] aromaticCarbons=${aromaticCarbons.join(",")}`,
-    );
+    console.log(`[nameAryloxySubstituent] aromaticCarbons=${aromaticCarbons.join(",")}`);
   }
 
   // Identify which ring the aryl carbon belongs to
@@ -771,11 +716,7 @@ export function nameAryloxySubstituent(
     // Find non-ring attachments (excluding oxygen)
     for (const bond of molecule.bonds) {
       let substituent = -1;
-      if (
-        bond.atom1 === ringCarbon &&
-        !ringSet.has(bond.atom2) &&
-        bond.atom2 !== oxygenAtomIdx
-      ) {
+      if (bond.atom1 === ringCarbon && !ringSet.has(bond.atom2) && bond.atom2 !== oxygenAtomIdx) {
         substituent = bond.atom2;
       } else if (
         bond.atom2 === ringCarbon &&
@@ -865,9 +806,7 @@ export function nameAlkoxySubstituent(
   const oxygenAtoms = Array.from(substituentAtoms).filter((idx) => {
     const atom = molecule.atoms[idx];
     if (!atom || atom.symbol !== "O" || idx === oxygenAtomIdx) return false;
-    const bondsToO = molecule.bonds.filter(
-      (b) => b.atom1 === idx || b.atom2 === idx,
-    );
+    const bondsToO = molecule.bonds.filter((b) => b.atom1 === idx || b.atom2 === idx);
     // must have at least one single bond
     const hasSingle = bondsToO.some((b) => b.type === BondType.SINGLE);
     if (!hasSingle) return false;
@@ -916,9 +855,7 @@ export function nameAlkoxySubstituent(
                   bb.atom2 !== other,
               );
               const isMethyl = carbonNeighbors.every(
-                (bb) =>
-                  molecule.atoms[bb.atom1 === nbr ? bb.atom2 : bb.atom1]
-                    ?.symbol !== "C",
+                (bb) => molecule.atoms[bb.atom1 === nbr ? bb.atom2 : bb.atom1]?.symbol !== "C",
               );
               siAlkyls.push(isMethyl ? "methyl" : getAlkylName(1));
             }
@@ -933,8 +870,7 @@ export function nameAlkoxySubstituent(
           const parts: string[] = [];
           for (const [alk, cnt] of Object.entries(counts)) {
             // Use OPSIN for multiplicative prefix (di, tri, tetra...)
-            const mult =
-              cnt > 1 ? getSimpleMultiplier(cnt, getSharedOPSINService()) : "";
+            const mult = cnt > 1 ? getSimpleMultiplier(cnt, getSharedOPSINService()) : "";
             parts.push(`${mult}${alk}`);
           }
           const silylBase = parts.join("");
@@ -981,9 +917,7 @@ export function nameAlkoxySubstituent(
                       bb.atom2 !== other,
                   );
                   const isMethyl = carbonNeighbors.every(
-                    (bb) =>
-                      molecule.atoms[bb.atom1 === nbr ? bb.atom2 : bb.atom1]
-                        ?.symbol !== "C",
+                    (bb) => molecule.atoms[bb.atom1 === nbr ? bb.atom2 : bb.atom1]?.symbol !== "C",
                   );
                   siAlkyls.push(isMethyl ? "methyl" : getAlkylName(1));
                 }
@@ -995,10 +929,7 @@ export function nameAlkoxySubstituent(
               for (const a of siAlkyls) counts[a] = (counts[a] || 0) + 1;
               const parts: string[] = [];
               for (const [alk, cnt] of Object.entries(counts)) {
-                const mult =
-                  cnt > 1
-                    ? getSimpleMultiplier(cnt, getSharedOPSINService())
-                    : "";
+                const mult = cnt > 1 ? getSimpleMultiplier(cnt, getSharedOPSINService()) : "";
                 parts.push(`${mult}${alk}`);
               }
               const silylBase = parts.join("");
@@ -1035,9 +966,7 @@ export function nameAlkoxySubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[nameAlkoxySubstituent] carbonAttachedToO=${carbonAttachedToO}`,
-    );
+    console.log(`[nameAlkoxySubstituent] carbonAttachedToO=${carbonAttachedToO}`);
   }
 
   if (carbonAttachedToO === -1) {
@@ -1048,12 +977,7 @@ export function nameAlkoxySubstituent(
   const attachedCarbon = molecule.atoms[carbonAttachedToO];
   if (attachedCarbon && attachedCarbon.aromatic) {
     // This is an aryloxy substituent (e.g., phenoxy, 4-chlorophenoxy)
-    return nameAryloxySubstituent(
-      molecule,
-      substituentAtoms,
-      oxygenAtomIdx,
-      carbonAttachedToO,
-    );
+    return nameAryloxySubstituent(molecule, substituentAtoms, oxygenAtomIdx, carbonAttachedToO);
   }
 
   // Special case: check for common branched patterns
@@ -1072,9 +996,7 @@ export function nameAlkoxySubstituent(
     // If first carbon has 3 carbon neighbors, it's tert-butoxy
     const carbonNeighbors = neighbors.filter((b) => {
       const otherAtom = b.atom1 === firstCarbon ? b.atom2 : b.atom1;
-      return (
-        molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx
-      );
+      return molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx;
     });
 
     if (carbonNeighbors.length === 3) {
@@ -1110,9 +1032,7 @@ export function nameAlkoxySubstituent(
 
     const carbonNeighbors = neighbors.filter((b) => {
       const otherAtom = b.atom1 === firstCarbon ? b.atom2 : b.atom1;
-      return (
-        molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx
-      );
+      return molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx;
     });
 
     if (carbonNeighbors.length === 2) {
@@ -1149,9 +1069,7 @@ export function nameAlkoxySubstituent(
 
     const firstCarbonNeighbors = firstCarbonBonds.filter((b) => {
       const otherAtom = b.atom1 === firstCarbon ? b.atom2 : b.atom1;
-      return (
-        molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx
-      );
+      return molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== oxygenAtomIdx;
     });
 
     // If first carbon has only 1 carbon neighbor, check if that's a tert-butyl
@@ -1169,9 +1087,7 @@ export function nameAlkoxySubstituent(
 
       const secondCarbonNeighbors = secondCarbonBonds.filter((b) => {
         const otherAtom = b.atom1 === secondCarbon ? b.atom2 : b.atom1;
-        return (
-          molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== firstCarbon
-        );
+        return molecule.atoms[otherAtom]?.symbol === "C" && otherAtom !== firstCarbon;
       });
 
       // If second carbon has 3 carbon neighbors, it's 2,2-dimethylpropoxy

@@ -284,9 +284,7 @@ export function bfs<TNode, TEdge>(
  * @param graph The graph to analyze
  * @returns Array of arrays, where each subarray contains node IDs in one component
  */
-export function findConnectedComponents<TNode, TEdge>(
-  graph: Graph<TNode, TEdge>,
-): number[][] {
+export function findConnectedComponents<TNode, TEdge>(graph: Graph<TNode, TEdge>): number[][] {
   const visited = new Set<number>();
   const components: number[][] = [];
 
@@ -316,9 +314,7 @@ export function findShortestPath<TNode, TEdge>(
   if (startNode === endNode) return [startNode];
 
   const visited = new Set<number>();
-  const queue: { node: number; path: number[] }[] = [
-    { node: startNode, path: [startNode] },
-  ];
+  const queue: { node: number; path: number[] }[] = [{ node: startNode, path: [startNode] }];
   visited.add(startNode);
 
   while (queue.length > 0) {
@@ -354,9 +350,7 @@ export function getDistance<TNode, TEdge>(
   if (startNode === endNode) return 0;
 
   const visited = new Set<number>();
-  const queue: { node: number; distance: number }[] = [
-    { node: startNode, distance: 0 },
-  ];
+  const queue: { node: number; distance: number }[] = [{ node: startNode, distance: 0 }];
   visited.add(startNode);
 
   while (queue.length > 0) {
@@ -451,9 +445,7 @@ export function findSSSR<TNode, TEdge>(graph: Graph<TNode, TEdge>): number[][] {
  * @param graph The graph to analyze
  * @returns Array of cycles, where each cycle is an array of node IDs
  */
-export function findCycles<TNode, TEdge>(
-  graph: Graph<TNode, TEdge>,
-): number[][] {
+export function findCycles<TNode, TEdge>(graph: Graph<TNode, TEdge>): number[][] {
   const cycles: number[][] = [];
   const nodes = graph.getNodes();
 
@@ -549,8 +541,7 @@ function normalizeCycle(cycle: number[]): number[] {
   if (cycle.length === 0) return cycle;
 
   // Check if cycle has closing duplicate
-  const hasClosingDuplicate =
-    cycle.length > 1 && cycle[0]! === cycle[cycle.length - 1]!;
+  const hasClosingDuplicate = cycle.length > 1 && cycle[0]! === cycle[cycle.length - 1]!;
 
   // Remove the closing duplicate if present
   const uniqueCycle = hasClosingDuplicate ? cycle.slice(0, -1) : cycle;
@@ -619,10 +610,7 @@ function findSmallCycles<TNode, TEdge>(
             // Check for duplicates
             let isDuplicate = false;
             for (const existing of cycles) {
-              if (
-                existing.length === normalized.length &&
-                existing.join(",") === key
-              ) {
+              if (existing.length === normalized.length && existing.join(",") === key) {
                 isDuplicate = true;
                 break;
               }
@@ -698,10 +686,7 @@ export function findBiconnectedComponents<TNode, TEdge>(
         const parentU = parent.get(u);
         const vLow2 = low.get(v)!;
         const uDisc = disc.get(u)!;
-        if (
-          (parentU === undefined && children > 1) ||
-          (parentU !== undefined && vLow2 >= uDisc)
-        ) {
+        if ((parentU === undefined && children > 1) || (parentU !== undefined && vLow2 >= uDisc)) {
           articulationPoints.add(u);
 
           const component: [number, number][] = [];
@@ -748,9 +733,7 @@ export function findBiconnectedComponents<TNode, TEdge>(
   };
 }
 
-export function findBridges<TNode, TEdge>(
-  graph: Graph<TNode, TEdge>,
-): [number, number][] {
+export function findBridges<TNode, TEdge>(graph: Graph<TNode, TEdge>): [number, number][] {
   const nodes = graph.getNodes();
   if (nodes.length === 0) {
     return [];

@@ -6,9 +6,7 @@ import { assertMatchesEqual } from "./comparison-framework";
 function testPattern(rdkit: any, pattern: string, smiles: string) {
   const smartsPattern = parseSMARTS(pattern);
   if (smartsPattern.errors && smartsPattern.errors.length > 0) {
-    throw new Error(
-      `Failed to parse SMARTS pattern ${pattern}: ${smartsPattern.errors}`,
-    );
+    throw new Error(`Failed to parse SMARTS pattern ${pattern}: ${smartsPattern.errors}`);
   }
 
   const parsed = parseSMILES(smiles);
@@ -17,11 +15,9 @@ function testPattern(rdkit: any, pattern: string, smiles: string) {
   }
 
   const rdkitResult = getSubstructMatches(rdkit, smiles, pattern);
-  const openchemResult = matchSMARTS(
-    smartsPattern.pattern!,
-    parsed.molecules[0]!,
-    { uniqueMatches: true },
-  );
+  const openchemResult = matchSMARTS(smartsPattern.pattern!, parsed.molecules[0]!, {
+    uniqueMatches: true,
+  });
   const openchemMatches = openchemResult.matches.map((match) =>
     match.atoms.map((a) => a.moleculeIndex),
   );

@@ -61,16 +61,12 @@ describe("Parentheses Wrapping Rules", () => {
   describe("Complex yl groups (SHOULD wrap)", () => {
     it("should wrap 2-methylbutan-2-yl", () => {
       expect(shouldWrapSubstituent("2-methylbutan-2-yl")).toBe(true);
-      expect(wrapSubstituent("2-methylbutan-2-yl")).toBe(
-        "(2-methylbutan-2-yl)",
-      );
+      expect(wrapSubstituent("2-methylbutan-2-yl")).toBe("(2-methylbutan-2-yl)");
     });
 
     it("should wrap 3-methylpentan-2-yl", () => {
       expect(shouldWrapSubstituent("3-methylpentan-2-yl")).toBe(true);
-      expect(wrapSubstituent("3-methylpentan-2-yl")).toBe(
-        "(3-methylpentan-2-yl)",
-      );
+      expect(wrapSubstituent("3-methylpentan-2-yl")).toBe("(3-methylpentan-2-yl)");
     });
 
     it("should wrap 2-ethylbutan-2-yl", () => {
@@ -82,9 +78,7 @@ describe("Parentheses Wrapping Rules", () => {
   describe("Comma-separated locants (SHOULD wrap)", () => {
     it("should wrap 2,2-dimethylpropyl", () => {
       expect(shouldWrapSubstituent("2,2-dimethylpropyl")).toBe(true);
-      expect(wrapSubstituent("2,2-dimethylpropyl")).toBe(
-        "(2,2-dimethylpropyl)",
-      );
+      expect(wrapSubstituent("2,2-dimethylpropyl")).toBe("(2,2-dimethylpropyl)");
     });
 
     it("should wrap 2,3-dimethylbutyl", () => {
@@ -100,9 +94,7 @@ describe("Parentheses Wrapping Rules", () => {
     });
 
     it("should handle already wrapped substituents", () => {
-      expect(wrapSubstituent("(2-methylbutan-2-yl)")).toBe(
-        "(2-methylbutan-2-yl)",
-      );
+      expect(wrapSubstituent("(2-methylbutan-2-yl)")).toBe("(2-methylbutan-2-yl)");
     });
 
     it("should use square brackets for nested parentheses", () => {
@@ -118,9 +110,7 @@ describe("Parentheses Wrapping Rules", () => {
 
     it("should wrap complex ether with internal digits", () => {
       expect(shouldWrapSubstituent("2-methylbutyloxymethoxy")).toBe(true);
-      expect(wrapSubstituent("2-methylbutyloxymethoxy")).toBe(
-        "(2-methylbutyloxymethoxy)",
-      );
+      expect(wrapSubstituent("2-methylbutyloxymethoxy")).toBe("(2-methylbutyloxymethoxy)");
     });
   });
 

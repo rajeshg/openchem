@@ -23,6 +23,9 @@ Several modules in openchem are derived from or inspired by RDKit's C++ implemen
 3. **LogP Calculation:**
    - `src/utils/logp.ts` — Wildman-Crippen LogP (from `Crippen.cpp`)
 
+4. **Tautomer Scoring:**
+   - `src/utils/tautomer/tautomer-scoring.ts` — Tautomer scoring system (inspired by `MolStandardize/Tautomer.cpp`)
+
 ### License
 
 ```

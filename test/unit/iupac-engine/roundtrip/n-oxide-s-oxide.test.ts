@@ -130,12 +130,8 @@ describe("N-oxide and S-oxide Compounds - SMILES Round-Trip Validation", () => {
       const sulfone = parseSMILES("CS(=O)(=O)C").molecules[0]!;
 
       // Sulfoxide has 1 oxygen, sulfone has 2
-      const sulfoxideOxygens = sulfoxide.atoms.filter(
-        (a) => a.atomicNumber === 8,
-      ).length;
-      const sulfoneOxygens = sulfone.atoms.filter(
-        (a) => a.atomicNumber === 8,
-      ).length;
+      const sulfoxideOxygens = sulfoxide.atoms.filter((a) => a.atomicNumber === 8).length;
+      const sulfoneOxygens = sulfone.atoms.filter((a) => a.atomicNumber === 8).length;
 
       expect(sulfoxideOxygens).toBe(1);
       expect(sulfoneOxygens).toBe(2);
@@ -150,12 +146,8 @@ describe("N-oxide and S-oxide Compounds - SMILES Round-Trip Validation", () => {
       const reparsedSulfoxide = parseSMILES(sulfoxideSmiles).molecules[0]!;
       const reparsedSulfone = parseSMILES(sulfoneSmiles).molecules[0]!;
 
-      expect(
-        reparsedSulfoxide.atoms.filter((a) => a.atomicNumber === 8).length,
-      ).toBe(1);
-      expect(
-        reparsedSulfone.atoms.filter((a) => a.atomicNumber === 8).length,
-      ).toBe(2);
+      expect(reparsedSulfoxide.atoms.filter((a) => a.atomicNumber === 8).length).toBe(1);
+      expect(reparsedSulfone.atoms.filter((a) => a.atomicNumber === 8).length).toBe(2);
     });
   });
 
@@ -199,9 +191,7 @@ describe("N-oxide and S-oxide Compounds - SMILES Round-Trip Validation", () => {
       const sulfur = mol.atoms.find((a) => a.atomicNumber === 16);
       expect(sulfur).toBeDefined();
 
-      const sulfurBonds = mol.bonds.filter(
-        (b) => b.atom1 === sulfur!.id || b.atom2 === sulfur!.id,
-      );
+      const sulfurBonds = mol.bonds.filter((b) => b.atom1 === sulfur!.id || b.atom2 === sulfur!.id);
       expect(sulfurBonds.length).toBe(3); // 2 C-S + 1 S=O
     });
 
@@ -210,9 +200,7 @@ describe("N-oxide and S-oxide Compounds - SMILES Round-Trip Validation", () => {
       const sulfur = mol.atoms.find((a) => a.atomicNumber === 16);
       expect(sulfur).toBeDefined();
 
-      const sulfurBonds = mol.bonds.filter(
-        (b) => b.atom1 === sulfur!.id || b.atom2 === sulfur!.id,
-      );
+      const sulfurBonds = mol.bonds.filter((b) => b.atom1 === sulfur!.id || b.atom2 === sulfur!.id);
       expect(sulfurBonds.length).toBe(4); // 2 C-S + 2 S=O
     });
   });

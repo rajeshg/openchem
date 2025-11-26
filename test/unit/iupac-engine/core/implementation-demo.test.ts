@@ -48,9 +48,7 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
     expect(ruleIds).toContain("P-51.1"); // Substitutive nomenclature
     expect(ruleIds).toContain("P-14.2"); // Lowest locant set
 
-    console.log(
-      `✓ Implemented ${rules.length} rules across ${layers.length} layers`,
-    );
+    console.log(`✓ Implemented ${rules.length} rules across ${layers.length} layers`);
   });
 
   test("should demonstrate immutable context with traceable execution", () => {
@@ -100,9 +98,7 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
       expect(firstTrace.ruleId).toBe("P-44.3.1");
       expect(firstTrace.blueBookSection).toBe("P-44.3.1");
       expect(firstTrace.phase).toBe(ExecutionPhase.PARENT_STRUCTURE);
-      expect(firstTrace.description).toBe(
-        "Selected 3-carbon chain from candidates",
-      );
+      expect(firstTrace.description).toBe("Selected 3-carbon chain from candidates");
     }
 
     // Verify phase completion
@@ -141,9 +137,7 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
       expect(rule.priority).toBeGreaterThan(0);
     }
 
-    console.log(
-      "✓ Blue Book rule implementation follows official IUPAC structure",
-    );
+    console.log("✓ Blue Book rule implementation follows official IUPAC structure");
   });
 
   test("should demonstrate complete layer architecture", () => {
@@ -151,20 +145,12 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
       {
         phase: "atomic",
         description: "Basic atomic analysis",
-        expectedRules: [
-          "atomic-valence",
-          "atomic-hybridization",
-          "atomic-aromatic",
-        ],
+        expectedRules: ["atomic-valence", "atomic-hybridization", "atomic-aromatic"],
       },
       {
         phase: "functional-groups",
         description: "Functional group detection",
-        expectedRules: [
-          "carboxylic-acid-detection",
-          "alcohol-detection",
-          "ketone-detection",
-        ],
+        expectedRules: ["carboxylic-acid-detection", "alcohol-detection", "ketone-detection"],
       },
       {
         phase: "nomenclature-method",
@@ -184,10 +170,7 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
       {
         phase: "name-assembly",
         description: "Final name construction",
-        expectedRules: [
-          "substituent-alphabetization",
-          "complete-name-assembly",
-        ],
+        expectedRules: ["substituent-alphabetization", "complete-name-assembly"],
       },
     ];
 
@@ -195,9 +178,7 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
       console.log(`✓ ${layerPhase.phase}: ${layerPhase.description}`);
     }
 
-    console.log(
-      "✓ Complete layer architecture implemented per Blue Book hierarchy",
-    );
+    console.log("✓ Complete layer architecture implemented per Blue Book hierarchy");
   });
 
   test("should demonstrate contract-based validation", () => {
@@ -222,23 +203,16 @@ describe("Complete IUPAC Rule Engine Implementation", () => {
 describe("IUPAC Engine Implementation Summary", () => {
   test("should provide implementation overview", () => {
     const implementationStatus = {
-      "Core Infrastructure":
-        "✓ Complete - Immutable context, phase controller, rule engine",
-      "Blue Book Rules":
-        "✓ Implemented - P-44.3, P-51, P-14 series with proper citations",
-      "Layer Architecture":
-        "✓ Complete - 8 layers following Blue Book hierarchy",
+      "Core Infrastructure": "✓ Complete - Immutable context, phase controller, rule engine",
+      "Blue Book Rules": "✓ Implemented - P-44.3, P-51, P-14 series with proper citations",
+      "Layer Architecture": "✓ Complete - 8 layers following Blue Book hierarchy",
       "Functional Groups": "✓ Implemented - Priority detection per Table 5.1",
       "Chain Selection": "✓ Complete - Full P-44.3 hierarchy with tie-breaking",
       "Ring Analysis": "✓ Implemented - P-44.2, P-44.4 with seniority rules",
-      "Numbering Phase":
-        "✓ Implemented - P-14.2-14.4 with lowest locant principle",
-      "Name Assembly":
-        "✓ Implemented - Alphabetization, multiplicative prefixes",
-      Traceability:
-        "✓ Complete - Full rule execution history with Blue Book citations",
-      "Contract Validation":
-        "✓ Implemented - Layer dependencies and outputs verified",
+      "Numbering Phase": "✓ Implemented - P-14.2-14.4 with lowest locant principle",
+      "Name Assembly": "✓ Implemented - Alphabetization, multiplicative prefixes",
+      Traceability: "✓ Complete - Full rule execution history with Blue Book citations",
+      "Contract Validation": "✓ Implemented - Layer dependencies and outputs verified",
     };
 
     console.log("\n=== IUPAC Rule Engine Implementation Status ===");
@@ -248,15 +222,11 @@ describe("IUPAC Engine Implementation Summary", () => {
 
     console.log("\n=== Key Features ===");
     console.log("• Blue Book Aligned: Direct citations and rule references");
-    console.log(
-      "• Immutable Context: Functional transitions with full traceability",
-    );
+    console.log("• Immutable Context: Functional transitions with full traceability");
     console.log("• Phase-Based: Explicit execution phases prevent conflicts");
     console.log("• Contract-Based: Clear dependencies and validation");
     console.log("• Comprehensive: P-44, P-51, P-14 series implemented");
-    console.log(
-      "• Educational: Complete trace history for debugging and learning",
-    );
+    console.log("• Educational: Complete trace history for debugging and learning");
 
     // Verify we have significant implementation
     const totalFeatures = Object.keys(implementationStatus).length;

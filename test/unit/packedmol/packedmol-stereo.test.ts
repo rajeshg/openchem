@@ -38,9 +38,7 @@ describe("PackedMol Stereo Encoding/Decoding", () => {
     });
 
     it("preserves chirality in complex molecules", () => {
-      const result = parseSMILES(
-        "CC(=O)O[C@H]1[C@@H](C)[C@H](O)[C@@H](C)[C@H]1O",
-      ); // Multiple chiral centers
+      const result = parseSMILES("CC(=O)O[C@H]1[C@@H](C)[C@H](O)[C@@H](C)[C@H]1O"); // Multiple chiral centers
       expect(result.errors.length).toBe(0);
 
       const mol = result.molecules[0]!;
@@ -62,9 +60,7 @@ describe("PackedMol Stereo Encoding/Decoding", () => {
       expect(result.errors.length).toBe(0);
 
       const mol = result.molecules[0]!;
-      const stereoBonds = mol.bonds.filter(
-        (b) => b.stereo !== "none" && b.type === "double",
-      );
+      const stereoBonds = mol.bonds.filter((b) => b.stereo !== "none" && b.type === "double");
 
       if (stereoBonds.length > 0) {
         const packed = encodePackedMol(mol);

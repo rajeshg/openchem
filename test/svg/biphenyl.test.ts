@@ -39,10 +39,7 @@ describe("Biphenyl Rendering", () => {
 
     // Check that no coordinates are duplicated, except for the connecting atoms
     const coordSet = new Set<string>();
-    const connectingAtomIds = new Set([
-      interRingBonds[0]!.atom1,
-      interRingBonds[0]!.atom2,
-    ]);
+    const connectingAtomIds = new Set([interRingBonds[0]!.atom1, interRingBonds[0]!.atom2]);
 
     coords.forEach((coord, idx) => {
       if (coord) {
@@ -68,19 +65,14 @@ describe("Biphenyl Rendering", () => {
     });
 
     // Calculate centroids of both rings
-    const ring0CenterX =
-      ring0Coords.reduce((sum, c) => sum + (c?.x || 0), 0) / ring0Coords.length;
-    const ring0CenterY =
-      ring0Coords.reduce((sum, c) => sum + (c?.y || 0), 0) / ring0Coords.length;
-    const ring1CenterX =
-      ring1Coords.reduce((sum, c) => sum + (c?.x || 0), 0) / ring1Coords.length;
-    const ring1CenterY =
-      ring1Coords.reduce((sum, c) => sum + (c?.y || 0), 0) / ring1Coords.length;
+    const ring0CenterX = ring0Coords.reduce((sum, c) => sum + (c?.x || 0), 0) / ring0Coords.length;
+    const ring0CenterY = ring0Coords.reduce((sum, c) => sum + (c?.y || 0), 0) / ring0Coords.length;
+    const ring1CenterX = ring1Coords.reduce((sum, c) => sum + (c?.x || 0), 0) / ring1Coords.length;
+    const ring1CenterY = ring1Coords.reduce((sum, c) => sum + (c?.y || 0), 0) / ring1Coords.length;
 
     // Rings should be separated by a reasonable distance
     const distance = Math.sqrt(
-      Math.pow(ring1CenterX - ring0CenterX, 2) +
-        Math.pow(ring1CenterY - ring0CenterY, 2),
+      Math.pow(ring1CenterX - ring0CenterX, 2) + Math.pow(ring1CenterY - ring0CenterY, 2),
     );
     expect(distance).toBeGreaterThan(30); // Should be roughly one bond length apart
 

@@ -81,10 +81,7 @@ describe("SDF Integration Tests", () => {
 
     const lines = sdfResult.sdf.split("\n");
     const atomBlockStart = 3;
-    const atomLines = lines.slice(
-      atomBlockStart,
-      atomBlockStart + molecule.atoms.length,
-    );
+    const atomLines = lines.slice(atomBlockStart, atomBlockStart + molecule.atoms.length);
 
     const hasStereoParity = atomLines.some((line) => {
       const stereoParity = parseInt(line.substring(39, 42).trim());
@@ -110,9 +107,7 @@ describe("SDF Integration Tests", () => {
 
     const reimportResult = parseMolfile(molblock);
     expect(reimportResult.errors).toEqual([]);
-    expect(
-      reimportResult.molecule?.bonds.some((b) => b.type === "aromatic"),
-    ).toBe(true);
+    expect(reimportResult.molecule?.bonds.some((b) => b.type === "aromatic")).toBe(true);
   });
 
   it("exports disconnected fragments", () => {

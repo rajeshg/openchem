@@ -17,9 +17,7 @@ export const P51_3_SKELETAL_REPLACEMENT_RULE: IUPACRule = {
   priority: RulePriority.EIGHT, // 80 - High priority for heteroatoms
   conditions: (context: ImmutableNamingContext) => {
     const state = context.getState();
-    const functionalGroups = Array.isArray(state.functionalGroups)
-      ? state.functionalGroups
-      : [];
+    const functionalGroups = Array.isArray(state.functionalGroups) ? state.functionalGroups : [];
     const atomicAnalysis = context.getState().atomicAnalysis;
 
     // Don't override if a method has already been selected

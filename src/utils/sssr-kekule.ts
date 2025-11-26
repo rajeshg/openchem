@@ -42,9 +42,7 @@ function buildSpanningTreeOptimized(
         // Back edge: connection to already-visited node
         // Normalize edge direction to avoid duplicates
         const edgeKey = [Math.min(next, node), Math.max(next, node)] as const;
-        if (
-          !backEdges.some((e) => e[0] === edgeKey[0] && e[1] === edgeKey[1])
-        ) {
+        if (!backEdges.some((e) => e[0] === edgeKey[0] && e[1] === edgeKey[1])) {
           backEdges.push([edgeKey[0], edgeKey[1]]);
         }
       }
@@ -138,11 +136,7 @@ function extractFundamentalCycle(
 // 3. Combine and deduplicate all cycles for SSSR selection
 //
 // Chemistry constraint: Ring atoms must have degree >= 2, so we skip degree-1 atoms.
-export function findAllCycles(
-  atoms: Atom[],
-  bonds: Bond[],
-  maxLen: number = 40,
-): number[][] {
+export function findAllCycles(atoms: Atom[], bonds: Bond[], maxLen: number = 40): number[][] {
   const n = atoms.length;
   const m = bonds.length;
 
@@ -175,12 +169,7 @@ export function findAllCycles(
 
   for (const [u, v] of treeResult.backEdges) {
     try {
-      const cycle = extractFundamentalCycle(
-        u,
-        v,
-        treeResult.parent,
-        treeResult.ancestors,
-      );
+      const cycle = extractFundamentalCycle(u, v, treeResult.parent, treeResult.ancestors);
 
       if (cycle && cycle.length <= maxLen && cycle.length >= 3) {
         // Normalize: sort atom IDs
@@ -220,8 +209,9 @@ function _findSmallCyclesBFS(
 
   for (const start of atoms.map((a) => a.id)) {
     // BFS from start node
-    const queue: Array<{ node: number; path: number[]; pathSet: Set<number> }> =
-      [{ node: start, path: [start], pathSet: new Set([start]) }];
+    const queue: Array<{ node: number; path: number[]; pathSet: Set<number> }> = [
+      { node: start, path: [start], pathSet: new Set([start]) },
+    ];
 
     while (queue.length > 0) {
       const { node, path, pathSet } = queue.shift()!;
@@ -331,10 +321,7 @@ class GF2Matrix {
     return true;
   }
 
-  private xorRows(
-    target: Map<number, boolean>,
-    source: Map<number, boolean>,
-  ): void {
+  private xorRows(target: Map<number, boolean>, source: Map<number, boolean>): void {
     for (const [col, val] of source) {
       if (target.has(col)) {
         if (val) {
@@ -347,10 +334,7 @@ class GF2Matrix {
   }
 }
 
-function isLinearlyIndependent(
-  newEdges: Set<string>,
-  matrix: GF2Matrix,
-): boolean {
+function isLinearlyIndependent(newEdges: Set<string>, matrix: GF2Matrix): boolean {
   return matrix.addRow(newEdges);
 }
 
@@ -362,9 +346,7 @@ export function findSSSR_Kekule(atoms: Atom[], bonds: Bond[]): number[][] {
   const ringCount = numEdges - numNodes + 1;
   if (ringCount <= 0) return [];
   const allCycles = findAllCycles(atoms, bonds);
-  allCycles.sort(
-    (a, b) => a.length - b.length || a.join(",").localeCompare(b.join(",")),
-  );
+  allCycles.sort((a, b) => a.length - b.length || a.join(",").localeCompare(b.join(",")));
 
   const sssr: number[][] = [];
   const matrix = new GF2Matrix();

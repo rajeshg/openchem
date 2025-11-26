@@ -85,10 +85,7 @@ function parsePropertyBlock(lines: string[]): Record<string, string> {
   const saveProperty = () => {
     if (currentKey === null) return;
 
-    while (
-      valueLines.length > 0 &&
-      valueLines[valueLines.length - 1]!.trim() === ""
-    ) {
+    while (valueLines.length > 0 && valueLines[valueLines.length - 1]!.trim() === "") {
       valueLines.pop();
     }
 

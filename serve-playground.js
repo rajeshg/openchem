@@ -6,8 +6,7 @@ const server = Bun.serve({
   port: 3000,
   async fetch(req) {
     const url = new URL(req.url);
-    let filePath =
-      url.pathname === "/" ? "/smiles-playground.html" : url.pathname;
+    let filePath = url.pathname === "/" ? "/smiles-playground.html" : url.pathname;
 
     // accept error reports from the playground (browser) so we can log import failures
     if (url.pathname === "/__import_error" && req.method === "POST") {

@@ -171,9 +171,8 @@ function processAlkanes(xmlContent: string): Partial<ExtractedRules> {
       if (category && result.alkaneStemComponents) {
         for (const token of list.tokens) {
           if (token.aliases.length > 0) {
-            result.alkaneStemComponents[
-              category as "units" | "tens" | "hundreds"
-            ][token.value] = token.aliases.join("|");
+            result.alkaneStemComponents[category as "units" | "tens" | "hundreds"][token.value] =
+              token.aliases.join("|");
           }
         }
       }
@@ -200,13 +199,7 @@ function processMultipliers(xmlContent: string): Partial<ExtractedRules> {
   const lists = extractTokenLists(xmlContent);
 
   for (const list of lists) {
-    let category:
-      | "basic"
-      | "group"
-      | "vonBaeyer"
-      | "ringAssembly"
-      | "fractional"
-      | null = null;
+    let category: "basic" | "group" | "vonBaeyer" | "ringAssembly" | "fractional" | null = null;
 
     if (list.tagname === "multiplier") {
       if (list.type === "basic") {
@@ -323,9 +316,7 @@ function processRingSystems(xmlContent: string): Partial<ExtractedRules> {
         // If entry exists, merge aliases
         if (result.ringSystems![smiles]) {
           const existing = result.ringSystems![smiles];
-          const newAliases = token.aliases.filter(
-            (a) => !existing.aliases.includes(a),
-          );
+          const newAliases = token.aliases.filter((a) => !existing.aliases.includes(a));
           existing.aliases.push(...newAliases);
         } else {
           result.ringSystems![smiles] = {
@@ -386,9 +377,7 @@ function extractAllRules(): ExtractedRules {
             if (rules.ringSystems[smiles]) {
               // Merge aliases
               const existing = rules.ringSystems[smiles];
-              const newAliases = data.aliases.filter(
-                (a) => !existing.aliases.includes(a),
-              );
+              const newAliases = data.aliases.filter((a) => !existing.aliases.includes(a));
               existing.aliases.push(...newAliases);
             } else {
               rules.ringSystems[smiles] = data;
@@ -423,22 +412,12 @@ function main() {
   console.log(`\n✓ Successfully extracted rules to ${outputPath}`);
   console.log("\nExtracted data:");
   console.log(`  Alkanes: ${Object.keys(rules.alkanes).length} entries`);
-  console.log(
-    `  Multipliers (basic): ${Object.keys(rules.multipliers.basic).length} entries`,
-  );
-  console.log(
-    `  Multipliers (group): ${Object.keys(rules.multipliers.group).length} entries`,
-  );
+  console.log(`  Multipliers (basic): ${Object.keys(rules.multipliers.basic).length} entries`);
+  console.log(`  Multipliers (group): ${Object.keys(rules.multipliers.group).length} entries`);
   console.log(`  Suffixes: ${Object.keys(rules.suffixes).length} entries`);
-  console.log(
-    `  Substituents: ${Object.keys(rules.substituents).length} entries`,
-  );
-  console.log(
-    `  Functional groups: ${Object.keys(rules.functionalGroups).length} entries`,
-  );
-  console.log(
-    `  Ring systems: ${Object.keys(rules.ringSystems).length} entries`,
-  );
+  console.log(`  Substituents: ${Object.keys(rules.substituents).length} entries`);
+  console.log(`  Functional groups: ${Object.keys(rules.functionalGroups).length} entries`);
+  console.log(`  Ring systems: ${Object.keys(rules.ringSystems).length} entries`);
 }
 
 main();

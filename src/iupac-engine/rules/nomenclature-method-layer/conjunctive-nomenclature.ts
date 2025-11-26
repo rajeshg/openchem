@@ -11,8 +11,7 @@ import { NomenclatureMethod, ExecutionPhase } from "../../immutable-context";
 export const CONJUNCTIVE_NOMENCLATURE_RULE: IUPACRule = {
   id: "conjunctive",
   name: "Conjunctive Nomenclature Method",
-  description:
-    "Select conjunctive nomenclature for fused systems (special cases)",
+  description: "Select conjunctive nomenclature for fused systems (special cases)",
   blueBookReference: "P-51 - Special cases",
   priority: RulePriority.SIX, // 60 - Mid priority for fused rings
   conditions: (context: ImmutableNamingContext) => {
@@ -25,9 +24,7 @@ export const CONJUNCTIVE_NOMENCLATURE_RULE: IUPACRule = {
     }
 
     // Check for fused ring systems
-    return (
-      !!candidateRings && candidateRings.some((ring: RingSystem) => ring.fused)
-    );
+    return !!candidateRings && candidateRings.some((ring: RingSystem) => ring.fused);
   },
   action: (context: ImmutableNamingContext) => {
     return context.withNomenclatureMethod(

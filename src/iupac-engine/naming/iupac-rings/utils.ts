@@ -43,8 +43,7 @@ export function getAlkaneBySize(n: number): string {
 }
 
 export function combineCycloWithSuffix(base: string, suffix: string): string {
-  if (base.endsWith("ane") && /^[aeiou]/.test(suffix))
-    return base.slice(0, -1) + suffix;
+  if (base.endsWith("ane") && /^[aeiou]/.test(suffix)) return base.slice(0, -1) + suffix;
   return base + suffix;
 }
 
@@ -98,9 +97,7 @@ export function buildPerimeterFromRings(fusedSystem: FusedSystem): number[] {
     ordered.push(current);
     visited.add(current);
     const adj = perimeterAdj[String(current)];
-    const neighbors = Array.isArray(adj)
-      ? adj.filter((n: number) => n !== prev)
-      : [];
+    const neighbors = Array.isArray(adj) ? adj.filter((n: number) => n !== prev) : [];
     prev = current;
     current = neighbors.length ? neighbors[0] : undefined;
     if (ordered.length > 1000) break; // safety
@@ -171,9 +168,7 @@ export function classifyFusedSubstituent(
     return { type: "alkyl", size: 2, name: "ethyl" };
   } else if (carbonCount === 3 && atoms.length === 3) {
     return { type: "alkyl", size: 3, name: "propyl" };
-  } else if (
-    atoms.some((atom) => atom.symbol === "O" && atom.hydrogens === 1)
-  ) {
+  } else if (atoms.some((atom) => atom.symbol === "O" && atom.hydrogens === 1)) {
     return { type: "functional", size: 1, name: "hydroxy" };
   } else if (atoms.some((atom) => atom.symbol === "Cl")) {
     return { type: "halo", size: 1, name: "chloro" };
@@ -236,16 +231,11 @@ export function generateClassicPolycyclicName(
 
   // Consider 2 or more rings, all atoms non-aromatic
   if (rings.length < 2) {
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] classic polycyclic: less than 2 rings");
+    if (process.env.VERBOSE) console.log("[VERBOSE] classic polycyclic: less than 2 rings");
     return null;
   }
   const atomIds = Array.isArray(rings)
-    ? Array.from(
-        new Set(
-          rings.flat().filter((idx): idx is number => typeof idx === "number"),
-        ),
-      )
+    ? Array.from(new Set(rings.flat().filter((idx): idx is number => typeof idx === "number")))
     : [];
   const atoms = atomIds
     .map((idx) => molecule.atoms[idx])
@@ -306,23 +296,17 @@ export function generateClassicPolycyclicName(
   const bridgeheads = Object.entries(ringMembership)
     .filter(([idx, count]) => {
       const atomIdx = Number(idx);
-      return (
-        typeof count === "number" && count > 1 && (degree[atomIdx] || 0) >= 3
-      );
+      return typeof count === "number" && count > 1 && (degree[atomIdx] || 0) >= 3;
     })
     .map(([idx]) => Number(idx));
 
   if (process.env.VERBOSE) {
-    console.log(
-      "[VERBOSE] classic polycyclic: ringMembership=",
-      ringMembership,
-    );
+    console.log("[VERBOSE] classic polycyclic: ringMembership=", ringMembership);
     console.log("[VERBOSE] classic polycyclic: degree=", degree);
     console.log("[VERBOSE] classic polycyclic: bridgeheads=", bridgeheads);
   }
   if (bridgeheads.length < 2) {
-    if (process.env.VERBOSE)
-      console.log("[VERBOSE] classic polycyclic: not enough bridgeheads");
+    if (process.env.VERBOSE) console.log("[VERBOSE] classic polycyclic: not enough bridgeheads");
     return null;
   }
 
@@ -379,9 +363,7 @@ export function generateClassicPolycyclicName(
 
     const uniquePaths = paths;
 
-    const bridgeLengths = uniquePaths
-      .map((p) => p.length - 2)
-      .filter((n) => n >= 0);
+    const bridgeLengths = uniquePaths.map((p) => p.length - 2).filter((n) => n >= 0);
     if (bridgeLengths.length >= 3) {
       // Sort paths by length (descending) for von Baeyer numbering
       const pathsWithLengths = uniquePaths.map((p) => ({
@@ -428,10 +410,7 @@ export function generateClassicPolycyclicName(
       }
 
       if (process.env.VERBOSE) {
-        console.log(
-          "[VERBOSE] von Baeyer numbering:",
-          Array.from(vonBaeyerNumbering.entries()),
-        );
+        console.log("[VERBOSE] von Baeyer numbering:", Array.from(vonBaeyerNumbering.entries()));
       }
 
       // Build heteroatom prefix if present
@@ -475,8 +454,7 @@ export function generateClassicPolycyclicName(
           for (const [symbol, positions] of groupedByElement) {
             const positionStr = positions.join(",");
             const count = positions.length;
-            const multiplier =
-              count > 1 ? getSimpleMultiplier(count, opsinService) : "";
+            const multiplier = count > 1 ? getSimpleMultiplier(count, opsinService) : "";
             heteroGroups.push(`${positionStr}-${multiplier}${symbol}`);
           }
           heteroPrefix = heteroGroups.join("-");
@@ -499,10 +477,7 @@ export function generateClassicPolycyclicName(
       };
     }
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] classic polycyclic: did not find 3 bridges",
-        bridgeLengths,
-      );
+      console.log("[VERBOSE] classic polycyclic: did not find 3 bridges", bridgeLengths);
     return null;
   }
 
@@ -519,11 +494,7 @@ export function generateClassicPolycyclicName(
     }
 
     // Helper function to find all paths between two nodes avoiding certain nodes
-    function findAllPaths(
-      start: number,
-      end: number,
-      avoid: Set<number> = new Set(),
-    ): number[][] {
+    function findAllPaths(start: number, end: number, avoid: Set<number> = new Set()): number[][] {
       const paths: number[][] = [];
       const visited = new Set<number>(avoid);
 
@@ -643,20 +614,14 @@ export function generateClassicPolycyclicName(
                 if (j === i) continue;
                 for (let k = 0; k < 3; k++) {
                   if (k === i || k === j) continue;
-                  pathPermutations.push([
-                    rawPaths[i]!,
-                    rawPaths[j]!,
-                    rawPaths[k]!,
-                  ]);
+                  pathPermutations.push([rawPaths[i]!, rawPaths[j]!, rawPaths[k]!]);
                 }
               }
             }
 
             if (process.env.VERBOSE) {
               console.log(`[TRICYCLO] Testing alpha=${alpha}, omega=${omega}`);
-              console.log(
-                `  Found ${pathPermutations.length} path permutations to evaluate`,
-              );
+              console.log(`  Found ${pathPermutations.length} path permutations to evaluate`);
             }
 
             // Test each path permutation
@@ -665,18 +630,10 @@ export function generateClassicPolycyclicName(
               const sortedLengths = [...lengths].sort((a, b) => b - a);
 
               if (process.env.VERBOSE) {
-                console.log(
-                  `  [Permutation] Path1: ${paths[0]!.join(",")} (length=${lengths[0]})`,
-                );
-                console.log(
-                  `  [Permutation] Path2: ${paths[1]!.join(",")} (length=${lengths[1]})`,
-                );
-                console.log(
-                  `  [Permutation] Path3: ${paths[2]!.join(",")} (length=${lengths[2]})`,
-                );
-                console.log(
-                  `  [Permutation] Bridge lengths: [${sortedLengths.join(".")}]`,
-                );
+                console.log(`  [Permutation] Path1: ${paths[0]!.join(",")} (length=${lengths[0]})`);
+                console.log(`  [Permutation] Path2: ${paths[1]!.join(",")} (length=${lengths[1]})`);
+                console.log(`  [Permutation] Path3: ${paths[2]!.join(",")} (length=${lengths[2]})`);
+                console.log(`  [Permutation] Bridge lengths: [${sortedLengths.join(".")}]`);
               }
 
               // Look for secondary bridges between intermediate bridgeheads
@@ -705,10 +662,7 @@ export function generateClassicPolycyclicName(
                     // Direct connection (0-length bridge)?
                     if (adjacency.get(atom1)?.has(atom2)) {
                       const bridge = { length: 0, from: atom1, to: atom2 };
-                      if (
-                        !shortestBridge ||
-                        bridge.length < shortestBridge.length
-                      ) {
+                      if (!shortestBridge || bridge.length < shortestBridge.length) {
                         shortestBridge = bridge;
                       }
                       if (process.env.VERBOSE) {
@@ -724,15 +678,9 @@ export function generateClassicPolycyclicName(
                         usedNodes.add(path[k]!);
                       }
 
-                      const secondaryPaths = findAllPaths(
-                        atom1,
-                        atom2,
-                        usedNodes,
-                      );
+                      const secondaryPaths = findAllPaths(atom1, atom2, usedNodes);
                       if (secondaryPaths.length > 0) {
-                        const minLength = Math.min(
-                          ...secondaryPaths.map((p) => p.length - 2),
-                        );
+                        const minLength = Math.min(...secondaryPaths.map((p) => p.length - 2));
                         if (minLength >= 0 && minLength < j - i - 1) {
                           // Only consider if it's actually a shortcut
                           const bridge = {
@@ -740,10 +688,7 @@ export function generateClassicPolycyclicName(
                             from: atom1,
                             to: atom2,
                           };
-                          if (
-                            !shortestBridge ||
-                            bridge.length < shortestBridge.length
-                          ) {
+                          if (!shortestBridge || bridge.length < shortestBridge.length) {
                             shortestBridge = bridge;
                           }
                           if (process.env.VERBOSE) {
@@ -791,19 +736,12 @@ export function generateClassicPolycyclicName(
                         for (let k = i + 1; k < j; k++) {
                           usedNodes.add(path[k]!);
                         }
-                        const secondaryPaths = findAllPaths(
-                          atom1,
-                          atom2,
-                          usedNodes,
-                        );
+                        const secondaryPaths = findAllPaths(atom1, atom2, usedNodes);
                         if (secondaryPaths.length > 0) {
                           const pathMinLength = Math.min(
                             ...secondaryPaths.map((p) => p.length - 2),
                           );
-                          if (
-                            pathMinLength === minLength &&
-                            pathMinLength < j - i - 1
-                          ) {
+                          if (pathMinLength === minLength && pathMinLength < j - i - 1) {
                             bridgesWithMinLength.push({
                               length: pathMinLength,
                               from: atom1,
@@ -855,9 +793,7 @@ export function generateClassicPolycyclicName(
 
               if (!allHeteroatomsInPaths && heteroatoms.length > 0) {
                 if (process.env.VERBOSE) {
-                  console.log(
-                    `  REJECTED: Not all heteroatoms are in main paths`,
-                  );
+                  console.log(`  REJECTED: Not all heteroatoms are in main paths`);
                 }
                 continue;
               }
@@ -869,20 +805,17 @@ export function generateClassicPolycyclicName(
               tempNumbering.set(alpha, pos++);
               for (let i = 1; i < paths[0]!.length - 1; i++) {
                 const atomIdx = paths[0]![i]!;
-                if (!tempNumbering.has(atomIdx))
-                  tempNumbering.set(atomIdx, pos++);
+                if (!tempNumbering.has(atomIdx)) tempNumbering.set(atomIdx, pos++);
               }
               tempNumbering.set(omega, pos++);
               // Path 2: traverse in REVERSE (from omega back to alpha) to match final numbering
               for (let i = paths[1]!.length - 2; i > 0; i--) {
                 const atomIdx = paths[1]![i]!;
-                if (!tempNumbering.has(atomIdx))
-                  tempNumbering.set(atomIdx, pos++);
+                if (!tempNumbering.has(atomIdx)) tempNumbering.set(atomIdx, pos++);
               }
               for (let i = 1; i < paths[2]!.length - 1; i++) {
                 const atomIdx = paths[2]![i]!;
-                if (!tempNumbering.has(atomIdx))
-                  tempNumbering.set(atomIdx, pos++);
+                if (!tempNumbering.has(atomIdx)) tempNumbering.set(atomIdx, pos++);
               }
 
               // Calculate heteroatom locant sum for comparison (lower is better per IUPAC)
@@ -893,10 +826,7 @@ export function generateClassicPolycyclicName(
                 if (haPos) heteroLocants.push(haPos);
               }
               heteroLocants.sort((a, b) => a - b);
-              const heteroSum = heteroLocants.reduce(
-                (sum, val) => sum + val,
-                0,
-              );
+              const heteroSum = heteroLocants.reduce((sum, val) => sum + val, 0);
 
               if (process.env.VERBOSE) {
                 console.log(`  Temp numbering map:`);
@@ -905,20 +835,14 @@ export function generateClassicPolycyclicName(
                 );
                 for (const [atomIdx, pos] of sortedEntries) {
                   const atom = molecule.atoms[atomIdx];
-                  console.log(
-                    `    pos ${pos} -> atom ${atomIdx} (${atom?.symbol})`,
-                  );
+                  console.log(`    pos ${pos} -> atom ${atomIdx} (${atom?.symbol})`);
                 }
               }
 
               // Calculate principal functional group locants (ketones, aldehydes, etc.)
               const principalLocants: number[] = [];
               const ringAtomSet = new Set(atomIds);
-              for (
-                let atomIdx = 0;
-                atomIdx < molecule.atoms.length;
-                atomIdx++
-              ) {
+              for (let atomIdx = 0; atomIdx < molecule.atoms.length; atomIdx++) {
                 const atom = molecule.atoms[atomIdx];
                 if (!atom || !ringAtomSet.has(atomIdx)) continue;
 
@@ -926,18 +850,10 @@ export function generateClassicPolycyclicName(
                 if (atom.symbol === "C" && atom.hybridization === "sp2") {
                   const carbonylBond = molecule.bonds.find((b) => {
                     const otherAtomIdx =
-                      b.atom1 === atomIdx
-                        ? b.atom2
-                        : b.atom2 === atomIdx
-                          ? b.atom1
-                          : -1;
+                      b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
                     if (otherAtomIdx < 0) return false;
                     const otherAtom = molecule.atoms[otherAtomIdx];
-                    return (
-                      otherAtom &&
-                      otherAtom.symbol === "O" &&
-                      b.type === "double"
-                    );
+                    return otherAtom && otherAtom.symbol === "O" && b.type === "double";
                   });
 
                   if (carbonylBond) {
@@ -945,9 +861,7 @@ export function generateClassicPolycyclicName(
                     if (pos !== undefined) {
                       principalLocants.push(pos);
                       if (process.env.VERBOSE) {
-                        console.log(
-                          `  Ketone at atom ${atomIdx} -> temp position ${pos}`,
-                        );
+                        console.log(`  Ketone at atom ${atomIdx} -> temp position ${pos}`);
                       }
                     }
                   }
@@ -958,11 +872,7 @@ export function generateClassicPolycyclicName(
               // Calculate substituent locants (methyl groups, etc.) for tie-breaking
               // Build a set of functional group atoms to exclude (e.g., C=O oxygen)
               const fgAtomSet = new Set<number>();
-              for (
-                let atomIdx = 0;
-                atomIdx < molecule.atoms.length;
-                atomIdx++
-              ) {
+              for (let atomIdx = 0; atomIdx < molecule.atoms.length; atomIdx++) {
                 const atom = molecule.atoms[atomIdx];
                 if (!atom || !ringAtomSet.has(atomIdx)) continue;
 
@@ -970,37 +880,23 @@ export function generateClassicPolycyclicName(
                 if (atom.symbol === "C" && atom.hybridization === "sp2") {
                   const carbonylBond = molecule.bonds.find((b) => {
                     const otherAtomIdx =
-                      b.atom1 === atomIdx
-                        ? b.atom2
-                        : b.atom2 === atomIdx
-                          ? b.atom1
-                          : -1;
+                      b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
                     if (otherAtomIdx < 0) return false;
                     const otherAtom = molecule.atoms[otherAtomIdx];
-                    return (
-                      otherAtom &&
-                      otherAtom.symbol === "O" &&
-                      b.type === "double"
-                    );
+                    return otherAtom && otherAtom.symbol === "O" && b.type === "double";
                   });
 
                   if (carbonylBond) {
                     // Mark the oxygen as a functional group atom
                     const oxygenIdx =
-                      carbonylBond.atom1 === atomIdx
-                        ? carbonylBond.atom2
-                        : carbonylBond.atom1;
+                      carbonylBond.atom1 === atomIdx ? carbonylBond.atom2 : carbonylBond.atom1;
                     fgAtomSet.add(oxygenIdx);
                   }
                 }
               }
 
               const substituentLocants: number[] = [];
-              for (
-                let atomIdx = 0;
-                atomIdx < molecule.atoms.length;
-                atomIdx++
-              ) {
+              for (let atomIdx = 0; atomIdx < molecule.atoms.length; atomIdx++) {
                 const atom = molecule.atoms[atomIdx];
                 if (!atom || !ringAtomSet.has(atomIdx)) continue;
 
@@ -1047,23 +943,15 @@ export function generateClassicPolycyclicName(
               // Then prefer largest third bridge. Use sortedLengths for consistent scoring across permutations.
               const sumOfTwoLargest = sortedLengths[0]! + sortedLengths[1]!;
               const currentScore =
-                sumOfTwoLargest * 1000000 +
-                sortedLengths[2]! * 10000 +
-                sortedLengths[0]! * 100;
+                sumOfTwoLargest * 1000000 + sortedLengths[2]! * 10000 + sortedLengths[0]! * 100;
 
               if (process.env.VERBOSE) {
                 console.log(
                   `  Heteroatom positions: [${heteroLocants.join(",")}], sum=${heteroSum}`,
                 );
-                console.log(
-                  `  Secondary bridge locants: [${secondaryBridgeLocants.join(",")}]`,
-                );
-                console.log(
-                  `  Principal FG locants: [${principalLocants.join(",")}]`,
-                );
-                console.log(
-                  `  Substituent locants: [${substituentLocants.join(",")}]`,
-                );
+                console.log(`  Secondary bridge locants: [${secondaryBridgeLocants.join(",")}]`);
+                console.log(`  Principal FG locants: [${principalLocants.join(",")}]`);
+                console.log(`  Substituent locants: [${substituentLocants.join(",")}]`);
                 console.log(
                   `  Score: ${currentScore} (sum2=${sumOfTwoLargest}, third=${lengths[2]}, first=${lengths[0]})`,
                 );
@@ -1086,18 +974,14 @@ export function generateClassicPolycyclicName(
                   heteroSum,
                 };
               } else {
-                const bestSumOfTwo =
-                  bestConfig.bridgeLengths[0]! + bestConfig.bridgeLengths[1]!;
+                const bestSumOfTwo = bestConfig.bridgeLengths[0]! + bestConfig.bridgeLengths[1]!;
                 const bestScore =
                   bestSumOfTwo * 1000000 +
                   bestConfig.bridgeLengths[2]! * 10000 +
                   bestConfig.bridgeLengths[0]! * 100;
 
                 // Helper function to compare two arrays lexicographically
-                const compareArrays = (
-                  arr1: number[],
-                  arr2: number[],
-                ): number => {
+                const compareArrays = (arr1: number[], arr2: number[]): number => {
                   const len = Math.min(arr1.length, arr2.length);
                   for (let i = 0; i < len; i++) {
                     if (arr1[i]! < arr2[i]!) return -1;
@@ -1157,10 +1041,8 @@ export function generateClassicPolycyclicName(
                 const bestHeteroLocants = bestConfig.heteroLocants ?? [];
                 let firstHeteroComparison = 0;
                 if (heteroLocants.length > 0 && bestHeteroLocants.length > 0) {
-                  if (heteroLocants[0]! < bestHeteroLocants[0]!)
-                    firstHeteroComparison = -1;
-                  else if (heteroLocants[0]! > bestHeteroLocants[0]!)
-                    firstHeteroComparison = 1;
+                  if (heteroLocants[0]! < bestHeteroLocants[0]!) firstHeteroComparison = -1;
+                  else if (heteroLocants[0]! > bestHeteroLocants[0]!) firstHeteroComparison = 1;
                 } else if (heteroLocants.length > 0) {
                   firstHeteroComparison = -1; // Current has heteroatoms, best doesn't
                 } else if (bestHeteroLocants.length > 0) {
@@ -1194,24 +1076,14 @@ export function generateClassicPolycyclicName(
                   console.log(
                     `    secondaryBridgeLocants: ${JSON.stringify(secondaryBridgeLocants)}`,
                   );
-                  console.log(
-                    `    heteroLocants: ${JSON.stringify(heteroLocants)}`,
-                  );
-                  console.log(
-                    `    principalLocants: ${JSON.stringify(principalLocants)}`,
-                  );
-                  console.log(
-                    `    substituentLocants: ${JSON.stringify(substituentLocants)}`,
-                  );
-                  console.log(
-                    `  Best: alpha=${bestConfig.alpha}, omega=${bestConfig.omega}`,
-                  );
+                  console.log(`    heteroLocants: ${JSON.stringify(heteroLocants)}`);
+                  console.log(`    principalLocants: ${JSON.stringify(principalLocants)}`);
+                  console.log(`    substituentLocants: ${JSON.stringify(substituentLocants)}`);
+                  console.log(`  Best: alpha=${bestConfig.alpha}, omega=${bestConfig.omega}`);
                   console.log(
                     `    secondaryBridgeLocants: ${JSON.stringify(bestConfig.secondaryBridgeLocants)}`,
                   );
-                  console.log(
-                    `    heteroLocants: ${JSON.stringify(bestConfig.heteroLocants)}`,
-                  );
+                  console.log(`    heteroLocants: ${JSON.stringify(bestConfig.heteroLocants)}`);
                   console.log(
                     `    principalLocants: ${JSON.stringify(bestConfig.principalLocants)}`,
                   );
@@ -1229,8 +1101,7 @@ export function generateClassicPolycyclicName(
                   // Step 1: Higher bridge score wins
                   currentScore > bestScore ||
                   // Step 3: Lower secondary bridge locants win (when bridge scores tie)
-                  (currentScore === bestScore &&
-                    secondaryBridgeComparison < 0) ||
+                  (currentScore === bestScore && secondaryBridgeComparison < 0) ||
                   // Step 4: Lower first heteroatom locant wins (when secondary bridges tie)
                   (currentScore === bestScore &&
                     secondaryBridgeComparison === 0 &&
@@ -1340,12 +1211,7 @@ export function generateClassicPolycyclicName(
 
             if (atom.symbol === "C" && atom.hybridization === "sp2") {
               const carbonylBond = molecule.bonds.find((b) => {
-                const otherIdx =
-                  b.atom1 === atomIdx
-                    ? b.atom2
-                    : b.atom2 === atomIdx
-                      ? b.atom1
-                      : -1;
+                const otherIdx = b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
                 if (otherIdx < 0) return false;
                 const other = molecule.atoms[otherIdx];
                 return other && other.symbol === "O" && b.type === "double";
@@ -1367,21 +1233,14 @@ export function generateClassicPolycyclicName(
 
             if (atom.symbol === "C" && atom.hybridization === "sp2") {
               const carbonylBond = molecule.bonds.find((b) => {
-                const otherIdx =
-                  b.atom1 === atomIdx
-                    ? b.atom2
-                    : b.atom2 === atomIdx
-                      ? b.atom1
-                      : -1;
+                const otherIdx = b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
                 if (otherIdx < 0) return false;
                 const other = molecule.atoms[otherIdx];
                 return other && other.symbol === "O" && b.type === "double";
               });
               if (carbonylBond) {
                 const oxygenIdx =
-                  carbonylBond.atom1 === atomIdx
-                    ? carbonylBond.atom2
-                    : carbonylBond.atom1;
+                  carbonylBond.atom1 === atomIdx ? carbonylBond.atom2 : carbonylBond.atom1;
                 fgAtomSet.add(oxygenIdx);
               }
             }
@@ -1389,12 +1248,9 @@ export function generateClassicPolycyclicName(
 
           for (let atomIdx = 0; atomIdx < molecule.atoms.length; atomIdx++) {
             const atom = molecule.atoms[atomIdx];
-            if (!atom || ringAtomSet.has(atomIdx) || fgAtomSet.has(atomIdx))
-              continue;
+            if (!atom || ringAtomSet.has(atomIdx) || fgAtomSet.has(atomIdx)) continue;
 
-            const bonds = molecule.bonds.filter(
-              (b) => b.atom1 === atomIdx || b.atom2 === atomIdx,
-            );
+            const bonds = molecule.bonds.filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
             for (const bond of bonds) {
               const otherIdx = bond.atom1 === atomIdx ? bond.atom2 : bond.atom1;
               if (ringAtomSet.has(otherIdx)) {
@@ -1467,8 +1323,7 @@ export function generateClassicPolycyclicName(
             for (const [symbol, positions] of groupedByElement) {
               const positionStr = positions.join(",");
               const count = positions.length;
-              const multiplier =
-                count > 1 ? getSimpleMultiplier(count, opsinService) : "";
+              const multiplier = count > 1 ? getSimpleMultiplier(count, opsinService) : "";
               heteroGroups.push(`${positionStr}-${multiplier}${symbol}`);
             }
             heteroPrefix = heteroGroups.join("-");
@@ -1479,11 +1334,7 @@ export function generateClassicPolycyclicName(
         const doubleBondLocants: number[] = [];
         const atomIdSet = new Set(atomIds);
         for (const bond of molecule.bonds) {
-          if (
-            bond.type === "double" &&
-            atomIdSet.has(bond.atom1) &&
-            atomIdSet.has(bond.atom2)
-          ) {
+          if (bond.type === "double" && atomIdSet.has(bond.atom1) && atomIdSet.has(bond.atom2)) {
             const pos1 = vonBaeyerNumbering.get(bond.atom1);
             const pos2 = vonBaeyerNumbering.get(bond.atom2);
             if (pos1 !== undefined && pos2 !== undefined) {
@@ -1495,9 +1346,7 @@ export function generateClassicPolycyclicName(
         doubleBondLocants.sort((a, b) => a - b);
 
         if (process.env.VERBOSE && doubleBondLocants.length > 0) {
-          console.log(
-            `[TRICYCLO] Double bonds at positions: ${doubleBondLocants.join(",")}`,
-          );
+          console.log(`[TRICYCLO] Double bonds at positions: ${doubleBondLocants.join(",")}`);
         }
 
         // Build bridge notation with secondary bridges
@@ -1512,18 +1361,12 @@ export function generateClassicPolycyclicName(
               const [minPos, maxPos] = [pos1, pos2].sort((a, b) => a - b);
               return { length: sb.length, minPos, maxPos };
             })
-            .filter(
-              (x): x is { length: number; minPos: number; maxPos: number } =>
-                x !== null,
-            )
+            .filter((x): x is { length: number; minPos: number; maxPos: number } => x !== null)
             .filter((bridge, index, self) => {
               // Deduplicate: keep only first occurrence of each unique bridge (by positions)
               return (
                 index ===
-                self.findIndex(
-                  (b) =>
-                    b.minPos === bridge.minPos && b.maxPos === bridge.maxPos,
-                )
+                self.findIndex((b) => b.minPos === bridge.minPos && b.maxPos === bridge.maxPos)
               );
             })
             .sort((a, b) => a.minPos - b.minPos || a.maxPos - b.maxPos);
@@ -1616,9 +1459,7 @@ export function generateClassicPolycyclicName(
     }
 
     // Remove duplicates and sort
-    const uniqueLengths = Array.from(new Set(bridgeLengths)).sort(
-      (a, b) => b - a,
-    );
+    const uniqueLengths = Array.from(new Set(bridgeLengths)).sort((a, b) => b - a);
 
     if (uniqueLengths.length >= 3) {
       const alkaneName = getAlkaneBySize(atomIds.length);
@@ -1728,16 +1569,10 @@ export function generateClassicPolycyclicName(
           if (atom.symbol === "C" && atom.hybridization === "sp2") {
             const carbonylBond = molecule.bonds.find((b) => {
               const otherAtomIdx =
-                b.atom1 === atomIdx
-                  ? b.atom2
-                  : b.atom2 === atomIdx
-                    ? b.atom1
-                    : -1;
+                b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
               if (otherAtomIdx < 0) return false;
               const otherAtom = molecule.atoms[otherAtomIdx];
-              return (
-                otherAtom && otherAtom.symbol === "O" && b.type === "double"
-              );
+              return otherAtom && otherAtom.symbol === "O" && b.type === "double";
             });
 
             if (carbonylBond) {
@@ -1759,23 +1594,15 @@ export function generateClassicPolycyclicName(
           if (atom.symbol === "C" && atom.hybridization === "sp2") {
             const carbonylBond = molecule.bonds.find((b) => {
               const otherAtomIdx =
-                b.atom1 === atomIdx
-                  ? b.atom2
-                  : b.atom2 === atomIdx
-                    ? b.atom1
-                    : -1;
+                b.atom1 === atomIdx ? b.atom2 : b.atom2 === atomIdx ? b.atom1 : -1;
               if (otherAtomIdx < 0) return false;
               const otherAtom = molecule.atoms[otherAtomIdx];
-              return (
-                otherAtom && otherAtom.symbol === "O" && b.type === "double"
-              );
+              return otherAtom && otherAtom.symbol === "O" && b.type === "double";
             });
 
             if (carbonylBond) {
               const oxygenIdx =
-                carbonylBond.atom1 === atomIdx
-                  ? carbonylBond.atom2
-                  : carbonylBond.atom1;
+                carbonylBond.atom1 === atomIdx ? carbonylBond.atom2 : carbonylBond.atom1;
               fgAtomSet.add(oxygenIdx);
             }
           }
@@ -1839,11 +1666,9 @@ export function generateClassicPolycyclicName(
         principalLocs: number[];
         substituentLocs: number[];
       }): number[] => {
-        return [
-          ...locants.heteroLocs,
-          ...locants.principalLocs,
-          ...locants.substituentLocs,
-        ].sort((a, b) => a - b);
+        return [...locants.heteroLocs, ...locants.principalLocs, ...locants.substituentLocs].sort(
+          (a, b) => a - b,
+        );
       };
 
       // Try all cyclic shifts to find optimal numbering
@@ -1861,19 +1686,13 @@ export function generateClassicPolycyclicName(
       const hasHeteroatoms = originalLocants.heteroLocs.length > 0;
       if (hasHeteroatoms) {
         if (process.env.VERBOSE) {
-          console.log(
-            `[TRICYCLO SHIFT] Heteroatoms present - skipping cyclic shift optimization`,
-          );
+          console.log(`[TRICYCLO SHIFT] Heteroatoms present - skipping cyclic shift optimization`);
         }
         // Keep original numbering - no cyclic shift optimization needed
       } else {
         // Only apply cyclic shift optimization when no heteroatoms are present
         for (let shift = 1; shift < maxPos; shift++) {
-          const shiftedNumbering = applyShift(
-            vonBaeyerNumbering,
-            shift,
-            maxPos,
-          );
+          const shiftedNumbering = applyShift(vonBaeyerNumbering, shift, maxPos);
           const locants = computeLocants(shiftedNumbering);
           const completeSet = getCompleteLocantSet(locants);
 
@@ -1881,9 +1700,7 @@ export function generateClassicPolycyclicName(
             console.log(`[TRICYCLO SHIFT] Evaluating shift${shift}:`);
             console.log(`  Hetero: [${locants.heteroLocs.join(",")}]`);
             console.log(`  Principal: [${locants.principalLocs.join(",")}]`);
-            console.log(
-              `  Substituent: [${locants.substituentLocs.join(",")}]`,
-            );
+            console.log(`  Substituent: [${locants.substituentLocs.join(",")}]`);
             console.log(`  Complete set: [${completeSet.join(",")}]`);
           }
 
@@ -1892,26 +1709,16 @@ export function generateClassicPolycyclicName(
           // hydride and should NOT be minimized during cyclic shift optimization.
           // 1. Principal functional group locants (P-14.3)
           // 2. Complete locant set (P-14.4)
-          const principalComp = compareArrays(
-            locants.principalLocs,
-            bestLocants.principalLocs,
-          );
+          const principalComp = compareArrays(locants.principalLocs, bestLocants.principalLocs);
           const completeSetComp = compareArrays(completeSet, bestCompleteSet);
 
           if (process.env.VERBOSE) {
-            console.log(
-              `  principalComp=${principalComp}, completeSetComp=${completeSetComp}`,
-            );
+            console.log(`  principalComp=${principalComp}, completeSetComp=${completeSetComp}`);
           }
 
-          if (
-            principalComp < 0 ||
-            (principalComp === 0 && completeSetComp < 0)
-          ) {
+          if (principalComp < 0 || (principalComp === 0 && completeSetComp < 0)) {
             if (process.env.VERBOSE) {
-              console.log(
-                `[TRICYCLO SHIFT] shift${shift} is BETTER - updating best`,
-              );
+              console.log(`[TRICYCLO SHIFT] shift${shift} is BETTER - updating best`);
             }
             bestNumbering = shiftedNumbering;
             bestLabel = `shift${shift}`;
@@ -1935,9 +1742,7 @@ export function generateClassicPolycyclicName(
         }
         console.log(`  Hetero: [${bestLocants.heteroLocs.join(",")}]`);
         console.log(`  Principal: [${bestLocants.principalLocs.join(",")}]`);
-        console.log(
-          `  Substituent: [${bestLocants.substituentLocs.join(",")}]`,
-        );
+        console.log(`  Substituent: [${bestLocants.substituentLocs.join(",")}]`);
         console.log(`  Complete set: [${bestCompleteSet.join(",")}]`);
       }
 
@@ -1983,8 +1788,7 @@ export function generateClassicPolycyclicName(
           for (const [symbol, positions] of groupedByElement) {
             const positionStr = positions.join(",");
             const count = positions.length;
-            const multiplier =
-              count > 1 ? getSimpleMultiplier(count, opsinService) : "";
+            const multiplier = count > 1 ? getSimpleMultiplier(count, opsinService) : "";
             heteroGroups.push(`${positionStr}-${multiplier}${symbol}`);
           }
           heteroPrefix = heteroGroups.join("-");
@@ -2003,9 +1807,7 @@ export function generateClassicPolycyclicName(
         );
 
       // Format bridge lengths for von Baeyer notation
-      const bridgeNotation = uniqueLengths
-        .slice(0, Math.min(uniqueLengths.length, 5))
-        .join(".");
+      const bridgeNotation = uniqueLengths.slice(0, Math.min(uniqueLengths.length, 5)).join(".");
 
       const fullPrefix = heteroPrefix ? `${heteroPrefix}${prefix}` : prefix;
 
@@ -2015,15 +1817,11 @@ export function generateClassicPolycyclicName(
       };
     }
     if (process.env.VERBOSE)
-      console.log(
-        "[VERBOSE] classic polycyclic: did not find enough bridges",
-        uniqueLengths,
-      );
+      console.log("[VERBOSE] classic polycyclic: did not find enough bridges", uniqueLengths);
     return null;
   }
 
-  if (process.env.VERBOSE)
-    console.log("[VERBOSE] classic polycyclic: no valid system");
+  if (process.env.VERBOSE) console.log("[VERBOSE] classic polycyclic: no valid system");
   return null;
 }
 
@@ -2034,8 +1832,7 @@ export function findHeteroatomsInRing(
   const atoms = ring.map((idx) => molecule.atoms[idx]).filter((a) => a);
   const counts: Record<string, number> = {};
   atoms.forEach((atom) => {
-    if (atom && atom.symbol !== "C")
-      counts[atom.symbol] = (counts[atom.symbol] || 0) + 1;
+    if (atom && atom.symbol !== "C") counts[atom.symbol] = (counts[atom.symbol] || 0) + 1;
   });
   return Object.entries(counts).map(([symbol, count]) => ({ symbol, count }));
 }

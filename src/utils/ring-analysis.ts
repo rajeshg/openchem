@@ -22,10 +22,7 @@ import { MoleculeGraph } from "./molecular-graph";
  * @complexity O(V × E^2) in worst case; typically much faster for typical molecules
  * @see findSSSR, findMCB
  */
-export function findRings(
-  atoms: readonly Atom[],
-  bonds: readonly Bond[],
-): number[][] {
+export function findRings(atoms: readonly Atom[], bonds: readonly Bond[]): number[][] {
   const rings: number[][] = [];
   const visited = new Set<number>();
   const ringSet = new Set<string>();
@@ -44,12 +41,7 @@ export function findRings(
     const neighbors = bonds
       .filter((b) => b.atom1 === currentId || b.atom2 === currentId)
       .map((b) => (b.atom1 === currentId ? b.atom2 : b.atom1))
-      .filter(
-        (id) =>
-          !visitedEdges.has(
-            `${Math.min(currentId, id)}-${Math.max(currentId, id)}`,
-          ),
-      );
+      .filter((id) => !visitedEdges.has(`${Math.min(currentId, id)}-${Math.max(currentId, id)}`));
 
     for (const neighborId of neighbors) {
       const edgeKey = `${Math.min(currentId, neighborId)}-${Math.max(currentId, neighborId)}`;
@@ -161,10 +153,7 @@ export function ringsShareAtoms(ring1: number[], ring2: number[]): boolean {
  * @complexity O(N²) where N is the number of atoms
  * @see findMCB, findAtomRings
  */
-export function findSSSR(
-  atoms: readonly Atom[],
-  bonds: readonly Bond[],
-): number[][] {
+export function findSSSR(atoms: readonly Atom[], bonds: readonly Bond[]): number[][] {
   const mol: Molecule = { atoms, bonds };
   const mg = new MoleculeGraph(mol);
   return mg.sssr;
@@ -182,19 +171,13 @@ export function findSSSR(
  *
  * @see findSSSR
  */
-export function findMCB(
-  atoms: readonly Atom[],
-  bonds: readonly Bond[],
-): number[][] {
+export function findMCB(atoms: readonly Atom[], bonds: readonly Bond[]): number[][] {
   const mol: Molecule = { atoms, bonds };
   const mg = new MoleculeGraph(mol);
   return mg.sssr;
 }
 
-function _countConnectedComponents(
-  atoms: readonly Atom[],
-  bonds: readonly Bond[],
-): number {
+function _countConnectedComponents(atoms: readonly Atom[], bonds: readonly Bond[]): number {
   const mol: Molecule = { atoms, bonds };
   const mg = new MoleculeGraph(mol);
   return mg.components.length;
@@ -269,8 +252,7 @@ export function classifyRingSystems(
         const [atom1, atom2] = sharedAtoms;
         const areAdjacent = bonds.some(
           (b) =>
-            (b.atom1 === atom1 && b.atom2 === atom2) ||
-            (b.atom1 === atom2 && b.atom2 === atom1),
+            (b.atom1 === atom1 && b.atom2 === atom2) || (b.atom1 === atom2 && b.atom2 === atom1),
         );
         if (areAdjacent) {
           isFused = true;
@@ -291,18 +273,12 @@ export function classifyRingSystems(
     if (isFused && !isBridged && connectedRings.length >= 2) {
       // Check if any pair of connected rings share atoms with each other
       let foundDisconnectedPair = false;
-      for (
-        let k = 0;
-        k < connectedRings.length && !foundDisconnectedPair;
-        k++
-      ) {
+      for (let k = 0; k < connectedRings.length && !foundDisconnectedPair; k++) {
         for (let l = k + 1; l < connectedRings.length; l++) {
           const ringK = rings[connectedRings[k]!]!;
           const ringL = rings[connectedRings[l]!]!;
           const ringKSet = new Set(ringK);
-          const sharedBetweenKL = ringL.filter((atom) =>
-            ringKSet.has(atom),
-          ).length;
+          const sharedBetweenKL = ringL.filter((atom) => ringKSet.has(atom)).length;
 
           if (sharedBetweenKL === 0) {
             // These two rings don't share atoms, but both connect to ring1
@@ -414,14 +390,11 @@ export function analyzeRings(mol: Molecule, mg?: MoleculeGraph): RingInfo {
     ringAtomSet,
     ringBondSet,
     isAtomInRing: (atomId: number) => ringAtomSet.has(atomId),
-    isBondInRing: (atom1: number, atom2: number) =>
-      ringBondSet.has(bondKey(atom1, atom2)),
+    isBondInRing: (atom1: number, atom2: number) => ringBondSet.has(bondKey(atom1, atom2)),
     getRingsContainingAtom: (atomId: number) =>
       rings.filter((_, idx) => ringSetArray[idx]!.has(atomId)),
     areBothAtomsInSameRing: (atom1: number, atom2: number) => {
-      return ringSetArray.some(
-        (ringSet) => ringSet.has(atom1) && ringSet.has(atom2),
-      );
+      return ringSetArray.some((ringSet) => ringSet.has(atom1) && ringSet.has(atom2));
     },
   };
 }
@@ -458,11 +431,7 @@ export function isAtomInRing(atomId: number, rings: number[][]): boolean {
  * @complexity O(R × S) where R is number of rings, S is average ring size
  * @see analyzeRings
  */
-export function isBondInRing(
-  atom1: number,
-  atom2: number,
-  rings: number[][],
-): boolean {
+export function isBondInRing(atom1: number, atom2: number, rings: number[][]): boolean {
   const ringSets = rings.map((r) => new Set(r));
   return ringSets.some((ringSet) => ringSet.has(atom1) && ringSet.has(atom2));
 }
@@ -484,10 +453,7 @@ export function isBondInRing(
  * @complexity O(R × S) where R is number of rings, S is average ring size
  * @see findAtomRings, analyzeRings
  */
-export function getRingsContainingAtom(
-  atomId: number,
-  rings: number[][],
-): number[][] {
+export function getRingsContainingAtom(atomId: number, rings: number[][]): number[][] {
   return rings.filter((ring) => {
     const ringSet = new Set(ring);
     return ringSet.has(atomId);
@@ -511,10 +477,7 @@ export function getRingsContainingAtom(
  * @complexity O(R × S) where R is number of rings, S is average ring size
  * @see findSSSR
  */
-export function getAromaticRings(
-  rings: number[][],
-  atoms: readonly Atom[],
-): number[][] {
+export function getAromaticRings(rings: number[][], atoms: readonly Atom[]): number[][] {
   const atomMap = new Map(atoms.map((a) => [a.id, a]));
   return rings.filter((ring) => {
     return ring.every((atomId) => {
@@ -537,10 +500,7 @@ export function getAromaticRings(
  * @complexity O(S) where S is the ring size
  * @see getRingBonds
  */
-export function getRingAtoms(
-  ring: readonly number[],
-  atoms: readonly Atom[],
-): Atom[] {
+export function getRingAtoms(ring: readonly number[], atoms: readonly Atom[]): Atom[] {
   const atomMap = new Map(atoms.map((a) => [a.id, a]));
   return [...ring].map((id: number) => atomMap.get(id)!);
 }
@@ -558,10 +518,7 @@ export function getRingAtoms(
  * @complexity O(M) where M is the number of bonds
  * @see getRingAtoms
  */
-export function getRingBonds(
-  ring: readonly number[],
-  bonds: readonly Bond[],
-): Bond[] {
+export function getRingBonds(ring: readonly number[], bonds: readonly Bond[]): Bond[] {
   const ringSet = new Set(ring);
   return bonds.filter((b) => ringSet.has(b.atom1) && ringSet.has(b.atom2));
 }
@@ -583,19 +540,13 @@ export function getRingBonds(
  * @complexity O(R²) where R is number of rings
  * @see filterElementaryRings, isPartOfFusedSystem
  */
-export function isCompositeRing(
-  ring: number[],
-  smallerRings: number[][],
-): boolean {
+export function isCompositeRing(ring: number[], smallerRings: number[][]): boolean {
   for (let i = 0; i < smallerRings.length; i++) {
     for (let j = i + 1; j < smallerRings.length; j++) {
       const ring1 = smallerRings[i]!;
       const ring2 = smallerRings[j]!;
       const combined = new Set([...ring1, ...ring2]);
-      if (
-        combined.size === ring.length &&
-        ring.every((id) => combined.has(id))
-      ) {
+      if (combined.size === ring.length && ring.every((id) => combined.has(id))) {
         return true;
       }
     }
@@ -621,9 +572,7 @@ export function isCompositeRing(
  */
 export function filterElementaryRings(allRings: number[][]): number[][] {
   return allRings.filter((ring: number[]) => {
-    const smallerRings = allRings.filter(
-      (r: number[]) => r.length < ring.length,
-    );
+    const smallerRings = allRings.filter((r: number[]) => r.length < ring.length);
     return !isCompositeRing(ring, smallerRings);
   });
 }
@@ -644,10 +593,7 @@ export function filterElementaryRings(allRings: number[][]): number[][] {
  * @complexity O(R × S) where R is number of rings, S is average ring size
  * @see classifyRingSystems, ringsShareAtoms
  */
-export function isPartOfFusedSystem(
-  ring: number[],
-  allRings: number[][],
-): boolean {
+export function isPartOfFusedSystem(ring: number[], allRings: number[][]): boolean {
   const ringSet = new Set(ring);
   for (const otherRing of allRings) {
     if (otherRing === ring) continue;

@@ -62,9 +62,7 @@ export function formatMatchDiff(
   lines.push(
     `openchem matches (${openchem.length}): ${JSON.stringify(normalizeMatches(openchem))}`,
   );
-  lines.push(
-    `RDKit matches (${rdkit.length}): ${JSON.stringify(normalizeMatches(rdkit))}`,
-  );
+  lines.push(`RDKit matches (${rdkit.length}): ${JSON.stringify(normalizeMatches(rdkit))}`);
   return lines.join("\n");
 }
 
@@ -76,12 +74,7 @@ export function assertMatchesEqual(
 ): void {
   const result = compareMatches(openchemMatches, rdkitMatches);
   if (!result.equal) {
-    const diff = formatMatchDiff(
-      openchemMatches,
-      rdkitMatches,
-      pattern,
-      smiles,
-    );
+    const diff = formatMatchDiff(openchemMatches, rdkitMatches, pattern, smiles);
     throw new Error(`${result.message}\n${diff}`);
   }
 }

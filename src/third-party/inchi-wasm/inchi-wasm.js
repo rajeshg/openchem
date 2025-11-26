@@ -34,9 +34,7 @@ const outputMaxBytes = 0x4000;
     inputView.set(encoder.encode(options + "\0"), pOptions);
 
     const result = instance.exports.molfile_to_inchi(pInput, pOptions, pOutput);
-    const outputView = new Uint8Array(
-      memory.buffer.slice(pOutput, pOutput + outputMaxBytes),
-    );
+    const outputView = new Uint8Array(memory.buffer.slice(pOutput, pOutput + outputMaxBytes));
     const o = outputView.subarray(0, outputView.indexOf(0));
     const output = decoder.decode(o);
 
@@ -57,17 +55,13 @@ const outputMaxBytes = 0x4000;
     inputView.set(new TextEncoder().encode(inchi + "\0"), pInput);
 
     const result = instance.exports.inchi_to_inchikey(pInput, pOutput);
-    const outputView = new Uint8Array(
-      memory.buffer.slice(pOutput, pOutput + outputMaxBytes),
-    );
+    const outputView = new Uint8Array(memory.buffer.slice(pOutput, pOutput + outputMaxBytes));
 
     if (result !== 0) {
       throw Error();
     }
 
-    return new TextDecoder().decode(
-      outputView.subarray(0, outputView.indexOf(0)),
-    );
+    return new TextDecoder().decode(outputView.subarray(0, outputView.indexOf(0)));
   };
 
   window.dispatchEvent(new Event("InChIReady"));

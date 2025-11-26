@@ -66,11 +66,7 @@ export function nameAmideSubstituent(
     let next = -1;
     for (const bond of molecule.bonds) {
       const neighbor =
-        bond.atom1 === current
-          ? bond.atom2
-          : bond.atom2 === current
-            ? bond.atom1
-            : -1;
+        bond.atom1 === current ? bond.atom2 : bond.atom2 === current ? bond.atom1 : -1;
       if (
         neighbor !== -1 &&
         !visited.has(neighbor) &&

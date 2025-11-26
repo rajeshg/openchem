@@ -1,10 +1,7 @@
 import type { Molecule } from "types";
 import type { NamingSubstituent } from "../iupac-types";
 import type { RingSystem } from "../../types";
-import {
-  identifyPolycyclicPattern,
-  identifyAdvancedFusedPattern,
-} from "./fused-naming";
+import { identifyPolycyclicPattern, identifyAdvancedFusedPattern } from "./fused-naming";
 import { getNumberingFunction } from "./numbering";
 import { getSimpleMultiplierWithVowel } from "../../opsin-adapter";
 import { getSharedOPSINService } from "../../opsin-service";
@@ -23,12 +20,7 @@ export function generateSubstitutedFusedNameWithIUPACNumbering(
 ): string {
   if (substituents.length === 0) return baseName;
   const numberingFn = getNumberingFunction(baseName);
-  const renumbered = applyNumberingToSubstituents(
-    substituents,
-    numberingFn,
-    fusedSystem,
-    molecule,
-  );
+  const renumbered = applyNumberingToSubstituents(substituents, numberingFn, fusedSystem, molecule);
   const grouped = groupSubstituents(renumbered);
   const prefixes = generatePrefixes(grouped);
   return `${prefixes.join("-")}${baseName}`;
@@ -92,8 +84,7 @@ export function findSubstituentsOnFusedSystem(
 ): NamingSubstituent[] {
   const substituents: NamingSubstituent[] = [];
   const fusedAtoms = new Set<number>();
-  for (const ring of fusedSystem.rings)
-    for (const atomIdx of ring) fusedAtoms.add(atomIdx);
+  for (const ring of fusedSystem.rings) for (const atomIdx of ring) fusedAtoms.add(atomIdx);
   const baseName =
     identifyAdvancedFusedPattern(fusedSystem.rings, molecule) ||
     identifyPolycyclicPattern(fusedSystem.rings, molecule) ||
@@ -102,16 +93,11 @@ export function findSubstituentsOnFusedSystem(
   for (const atomIdx of fusedAtoms) {
     for (const bond of molecule.bonds) {
       let substituentAtomIdx = -1;
-      if (bond.atom1 === atomIdx && !fusedAtoms.has(bond.atom2))
-        substituentAtomIdx = bond.atom2;
+      if (bond.atom1 === atomIdx && !fusedAtoms.has(bond.atom2)) substituentAtomIdx = bond.atom2;
       else if (bond.atom2 === atomIdx && !fusedAtoms.has(bond.atom1))
         substituentAtomIdx = bond.atom1;
       if (substituentAtomIdx >= 0) {
-        const substituentInfo = classifyFusedSubstituent(
-          molecule,
-          substituentAtomIdx,
-          fusedAtoms,
-        );
+        const substituentInfo = classifyFusedSubstituent(molecule, substituentAtomIdx, fusedAtoms);
         if (substituentInfo) {
           substituents.push({
             position: numberingFn(atomIdx, fusedSystem, molecule),
@@ -124,9 +110,7 @@ export function findSubstituentsOnFusedSystem(
     }
   }
   const unique = substituents.filter(
-    (s, i, arr) =>
-      i ===
-      arr.findIndex((x) => x.position === s.position && x.name === s.name),
+    (s, i, arr) => i === arr.findIndex((x) => x.position === s.position && x.name === s.name),
   );
   return unique;
 }
@@ -188,9 +172,7 @@ function classifyFusedSubstituent(
     return { type: "alkyl", size: 2, name: "ethyl" };
   } else if (carbonCount === 3 && atoms.length === 3) {
     return { type: "alkyl", size: 3, name: "propyl" };
-  } else if (
-    atoms.some((atom) => atom.symbol === "O" && atom.hydrogens === 1)
-  ) {
+  } else if (atoms.some((atom) => atom.symbol === "O" && atom.hydrogens === 1)) {
     return { type: "functional", size: 1, name: "hydroxy" };
   } else if (atoms.some((atom) => atom.symbol === "Cl")) {
     return { type: "halo", size: 1, name: "chloro" };
@@ -204,11 +186,7 @@ function classifyFusedSubstituent(
       (idx) => molecule.atoms[idx]?.symbol === "S",
     );
     if (sulfurAtomIdx !== undefined) {
-      const name = nameAlkylSulfanylSubstituent(
-        molecule,
-        substituentAtoms,
-        sulfurAtomIdx,
-      );
+      const name = nameAlkylSulfanylSubstituent(molecule, substituentAtoms, sulfurAtomIdx);
       return { type: "functional", size: substituentAtoms.size, name };
     }
   }
@@ -221,17 +199,13 @@ function classifyFusedSubstituent(
     }
     const alkaneName = ruleEngine.getAlkaneName(carbonCount);
     if (process.env.VERBOSE) {
-      console.log(
-        `[substituents.ts] alkaneName from rule engine: ${alkaneName}`,
-      );
+      console.log(`[substituents.ts] alkaneName from rule engine: ${alkaneName}`);
     }
     if (alkaneName) {
       // Remove "ane" suffix and add "yl" for substituent naming
       const prefix = alkaneName.replace(/ane$/, "");
       if (process.env.VERBOSE) {
-        console.log(
-          `[substituents.ts] prefix after stripping 'ane': ${prefix}`,
-        );
+        console.log(`[substituents.ts] prefix after stripping 'ane': ${prefix}`);
         console.log(`[substituents.ts] final name: ${prefix}yl`);
       }
       return { type: "alkyl", size: carbonCount, name: `${prefix}yl` };

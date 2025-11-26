@@ -46,9 +46,7 @@ describe("Performance Benchmarks", () => {
   });
 
   it("should benchmark SMILES generation", () => {
-    const molecules = Object.values(MOLECULES).map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
     const iterations = 50;
 
     const start = performance.now();
@@ -74,9 +72,7 @@ describe("Performance Benchmarks", () => {
   it(
     "should benchmark molecular properties calculation",
     () => {
-      const molecules = Object.values(MOLECULES).map(
-        (s) => parseSMILES(s).molecules[0]!,
-      );
+      const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
       const iterations = 50;
 
       const start = performance.now();
@@ -104,9 +100,7 @@ describe("Performance Benchmarks", () => {
   );
 
   it("should benchmark SMARTS matching", () => {
-    const molecules = Object.values(MOLECULES).map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
 
     // Simple SMARTS patterns that are known to work
     const patterns = ["c1ccccc1", "[C,N]", "[#6]=[#6]", "[O;H]"];
@@ -137,18 +131,14 @@ describe("Performance Benchmarks", () => {
     const avgMs = totalMs / totalMatches;
 
     console.log(`\n📊 SMARTS Matching Performance:`);
-    console.log(
-      `   Total time: ${totalMs.toFixed(2)}ms (${totalMatches} match operations)`,
-    );
+    console.log(`   Total time: ${totalMs.toFixed(2)}ms (${totalMatches} match operations)`);
     console.log(`   Average: ${avgMs.toFixed(4)}ms per pattern match`);
 
     expect(avgMs).toBeGreaterThan(0);
   });
 
   it("should benchmark MOL file I/O", () => {
-    const molecules = Object.values(MOLECULES).map(
-      (s) => parseSMILES(s).molecules[0]!,
-    );
+    const molecules = Object.values(MOLECULES).map((s) => parseSMILES(s).molecules[0]!);
     const iterations = 20;
 
     // Generate MOL files

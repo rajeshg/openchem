@@ -25,13 +25,9 @@ import { getSharedOPSINService } from "../../../opsin-service";
  * @param molecule - Molecule containing the chain
  * @returns Lowest OPSIN priority number (999 if no functional groups found)
  */
-export function getChainFunctionalGroupPriority(
-  chain: number[],
-  molecule: Molecule,
-): number {
+export function getChainFunctionalGroupPriority(chain: number[], molecule: Molecule): number {
   const opsinService = getSharedOPSINService();
-  const priorityMap =
-    opsinService.getRawRules().functionalGroupPriorities || {};
+  const priorityMap = opsinService.getRawRules().functionalGroupPriorities || {};
 
   let best = 999; // Start with very high (low priority), find minimum
 
@@ -47,11 +43,7 @@ export function getChainFunctionalGroupPriority(
         const nat = molecule.atoms[neigh];
         if (!nat) continue;
         // Check for amine: C-N single bond where N is not in chain
-        if (
-          nat.symbol === "N" &&
-          b.type === BondType.SINGLE &&
-          !chain.includes(neigh)
-        ) {
+        if (nat.symbol === "N" && b.type === BondType.SINGLE && !chain.includes(neigh)) {
           // Verify this is an amine nitrogen (not nitro, etc.)
           let oxygenCount = 0;
           for (const nb of molecule.bonds) {
@@ -104,10 +96,8 @@ export function getChainFunctionalGroupPriority(
             // check if that oxygen is bonded to a carbon (ester-like)
             const oConnectedToC = molecule.bonds.some(
               (ob) =>
-                (ob.atom1 === neigh &&
-                  molecule.atoms[ob.atom2]?.symbol === "C") ||
-                (ob.atom2 === neigh &&
-                  molecule.atoms[ob.atom1]?.symbol === "C"),
+                (ob.atom1 === neigh && molecule.atoms[ob.atom2]?.symbol === "C") ||
+                (ob.atom2 === neigh && molecule.atoms[ob.atom1]?.symbol === "C"),
             );
             if (oConnectedToC) singleOConnectedToC = true;
           }
@@ -153,19 +143,14 @@ export function getChainFunctionalGroupPriority(
         const singleOidx = molecule.bonds.find(
           (b) =>
             (b.atom1 === idx || b.atom2 === idx) &&
-            (b.atom1 === idx
-              ? molecule.atoms[b.atom2]
-              : molecule.atoms[b.atom1]
-            )?.symbol === "O" &&
+            (b.atom1 === idx ? molecule.atoms[b.atom2] : molecule.atoms[b.atom1])?.symbol === "O" &&
             b.type === BondType.SINGLE,
         );
         if (singleOidx) {
-          const oIdx =
-            singleOidx.atom1 === idx ? singleOidx.atom2 : singleOidx.atom1;
+          const oIdx = singleOidx.atom1 === idx ? singleOidx.atom2 : singleOidx.atom1;
           // check if that O connects to another carbon which has a double O
           const connectsToCarbonyl = molecule.bonds.some((ob) => {
-            const otherC =
-              ob.atom1 === oIdx ? ob.atom2 : ob.atom1 === oIdx ? ob.atom1 : -1;
+            const otherC = ob.atom1 === oIdx ? ob.atom2 : ob.atom1 === oIdx ? ob.atom1 : -1;
             if (otherC < 0) return false;
             const otherNat = molecule.atoms[otherC];
             if (!otherNat || otherNat.symbol !== "C") return false;
@@ -173,10 +158,8 @@ export function getChainFunctionalGroupPriority(
             return molecule.bonds.some(
               (cb) =>
                 (cb.atom1 === otherC || cb.atom2 === otherC) &&
-                (cb.atom1 === otherC
-                  ? molecule.atoms[cb.atom2]
-                  : molecule.atoms[cb.atom1]
-                )?.symbol === "O" &&
+                (cb.atom1 === otherC ? molecule.atoms[cb.atom2] : molecule.atoms[cb.atom1])
+                  ?.symbol === "O" &&
                 cb.type === BondType.DOUBLE,
             );
           });
@@ -196,8 +179,7 @@ export function getChainFunctionalGroupPriority(
       }
       // ketone/aldehyde-like - use OPSIN priority
       else if (hasDoubleO) {
-        const opsinPriority =
-          priorityMap["ketone"] || priorityMap["aldehyde"] || 9;
+        const opsinPriority = priorityMap["ketone"] || priorityMap["aldehyde"] || 9;
         best = Math.min(best, opsinPriority);
       }
     }
@@ -215,8 +197,7 @@ export function getChainFunctionalGroupPriority(
         if (!nat) continue;
         if (nat.symbol === "O") {
           if (b.type === BondType.DOUBLE) doubleOcount++;
-          if (b.type === BondType.SINGLE && nat.hydrogens && nat.hydrogens > 0)
-            singleOwithH = true;
+          if (b.type === BondType.SINGLE && nat.hydrogens && nat.hydrogens > 0) singleOwithH = true;
         }
         if (nat.symbol === "N" && b.type === BondType.SINGLE) singleN = true;
         if (nat.symbol === "Cl" && b.type === BondType.SINGLE) hasCl = true;
@@ -251,14 +232,12 @@ export function getChainFunctionalGroupPriority(
         if (!nat) continue;
         if (nat.symbol === "O") {
           if (b.type === BondType.DOUBLE) doubleO = true;
-          if (b.type === BondType.SINGLE && nat.hydrogens && nat.hydrogens > 0)
-            singleOwithH = true;
+          if (b.type === BondType.SINGLE && nat.hydrogens && nat.hydrogens > 0) singleOwithH = true;
         }
       }
       if (doubleO && singleOwithH) {
         // phosphonic/phosphoric acid - use OPSIN priority
-        const opsinPriority =
-          priorityMap["phosphonic acid"] || priorityMap["phosphoric acid"] || 1;
+        const opsinPriority = priorityMap["phosphonic acid"] || priorityMap["phosphoric acid"] || 1;
         best = Math.min(best, opsinPriority);
       }
     }
@@ -293,19 +272,15 @@ export function getChainFunctionalGroupPriority(
           const cHasDoubleO = molecule.bonds.some(
             (cb) =>
               (cb.atom1 === neigh || cb.atom2 === neigh) &&
-              (cb.atom1 === neigh
-                ? molecule.atoms[cb.atom2]
-                : molecule.atoms[cb.atom1]
-              )?.symbol === "O" &&
+              (cb.atom1 === neigh ? molecule.atoms[cb.atom2] : molecule.atoms[cb.atom1])?.symbol ===
+                "O" &&
               cb.type === BondType.DOUBLE,
           );
           const cHasDoubleS = molecule.bonds.some(
             (cb) =>
               (cb.atom1 === neigh || cb.atom2 === neigh) &&
-              (cb.atom1 === neigh
-                ? molecule.atoms[cb.atom2]
-                : molecule.atoms[cb.atom1]
-              )?.symbol === "S" &&
+              (cb.atom1 === neigh ? molecule.atoms[cb.atom2] : molecule.atoms[cb.atom1])?.symbol ===
+                "S" &&
               cb.type === BondType.DOUBLE,
           );
           if (cHasDoubleO) {
@@ -358,20 +333,13 @@ export function getChainFunctionalGroupPriority(
             if (!pnat) continue;
             if (pnat.symbol === "O") {
               if (pb.type === BondType.DOUBLE) hasDoubleO = true;
-              if (
-                pb.type === BondType.SINGLE &&
-                pnat.hydrogens &&
-                pnat.hydrogens > 0
-              )
-                hasOH = true;
+              if (pb.type === BondType.SINGLE && pnat.hydrogens && pnat.hydrogens > 0) hasOH = true;
             }
           }
           if (hasDoubleO && hasOH) {
             // phosphonic acid priority - use OPSIN priority
             const opsinPriority =
-              priorityMap["phosphonic acid"] ||
-              priorityMap["phosphoric acid"] ||
-              1;
+              priorityMap["phosphonic acid"] || priorityMap["phosphoric acid"] || 1;
             best = Math.min(best, opsinPriority);
           }
         }

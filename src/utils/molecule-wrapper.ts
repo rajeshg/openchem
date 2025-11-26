@@ -22,10 +22,7 @@ import { encodePackedMol } from "src/generators/packedmol-encoder";
  *
  * If you want ONLY PackedMol backing (no enriched data in memory), pass skipEnrichment=true
  */
-export function wrapMolecule(
-  mol: Molecule,
-  skipEnrichment = false,
-): MoleculeImpl {
+export function wrapMolecule(mol: Molecule, skipEnrichment = false): MoleculeImpl {
   const packed = encodePackedMol(mol);
   // If skipEnrichment is false (default), keep enriched data for fast access
   // If skipEnrichment is true, rely on decoding from PackedMol

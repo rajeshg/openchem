@@ -1,8 +1,4 @@
-import type {
-  IUPACParseResult,
-  IUPACParserConfig,
-  OPSINRules,
-} from "./iupac-types";
+import type { IUPACParseResult, IUPACParserConfig, OPSINRules } from "./iupac-types";
 import type { ParseError } from "types";
 import { IUPACTokenizer } from "./iupac-tokenizer";
 import { IUPACGraphBuilder } from "./iupac-graph-builder";
@@ -16,10 +12,7 @@ import opsinRulesData from "opsin-rules.json";
  * @param config Optional configuration
  * @returns Parse result containing molecule or errors
  */
-export function parseIUPACName(
-  name: string,
-  config?: IUPACParserConfig,
-): IUPACParseResult {
+export function parseIUPACName(name: string, config?: IUPACParserConfig): IUPACParseResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -33,10 +26,7 @@ export function parseIUPACName(
     }
 
     // Get OPSIN rules (from opsin-rules.json)
-    const rules =
-      (opsinRulesData as OPSINRules) ||
-      config?.customRules ||
-      ({} as OPSINRules);
+    const rules = (opsinRulesData as OPSINRules) || config?.customRules || ({} as OPSINRules);
 
     // Stage 1: Tokenize the IUPAC name
     const tokenizer = new IUPACTokenizer(rules);

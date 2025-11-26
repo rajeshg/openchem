@@ -18,10 +18,7 @@
  * - PbH4 → plumbane
  */
 
-import {
-  ImmutableNamingContext,
-  ExecutionPhase,
-} from "../../immutable-context";
+import { ImmutableNamingContext, ExecutionPhase } from "../../immutable-context";
 import type { IUPACRule } from "../../types";
 
 // Load OPSIN rules to reuse alkane stems and substituent aliases where helpful
@@ -29,10 +26,7 @@ import type { IUPACRule } from "../../types";
 const OPSIN_RULES: unknown = require("../../../../opsin-rules.json");
 
 // Parent hydride definitions per IUPAC P-2.1
-const HETEROATOM_PARENT_HYDRIDES: Record<
-  string,
-  { name: string; valence: number }
-> = {
+const HETEROATOM_PARENT_HYDRIDES: Record<string, { name: string; valence: number }> = {
   // Group 13: borane family
   B: { name: "borane", valence: 3 },
 
@@ -58,8 +52,7 @@ const HETEROATOM_PARENT_HYDRIDES: Record<
 export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
   id: "P-2.1",
   name: "Heteroatom Parent Hydride Selection",
-  description:
-    "Select heteroatom parent hydride as parent structure per Blue Book P-2.1",
+  description: "Select heteroatom parent hydride as parent structure per Blue Book P-2.1",
   blueBookReference: "P-2.1 - Parent hydrides for elements other than carbon",
   priority: 150, // High priority - run early in parent structure phase
   conditions: (context: ImmutableNamingContext) => {
@@ -67,17 +60,14 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
 
     // Skip if parent structure already selected
     if (context.getState().parentStructure) {
-      if (process.env.VERBOSE)
-        console.log("P-2.1: parent structure already selected");
+      if (process.env.VERBOSE) console.log("P-2.1: parent structure already selected");
       return false;
     }
 
     // Check for heteroatom molecules with correct valence
     const heteroatoms = molecule.atoms.filter(
       (atom) =>
-        atom.symbol !== "C" &&
-        atom.symbol !== "H" &&
-        HETEROATOM_PARENT_HYDRIDES[atom.symbol],
+        atom.symbol !== "C" && atom.symbol !== "H" && HETEROATOM_PARENT_HYDRIDES[atom.symbol],
     );
 
     if (process.env.VERBOSE)
@@ -97,8 +87,7 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
     const hydrideDef = HETEROATOM_PARENT_HYDRIDES[heteroatom.symbol];
 
     if (!hydrideDef) {
-      if (process.env.VERBOSE)
-        console.log("P-2.1: No hydride definition for:", heteroatom.symbol);
+      if (process.env.VERBOSE) console.log("P-2.1: No hydride definition for:", heteroatom.symbol);
       return false;
     }
 
@@ -106,19 +95,10 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
     const implicitHydrogens = heteroatom.hydrogens || 0;
     const heteroatomIndex = molecule.atoms.indexOf(heteroatom);
     const bondOrders = molecule.bonds
-      .filter(
-        (bond) =>
-          bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
-      )
+      .filter((bond) => bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex)
       .reduce((sum, bond) => {
         const order =
-          bond.type === "single"
-            ? 1
-            : bond.type === "double"
-              ? 2
-              : bond.type === "triple"
-                ? 3
-                : 1;
+          bond.type === "single" ? 1 : bond.type === "double" ? 2 : bond.type === "triple" ? 3 : 1;
         return sum + order;
       }, 0);
 
@@ -140,14 +120,10 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
     // functional groups present (like amines, alcohols, etc.)
     // This prevents phosphorus/sulfur substituents from being chosen as parent
     const hasNitrogen = molecule.atoms.some((a) => a.symbol === "N");
-    const heavyAtomCount = molecule.atoms.filter(
-      (a) => a.symbol !== "H",
-    ).length;
+    const heavyAtomCount = molecule.atoms.filter((a) => a.symbol !== "H").length;
 
     if (process.env.VERBOSE) {
-      console.log(
-        `P-2.1: hasNitrogen=${hasNitrogen}, heavyAtomCount=${heavyAtomCount}`,
-      );
+      console.log(`P-2.1: hasNitrogen=${hasNitrogen}, heavyAtomCount=${heavyAtomCount}`);
     }
 
     // Don't select P/As/Sb/Bi as parent if molecule has nitrogen (amines take precedence)
@@ -158,16 +134,14 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
         heteroatom.symbol === "Bi") &&
       hasNitrogen
     ) {
-      if (process.env.VERBOSE)
-        console.log("P-2.1: Nitrogen present - amine takes precedence");
+      if (process.env.VERBOSE) console.log("P-2.1: Nitrogen present - amine takes precedence");
       return false;
     }
 
     // Don't select heteroatom parent for complex molecules (>10 heavy atoms)
     // These should be handled by chain-based nomenclature
     if (heavyAtomCount > 10) {
-      if (process.env.VERBOSE)
-        console.log("P-2.1: Molecule too complex for heteroatom parent");
+      if (process.env.VERBOSE) console.log("P-2.1: Molecule too complex for heteroatom parent");
       return false;
     }
 
@@ -181,13 +155,8 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
       heteroatom.symbol === "Bi"
     ) {
       const carbonNeighbors = molecule.bonds
-        .filter(
-          (bond) =>
-            bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex,
-        )
-        .map((bond) =>
-          bond.atom1 === heteroatomIndex ? bond.atom2 : bond.atom1,
-        )
+        .filter((bond) => bond.atom1 === heteroatomIndex || bond.atom2 === heteroatomIndex)
+        .map((bond) => (bond.atom1 === heteroatomIndex ? bond.atom2 : bond.atom1))
         .filter((idx) => molecule.atoms[idx]?.symbol === "C");
 
       // For each carbon neighbor, check if it forms a chain
@@ -206,14 +175,9 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
             chainLength++;
             // Add carbon neighbors to queue
             molecule.bonds
-              .filter(
-                (bond) => bond.atom1 === current || bond.atom2 === current,
-              )
+              .filter((bond) => bond.atom1 === current || bond.atom2 === current)
               .map((bond) => (bond.atom1 === current ? bond.atom2 : bond.atom1))
-              .filter(
-                (idx) =>
-                  !visited.has(idx) && molecule.atoms[idx]?.symbol === "C",
-              )
+              .filter((idx) => !visited.has(idx) && molecule.atoms[idx]?.symbol === "C")
               .forEach((idx) => queue.push(idx));
           }
         }
@@ -237,9 +201,7 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
     const molecule = context.getState().molecule;
     const heteroatom = molecule.atoms.find(
       (atom) =>
-        atom.symbol !== "C" &&
-        atom.symbol !== "H" &&
-        HETEROATOM_PARENT_HYDRIDES[atom.symbol],
+        atom.symbol !== "C" && atom.symbol !== "H" && HETEROATOM_PARENT_HYDRIDES[atom.symbol],
     )!;
 
     console.log("P-2 selecting heteroatom parent:", heteroatom.symbol);
@@ -276,8 +238,7 @@ export const P2_1_HETEROATOM_PARENT_HYDRIDE_RULE: IUPACRule = {
 export const P2_2_CARBON_PARENT_HYDRIDE_RULE: IUPACRule = {
   id: "P-2.2",
   name: "Carbon Parent Hydride Selection",
-  description:
-    "Select carbon parent hydride (alkane) as parent structure per Blue Book P-2.2",
+  description: "Select carbon parent hydride (alkane) as parent structure per Blue Book P-2.2",
   blueBookReference: "P-2.2 - Parent hydrides for carbon chains",
   priority: 50, // Run after chain selection
   conditions: (context: ImmutableNamingContext) => {
@@ -299,9 +260,7 @@ export const P2_2_CARBON_PARENT_HYDRIDE_RULE: IUPACRule = {
 
     // Check for simple hydrocarbon molecules (methane, ethane, etc.)
     const carbons = molecule.atoms.filter((a) => a.symbol === "C");
-    const heteroatoms = molecule.atoms.filter(
-      (a) => a.symbol !== "C" && a.symbol !== "H",
-    );
+    const heteroatoms = molecule.atoms.filter((a) => a.symbol !== "C" && a.symbol !== "H");
 
     // Must have carbons and no heteroatoms
     if (carbons.length === 0 || heteroatoms.length > 0) {
@@ -340,8 +299,7 @@ export const P2_2_CARBON_PARENT_HYDRIDE_RULE: IUPACRule = {
     let name = `${carbonCount}-ane`;
     try {
       const alkaneKey = "C".repeat(Math.max(1, carbonCount));
-      const alkanes = (OPSIN_RULES as { alkanes?: Record<string, string> })
-        ?.alkanes;
+      const alkanes = (OPSIN_RULES as { alkanes?: Record<string, string> })?.alkanes;
       const stem = alkanes?.[alkaneKey];
       if (stem) {
         name = `${stem}ane`;

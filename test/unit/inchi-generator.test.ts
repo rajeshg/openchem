@@ -1,9 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "src/parsers/smiles-parser";
-import {
-  generateInChI,
-  generateInChIKey,
-} from "src/generators/inchi-generator";
+import { generateInChI, generateInChIKey } from "src/generators/inchi-generator";
 
 describe("InChI Generator", () => {
   it("should generate InChI for benzene", async () => {

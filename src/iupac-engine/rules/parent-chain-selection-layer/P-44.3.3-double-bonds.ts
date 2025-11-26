@@ -23,9 +23,8 @@ export const P44_3_3_DOUBLE_BONDS_RULE: IUPACRule = {
       !!context.getState().p44_3_2_applied &&
       chains.every(
         (chain) =>
-          chain.multipleBonds.filter(
-            (bond) => bond.type === "double" || bond.type === "triple",
-          ).length === maxMultipleBonds,
+          chain.multipleBonds.filter((bond) => bond.type === "double" || bond.type === "triple")
+            .length === maxMultipleBonds,
       ) &&
       !context.getState().p44_3_3_applied &&
       !context.getState().parentStructure
@@ -52,8 +51,7 @@ export const P44_3_3_DOUBLE_BONDS_RULE: IUPACRule = {
     }
     // Count double bonds for each chain
     const doubleBondCounts = chains.map((chain) => {
-      return chain.multipleBonds.filter((bond) => bond.type === "double")
-        .length;
+      return chain.multipleBonds.filter((bond) => bond.type === "double").length;
     });
     const maxDoubleBonds = Math.max(...doubleBondCounts);
     const chainsWithMaxDoubleBonds = chains.filter(

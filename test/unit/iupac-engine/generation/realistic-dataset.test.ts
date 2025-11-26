@@ -1,8 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
 import dataset from "./smiles-to-iupac-realistic-dataset.json";
-const realisticDataset: Array<{ smiles: string; iupac: string }> =
-  dataset as any;
+const realisticDataset: Array<{ smiles: string; iupac: string }> = dataset as any;
 import { RuleEngine } from "../../../../src/iupac-engine/engine";
 
 // Known Limitations - Skipped test cases:
@@ -99,9 +98,7 @@ describe("SMILES to IUPAC Name Realistic Test (New Engine)", () => {
         // Skip known limitations
         if (SKIP_SMILES.has(entry.smiles)) {
           skippedCount++;
-          console.log(
-            `Skipping known limitation: ${entry.smiles.substring(0, 50)}...`,
-          );
+          console.log(`Skipping known limitation: ${entry.smiles.substring(0, 50)}...`);
           return;
         }
         const result = parseSMILES(entry.smiles);
@@ -117,9 +114,7 @@ describe("SMILES to IUPAC Name Realistic Test (New Engine)", () => {
         expect(typeof genName).toBe("string");
         expect(genName.length).toBeGreaterThan(0);
 
-        console.log(
-          `Generated for ${entry.smiles}: ${genName}, ref: ${refName}`,
-        );
+        console.log(`Generated for ${entry.smiles}: ${genName}, ref: ${refName}`);
         if (genName !== refName) {
           mismatches.push({
             smiles: entry.smiles,
@@ -138,9 +133,7 @@ describe("SMILES to IUPAC Name Realistic Test (New Engine)", () => {
       console.log(`  Skipped (known limitations): ${skippedCount}`);
       console.log(`  Matches: ${matchCount}`);
       console.log(`  Mismatches: ${mismatches.length}`);
-      console.log(
-        `  Match rate: ${((matchCount / testedCount) * 100).toFixed(1)}%`,
-      );
+      console.log(`  Match rate: ${((matchCount / testedCount) * 100).toFixed(1)}%`);
       if (mismatches.length > 0 && mismatches.length <= 10) {
         console.log(`\nMismatches:`);
         mismatches.forEach((m, i) => {

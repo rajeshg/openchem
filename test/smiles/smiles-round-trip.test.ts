@@ -59,8 +59,7 @@ describe("Quick Wins - Already Supported Features", () => {
       const mol = result.molecules[0]!;
       expect(mol.atoms).toHaveLength(12);
       const bond = mol.bonds.find(
-        (b: Bond) =>
-          (b.atom1 === 5 && b.atom2 === 6) || (b.atom1 === 6 && b.atom2 === 5),
+        (b: Bond) => (b.atom1 === 5 && b.atom2 === 6) || (b.atom1 === 6 && b.atom2 === 5),
       );
       expect(bond?.type).toBe(BondType.SINGLE);
     });
@@ -87,8 +86,7 @@ describe("Quick Wins - Already Supported Features", () => {
       expect(result.errors).toEqual([]);
       const mol = result.molecules[0]!;
       const bond = mol.bonds.find(
-        (b: Bond) =>
-          (b.atom1 === 5 && b.atom2 === 6) || (b.atom1 === 6 && b.atom2 === 5),
+        (b: Bond) => (b.atom1 === 5 && b.atom2 === 6) || (b.atom1 === 6 && b.atom2 === 5),
       );
       expect(bond?.type).toBe(BondType.SINGLE);
     });
@@ -102,8 +100,7 @@ describe("Quick Wins - Already Supported Features", () => {
       expect(mol.atoms).toHaveLength(6);
       expect(mol.bonds).toHaveLength(6);
       const ringBond = mol.bonds.find(
-        (b: Bond) =>
-          (b.atom1 === 0 && b.atom2 === 5) || (b.atom1 === 5 && b.atom2 === 0),
+        (b: Bond) => (b.atom1 === 0 && b.atom2 === 5) || (b.atom1 === 5 && b.atom2 === 0),
       );
       expect(ringBond).toBeDefined();
     });
@@ -121,8 +118,7 @@ describe("Quick Wins - Already Supported Features", () => {
       const mol = result.molecules[0]!;
       expect(mol.atoms).toHaveLength(5);
       const ringBond = mol.bonds.find(
-        (b: Bond) =>
-          (b.atom1 === 0 && b.atom2 === 4) || (b.atom1 === 4 && b.atom2 === 0),
+        (b: Bond) => (b.atom1 === 0 && b.atom2 === 4) || (b.atom1 === 4 && b.atom2 === 0),
       );
       expect(ringBond?.type).toBe(BondType.DOUBLE);
     });
@@ -175,8 +171,7 @@ describe("Quick Wins - Already Supported Features", () => {
       expect(result.errors).toEqual([]);
       const mol = result.molecules[0]!;
       const ringBond = mol.bonds.find(
-        (b: Bond) =>
-          (b.atom1 === 0 && b.atom2 === 4) || (b.atom1 === 4 && b.atom2 === 0),
+        (b: Bond) => (b.atom1 === 0 && b.atom2 === 4) || (b.atom1 === 4 && b.atom2 === 0),
       );
       expect(ringBond?.type).toBe(BondType.DOUBLE);
     });

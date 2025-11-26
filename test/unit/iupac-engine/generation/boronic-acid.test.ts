@@ -159,9 +159,7 @@ describe("Boronic Acid and Organoboron Compounds - Comprehensive", () => {
     });
 
     it("should name 1,3,5-benzenetrieboronic acid", () => {
-      const result = generateIUPACNameFromSMILES(
-        "B(O)(O)c1cc(B(O)O)cc(B(O)O)c1",
-      );
+      const result = generateIUPACNameFromSMILES("B(O)(O)c1cc(B(O)O)cc(B(O)O)c1");
       expect(result.name).toBeDefined();
     });
 
@@ -183,9 +181,7 @@ describe("Boronic Acid and Organoboron Compounds - Comprehensive", () => {
     });
 
     it("should name boroxine ring", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1B1OB(c2ccccc2)OB(c3ccccc3)O1",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1B1OB(c2ccccc2)OB(c3ccccc3)O1");
       expect(result.name).toBeDefined();
     });
 
@@ -241,9 +237,7 @@ describe("Boronic Acid and Organoboron Compounds - Comprehensive", () => {
     });
 
     it("should name pyrene-1-boronic acid", () => {
-      const result = generateIUPACNameFromSMILES(
-        "B(O)(O)c1cc2ccc3cccc4ccc(cc2c14)cc3",
-      );
+      const result = generateIUPACNameFromSMILES("B(O)(O)c1cc2ccc3cccc4ccc(cc2c14)cc3");
       expect(result.name).toBeDefined();
     });
   });

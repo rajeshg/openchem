@@ -14,22 +14,14 @@ const failingBondSMILES = [
   "C1C=C2C(CC3C(=O)C(=CC(=O)C3(C2C4=C(C=CC5=CC=CC=C54)O)C6=CC=CC=C6)C7=CC=CC=C7)C8C1C(=O)N(C8=O)C9=CC=C(C=C9)NC1=CC=CC=C1",
 ];
 
-const failingRoundTrip = [
-  "C1=CC2=C3C(=C1)C4=C(C=CC5=C4C6=C(C=CC(=C36)C=C2)C=C5)[N+](=O)[O-]",
-];
+const failingRoundTrip = ["C1=CC2=C3C(=C1)C4=C(C=CC5=C4C6=C(C=CC(=C36)C=C2)C=C5)[N+](=O)[O-]"];
 
 describe("Focused failing cases", () => {
   it("reproduces bond mismatches", () => {
     for (const s of failingBondSMILES) {
       const parsed = parseSMILES(s);
-      const openchemAtoms = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.atoms.length,
-        0,
-      );
-      const openchemBonds = parsed.molecules.reduce(
-        (sum, mol) => sum + mol.bonds.length,
-        0,
-      );
+      const openchemAtoms = parsed.molecules.reduce((sum, mol) => sum + mol.atoms.length, 0);
+      const openchemBonds = parsed.molecules.reduce((sum, mol) => sum + mol.bonds.length, 0);
       // we expect these to currently mismatch RDKit per previous run
       // just assert parsed succeeded
       expect(parsed.errors && parsed.errors.length).toBe(0);

@@ -58,9 +58,7 @@ for (const testMol of testMolecules) {
   const drugLike = Descriptors.drugLikeness(molecule);
 
   console.log(`   LogP: ${logP.toFixed(3)}`);
-  console.log(
-    `   Lipinski: ${drugLike.lipinski.passes ? "✅ PASS" : "❌ FAIL"}`,
-  );
+  console.log(`   Lipinski: ${drugLike.lipinski.passes ? "✅ PASS" : "❌ FAIL"}`);
   if (!drugLike.lipinski.passes) {
     console.log(`     Violations: ${drugLike.lipinski.violations.join(", ")}`);
   }
@@ -93,9 +91,5 @@ console.log("Blood-Brain Barrier Penetration:");
 console.log("- TPSA < 90 Å² suggests likely CNS penetration");
 console.log("- TPSA > 90 Å² suggests poor CNS penetration\n");
 
-console.log(
-  "Note: These are empirical rules and should be used as guidelines,",
-);
-console.log(
-  "not absolute requirements. Many successful drugs violate one or more rules.",
-);
+console.log("Note: These are empirical rules and should be used as guidelines,");
+console.log("not absolute requirements. Many successful drugs violate one or more rules.");

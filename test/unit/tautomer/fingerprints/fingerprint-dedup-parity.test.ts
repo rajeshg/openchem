@@ -19,12 +19,10 @@ describe("tautomer: fingerprint dedup parity", () => {
 
       const tNoFp = enumerateTautomers(mol, {
         maxTautomers: 512,
-        phases: [1, 2, 3],
         useFingerprintDedup: false,
       });
       const tWithFp = enumerateTautomers(mol, {
         maxTautomers: 512,
-        phases: [1, 2, 3],
         useFingerprintDedup: true,
       });
 

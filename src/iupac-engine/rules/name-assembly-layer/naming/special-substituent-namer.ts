@@ -1,9 +1,5 @@
 import type { Atom, Molecule } from "types";
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../../types";
 import type { NamingSubstituent } from "../../../naming/iupac-types";
 import {
   nameAlkylSulfanylSubstituent,
@@ -13,10 +9,7 @@ import {
 } from "../../../naming/iupac-chains";
 import { collectSubstituentAtoms, findAttachmentPoint } from "../utils";
 
-type UnifiedSubstituent =
-  | StructuralSubstituent
-  | NamingSubstituent
-  | FunctionalGroup;
+type UnifiedSubstituent = StructuralSubstituent | NamingSubstituent | FunctionalGroup;
 
 interface SpecialNamingContext {
   molecule: Molecule;
@@ -25,9 +18,7 @@ interface SpecialNamingContext {
   subName: string;
 }
 
-export function nameSpecialSubstituent(
-  context: SpecialNamingContext,
-): string | null {
+export function nameSpecialSubstituent(context: SpecialNamingContext): string | null {
   const { molecule, parentStructure, sub, subName } = context;
 
   // Extract locant prefix if present (e.g., "10-" from "10-thioether")
@@ -41,16 +32,8 @@ export function nameSpecialSubstituent(
   }
 
   // Try phosphorylsulfanyl naming
-  if (
-    subName === "phosphorylsulfanyl" ||
-    subName.includes("-phosphorylsulfanyl")
-  ) {
-    const named = namePhosphorylsulfanyl(
-      molecule,
-      parentStructure,
-      sub,
-      locantPrefix,
-    );
+  if (subName === "phosphorylsulfanyl" || subName.includes("-phosphorylsulfanyl")) {
+    const named = namePhosphorylsulfanyl(molecule, parentStructure, sub, locantPrefix);
     if (named) return named;
   }
 
@@ -103,20 +86,14 @@ function nameThioether(
       mainChainAtomIndices,
     );
 
-    const baseName = nameAlkylSulfanylSubstituent(
-      molecule,
-      substituentAtomIndices,
-      sulfurIdx,
-    );
+    const baseName = nameAlkylSulfanylSubstituent(molecule, substituentAtomIndices, sulfurIdx);
     return locantPrefix + baseName;
   }
 
   // Handle number[] (NamingSubstituent)
   if (typeof firstAtom === "number") {
     const atomIndices = sub.atoms as number[];
-    const sulfurIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "S",
-    );
+    const sulfurIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "S");
     if (sulfurIdx === undefined) return "sulfanyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
@@ -126,11 +103,7 @@ function nameThioether(
       mainChainAtomIndices,
     );
 
-    const baseName = nameAlkylSulfanylSubstituent(
-      molecule,
-      substituentAtomIndices,
-      sulfurIdx,
-    );
+    const baseName = nameAlkylSulfanylSubstituent(molecule, substituentAtomIndices, sulfurIdx);
     return locantPrefix + baseName;
   }
 
@@ -157,18 +130,12 @@ function namePhosphorylsulfanyl(
     if (!sulfurAtom || !phosphorusAtom) return "phosphorylsulfanyl";
 
     const sulfurIdx = molecule.atoms.findIndex((a) => a.id === sulfurAtom.id);
-    const phosphorusIdx = molecule.atoms.findIndex(
-      (a) => a.id === phosphorusAtom.id,
-    );
+    const phosphorusIdx = molecule.atoms.findIndex((a) => a.id === phosphorusAtom.id);
 
     if (sulfurIdx === -1 || phosphorusIdx === -1) return "phosphorylsulfanyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      sulfurIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, sulfurIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -196,23 +163,15 @@ function namePhosphorylsulfanyl(
 
   if (typeof firstAtom === "number") {
     const atomIndices = sub.atoms as number[];
-    const sulfurIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "S",
-    );
-    const phosphorusIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "P",
-    );
+    const sulfurIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "S");
+    const phosphorusIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "P");
 
     if (sulfurIdx === undefined || phosphorusIdx === undefined) {
       return "phosphorylsulfanyl";
     }
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      sulfurIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, sulfurIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -258,17 +217,11 @@ function namePhosphoryl(
     const phosphorusAtom = atoms.find((atom: Atom) => atom.symbol === "P");
     if (!phosphorusAtom) return "phosphoryl";
 
-    const phosphorusIdx = molecule.atoms.findIndex(
-      (a) => a.id === phosphorusAtom.id,
-    );
+    const phosphorusIdx = molecule.atoms.findIndex((a) => a.id === phosphorusAtom.id);
     if (phosphorusIdx === -1) return "phosphoryl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      phosphorusIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, phosphorusIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -277,27 +230,17 @@ function namePhosphoryl(
       attachmentPoint,
     );
 
-    const baseName = namePhosphorylSubstituent(
-      molecule,
-      substituentAtomIndices,
-      phosphorusIdx,
-    );
+    const baseName = namePhosphorylSubstituent(molecule, substituentAtomIndices, phosphorusIdx);
     return locantPrefix + baseName;
   }
 
   if (typeof firstAtom === "number") {
     const atomIndices = sub.atoms as number[];
-    const phosphorusIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "P",
-    );
+    const phosphorusIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "P");
     if (phosphorusIdx === undefined) return "phosphoryl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      phosphorusIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, phosphorusIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -306,11 +249,7 @@ function namePhosphoryl(
       attachmentPoint,
     );
 
-    const baseName = namePhosphorylSubstituent(
-      molecule,
-      substituentAtomIndices,
-      phosphorusIdx,
-    );
+    const baseName = namePhosphorylSubstituent(molecule, substituentAtomIndices, phosphorusIdx);
     return locantPrefix + baseName;
   }
 
@@ -334,17 +273,11 @@ function namePhosphanyl(
     const phosphorusAtom = atoms.find((atom: Atom) => atom.symbol === "P");
     if (!phosphorusAtom) return "phosphanyl";
 
-    const phosphorusIdx = molecule.atoms.findIndex(
-      (a) => a.id === phosphorusAtom.id,
-    );
+    const phosphorusIdx = molecule.atoms.findIndex((a) => a.id === phosphorusAtom.id);
     if (phosphorusIdx === -1) return "phosphanyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      phosphorusIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, phosphorusIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -364,17 +297,11 @@ function namePhosphanyl(
 
   if (typeof firstAtom === "number") {
     const atomIndices = sub.atoms as number[];
-    const phosphorusIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "P",
-    );
+    const phosphorusIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "P");
     if (phosphorusIdx === undefined) return "phosphanyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
-    const attachmentPoint = findAttachmentPoint(
-      molecule,
-      phosphorusIdx,
-      mainChainAtomIndices,
-    );
+    const attachmentPoint = findAttachmentPoint(molecule, phosphorusIdx, mainChainAtomIndices);
 
     const substituentAtomIndices = collectSubstituentAtoms(
       molecule,
@@ -412,9 +339,7 @@ function nameAmide(
     const carbonylCarbon = atoms.find((atom: Atom) => atom.symbol === "C");
     if (!carbonylCarbon) return "carbamoyl";
 
-    const carbonylIdx = molecule.atoms.findIndex(
-      (a) => a.id === carbonylCarbon.id,
-    );
+    const carbonylIdx = molecule.atoms.findIndex((a) => a.id === carbonylCarbon.id);
     if (carbonylIdx === -1) return "carbamoyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
@@ -424,19 +349,13 @@ function nameAmide(
       mainChainAtomIndices,
     );
 
-    const baseName = nameAmideSubstituent(
-      molecule,
-      substituentAtomIndices,
-      carbonylIdx,
-    );
+    const baseName = nameAmideSubstituent(molecule, substituentAtomIndices, carbonylIdx);
     return locantPrefix + baseName;
   }
 
   if (typeof firstAtom === "number") {
     const atomIndices = sub.atoms as number[];
-    const carbonylIdx = atomIndices.find(
-      (idx: number) => molecule.atoms[idx]?.symbol === "C",
-    );
+    const carbonylIdx = atomIndices.find((idx: number) => molecule.atoms[idx]?.symbol === "C");
     if (carbonylIdx === undefined) return "carbamoyl";
 
     const mainChainAtomIndices = getMainChainIndices(molecule, parentStructure);
@@ -446,21 +365,14 @@ function nameAmide(
       mainChainAtomIndices,
     );
 
-    const baseName = nameAmideSubstituent(
-      molecule,
-      substituentAtomIndices,
-      carbonylIdx,
-    );
+    const baseName = nameAmideSubstituent(molecule, substituentAtomIndices, carbonylIdx);
     return locantPrefix + baseName;
   }
 
   return "carbamoyl";
 }
 
-function getMainChainIndices(
-  molecule: Molecule,
-  parentStructure: ParentStructure,
-): Set<number> {
+function getMainChainIndices(molecule: Molecule, parentStructure: ParentStructure): Set<number> {
   const mainChainAtomIds = new Set<number>();
 
   if (parentStructure.chain?.atoms) {

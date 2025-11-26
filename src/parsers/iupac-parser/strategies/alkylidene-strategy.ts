@@ -70,9 +70,7 @@ export class AlkylideneStrategy extends BaseSubstituentStrategy {
     else if (val.startsWith("pent")) chainLen = 5;
     else if (val.startsWith("hex")) chainLen = 6;
 
-    this.log(
-      `Building alkylidene with ${chainLen}-carbon chain from ${alkylBase.value}`,
-    );
+    this.log(`Building alkylidene with ${chainLen}-carbon chain from ${alkylBase.value}`);
 
     // Build the alkyl chain
     const chainAtoms = builder.createLinearChain(chainLen);
@@ -94,11 +92,7 @@ export class AlkylideneStrategy extends BaseSubstituentStrategy {
             for (const locToken of ctx.locantTokens) {
               const locs = (locToken.metadata?.positions as number[]) || [];
               for (const loc of locs) {
-                const atomIdx = builderContext.locantToAtomIndex(
-                  loc,
-                  phenylAtoms,
-                  false,
-                );
+                const atomIdx = builderContext.locantToAtomIndex(loc, phenylAtoms, false);
                 if (atomIdx !== null) {
                   const oIdx = builder.addAtom("O");
                   builder.addBond(atomIdx, oIdx);
@@ -110,16 +104,9 @@ export class AlkylideneStrategy extends BaseSubstituentStrategy {
         }
       } else {
         // Apply other substituents to chain
-        const substLocants = builderContext.getLocantsBeforeSubstituent(
-          subst,
-          ctx.locantTokens,
-        );
+        const substLocants = builderContext.getLocantsBeforeSubstituent(subst, ctx.locantTokens);
         for (const loc of substLocants) {
-          const atomIdx = builderContext.locantToAtomIndex(
-            loc,
-            chainAtoms,
-            false,
-          );
+          const atomIdx = builderContext.locantToAtomIndex(loc, chainAtoms, false);
           if (atomIdx !== null) {
             if (subst.value === "methyl") {
               builder.addMethyl(atomIdx);

@@ -54,12 +54,8 @@ describe("SMILES Parser", () => {
     expect(result.molecules[0]!.atoms).toHaveLength(4);
     expect(result.molecules[0]!.bonds).toHaveLength(3);
     // All C, all single bonds, hydrogens: central C has 1 H, others 3
-    expect(result.molecules[0]!.atoms.every((a) => a.symbol === "C")).toBe(
-      true,
-    );
-    expect(
-      result.molecules[0]!.bonds.every((b) => b.type === BondType.SINGLE),
-    ).toBe(true);
+    expect(result.molecules[0]!.atoms.every((a) => a.symbol === "C")).toBe(true);
+    expect(result.molecules[0]!.bonds.every((b) => b.type === BondType.SINGLE)).toBe(true);
     const hydrogens = result.molecules[0]!.atoms.map((a) => a.hydrogens);
     expect(hydrogens.sort()).toEqual([1, 3, 3, 3]); // one with 1 H
   });
@@ -94,24 +90,16 @@ describe("SMILES Parser", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.molecules[0]!.atoms).toHaveLength(6);
     expect(result.molecules[0]!.bonds).toHaveLength(6);
-    expect(
-      result.molecules[0]!.atoms.every((a) => a.symbol === "C" && a.aromatic),
-    ).toBe(true);
-    expect(
-      result.molecules[0]!.bonds.every((b) => b.type === BondType.AROMATIC),
-    ).toBe(true);
-    expect(result.molecules[0]!.atoms.every((a) => a.hydrogens === 1)).toBe(
-      true,
-    );
+    expect(result.molecules[0]!.atoms.every((a) => a.symbol === "C" && a.aromatic)).toBe(true);
+    expect(result.molecules[0]!.bonds.every((b) => b.type === BondType.AROMATIC)).toBe(true);
+    expect(result.molecules[0]!.atoms.every((a) => a.hydrogens === 1)).toBe(true);
   });
 
   it("parses C[C@H] (chiral carbon)", () => {
     const result = parseSMILES("C[C@H]");
     expect(result.errors).toHaveLength(0);
     expect(result.molecules[0]!.atoms).toHaveLength(2);
-    const chiralAtom = result.molecules[0]!.atoms.find(
-      (a) => a.chiral === "@",
-    )!;
+    const chiralAtom = result.molecules[0]!.atoms.find((a) => a.chiral === "@")!;
     expect(chiralAtom.symbol).toBe("C");
     expect(chiralAtom.hydrogens).toBe(1);
   });

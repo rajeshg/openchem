@@ -41,8 +41,7 @@ export class SulfonylStrategy extends BaseSubstituentStrategy {
     const sulfanylMatch = substValue.match(/^(.+)sulfanyl$/);
     const sulfinylsulfanylMatch = substValue.match(/^(.+)sulfinylsulfanyl$/);
 
-    const match =
-      sulfonylMatch || sulfinylMatch || sulfanylMatch || sulfinylsulfanylMatch;
+    const match = sulfonylMatch || sulfinylMatch || sulfanylMatch || sulfinylsulfanylMatch;
 
     if (!match) {
       return null;

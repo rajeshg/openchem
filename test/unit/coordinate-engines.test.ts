@@ -23,9 +23,7 @@ describe("coordinate engine comparison", () => {
       const coords = generateCoordinates(molecule);
 
       expect(coords.length).toBe(molecule.atoms.length);
-      expect(
-        coords.every((c) => typeof c.x === "number" && typeof c.y === "number"),
-      ).toBe(true);
+      expect(coords.every((c) => typeof c.x === "number" && typeof c.y === "number")).toBe(true);
     });
   });
 
@@ -51,9 +49,7 @@ describe("coordinate engine comparison", () => {
 
     const coords = generateCoordinates(molecule, {});
     expect(coords.length).toBe(molecule.atoms.length);
-    expect(
-      coords.every((c) => typeof c.x === "number" && typeof c.y === "number"),
-    ).toBe(true);
+    expect(coords.every((c) => typeof c.x === "number" && typeof c.y === "number")).toBe(true);
   });
 
   it("should generate 120 degree angles for branched molecules", () => {
@@ -66,9 +62,7 @@ describe("coordinate engine comparison", () => {
 
     const coords = generateCoordinates(molecule);
 
-    const c1Idx = molecule.atoms.findIndex(
-      (a) => a.symbol === "C" && a.id === 1,
-    );
+    const c1Idx = molecule.atoms.findIndex((a) => a.symbol === "C" && a.id === 1);
     expect(c1Idx).toBeGreaterThanOrEqual(0);
     const c1Coord = coords[c1Idx]!;
 
@@ -98,15 +92,9 @@ describe("coordinate engine comparison", () => {
       return Math.acos(dot / (len1 * len2));
     }
 
-    const angle01 =
-      (angleBetween(neighborCoords[0]!, c1Coord, neighborCoords[1]!) * 180) /
-      Math.PI;
-    const angle12 =
-      (angleBetween(neighborCoords[1]!, c1Coord, neighborCoords[2]!) * 180) /
-      Math.PI;
-    const angle02 =
-      (angleBetween(neighborCoords[0]!, c1Coord, neighborCoords[2]!) * 180) /
-      Math.PI;
+    const angle01 = (angleBetween(neighborCoords[0]!, c1Coord, neighborCoords[1]!) * 180) / Math.PI;
+    const angle12 = (angleBetween(neighborCoords[1]!, c1Coord, neighborCoords[2]!) * 180) / Math.PI;
+    const angle02 = (angleBetween(neighborCoords[0]!, c1Coord, neighborCoords[2]!) * 180) / Math.PI;
 
     // v2 produces different but valid geometry - just check angles are reasonable
     expect(angle01).toBeGreaterThan(80);

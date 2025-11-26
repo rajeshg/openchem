@@ -135,10 +135,7 @@ export function collectSubstituentAtoms(
         if (mainChainAtoms.has(neighborIdx)) continue;
 
         // Skip if this is the attachment point to exclude
-        if (
-          excludeAttachmentPoint !== undefined &&
-          neighborIdx === excludeAttachmentPoint
-        )
+        if (excludeAttachmentPoint !== undefined && neighborIdx === excludeAttachmentPoint)
           continue;
 
         // Add to substituent and continue traversal
@@ -182,12 +179,7 @@ export function collectConnectedAtomsInSet(
       if (bond.atom1 === current) next = bond.atom2;
       else if (bond.atom2 === current) next = bond.atom1;
 
-      if (
-        next !== -1 &&
-        next !== excludeIdx &&
-        !collected.has(next) &&
-        allowedAtoms.has(next)
-      ) {
+      if (next !== -1 && next !== excludeIdx && !collected.has(next) && allowedAtoms.has(next)) {
         stack.push(next);
       }
     }
@@ -222,9 +214,7 @@ export function formatSubstituentGroups(
   opsinService?: OPSINService,
 ): string {
   // Sort groups alphabetically by substituent name
-  const sortedGroups = Array.from(groups.entries()).sort((a, b) =>
-    a[0].localeCompare(b[0]),
-  );
+  const sortedGroups = Array.from(groups.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   const parts: string[] = [];
 

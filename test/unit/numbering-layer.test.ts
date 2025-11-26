@@ -8,11 +8,7 @@ import {
   P14_2_LOWEST_LOCANT_SET_RULE,
   P14_3_PRINCIPAL_GROUP_NUMBERING_RULE,
 } from "src/iupac-engine/rules/numbering-layer";
-import type {
-  ParentStructure,
-  FunctionalGroup,
-  Chain,
-} from "src/iupac-engine/types";
+import type { ParentStructure, FunctionalGroup, Chain } from "src/iupac-engine/types";
 import type { Atom, Bond } from "types";
 import { getSharedOPSINService } from "src/iupac-engine/opsin-service";
 import { OPSINFunctionalGroupDetector } from "src/iupac-engine/opsin-functional-group-detector";
@@ -46,11 +42,7 @@ function makeAtoms(ids: number[]): Atom[] {
       }) as Atom,
   );
 }
-function makeChain(
-  locants: number[],
-  multipleBonds = [],
-  substituents = [],
-): Chain {
+function makeChain(locants: number[], multipleBonds = [], substituents = []): Chain {
   return {
     atoms: makeAtoms(locants),
     bonds: [],
@@ -87,10 +79,7 @@ describe("P-14 numbering rules", () => {
       makeGroup("alcohol", 3, [2], true),
       makeGroup("methyl", 10, [3], false),
     ];
-    let context = ImmutableNamingContext.create(
-      { atoms: [], bonds: [] },
-      createTestServices(),
-    );
+    let context = ImmutableNamingContext.create({ atoms: [], bonds: [] }, createTestServices());
     context = context.withStateUpdate(
       (state) => ({ ...state, parentStructure, functionalGroups }),
       "setup",
@@ -115,10 +104,7 @@ describe("P-14 numbering rules", () => {
       makeGroup("alcohol", 3, [2], true), // Alcohol at atom 2 (position 1 in chain)
       makeGroup("methyl", 10, [3], false),
     ];
-    let context = ImmutableNamingContext.create(
-      { atoms: [], bonds: [] },
-      createTestServices(),
-    );
+    let context = ImmutableNamingContext.create({ atoms: [], bonds: [] }, createTestServices());
     context = context.withStateUpdate(
       (state) => ({ ...state, parentStructure, functionalGroups }),
       "setup",
@@ -148,10 +134,7 @@ describe("P-14 numbering rules", () => {
       makeGroup("methyl", 10, [3], false),
       makeGroup("ethyl", 10, [4], false),
     ];
-    let context = ImmutableNamingContext.create(
-      { atoms: [], bonds: [] },
-      createTestServices(),
-    );
+    let context = ImmutableNamingContext.create({ atoms: [], bonds: [] }, createTestServices());
     context = context.withStateUpdate(
       (state) => ({ ...state, parentStructure, functionalGroups }),
       "setup",

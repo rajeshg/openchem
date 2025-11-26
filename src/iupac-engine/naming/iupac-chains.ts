@@ -1,16 +1,9 @@
 import type { Molecule } from "types";
 import { BondType } from "types";
-import {
-  getAlkaneBaseName,
-  getAlkylName,
-  getGreekNumeral,
-} from "./iupac-helpers";
+import { getAlkaneBaseName, getAlkylName, getGreekNumeral } from "./iupac-helpers";
 import type { NamingSubstituent } from "./iupac-types";
 import { getSharedOPSINService } from "../opsin-service";
-import {
-  getHeteroAtomPrefixFromOPSIN,
-  getSimpleMultiplierWithVowel,
-} from "../opsin-adapter";
+import { getHeteroAtomPrefixFromOPSIN, getSimpleMultiplierWithVowel } from "../opsin-adapter";
 import {
   findSubstituents,
   classifySubstituent,
@@ -38,17 +31,12 @@ export { findMainChain } from "./chains/main-chain-selection";
 export { getChainFunctionalGroupPriority } from "./chains/main-chain-selection/functional-group-priority";
 
 function _getCombinedLocants(molecule: Molecule, chain: number[]): number[] {
-  const substituentLocants = findSubstituents(molecule, chain).map((s) =>
-    parseInt(s.position),
-  );
+  const substituentLocants = findSubstituents(molecule, chain).map((s) => parseInt(s.position));
   const unsaturationLocants = getUnsaturationPositions(chain, molecule);
   return [...substituentLocants, ...unsaturationLocants].sort((a, b) => a - b);
 }
 
-function getUnsaturationPositions(
-  chain: number[],
-  molecule: Molecule,
-): number[] {
+function getUnsaturationPositions(chain: number[], molecule: Molecule): number[] {
   const positions: number[] = [];
   for (let i = 0; i < chain.length - 1; i++) {
     const bond = molecule.bonds.find(
@@ -56,10 +44,7 @@ function getUnsaturationPositions(
         (b.atom1 === chain[i] && b.atom2 === chain[i + 1]) ||
         (b.atom1 === chain[i + 1] && b.atom2 === chain[i]),
     );
-    if (
-      bond &&
-      (bond.type === BondType.DOUBLE || bond.type === BondType.TRIPLE)
-    ) {
+    if (bond && (bond.type === BondType.DOUBLE || bond.type === BondType.TRIPLE)) {
       positions.push(i + 1);
     }
   }
@@ -71,19 +56,14 @@ function _isValidChain(chain: number[], molecule: Molecule): boolean {
     const atom1 = chain[i];
     const atom2 = chain[i + 1];
     const bondExists = molecule.bonds.some(
-      (b) =>
-        (b.atom1 === atom1 && b.atom2 === atom2) ||
-        (b.atom1 === atom2 && b.atom2 === atom1),
+      (b) => (b.atom1 === atom1 && b.atom2 === atom2) || (b.atom1 === atom2 && b.atom2 === atom1),
     );
     if (!bondExists) return false;
   }
   return true;
 }
 
-function renumberUnsaturationToLowest(
-  positions: number[],
-  chainLength: number,
-): number[] {
+function renumberUnsaturationToLowest(positions: number[], chainLength: number): number[] {
   if (positions.length === 0) return positions;
   const original = positions.slice().sort((a, b) => a - b);
   const reversed = original.map((p) => chainLength - p).sort((a, b) => a - b);
@@ -105,10 +85,7 @@ export function findLongestCarbonChain(molecule: Molecule): number[] {
   for (const idx of carbonIndices) adjList.set(idx, []);
 
   for (const bond of molecule.bonds) {
-    if (
-      molecule.atoms[bond.atom1]?.symbol === "C" &&
-      molecule.atoms[bond.atom2]?.symbol === "C"
-    ) {
+    if (molecule.atoms[bond.atom1]?.symbol === "C" && molecule.atoms[bond.atom2]?.symbol === "C") {
       adjList.get(bond.atom1)?.push(bond.atom2);
       adjList.get(bond.atom2)?.push(bond.atom1);
     }
@@ -175,10 +152,7 @@ export function findLongestHeteroChain(molecule: Molecule): number[] {
   return longestPath;
 }
 
-export function generateHeteroPrefixes(
-  mainChain: number[],
-  molecule: Molecule,
-): string[] {
+export function generateHeteroPrefixes(mainChain: number[], molecule: Molecule): string[] {
   const opsinService = getSharedOPSINService();
   const prefixes: string[] = [];
 
@@ -187,10 +161,7 @@ export function generateHeteroPrefixes(
     if (!atom || atom.symbol === "C") continue;
 
     const position = mainChain.indexOf(atomIdx) + 1;
-    const heteroPrefix = getHeteroAtomPrefixFromOPSIN(
-      atom.symbol,
-      opsinService,
-    );
+    const heteroPrefix = getHeteroAtomPrefixFromOPSIN(atom.symbol, opsinService);
 
     if (heteroPrefix) {
       prefixes.push(`${position}-${heteroPrefix}`);
@@ -223,10 +194,7 @@ export function generateChainBaseName(
 } | null {
   const heteroAtoms = mainChain
     .map((idx) => molecule.atoms[idx])
-    .filter(
-      (atom): atom is NonNullable<typeof atom> =>
-        atom !== undefined && atom.symbol !== "C",
-    );
+    .filter((atom): atom is NonNullable<typeof atom> => atom !== undefined && atom.symbol !== "C");
 
   let doubleBonds: number[] = [];
   let tripleBonds: number[] = [];
@@ -247,16 +215,10 @@ export function generateChainBaseName(
 
   let unsaturation: { type: "ene" | "yne"; positions: number[] } | null = null;
   if (tripleBonds.length > 0) {
-    const renumberedTriples = renumberUnsaturationToLowest(
-      tripleBonds,
-      carbonCount,
-    );
+    const renumberedTriples = renumberUnsaturationToLowest(tripleBonds, carbonCount);
     unsaturation = { type: "yne", positions: renumberedTriples };
   } else if (doubleBonds.length > 0) {
-    const renumberedDoubles = renumberUnsaturationToLowest(
-      doubleBonds,
-      carbonCount,
-    );
+    const renumberedDoubles = renumberUnsaturationToLowest(doubleBonds, carbonCount);
     unsaturation = { type: "ene", positions: renumberedDoubles };
   }
 
@@ -330,9 +292,7 @@ export function namePhosphanylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[namePhosphanylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`,
-    );
+    console.log(`[namePhosphanylSubstituent] substituentsOnP=${substituentsOnP.join(",")}`);
   }
 
   if (substituentsOnP.length === 0) {
@@ -358,12 +318,7 @@ export function namePhosphanylSubstituent(
       branchAtoms.add(current);
 
       for (const bond of molecule.bonds) {
-        const next =
-          bond.atom1 === current
-            ? bond.atom2
-            : bond.atom2 === current
-              ? bond.atom1
-              : -1;
+        const next = bond.atom1 === current ? bond.atom2 : bond.atom2 === current ? bond.atom1 : -1;
         if (next !== -1 && !visited.has(next) && substituentAtoms.has(next)) {
           stack.push(next);
         }
@@ -381,9 +336,7 @@ export function namePhosphanylSubstituent(
 
       // Check for phenyl group
       if (subAtom.aromatic) {
-        const ringContainingCarbon = molecule.rings?.find((ring) =>
-          ring.includes(subAtomIdx),
-        );
+        const ringContainingCarbon = molecule.rings?.find((ring) => ring.includes(subAtomIdx));
         if (ringContainingCarbon && ringContainingCarbon.length === 6) {
           const allCarbons = ringContainingCarbon.every(
             (atomId: number) => molecule.atoms[atomId]?.symbol === "C",
@@ -410,10 +363,7 @@ export function namePhosphanylSubstituent(
     }
 
     if (branchName) {
-      substituentGroups.set(
-        branchName,
-        (substituentGroups.get(branchName) || 0) + 1,
-      );
+      substituentGroups.set(branchName, (substituentGroups.get(branchName) || 0) + 1);
     }
   }
 
@@ -454,9 +404,7 @@ export function namePhosphanylSubstituent(
   }
 
   if (process.env.VERBOSE) {
-    console.log(
-      `[namePhosphanylSubstituent] final name: ${baseName} (linker=${linkerSymbol})`,
-    );
+    console.log(`[namePhosphanylSubstituent] final name: ${baseName} (linker=${linkerSymbol})`);
   }
 
   // Format as "diphenylphosphanyloxy" or "methylethylphosphanyl"
@@ -506,11 +454,7 @@ export function generateSubstitutedName(
     const multiplier =
       count === 1
         ? ""
-        : getSimpleMultiplierWithVowel(
-            count,
-            root.charAt(0),
-            getSharedOPSINService(),
-          );
+        : getSimpleMultiplierWithVowel(count, root.charAt(0), getSharedOPSINService());
 
     // Check if we can omit the locant: single substituent at position 1, no heteroatoms, simple saturated chain
     const canOmitLocant =
@@ -538,10 +482,7 @@ export function generateSubstitutedName(
   });
 
   // Sort prefixes alphabetically by root (IUPAC ignores multiplicative prefixes)
-  const allPrefixes: PrefixObj[] = [
-    ...substituentPrefixes,
-    ...heteroPrefixObjs,
-  ];
+  const allPrefixes: PrefixObj[] = [...substituentPrefixes, ...heteroPrefixObjs];
   allPrefixes.sort((A, B) => {
     const aRoot = A.root.replace(/^(di|tri|tetra|bis|tris|tetr)/i, "");
     const bRoot = B.root.replace(/^(di|tri|tetra|bis|tris|tetr)/i, "");

@@ -124,15 +124,8 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
       let canonicalReferenceSmiles = referenceSmiles;
       try {
         const refResult = parseSMILES(referenceSmiles);
-        if (
-          refResult.molecules.length > 0 &&
-          refResult.molecules[0] &&
-          !refResult.errors?.length
-        ) {
-          canonicalReferenceSmiles = generateSMILES(
-            refResult.molecules[0],
-            true,
-          );
+        if (refResult.molecules.length > 0 && refResult.molecules[0] && !refResult.errors?.length) {
+          canonicalReferenceSmiles = generateSMILES(refResult.molecules[0], true);
         }
       } catch (error) {
         // If we can't parse/canonicalize the reference, use it as-is
@@ -140,9 +133,7 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
 
       if (generatedSmiles === canonicalReferenceSmiles) {
         matchCount++;
-      } else if (
-        areStructurallyEquivalent(generatedSmiles, canonicalReferenceSmiles)
-      ) {
+      } else if (areStructurallyEquivalent(generatedSmiles, canonicalReferenceSmiles)) {
         // Accept as match if fingerprints are >95% similar (handles aromatic vs explicit notation)
         matchCount++;
       } else if (generatedSmiles === "") {
@@ -164,8 +155,7 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
 
     const total = realisticDataset.length;
     const testedCount = total - skippedCount;
-    const totalFailures =
-      parsingErrorCount + generationErrorCount + structuralMismatchCount;
+    const totalFailures = parsingErrorCount + generationErrorCount + structuralMismatchCount;
 
     console.log(`\nIUPAC to SMILES Realistic Test Summary:`);
     console.log(`  Total cases: ${total}`);
@@ -176,9 +166,7 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
     console.log(`  Generation errors: ${generationErrorCount}`);
     console.log(`  Structural mismatches: ${structuralMismatchCount}`);
     console.log(`  Total failures: ${totalFailures}`);
-    console.log(
-      `  Match rate: ${((matchCount / testedCount) * 100).toFixed(1)}%`,
-    );
+    console.log(`  Match rate: ${((matchCount / testedCount) * 100).toFixed(1)}%`);
     console.log(
       `  Success rate (realistic): ${((matchCount / (testedCount - (parsingErrorCount + generationErrorCount))) * 100).toFixed(1)}%`,
     );
@@ -191,9 +179,7 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
         console.log(`   Error: ${m.error.substring(0, 100)}...`);
       });
       if (parsingErrors.length > 5) {
-        console.log(
-          `   ... and ${parsingErrors.length - 5} more parsing errors`,
-        );
+        console.log(`   ... and ${parsingErrors.length - 5} more parsing errors`);
       }
     }
 
@@ -202,24 +188,16 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
       console.log(`  (These should be debugged to find root causes)`);
       generationErrors.slice(0, 5).forEach((m, i) => {
         console.log(`#${i + 1}: ${m.iupac}`);
-        console.log(
-          `   Expected: ${m.referenceSmiles}, Generated: "${m.generatedSmiles}"`,
-        );
+        console.log(`   Expected: ${m.referenceSmiles}, Generated: "${m.generatedSmiles}"`);
       });
       if (generationErrors.length > 5) {
-        console.log(
-          `   ... and ${generationErrors.length - 5} more generation errors`,
-        );
+        console.log(`   ... and ${generationErrors.length - 5} more generation errors`);
       }
     }
 
     if (structuralMismatchCount > 0) {
-      console.log(
-        `\nStructural Mismatches (${structuralMismatchCount} - Priority for fixes):`,
-      );
-      console.log(
-        `  GROUP A: Fragment Loss (major structural loss) - HIGH PRIORITY`,
-      );
+      console.log(`\nStructural Mismatches (${structuralMismatchCount} - Priority for fixes):`);
+      console.log(`  GROUP A: Fragment Loss (major structural loss) - HIGH PRIORITY`);
       const groupAMismatches = mismatches.filter((m) => {
         const desc = m.iupac.toLowerCase();
         return (
@@ -236,34 +214,25 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
       });
 
       if (structuralMismatchCount > 0) {
-        console.log(
-          `\n  See iupac-to-smiles-detailed-report.csv for full breakdown`,
-        );
+        console.log(`\n  See iupac-to-smiles-detailed-report.csv for full breakdown`);
       }
     }
 
     // Write detailed report to file
     const fs = require("fs");
     const path = require("path");
-    const reportPath = path.join(
-      __dirname,
-      "iupac-to-smiles-detailed-report.csv",
-    );
+    const reportPath = path.join(__dirname, "iupac-to-smiles-detailed-report.csv");
     const header = "iupac,expected_smiles,generated_smiles,status,error\n";
     const rows: string[] = [];
 
     // Add parsing errors
     parsingErrors.forEach((m) => {
-      rows.push(
-        `"${m.iupac}","","","PARSING_ERROR","${m.error.replace(/"/g, '""')}"`,
-      );
+      rows.push(`"${m.iupac}","","","PARSING_ERROR","${m.error.replace(/"/g, '""')}"`);
     });
 
     // Add generation errors
     generationErrors.forEach((m) => {
-      rows.push(
-        `"${m.iupac}","${m.referenceSmiles}","${m.generatedSmiles}","GENERATION_ERROR",""`,
-      );
+      rows.push(`"${m.iupac}","${m.referenceSmiles}","${m.generatedSmiles}","GENERATION_ERROR",""`);
     });
 
     // Add structural mismatches
@@ -290,22 +259,15 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
               refResult.molecules[0] &&
               !refResult.errors?.length
             ) {
-              canonicalReferenceSmiles = generateSMILES(
-                refResult.molecules[0],
-                true,
-              );
+              canonicalReferenceSmiles = generateSMILES(refResult.molecules[0], true);
             }
           } catch (error) {
             // Use as-is if canonicalization fails
           }
 
           if (generatedSmiles === canonicalReferenceSmiles) {
-            rows.push(
-              `"${entry.iupac}","${entry.smiles}","${generatedSmiles}","MATCH",""`,
-            );
-          } else if (
-            areStructurallyEquivalent(generatedSmiles, canonicalReferenceSmiles)
-          ) {
+            rows.push(`"${entry.iupac}","${entry.smiles}","${generatedSmiles}","MATCH",""`);
+          } else if (areStructurallyEquivalent(generatedSmiles, canonicalReferenceSmiles)) {
             rows.push(
               `"${entry.iupac}","${entry.smiles}","${generatedSmiles}","MATCH_FINGERPRINT_EQUIV",""`,
             );
@@ -324,8 +286,6 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
     console.log(
       `\n${matchCount}/${testedCount} cases working (${((matchCount / testedCount) * 100).toFixed(1)}%)`,
     );
-    console.log(
-      `This test serves as a benchmark for IUPAC parser development progress.`,
-    );
+    console.log(`This test serves as a benchmark for IUPAC parser development progress.`);
   });
 });

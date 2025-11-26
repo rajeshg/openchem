@@ -1,8 +1,4 @@
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  StructuralSubstituent,
-} from "../../types";
+import type { FunctionalGroup, ParentStructure, StructuralSubstituent } from "../../types";
 import type { NamingSubstituent } from "../../naming/iupac-types";
 
 /**

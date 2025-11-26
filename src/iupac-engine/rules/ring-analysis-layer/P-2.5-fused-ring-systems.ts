@@ -19,11 +19,7 @@ export const P2_5_FUSED_RING_SYSTEMS_RULE: IUPACRule = {
   priority: RulePriority.SEVEN,
   conditions: (context) => {
     const candidateRings = context.getState().candidateRings;
-    return (
-      candidateRings &&
-      candidateRings.length > 1 &&
-      !context.getState().parentStructure
-    );
+    return candidateRings && candidateRings.length > 1 && !context.getState().parentStructure;
   },
   action: (context) => {
     const candidateRings = context.getState().candidateRings;
@@ -69,14 +65,9 @@ export const P2_5_FUSED_RING_SYSTEMS_RULE: IUPACRule = {
 /**
  * Helper function to generate fused system names
  */
-function generateFusedPolycyclicName(
-  fusedRings: number[][],
-  molecule: Molecule,
-): string | null {
+function generateFusedPolycyclicName(fusedRings: number[][], molecule: Molecule): string | null {
   // For now, delegate to existing fused naming logic
   // This could be enhanced with specific P-2.5 rules
-  const {
-    identifyPolycyclicPattern,
-  } = require("../../naming/iupac-rings/index");
+  const { identifyPolycyclicPattern } = require("../../naming/iupac-rings/index");
   return identifyPolycyclicPattern(fusedRings, molecule);
 }

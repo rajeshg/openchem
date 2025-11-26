@@ -11,9 +11,7 @@ async function initializeRDKit(): Promise<any> {
   try {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     rdkitInstance = await (initRDKitModule as any)();
@@ -86,37 +84,34 @@ describe("RDKit Stereo SMILES Comparison", () => {
 
   testCases.forEach(({ input, description }) => {
     const testFn = KNOWN_DIFFERENCES.has(input) ? it.skip : it;
-    testFn(
-      `matches RDKit canonical SMILES for ${description}: ${input}`,
-      async () => {
-        const RDKit = await initializeRDKit();
+    testFn(`matches RDKit canonical SMILES for ${description}: ${input}`, async () => {
+      const RDKit = await initializeRDKit();
 
-        // Parse with openchem
-        const result = parseSMILES(input);
-        expect(result.errors).toHaveLength(0);
+      // Parse with openchem
+      const result = parseSMILES(input);
+      expect(result.errors).toHaveLength(0);
 
-        // Generate canonical SMILES with openchem
-        const ourCanonical = generateSMILES(result.molecules);
+      // Generate canonical SMILES with openchem
+      const ourCanonical = generateSMILES(result.molecules);
 
-        // Get RDKit canonical SMILES
-        let rdkitCanonical = "";
-        try {
-          const mol = RDKit.get_mol(input);
-          if (mol && mol.is_valid()) {
-            rdkitCanonical = mol.get_smiles();
-          }
-        } catch (e) {
-          console.error(`RDKit error for ${input}:`, e);
-          rdkitCanonical = "";
+      // Get RDKit canonical SMILES
+      let rdkitCanonical = "";
+      try {
+        const mol = RDKit.get_mol(input);
+        if (mol && mol.is_valid()) {
+          rdkitCanonical = mol.get_smiles();
         }
+      } catch (e) {
+        console.error(`RDKit error for ${input}:`, e);
+        rdkitCanonical = "";
+      }
 
-        if (!rdkitCanonical) {
-          throw new Error(`RDKit failed to parse ${input}`);
-        }
+      if (!rdkitCanonical) {
+        throw new Error(`RDKit failed to parse ${input}`);
+      }
 
-        // Compare
-        expect(ourCanonical).toBe(rdkitCanonical);
-      },
-    );
+      // Compare
+      expect(ourCanonical).toBe(rdkitCanonical);
+    });
   });
 });

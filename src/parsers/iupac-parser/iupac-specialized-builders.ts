@@ -10,10 +10,7 @@ export interface IUPACSpecializedContext {
     chainAtoms: number[],
     reverseNumbering?: boolean,
   ): number | null;
-  getLocantsBeforeSubstituent(
-    substituent: IUPACToken,
-    locantTokens: IUPACToken[],
-  ): number[];
+  getLocantsBeforeSubstituent(substituent: IUPACToken, locantTokens: IUPACToken[]): number[];
   getMultiplierBeforeSubstituent(
     substituent: IUPACToken,
     multiplierTokens: IUPACToken[],
@@ -68,9 +65,7 @@ export class IUPACSpecializedBuilders {
     multiplierTokens: IUPACToken[],
     prefixTokens: IUPACToken[],
   ): Molecule {
-    const nPrefixToken = prefixTokens.find((p) =>
-      this.isNSubstitutionPrefix(p),
-    );
+    const nPrefixToken = prefixTokens.find((p) => this.isNSubstitutionPrefix(p));
     if (!nPrefixToken) {
       throw new Error("N-prefix not found for amide");
     }
@@ -94,12 +89,8 @@ export class IUPACSpecializedBuilders {
     }
 
     // Separate N-substituents (after N-prefix) from carbon substituents (before N-prefix)
-    const nSubstituents = substituentTokens.filter(
-      (s) => s.position > nPrefixToken.position,
-    );
-    const carbonSubstituents = substituentTokens.filter(
-      (s) => s.position < nPrefixToken.position,
-    );
+    const nSubstituents = substituentTokens.filter((s) => s.position > nPrefixToken.position);
+    const carbonSubstituents = substituentTokens.filter((s) => s.position < nPrefixToken.position);
 
     if (process.env.VERBOSE) {
       console.log(
@@ -118,12 +109,9 @@ export class IUPACSpecializedBuilders {
 
       // Check for multiplier before this substituent
       const multiplierBefore = multiplierTokens.find(
-        (m) =>
-          m.position > nPrefixToken.position && m.position < nSubst.position,
+        (m) => m.position > nPrefixToken.position && m.position < nSubst.position,
       );
-      const count = multiplierBefore
-        ? (multiplierBefore.metadata?.count as number) || 1
-        : 1;
+      const count = multiplierBefore ? (multiplierBefore.metadata?.count as number) || 1 : 1;
 
       if (process.env.VERBOSE) {
         console.log(`[n-amide] Adding ${count}x ${substValue} to nitrogen`);
@@ -157,12 +145,8 @@ export class IUPACSpecializedBuilders {
 
     // Add carbon substituents to the main chain
     if (carbonSubstituents.length > 0) {
-      const carbonLocants = locantTokens.filter(
-        (l) => l.position < nPrefixToken.position,
-      );
-      const carbonMultipliers = multiplierTokens.filter(
-        (m) => m.position < nPrefixToken.position,
-      );
+      const carbonLocants = locantTokens.filter((l) => l.position < nPrefixToken.position);
+      const carbonMultipliers = multiplierTokens.filter((m) => m.position < nPrefixToken.position);
       this.context.substituentApplicator.applySubstituents(
         builder,
         mainChainAtoms,
@@ -191,9 +175,7 @@ export class IUPACSpecializedBuilders {
     multiplierTokens: IUPACToken[],
     prefixTokens: IUPACToken[],
   ): Molecule {
-    const nPrefixToken = prefixTokens.find((p) =>
-      this.isNSubstitutionPrefix(p),
-    );
+    const nPrefixToken = prefixTokens.find((p) => this.isNSubstitutionPrefix(p));
     if (!nPrefixToken) {
       throw new Error("N-prefix not found for amine");
     }
@@ -237,11 +219,7 @@ export class IUPACSpecializedBuilders {
       mainChainAtoms = builder.createPyrroleRing();
     } else if (parentValue === "pyridine" || parentSmiles === "c1ccncc1") {
       mainChainAtoms = builder.createPyridineRing();
-    } else if (
-      parentValue === "benzene" ||
-      parentValue === "benz" ||
-      parentSmiles === "c1ccccc1"
-    ) {
+    } else if (parentValue === "benzene" || parentValue === "benz" || parentSmiles === "c1ccccc1") {
       mainChainAtoms = builder.createBenzeneRing();
     } else {
       // Linear alkane chain (default case)
@@ -255,9 +233,7 @@ export class IUPACSpecializedBuilders {
     // Determine where to add the amine group(s)
     // For terminal amines, default is position 1 (index 0)
     // For diamines/triamines, extract all locants
-    const amineSuffix = suffixTokens.find(
-      (s) => s.value === "amine" || s.value === "amin",
-    );
+    const amineSuffix = suffixTokens.find((s) => s.value === "amine" || s.value === "amin");
 
     // Extract all amine positions (for diamines, triamines, etc.)
     const amineSiteIndices: number[] = [];
@@ -273,14 +249,9 @@ export class IUPACSpecializedBuilders {
       );
 
       // Also check for locants AFTER the amine suffix in case of alternate tokenizations
-      const afterAmineSuffixLocants = locantTokens.filter(
-        (l) => l.position > amineSuffix.position,
-      );
+      const afterAmineSuffixLocants = locantTokens.filter((l) => l.position > amineSuffix.position);
 
-      const allAmineSuffixLocants = [
-        ...beforeAmineSuffixLocants,
-        ...afterAmineSuffixLocants,
-      ];
+      const allAmineSuffixLocants = [...beforeAmineSuffixLocants, ...afterAmineSuffixLocants];
 
       // Filter to get locants that are not substituent-related
       // (i.e., not locants associated with carbon substituents before the N-prefix)
@@ -315,16 +286,11 @@ export class IUPACSpecializedBuilders {
           amineSiteIndices.length = 0;
 
           for (const locantNum of parsedLocants) {
-            const idx = this.context.locantToAtomIndex(
-              locantNum,
-              mainChainAtoms,
-            );
+            const idx = this.context.locantToAtomIndex(locantNum, mainChainAtoms);
             if (idx !== null) {
               amineSiteIndices.push(idx);
               if (process.env.VERBOSE) {
-                console.log(
-                  `[n-amine] Added amine site at locant ${locantNum} (index ${idx})`,
-                );
+                console.log(`[n-amine] Added amine site at locant ${locantNum} (index ${idx})`);
               }
             }
           }
@@ -346,9 +312,7 @@ export class IUPACSpecializedBuilders {
       const nIdx = builder.addAmine(siteIdx);
       nitrogenIndices.push(nIdx);
       if (process.env.VERBOSE) {
-        console.log(
-          `[n-amine] Added nitrogen at site ${siteIdx} -> N-index ${nIdx}`,
-        );
+        console.log(`[n-amine] Added nitrogen at site ${siteIdx} -> N-index ${nIdx}`);
       }
     }
 
@@ -371,9 +335,7 @@ export class IUPACSpecializedBuilders {
       // 2. It comes before any locant that comes after N- (meaning it's part of the N-group)
       if (s.isInParentheses) {
         if (process.env.VERBOSE) {
-          console.log(
-            `[n-amine] ${s.value} is in parentheses -> N-substituent`,
-          );
+          console.log(`[n-amine] ${s.value} is in parentheses -> N-substituent`);
         }
         return true;
       }
@@ -383,9 +345,7 @@ export class IUPACSpecializedBuilders {
         (suffix) =>
           (suffix.value === "idene" || suffix.value === "ylidene") &&
           suffix.position > s.position &&
-          !substituentTokens.some(
-            (x) => x.position > s.position && x.position < suffix.position,
-          ),
+          !substituentTokens.some((x) => x.position > s.position && x.position < suffix.position),
       );
       if (ideneOrYlideneSuffix) {
         if (process.env.VERBOSE) {
@@ -397,15 +357,11 @@ export class IUPACSpecializedBuilders {
       }
 
       // Check if there's a locant between N-prefix and this substituent
-      const locantsAfterNPrefix = locantTokens.filter(
-        (l) => l.position > nPrefixToken.position,
-      );
+      const locantsAfterNPrefix = locantTokens.filter((l) => l.position > nPrefixToken.position);
       if (locantsAfterNPrefix.length === 0) {
         // No locants after N-prefix, so all substituents after N are N-substituents
         if (process.env.VERBOSE) {
-          console.log(
-            `[n-amine] ${s.value} has no locant after N-prefix -> N-substituent`,
-          );
+          console.log(`[n-amine] ${s.value} has no locant after N-prefix -> N-substituent`);
         }
         return true;
       }
@@ -420,9 +376,7 @@ export class IUPACSpecializedBuilders {
       return isBeforeLocant;
     });
 
-    const carbonSubstituents = substituentTokens.filter(
-      (s) => !nSubstituents.includes(s),
-    );
+    const carbonSubstituents = substituentTokens.filter((s) => !nSubstituents.includes(s));
 
     if (process.env.VERBOSE) {
       console.log(
@@ -448,9 +402,7 @@ export class IUPACSpecializedBuilders {
           const substValue = nSubst.value.toLowerCase();
 
           if (process.env.VERBOSE) {
-            console.log(
-              `[n-amine] Adding 1x ${substValue} to nitrogen ${nitrogenIdx}`,
-            );
+            console.log(`[n-amine] Adding 1x ${substValue} to nitrogen ${nitrogenIdx}`);
           }
 
           // Add substituent ONCE per nitrogen (multiplier is already accounted for by having multiple N's)
@@ -460,15 +412,9 @@ export class IUPACSpecializedBuilders {
             builder.addEthyl(nitrogenIdx);
           } else if (substValue === "propyl") {
             builder.addAlkylSubstituent(nitrogenIdx, 3);
-          } else if (
-            substValue === "isopropyl" ||
-            substValue === "propan-2-yl"
-          ) {
+          } else if (substValue === "isopropyl" || substValue === "propan-2-yl") {
             builder.addIsopropyl(nitrogenIdx);
-          } else if (
-            substValue === "tert-butyl" ||
-            substValue === "tertbutyl"
-          ) {
+          } else if (substValue === "tert-butyl" || substValue === "tertbutyl") {
             builder.addTertButyl(nitrogenIdx);
           } else if (substValue === "phenyl") {
             // Add benzene ring
@@ -491,17 +437,12 @@ export class IUPACSpecializedBuilders {
 
         // Check for multiplier before this substituent
         const multiplierBefore = multiplierTokens.find(
-          (m) =>
-            m.position > nPrefixToken.position && m.position < nSubst.position,
+          (m) => m.position > nPrefixToken.position && m.position < nSubst.position,
         );
-        const count = multiplierBefore
-          ? (multiplierBefore.metadata?.count as number) || 1
-          : 1;
+        const count = multiplierBefore ? (multiplierBefore.metadata?.count as number) || 1 : 1;
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[n-amine] Adding ${count}x ${substValue} to nitrogen ${nitrogenIdx}`,
-          );
+          console.log(`[n-amine] Adding ${count}x ${substValue} to nitrogen ${nitrogenIdx}`);
         }
 
         // Add substituent 'count' times
@@ -509,20 +450,17 @@ export class IUPACSpecializedBuilders {
           // Check if this is a nested/complex substituent (e.g., "3-chloro-4-fluorophenyl")
           if (nSubst.nestedTokens && nSubst.nestedTokens.length > 0) {
             // Build the nested substituent and attach it
-            const nestedResult =
-              this.context.nestedBuilder.buildNestedSubstituent(
-                builder,
-                nSubst.nestedTokens,
-              );
+            const nestedResult = this.context.nestedBuilder.buildNestedSubstituent(
+              builder,
+              nSubst.nestedTokens,
+            );
 
             if (nestedResult) {
               const attachmentPoint = nestedResult.attachmentPoint;
               builder.addBond(nitrogenIdx, attachmentPoint);
 
               if (process.env.VERBOSE) {
-                console.log(
-                  `[n-amine] Attached nested substituent: ${substValue}`,
-                );
+                console.log(`[n-amine] Attached nested substituent: ${substValue}`);
               }
             }
           } else if (substValue === "methyl") {
@@ -531,15 +469,9 @@ export class IUPACSpecializedBuilders {
             builder.addEthyl(nitrogenIdx);
           } else if (substValue === "propyl") {
             builder.addAlkylSubstituent(nitrogenIdx, 3);
-          } else if (
-            substValue === "isopropyl" ||
-            substValue === "propan-2-yl"
-          ) {
+          } else if (substValue === "isopropyl" || substValue === "propan-2-yl") {
             builder.addIsopropyl(nitrogenIdx);
-          } else if (
-            substValue === "tert-butyl" ||
-            substValue === "tertbutyl"
-          ) {
+          } else if (substValue === "tert-butyl" || substValue === "tertbutyl") {
             builder.addTertButyl(nitrogenIdx);
           } else if (substValue === "phenyl") {
             // Add benzene ring
@@ -572,9 +504,7 @@ export class IUPACSpecializedBuilders {
           const followingSubstituent = carbonSubstituents.find(
             (s) =>
               s.position > l.position &&
-              !carbonSubstituents.some(
-                (x) => x.position > l.position && x.position < s.position,
-              ),
+              !carbonSubstituents.some((x) => x.position > l.position && x.position < s.position),
           );
           if (followingSubstituent) {
             // This locant is for a substituent
@@ -584,9 +514,7 @@ export class IUPACSpecializedBuilders {
           // Otherwise, check if there's an amine suffix after this locant
           // If so, this locant is likely for the amine position
           const amineSuffix = suffixTokens.find(
-            (s) =>
-              (s.value === "amine" || s.value === "amin") &&
-              s.position > l.position,
+            (s) => (s.value === "amine" || s.value === "amin") && s.position > l.position,
           );
           // If there's an amine suffix after this locant, this locant is for the amine, not for carbon substituents
           return !amineSuffix;
@@ -635,15 +563,10 @@ export class IUPACSpecializedBuilders {
 
     if (amineNitrogens.length === 0) return;
 
-    const nPrefixToken = prefixTokens.find((p) =>
-      this.isNSubstitutionPrefix(p),
-    );
+    const nPrefixToken = prefixTokens.find((p) => this.isNSubstitutionPrefix(p));
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[applyNPrefixSubstituents] N-prefix token:`,
-        nPrefixToken?.value || "none",
-      );
+      console.log(`[applyNPrefixSubstituents] N-prefix token:`, nPrefixToken?.value || "none");
     }
 
     if (!nPrefixToken) return;
@@ -678,10 +601,7 @@ export class IUPACSpecializedBuilders {
     for (const nSubst of nSubstituents) {
       // Check if this substituent has a numeric locant (meaning it belongs to the ring)
       // Exception: if the "locant" is N (which might be parsed as locant), it belongs to N
-      const _locants = this.context.getLocantsBeforeSubstituent(
-        nSubst,
-        locantTokens,
-      );
+      const _locants = this.context.getLocantsBeforeSubstituent(nSubst, locantTokens);
 
       // Filter out N locants (if any)
       // Note: locantTokens usually contain numeric values or "N".
@@ -711,10 +631,7 @@ export class IUPACSpecializedBuilders {
       }
 
       // Check multiplier
-      const multiplier = this.context.getMultiplierBeforeSubstituent(
-        nSubst,
-        multiplierTokens,
-      );
+      const multiplier = this.context.getMultiplierBeforeSubstituent(nSubst, multiplierTokens);
       let count = multiplier ? (multiplier.metadata?.count as number) || 1 : 1;
 
       if (precedingLocant && /^\d/.test(precedingLocant.value)) {
@@ -725,9 +642,7 @@ export class IUPACSpecializedBuilders {
         // Calculate number of Ns in the prefix
         const nPrefixValue = nPrefixToken.value.toLowerCase();
         // Split by comma or hyphen (standard delimiters)
-        const nParts = nPrefixValue
-          .split(/[,-]/)
-          .filter((p) => p.trim() === "n");
+        const nParts = nPrefixValue.split(/[,-]/).filter((p) => p.trim() === "n");
         const nCount = nParts.length;
 
         if (nCount > 0) {
@@ -758,9 +673,7 @@ export class IUPACSpecializedBuilders {
         const nPrefixValue = nPrefixToken.value.toLowerCase();
 
         // Update count based on number of Ns
-        const nParts = nPrefixValue
-          .split(/[,-]/)
-          .filter((p) => p.trim() === "n");
+        const nParts = nPrefixValue.split(/[,-]/).filter((p) => p.trim() === "n");
         const nCount = nParts.length;
         if (nCount > 0) {
           count = nCount;
@@ -789,11 +702,10 @@ export class IUPACSpecializedBuilders {
             if (atomIdx !== null) {
               // Apply the same substituent to this ring position
               if (nSubst.nestedTokens && nSubst.nestedTokens.length > 0) {
-                const nestedResult =
-                  this.context.nestedBuilder.buildNestedSubstituent(
-                    builder,
-                    nSubst.nestedTokens,
-                  );
+                const nestedResult = this.context.nestedBuilder.buildNestedSubstituent(
+                  builder,
+                  nSubst.nestedTokens,
+                );
                 if (nestedResult) {
                   builder.addBond(atomIdx, nestedResult.attachmentPoint);
                 }
@@ -801,14 +713,10 @@ export class IUPACSpecializedBuilders {
                 const simpleVal = nSubst.value.toLowerCase();
                 if (simpleVal === "methyl") builder.addMethyl(atomIdx);
                 else if (simpleVal === "ethyl") builder.addEthyl(atomIdx);
-                else if (simpleVal === "propyl")
-                  builder.addAlkylSubstituent(atomIdx, 3);
-                else if (simpleVal === "isopropyl")
-                  builder.addIsopropyl(atomIdx);
-                else if (simpleVal === "butyl")
-                  builder.addAlkylSubstituent(atomIdx, 4);
-                else if (simpleVal === "tert-butyl")
-                  builder.addTertButyl(atomIdx);
+                else if (simpleVal === "propyl") builder.addAlkylSubstituent(atomIdx, 3);
+                else if (simpleVal === "isopropyl") builder.addIsopropyl(atomIdx);
+                else if (simpleVal === "butyl") builder.addAlkylSubstituent(atomIdx, 4);
+                else if (simpleVal === "tert-butyl") builder.addTertButyl(atomIdx);
               }
               if (process.env.VERBOSE) {
                 console.log(
@@ -822,28 +730,23 @@ export class IUPACSpecializedBuilders {
 
       for (let i = 0; i < count; i++) {
         if (nSubst.nestedTokens && nSubst.nestedTokens.length > 0) {
-          const nestedResult =
-            this.context.nestedBuilder.buildNestedSubstituent(
-              builder,
-              nSubst.nestedTokens,
-            );
+          const nestedResult = this.context.nestedBuilder.buildNestedSubstituent(
+            builder,
+            nSubst.nestedTokens,
+          );
           if (nestedResult) {
             builder.addBond(targetN, nestedResult.attachmentPoint);
             if (process.env.VERBOSE) {
-              console.log(
-                `[applyNPrefixSubstituents] Attached nested substituent ${substValue}`,
-              );
+              console.log(`[applyNPrefixSubstituents] Attached nested substituent ${substValue}`);
             }
           }
         } else {
           // Simple substituents
           if (substValue === "methyl") builder.addMethyl(targetN);
           else if (substValue === "ethyl") builder.addEthyl(targetN);
-          else if (substValue === "propyl")
-            builder.addAlkylSubstituent(targetN, 3);
+          else if (substValue === "propyl") builder.addAlkylSubstituent(targetN, 3);
           else if (substValue === "isopropyl") builder.addIsopropyl(targetN);
-          else if (substValue === "butyl")
-            builder.addAlkylSubstituent(targetN, 4);
+          else if (substValue === "butyl") builder.addAlkylSubstituent(targetN, 4);
           else if (substValue === "tert-butyl") builder.addTertButyl(targetN);
           else if (substValue === "phenyl") {
             const ph = builder.createBenzeneRing();
@@ -868,19 +771,14 @@ export class IUPACSpecializedBuilders {
   ): Molecule {
     // For esters, find the parent with the "oate" suffix (the acyl chain)
     // Other parents are part of the ester alkyl group name
-    const oateToken = suffixTokens.find(
-      (s) => s.value === "oate" || s.value === "anoate",
-    );
+    const oateToken = suffixTokens.find((s) => s.value === "oate" || s.value === "anoate");
     let acylParentIdx = 0; // default to first
     if (oateToken && parentTokens.length > 1) {
       // Find the parent token that's closest to the oate suffix
-      const parentsBeforeOate = parentTokens.filter(
-        (p) => p.position < oateToken.position,
-      );
+      const parentsBeforeOate = parentTokens.filter((p) => p.position < oateToken.position);
       if (parentsBeforeOate.length > 0) {
         // Use the last parent before oate (should be the acyl chain)
-        const lastParentBeforeOate =
-          parentsBeforeOate[parentsBeforeOate.length - 1]!;
+        const lastParentBeforeOate = parentsBeforeOate[parentsBeforeOate.length - 1]!;
         acylParentIdx = parentTokens.indexOf(lastParentBeforeOate);
       }
     }
@@ -940,11 +838,7 @@ export class IUPACSpecializedBuilders {
         });
 
         if (process.env.VERBOSE) {
-          console.log(
-            "[ester] Parsed aromatic parent:",
-            acylChainAtoms.length,
-            "atoms",
-          );
+          console.log("[ester] Parsed aromatic parent:", acylChainAtoms.length, "atoms");
         }
       }
     } else {
@@ -955,9 +849,7 @@ export class IUPACSpecializedBuilders {
     // Check if this is a diester (has "di" multiplier before oate)
     const isDiester =
       oateToken &&
-      multiplierTokens.some(
-        (m) => m.value === "di" && m.position < oateToken.position,
-      );
+      multiplierTokens.some((m) => m.value === "di" && m.position < oateToken.position);
 
     // Separate substituents with locants (acyl chain substituents) from those without (ester alkyl groups)
     const acylSubstituents: IUPACToken[] = [];
@@ -972,9 +864,7 @@ export class IUPACSpecializedBuilders {
         const locantsBeforeThis = locantTokens.filter(
           (l) =>
             l.position < subst.position &&
-            !locantTokens.some(
-              (x) => x.position > l.position && x.position < subst.position,
-            ),
+            !locantTokens.some((x) => x.position > l.position && x.position < subst.position),
         );
         if (process.env.VERBOSE) {
           console.log(
@@ -1019,9 +909,7 @@ export class IUPACSpecializedBuilders {
         const relevantLocants = locantTokens.filter(
           (l) =>
             l.position < subst.position &&
-            !locantTokens.some(
-              (x) => x.position > l.position && x.position < subst.position,
-            ) &&
+            !locantTokens.some((x) => x.position > l.position && x.position < subst.position) &&
             !consumedLocants.has(l),
         );
         const hasLocant = relevantLocants.length > 0;
@@ -1084,22 +972,10 @@ export class IUPACSpecializedBuilders {
       const endIdx = acylChainAtoms[acylChainAtoms.length - 1];
 
       if (startIdx !== undefined) {
-        this.addEsterWithAlkyl(
-          builder,
-          startIdx,
-          esterAlkylTokens,
-          locantTokens,
-          multiplierTokens,
-        );
+        this.addEsterWithAlkyl(builder, startIdx, esterAlkylTokens, locantTokens, multiplierTokens);
       }
       if (endIdx !== undefined) {
-        this.addEsterWithAlkyl(
-          builder,
-          endIdx,
-          esterAlkylTokens,
-          locantTokens,
-          multiplierTokens,
-        );
+        this.addEsterWithAlkyl(builder, endIdx, esterAlkylTokens, locantTokens, multiplierTokens);
       }
     } else {
       // Simple ester: add to terminal carbon
@@ -1137,12 +1013,8 @@ export class IUPACSpecializedBuilders {
       // Handle multiple esterAlkylTokens:
       // If we have both parenthetical (ring) and non-parenthetical (alkyl) tokens,
       // build the alkyl as the base and attach the parenthetical as substituents
-      const parentheticalTokens = esterAlkylTokens.filter(
-        (t) => t.isInParentheses,
-      );
-      const nonParentheticalTokens = esterAlkylTokens.filter(
-        (t) => !t.isInParentheses,
-      );
+      const parentheticalTokens = esterAlkylTokens.filter((t) => t.isInParentheses);
+      const nonParentheticalTokens = esterAlkylTokens.filter((t) => !t.isInParentheses);
 
       let baseAlkylLength = 0;
       let baseCarbonIdx: number | null = null;
@@ -1167,9 +1039,7 @@ export class IUPACSpecializedBuilders {
         }
 
         if (process.env.VERBOSE) {
-          console.log(
-            `[ester] Built base alkyl: ${baseToken.value} (length=${baseAlkylLength})`,
-          );
+          console.log(`[ester] Built base alkyl: ${baseToken.value} (length=${baseAlkylLength})`);
         }
       }
 
@@ -1177,8 +1047,7 @@ export class IUPACSpecializedBuilders {
       // Or directly to the ester oxygen if there is no base alkyl (e.g., aryl ester)
       if (parentheticalTokens.length > 0) {
         // If no base alkyl (baseCarbonIdx is null), we attach directly to etherOxygenIdx
-        const attachToIdx =
-          baseCarbonIdx !== null ? baseCarbonIdx : etherOxygenIdx;
+        const attachToIdx = baseCarbonIdx !== null ? baseCarbonIdx : etherOxygenIdx;
 
         for (const parentToken of parentheticalTokens) {
           if (parentToken.nestedTokens) {
@@ -1187,9 +1056,7 @@ export class IUPACSpecializedBuilders {
               (m) =>
                 m.position < parentToken.position &&
                 !multiplierTokens.some(
-                  (x) =>
-                    x.position > m.position &&
-                    x.position < parentToken.position,
+                  (x) => x.position > m.position && x.position < parentToken.position,
                 ),
             );
 
@@ -1198,17 +1065,12 @@ export class IUPACSpecializedBuilders {
               (l) =>
                 l.position < parentToken.position &&
                 !locantTokens.some(
-                  (x) =>
-                    x.position > l.position &&
-                    x.position < parentToken.position,
+                  (x) => x.position > l.position && x.position < parentToken.position,
                 ),
             );
 
             let positions: number[] = [];
-            if (
-              relevantLocants.length > 0 &&
-              relevantLocants[0]?.metadata?.positions
-            ) {
+            if (relevantLocants.length > 0 && relevantLocants[0]?.metadata?.positions) {
               positions = relevantLocants[0].metadata.positions as number[];
             }
 
@@ -1226,11 +1088,10 @@ export class IUPACSpecializedBuilders {
 
             // Build and attach the substituent at each position
             for (const pos of positions) {
-              const alkylResult =
-                this.context.nestedBuilder.buildNestedSubstituent(
-                  builder,
-                  parentToken.nestedTokens,
-                );
+              const alkylResult = this.context.nestedBuilder.buildNestedSubstituent(
+                builder,
+                parentToken.nestedTokens,
+              );
               if (alkylResult) {
                 // If attaching to base alkyl, map position. If attaching to oxygen, use it directly.
                 let targetIdx = attachToIdx;
@@ -1277,9 +1138,7 @@ export class IUPACSpecializedBuilders {
     const oxyToken = suffixTokens[oxyConnectorIdx]!;
 
     // Find parent chains before and after "oxy"
-    const alkylParent = parentTokens.find(
-      (p) => p.position < oxyToken.position,
-    );
+    const alkylParent = parentTokens.find((p) => p.position < oxyToken.position);
     const mainParent = parentTokens.find((p) => p.position > oxyToken.position);
 
     if (!alkylParent || !mainParent) {
@@ -1292,9 +1151,7 @@ export class IUPACSpecializedBuilders {
     }
 
     // Find locant for attachment position (before alkyl parent)
-    const attachLocant = locantTokens.find(
-      (l) => l.position < alkylParent.position,
-    );
+    const attachLocant = locantTokens.find((l) => l.position < alkylParent.position);
     const attachPosition = attachLocant
       ? ((attachLocant.metadata?.positions as number[])?.[0] ?? 1)
       : 1;
@@ -1304,18 +1161,12 @@ export class IUPACSpecializedBuilders {
     const alkylChainAtoms = builder.createLinearChain(alkylAtomCount);
 
     // Apply substituents to alkyl chain
-    const alkylSubstituents = substituentTokens.filter(
-      (s) => s.position < oxyToken.position,
-    );
+    const alkylSubstituents = substituentTokens.filter((s) => s.position < oxyToken.position);
     const alkylLocants = locantTokens.filter(
-      (l) =>
-        l.position > (attachLocant?.position ?? -1) &&
-        l.position < oxyToken.position,
+      (l) => l.position > (attachLocant?.position ?? -1) && l.position < oxyToken.position,
     );
     const alkylMultipliers = multiplierTokens.filter(
-      (m) =>
-        m.position > (attachLocant?.position ?? -1) &&
-        m.position < oxyToken.position,
+      (m) => m.position > (attachLocant?.position ?? -1) && m.position < oxyToken.position,
     );
 
     if (alkylSubstituents.length > 0) {
@@ -1333,26 +1184,14 @@ export class IUPACSpecializedBuilders {
     const mainChainAtoms = builder.createLinearChain(mainAtomCount);
 
     // Apply functional groups to main chain
-    const mainSuffixes = suffixTokens.filter(
-      (s) => s.position > oxyToken.position,
-    );
-    const mainLocants = locantTokens.filter(
-      (l) => l.position > oxyToken.position,
-    );
+    const mainSuffixes = suffixTokens.filter((s) => s.position > oxyToken.position);
+    const mainLocants = locantTokens.filter((l) => l.position > oxyToken.position);
 
     // Apply unsaturation
-    this.context.applyUnsaturation(
-      builder,
-      mainChainAtoms,
-      mainSuffixes,
-      mainLocants,
-      false,
-    );
+    this.context.applyUnsaturation(builder, mainChainAtoms, mainSuffixes, mainLocants, false);
 
     // Apply other functional groups
-    const mainSubstituents = substituentTokens.filter(
-      (s) => s.position > oxyToken.position,
-    );
+    const mainSubstituents = substituentTokens.filter((s) => s.position > oxyToken.position);
     this.context.applySuffixes(
       builder,
       mainChainAtoms,
@@ -1362,10 +1201,7 @@ export class IUPACSpecializedBuilders {
     );
 
     // Connect alkyl chain to main chain via oxygen (ether linkage)
-    const mainAttachAtomIdx = this.context.locantToAtomIndex(
-      attachPosition,
-      mainChainAtoms,
-    );
+    const mainAttachAtomIdx = this.context.locantToAtomIndex(attachPosition, mainChainAtoms);
     if (mainAttachAtomIdx !== null) {
       builder.addAlkoxyGroup(mainAttachAtomIdx, alkylChainAtoms);
     }

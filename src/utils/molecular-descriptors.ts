@@ -4,10 +4,7 @@ import { getHeavyAtomCount } from "./molecular-properties";
 /**
  * Compute basic molecular descriptors
  */
-export function computeDescriptors(
-  mol: Molecule,
-  opts: DescriptorOptions = {},
-): DescriptorResult {
+export function computeDescriptors(mol: Molecule, opts: DescriptorOptions = {}): DescriptorResult {
   const atomCount = getAtomCount(mol);
   const bondCount = getBondCount(mol);
   const formalCharge = getFormalCharge(mol);
@@ -86,10 +83,7 @@ export function getHeavyAtomFraction(mol: Molecule): number {
   if (heavyAtoms === 0) return 0;
 
   // Total atoms = explicit atoms + implicit hydrogens
-  const implicitHydrogens = mol.atoms.reduce(
-    (sum, atom) => sum + (atom.hydrogens ?? 0),
-    0,
-  );
+  const implicitHydrogens = mol.atoms.reduce((sum, atom) => sum + (atom.hydrogens ?? 0), 0);
   const totalAtoms = mol.atoms.length + implicitHydrogens;
 
   return heavyAtoms / totalAtoms;

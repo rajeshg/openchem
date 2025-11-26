@@ -48,16 +48,8 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
   };
 
   describe("Spiro Compounds", () => {
-    testMatch(
-      "C1CCC2(CC1)CCC1(CC2)CCCC1",
-      "[R2]",
-      "Spiro[5.5]undecane - R2 atoms",
-    );
-    testMatch(
-      "C1CCC2(CC1)CCC1(CC2)CCCC1",
-      "[R3]",
-      "Spiro[5.5]undecane - R3 atoms",
-    );
+    testMatch("C1CCC2(CC1)CCC1(CC2)CCCC1", "[R2]", "Spiro[5.5]undecane - R2 atoms");
+    testMatch("C1CCC2(CC1)CCC1(CC2)CCCC1", "[R3]", "Spiro[5.5]undecane - R3 atoms");
     testMatch("C1CCC2(CC1)CCCC2", "[R2]", "Spiro[5.4]decane - R2 atoms");
     testMatch("C12CCC(CC1)CC2", "[r5]", "Spiro compound - 5-membered rings");
   });
@@ -71,8 +63,7 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
     testMatch("C1CC2CCC1C2", "[R3]", "Bicyclo[2.2.1]heptane - R3 atoms", {
       openchem: 0,
       rdkit: 0,
-      reason:
-        "SSSR: no atoms in 3 rings. RDKit also finds no atoms in 3 rings for this structure.",
+      reason: "SSSR: no atoms in 3 rings. RDKit also finds no atoms in 3 rings for this structure.",
     });
     testMatch("C1CCC2CC3CCC(C1)C32", "[R3]", "Adamantane - R3 atoms", {
       openchem: 1,
@@ -88,31 +79,11 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
   });
 
   describe("Large Fused Systems", () => {
-    testMatch(
-      "C1=CC=C2C=CC=C3C=CC=C4C=CC=C1C2=C34",
-      "[R2]",
-      "Anthracene - R2 atoms",
-    );
-    testMatch(
-      "C1=CC=C2C=CC=C3C=CC=C4C=CC=C1C2=C34",
-      "[R3]",
-      "Anthracene - R3 atoms",
-    );
-    testMatch(
-      "C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1",
-      "[R2]",
-      "Pyrene - R2 atoms",
-    );
-    testMatch(
-      "C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1",
-      "[R3]",
-      "Pyrene - R3 atoms",
-    );
-    testMatch(
-      "C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1",
-      "[R4]",
-      "Pyrene - R4 atoms",
-    );
+    testMatch("C1=CC=C2C=CC=C3C=CC=C4C=CC=C1C2=C34", "[R2]", "Anthracene - R2 atoms");
+    testMatch("C1=CC=C2C=CC=C3C=CC=C4C=CC=C1C2=C34", "[R3]", "Anthracene - R3 atoms");
+    testMatch("C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1", "[R2]", "Pyrene - R2 atoms");
+    testMatch("C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1", "[R3]", "Pyrene - R3 atoms");
+    testMatch("C1=CC=C2C3=C4C(=CC=C3)C=CC=C4C=CC2=C1", "[R4]", "Pyrene - R4 atoms");
   });
 
   describe("Macrocycles", () => {
@@ -125,22 +96,12 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
   describe("Complex Polycyclic Systems", () => {
     testMatch("C12C3C4C1C5C2C3C45", "[R4]", "Cubane - R4 atoms");
     testMatch("C12C3C4C1C5C2C3C45", "[r4]", "Cubane - r4 ring size");
-    testMatch(
-      "C1CC2CCC3C(C1)C1CCC4CCCC(C2)C4C31",
-      "[R4]",
-      "Twistane - R4 atoms",
-    );
-    testMatch(
-      "C1C2CC3CC1CC(C2)C3",
-      "[R3]",
-      "Adamantane (mislabeled) - R3 atoms",
-      {
-        openchem: 1,
-        rdkit: 4,
-        reason:
-          "RDKit uses extended ring set instead of SSSR. See docs/smarts-matching.md",
-      },
-    );
+    testMatch("C1CC2CCC3C(C1)C1CCC4CCCC(C2)C4C31", "[R4]", "Twistane - R4 atoms");
+    testMatch("C1C2CC3CC1CC(C2)C3", "[R3]", "Adamantane (mislabeled) - R3 atoms", {
+      openchem: 1,
+      rdkit: 4,
+      reason: "RDKit uses extended ring set instead of SSSR. See docs/smarts-matching.md",
+    });
   });
 
   describe("Mixed Ring Systems", () => {
@@ -157,11 +118,7 @@ describe("SMARTS Edge Cases - RDKit Comparison", () => {
   });
 
   describe("Edge Cases - Ring Count Boundaries", () => {
-    testMatch(
-      "C1CCCCC1C2CCCCC2",
-      "[R0]",
-      "Two separate rings - R0 atoms (linker)",
-    );
+    testMatch("C1CCCCC1C2CCCCC2", "[R0]", "Two separate rings - R0 atoms (linker)");
     testMatch("C1CCCCC1C2CCCCC2", "[R1]", "Two separate rings - R1 atoms");
     testMatch("C1CCCCC1", "[!R0]", "Single ring - not R0");
   });

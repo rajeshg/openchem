@@ -1,9 +1,6 @@
 import type { Atom, Bond } from "types";
 
-export function getBondsForAtom(
-  bonds: readonly Bond[],
-  atomId: number,
-): Bond[] {
+export function getBondsForAtom(bonds: readonly Bond[], atomId: number): Bond[] {
   return bonds.filter((b) => b.atom1 === atomId || b.atom2 === atomId);
 }
 
@@ -11,11 +8,7 @@ export function getOtherAtomId(bond: Bond, atomId: number): number {
   return bond.atom1 === atomId ? bond.atom2 : bond.atom1;
 }
 
-export function getOtherAtom(
-  bond: Bond,
-  atomId: number,
-  atoms: readonly Atom[],
-): Atom | undefined {
+export function getOtherAtom(bond: Bond, atomId: number, atoms: readonly Atom[]): Atom | undefined {
   const otherId = getOtherAtomId(bond, atomId);
   return atoms.find((a) => a.id === otherId);
 }
@@ -60,13 +53,8 @@ export function hasTripleBond(bonds: readonly Bond[], atomId: number): boolean {
   return getBondsForAtom(bonds, atomId).some((b) => b.type === "triple");
 }
 
-export function hasMultipleBond(
-  bonds: readonly Bond[],
-  atomId: number,
-): boolean {
-  return getBondsForAtom(bonds, atomId).some(
-    (b) => b.type === "double" || b.type === "triple",
-  );
+export function hasMultipleBond(bonds: readonly Bond[], atomId: number): boolean {
+  return getBondsForAtom(bonds, atomId).some((b) => b.type === "double" || b.type === "triple");
 }
 
 export function hasCarbonylBond(
@@ -97,8 +85,7 @@ export function hasImineBond(
     const other = getOtherAtom(b, atomId, atoms);
     if (!other) return false;
     return (
-      (atom.symbol === "C" && other.symbol === "N") ||
-      (atom.symbol === "N" && other.symbol === "C")
+      (atom.symbol === "C" && other.symbol === "N") || (atom.symbol === "N" && other.symbol === "C")
     );
   });
 }

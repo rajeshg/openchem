@@ -116,9 +116,7 @@ describe("bond-utils", () => {
     });
 
     it("returns true for isotopic hydrogen", () => {
-      expect(isHeavyAtom({ id: 0, symbol: "H", isotope: 2 } as Atom)).toBe(
-        true,
-      );
+      expect(isHeavyAtom({ id: 0, symbol: "H", isotope: 2 } as Atom)).toBe(true);
     });
 
     it("returns true for carbon", () => {
@@ -269,10 +267,7 @@ describe("bond-utils", () => {
 
   describe("hasCarbonylBond", () => {
     it("returns false for non-carbon atom", () => {
-      const atoms: Atom[] = [
-        { id: 0, symbol: "O" } as Atom,
-        { id: 1, symbol: "O" } as Atom,
-      ];
+      const atoms: Atom[] = [{ id: 0, symbol: "O" } as Atom, { id: 1, symbol: "O" } as Atom];
       const bonds: Bond[] = [
         { atom1: 0, atom2: 1, type: BondType.DOUBLE, stereo: StereoType.NONE },
       ];
@@ -291,10 +286,7 @@ describe("bond-utils", () => {
     });
 
     it("returns true for C=O bond", () => {
-      const atoms: Atom[] = [
-        { id: 0, symbol: "C" } as Atom,
-        { id: 1, symbol: "O" } as Atom,
-      ];
+      const atoms: Atom[] = [{ id: 0, symbol: "C" } as Atom, { id: 1, symbol: "O" } as Atom];
       const bonds: Bond[] = [
         { atom1: 0, atom2: 1, type: BondType.DOUBLE, stereo: StereoType.NONE },
       ];
@@ -302,10 +294,7 @@ describe("bond-utils", () => {
     });
 
     it("returns false for C=C bond", () => {
-      const atoms: Atom[] = [
-        { id: 0, symbol: "C" } as Atom,
-        { id: 1, symbol: "C" } as Atom,
-      ];
+      const atoms: Atom[] = [{ id: 0, symbol: "C" } as Atom, { id: 1, symbol: "C" } as Atom];
       const bonds: Bond[] = [
         { atom1: 0, atom2: 1, type: BondType.DOUBLE, stereo: StereoType.NONE },
       ];
@@ -313,10 +302,7 @@ describe("bond-utils", () => {
     });
 
     it("returns false for C-O single bond", () => {
-      const atoms: Atom[] = [
-        { id: 0, symbol: "C" } as Atom,
-        { id: 1, symbol: "O" } as Atom,
-      ];
+      const atoms: Atom[] = [{ id: 0, symbol: "C" } as Atom, { id: 1, symbol: "O" } as Atom];
       const bonds: Bond[] = [
         { atom1: 0, atom2: 1, type: BondType.SINGLE, stereo: StereoType.NONE },
       ];

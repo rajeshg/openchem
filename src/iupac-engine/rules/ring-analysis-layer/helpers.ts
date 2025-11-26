@@ -20,10 +20,7 @@ export function detectRingSystems(molecule: Molecule): unknown[] {
   const classification = classifyRingSystems(molecule.atoms, molecule.bonds);
 
   // Build lookup for ring classification
-  const ringClassification = new Map<
-    number,
-    "isolated" | "fused" | "spiro" | "bridged"
-  >();
+  const ringClassification = new Map<number, "isolated" | "fused" | "spiro" | "bridged">();
   for (let i = 0; i < rings.length; i++) {
     const ring = rings[i];
     if (!ring) continue;
@@ -85,10 +82,7 @@ export function detectRingSystems(molecule: Molecule): unknown[] {
   // DEBUG: Log groups for debugging
   if (process.env.VERBOSE) {
     console.log(`[detectRingSystems] Total rings: ${rings.length}`);
-    console.log(
-      `[detectRingSystems] Groups Map:`,
-      Array.from(groups.entries()),
-    );
+    console.log(`[detectRingSystems] Groups Map:`, Array.from(groups.entries()));
     for (const [root, ringIndices] of groups) {
       console.log(
         `  Group ${root}: ${ringIndices.length} rings, indices: [${ringIndices.join(", ")}]`,
@@ -114,8 +108,7 @@ export function detectRingSystems(molecule: Molecule): unknown[] {
       for (let i = 0; i < ring.length; i++) {
         const atom1 = ring[i]!;
         const atom2 = ring[(i + 1) % ring.length]!;
-        const bondKey =
-          atom1 < atom2 ? `${atom1}-${atom2}` : `${atom2}-${atom1}`;
+        const bondKey = atom1 < atom2 ? `${atom1}-${atom2}` : `${atom2}-${atom1}`;
         bondSet.add(bondKey);
       }
     }
@@ -130,16 +123,13 @@ export function detectRingSystems(molecule: Molecule): unknown[] {
       .map((key) => {
         const [a1, a2] = key.split("-").map(Number);
         return molecule.bonds.find(
-          (b) =>
-            (b.atom1 === a1 && b.atom2 === a2) ||
-            (b.atom1 === a2 && b.atom2 === a1),
+          (b) => (b.atom1 === a1 && b.atom2 === a2) || (b.atom1 === a2 && b.atom2 === a1),
         );
       })
       .filter((b) => b) as Bond[];
 
     // Determine classification (take first ring's classification as representative)
-    const primaryClassification =
-      ringClassification.get(ringIndices[0]!) || "isolated";
+    const primaryClassification = ringClassification.get(ringIndices[0]!) || "isolated";
 
     // Construct ring system object
     const ringSystem = {
@@ -168,10 +158,7 @@ function arraysEqual(a: number[], b: number[]): boolean {
 /**
  * Determine ring type (aromatic, aliphatic, heterocyclic)
  */
-function determineRingType(ringSystem: {
-  atoms: Atom[];
-  bonds: Bond[];
-}): string {
+function determineRingType(ringSystem: { atoms: Atom[]; bonds: Bond[] }): string {
   const hasAromaticAtoms = ringSystem.atoms.some((atom) => atom.aromatic);
   const hasHeteroatoms = ringSystem.atoms.some((atom) => atom.symbol !== "C");
 
@@ -205,12 +192,7 @@ export function generateRingName(
   const classification = ringSystem.classification;
 
   // Handle fused ring systems (naphthalene, anthracene, etc.)
-  if (
-    classification === "fused" &&
-    molecule &&
-    ringSystem.rings &&
-    ringSystem.rings.length > 1
-  ) {
+  if (classification === "fused" && molecule && ringSystem.rings && ringSystem.rings.length > 1) {
     const fusedName = generateFusedPolycyclicName(ringSystem.rings, molecule);
     if (fusedName) {
       return fusedName;
@@ -218,12 +200,7 @@ export function generateRingName(
   }
 
   // Handle bridged ring systems (bicyclo, tricyclo, etc.)
-  if (
-    classification === "bridged" &&
-    molecule &&
-    ringSystem.rings &&
-    ringSystem.rings.length > 1
-  ) {
+  if (classification === "bridged" && molecule && ringSystem.rings && ringSystem.rings.length > 1) {
     const bridgedResult = generateBridgedPolycyclicName(
       ringSystem.rings,
       molecule,
@@ -235,12 +212,7 @@ export function generateRingName(
   }
 
   // Handle spiro ring systems
-  if (
-    classification === "spiro" &&
-    molecule &&
-    ringSystem.rings &&
-    ringSystem.rings.length > 1
-  ) {
+  if (classification === "spiro" && molecule && ringSystem.rings && ringSystem.rings.length > 1) {
     const spiroName = generateSpiroPolycyclicName(ringSystem.rings, molecule);
     if (spiroName) {
       return spiroName;
@@ -280,9 +252,7 @@ export function generateRingName(
 
       if (ringIndices.length === atoms.length) {
         // Import the proper aromatic naming function
-        const {
-          generateAromaticRingName,
-        } = require("../../naming/iupac-rings/aromatic-naming");
+        const { generateAromaticRingName } = require("../../naming/iupac-rings/aromatic-naming");
         const aromaticName = generateAromaticRingName(ringIndices, molecule);
         if (aromaticName && !aromaticName.startsWith("aromatic_C")) {
           return aromaticName;
@@ -309,10 +279,8 @@ export function generateRingName(
       if (hasNitrogen === 1 && totalHetero === 1) return "pyrrole";
       if (hasSulfur === 1 && totalHetero === 1) return "thiophene";
       if (hasNitrogen === 2 && totalHetero === 2) return "imidazole";
-      if (hasNitrogen === 1 && hasSulfur === 1 && totalHetero === 2)
-        return "thiazole";
-      if (hasNitrogen === 1 && hasOxygen === 1 && totalHetero === 2)
-        return "oxazole";
+      if (hasNitrogen === 1 && hasSulfur === 1 && totalHetero === 2) return "thiazole";
+      if (hasNitrogen === 1 && hasOxygen === 1 && totalHetero === 2) return "oxazole";
     }
   }
 
@@ -320,8 +288,7 @@ export function generateRingName(
   if (type !== "aromatic" && totalHetero === 1 && size === 3) {
     const ringIndices = atoms.map((atom) => atom.id);
     const doubleBondsInRing = (ringSystem.bonds || []).filter((bond) => {
-      const isInRing =
-        ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
+      const isInRing = ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
       return isInRing && bond.type === BondType.DOUBLE;
     });
 
@@ -364,14 +331,8 @@ export function generateRingName(
             const atom2InRing = ringIndices.includes(atom2.id);
 
             if (
-              (atom1InRing &&
-                atom1.symbol === "C" &&
-                !atom2InRing &&
-                atom2.symbol === "O") ||
-              (atom2InRing &&
-                atom2.symbol === "C" &&
-                !atom1InRing &&
-                atom1.symbol === "O")
+              (atom1InRing && atom1.symbol === "C" && !atom2InRing && atom2.symbol === "O") ||
+              (atom2InRing && atom2.symbol === "C" && !atom1InRing && atom1.symbol === "O")
             ) {
               hasRingCarbonyl = true;
               break;
@@ -392,8 +353,7 @@ export function generateRingName(
     // Check if saturated (no double bonds in ring)
     const ringIndices = atoms.map((atom) => atom.id);
     const doubleBondsInRing = (ringSystem.bonds || []).filter((bond) => {
-      const isInRing =
-        ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
+      const isInRing = ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
       return isInRing && bond.type === BondType.DOUBLE;
     });
 
@@ -416,14 +376,8 @@ export function generateRingName(
 
                 // Check if one atom is a ring carbon and the other is an exocyclic oxygen
                 if (
-                  (atom1InRing &&
-                    atom1.symbol === "C" &&
-                    !atom2InRing &&
-                    atom2.symbol === "O") ||
-                  (atom2InRing &&
-                    atom2.symbol === "C" &&
-                    !atom1InRing &&
-                    atom1.symbol === "O")
+                  (atom1InRing && atom1.symbol === "C" && !atom2InRing && atom2.symbol === "O") ||
+                  (atom2InRing && atom2.symbol === "C" && !atom1InRing && atom1.symbol === "O")
                 ) {
                   hasRingCarbonyl = true;
                   break;
@@ -461,12 +415,7 @@ export function generateRingName(
       const doubleBondCount = doubleBondsInRing.length;
 
       // Thiazoline: 5-membered ring with 1 nitrogen + 1 sulfur + 1 C=N double bond
-      if (
-        hasNitrogen === 1 &&
-        hasSulfur === 1 &&
-        totalHetero === 2 &&
-        doubleBondCount === 1
-      ) {
+      if (hasNitrogen === 1 && hasSulfur === 1 && totalHetero === 2 && doubleBondCount === 1) {
         const doubleBond = doubleBondsInRing[0]!;
         const atom1 = atoms.find((a) => a.id === doubleBond.atom1);
         const atom2 = atoms.find((a) => a.id === doubleBond.atom2);
@@ -494,12 +443,7 @@ export function generateRingName(
       }
 
       // Oxazoline: 5-membered ring with 1 nitrogen + 1 oxygen + 1 C=N double bond
-      if (
-        hasNitrogen === 1 &&
-        hasOxygen === 1 &&
-        totalHetero === 2 &&
-        doubleBondCount === 1
-      ) {
+      if (hasNitrogen === 1 && hasOxygen === 1 && totalHetero === 2 && doubleBondCount === 1) {
         const doubleBond = doubleBondsInRing[0]!;
         const atom1 = atoms.find((a) => a.id === doubleBond.atom1);
         const atom2 = atoms.find((a) => a.id === doubleBond.atom2);
@@ -521,8 +465,7 @@ export function generateRingName(
     const ringIndices = atoms.map((atom) => atom.id);
     const isSaturated = !ringIndices.some((_atomIdx: number) => {
       return (ringSystem.bonds || []).some((bond) => {
-        const isInRing =
-          ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
+        const isInRing = ringIndices.includes(bond.atom1) && ringIndices.includes(bond.atom2);
         return isInRing && bond.type === BondType.DOUBLE;
       });
     });
@@ -587,12 +530,9 @@ export function generateBridgedPolycyclicName(
   ringCount?: number,
 ): { name: string; vonBaeyerNumbering?: Map<number, number> } | null {
   // Use the engine's own naming function
-  const {
-    generateClassicPolycyclicName,
-  } = require("../../naming/iupac-rings/utils");
+  const { generateClassicPolycyclicName } = require("../../naming/iupac-rings/utils");
   // If ringCount not provided, compute SSSR
-  const actualRingCount =
-    ringCount ?? findSSSR(molecule.atoms, molecule.bonds).length;
+  const actualRingCount = ringCount ?? findSSSR(molecule.atoms, molecule.bonds).length;
   return generateClassicPolycyclicName(molecule, bridgedRings, actualRingCount);
 }
 
@@ -617,8 +557,6 @@ export function generateFusedPolycyclicName(
 ): string | null {
   // For now, delegate to existing fused naming logic
   // This could be enhanced with specific P-2.5 rules
-  const {
-    identifyPolycyclicPattern,
-  } = require("../../naming/iupac-rings/fused-naming");
+  const { identifyPolycyclicPattern } = require("../../naming/iupac-rings/fused-naming");
   return identifyPolycyclicPattern(fusedRings, molecule);
 }

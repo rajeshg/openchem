@@ -59,9 +59,7 @@ export function getGreekNumeral(n: number): string {
   return getSimpleMultiplier(n, opsinService);
 }
 
-export function generateSimpleNameFromFormula(
-  elementCounts: Record<string, number>,
-): string {
+export function generateSimpleNameFromFormula(elementCounts: Record<string, number>): string {
   const elements = Object.keys(elementCounts).sort((a, b) => {
     if (a === "C") return -1;
     if (b === "C") return 1;

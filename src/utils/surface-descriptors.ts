@@ -93,11 +93,7 @@ function isBondedToUnsaturated(
     if (!neighbor || neighbor.symbol === "H") continue;
 
     // Check if neighbor is unsaturated (sp2, sp, or aromatic)
-    if (
-      neighbor.aromatic ||
-      neighbor.hybridization === "sp2" ||
-      neighbor.hybridization === "sp"
-    ) {
+    if (neighbor.aromatic || neighbor.hybridization === "sp2" || neighbor.hybridization === "sp") {
       return true;
     }
   }
@@ -109,11 +105,7 @@ function isBondedToUnsaturated(
  * Check if oxygen is bonded to a carbonyl carbon (C=O pattern)
  * Used to detect ester oxygen and carboxylic OH
  */
-function isBondedToCarbonyl(
-  atom: Atom,
-  bonds: readonly Bond[],
-  atoms: readonly Atom[],
-): boolean {
+function isBondedToCarbonyl(atom: Atom, bonds: readonly Bond[], atoms: readonly Atom[]): boolean {
   if (atom.symbol !== "O") return false;
 
   const atomBonds = getBondsForAtom(bonds, atom.id);
@@ -131,8 +123,7 @@ function isBondedToCarbonyl(
     for (const cBond of carbonBonds) {
       if (cBond.type !== "double") continue;
 
-      const otherAtomId =
-        cBond.atom1 === neighbor.id ? cBond.atom2 : cBond.atom1;
+      const otherAtomId = cBond.atom1 === neighbor.id ? cBond.atom2 : cBond.atom1;
       const otherAtom = atoms.find((a) => a.id === otherAtomId);
 
       if (otherAtom?.symbol === "O") {
@@ -147,11 +138,7 @@ function isBondedToCarbonyl(
 /**
  * Check if an atom is bonded to an aromatic carbon
  */
-function isBondedToAromatic(
-  atom: Atom,
-  bonds: readonly Bond[],
-  atoms: readonly Atom[],
-): boolean {
+function isBondedToAromatic(atom: Atom, bonds: readonly Bond[], atoms: readonly Atom[]): boolean {
   const atomBonds = getBondsForAtom(bonds, atom.id);
 
   for (const bond of atomBonds) {
@@ -328,18 +315,9 @@ export function getLabuteASA(mol: Molecule): number {
     // Skip hydrogens (they're implicit in the contribution values)
     if (atom.symbol === "H") continue;
 
-    const heavyNeighbors = getHeavyNeighborCount(
-      enriched.bonds,
-      atom.id,
-      enriched.atoms,
-    );
+    const heavyNeighbors = getHeavyNeighborCount(enriched.bonds, atom.id, enriched.atoms);
 
-    const contribution = getAtomContribution(
-      atom,
-      heavyNeighbors,
-      enriched.bonds,
-      enriched.atoms,
-    );
+    const contribution = getAtomContribution(atom, heavyNeighbors, enriched.bonds, enriched.atoms);
     totalASA += contribution;
   }
 

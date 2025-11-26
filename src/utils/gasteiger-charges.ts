@@ -133,10 +133,7 @@ export function computeGasteigerCharges(mol: Molecule, nIter = 12): number[] {
   const processedBonds = new Set<string>();
 
   for (let iter = 0; iter < nIter; iter++) {
-    const deltaCharges: number[] = Array.from(
-      { length: mol.atoms.length },
-      () => 0,
-    );
+    const deltaCharges: number[] = Array.from({ length: mol.atoms.length }, () => 0);
     processedBonds.clear();
 
     // Process each bond once

@@ -3,8 +3,7 @@ import { parseIUPACName, parseSMILES } from "index";
 
 describe("Case 5 analysis", () => {
   it("should analyze methyl 3-(2,2-dimethylbutanoylamino)-5-(3-methylbutyl)benzoate", () => {
-    const iupacName =
-      "methyl 3-(2,2-dimethylbutanoylamino)-5-(3-methylbutyl)benzoate";
+    const iupacName = "methyl 3-(2,2-dimethylbutanoylamino)-5-(3-methylbutyl)benzoate";
     const expected = "O=C(C(C)(C)CC)Nc1cc(C(=O)OC)cc(c1)CCC(C)C";
 
     console.log("\nIUPAC:", iupacName);

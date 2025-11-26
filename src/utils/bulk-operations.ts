@@ -7,10 +7,7 @@ import {
   checkVeberRules,
   checkBBBPenetration,
 } from "src/utils/molecular-properties";
-import {
-  computeMorganFingerprint,
-  tanimotoSimilarity,
-} from "src/utils/morgan-fingerprint";
+import { computeMorganFingerprint, tanimotoSimilarity } from "src/utils/morgan-fingerprint";
 
 /**
  * Bulk SMARTS matching results for a set of molecules
@@ -95,9 +92,7 @@ export function bulkMatchSMARTS(
  * // Results include LogP, Lipinski, Veber, and BBB penetration for each
  * ```
  */
-export function bulkComputeProperties(
-  molecules: Molecule[],
-): BulkPropertiesResult[] {
+export function bulkComputeProperties(molecules: Molecule[]): BulkPropertiesResult[] {
   return molecules.map((mol, index) => {
     const logp = computeLogP(mol);
     const lipinski = checkLipinskiRuleOfFive(mol);
@@ -143,9 +138,7 @@ export function bulkComputeSimilarities(
   fpSize: number = 2048,
 ): BulkFingerprintResult[] {
   // Precompute all fingerprints
-  const fingerprints = molecules.map((mol) =>
-    computeMorganFingerprint(mol, radius, fpSize),
-  );
+  const fingerprints = molecules.map((mol) => computeMorganFingerprint(mol, radius, fpSize));
 
   // Compute pairwise similarities
   const results: BulkFingerprintResult[] = [];
@@ -190,20 +183,12 @@ export function bulkFindSimilar(
   targetIndex: number;
   similarity: number;
 }> {
-  const queryFingerprint = computeMorganFingerprint(
-    queryMolecule,
-    radius,
-    fpSize,
-  );
+  const queryFingerprint = computeMorganFingerprint(queryMolecule, radius, fpSize);
 
   const results: Array<{ targetIndex: number; similarity: number }> = [];
 
   for (let i = 0; i < targetMolecules.length; i++) {
-    const targetFingerprint = computeMorganFingerprint(
-      targetMolecules[i]!,
-      radius,
-      fpSize,
-    );
+    const targetFingerprint = computeMorganFingerprint(targetMolecules[i]!, radius, fpSize);
     const similarity = tanimotoSimilarity(queryFingerprint, targetFingerprint);
 
     if (similarity >= threshold) {

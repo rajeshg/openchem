@@ -1,11 +1,7 @@
 import type { Atom, Bond, ParseError } from "types";
 import { getBondsForAtom } from "src/utils/bond-utils";
 
-function getSubstituentCount(
-  atomId: number,
-  atoms: Atom[],
-  bonds: Bond[],
-): number {
+function getSubstituentCount(atomId: number, atoms: Atom[], bonds: Bond[]): number {
   const atom = atoms.find((a) => a.id === atomId)!;
   const bondCount = getBondsForAtom(bonds, atomId).length;
   return bondCount + (atom.hydrogens || 0);
@@ -14,11 +10,7 @@ function getSubstituentCount(
 /**
  * Validate stereochemistry specifications
  */
-export function validateStereochemistry(
-  atoms: Atom[],
-  bonds: Bond[],
-  errors: ParseError[],
-): void {
+export function validateStereochemistry(atoms: Atom[], bonds: Bond[], errors: ParseError[]): void {
   for (const atom of atoms) {
     if (atom.chiral) {
       const substituentCount = getSubstituentCount(atom.id, atoms, bonds);
@@ -81,10 +73,7 @@ export function validateStereochemistry(
 
   // Validate double bond stereochemistry
   for (const bond of bonds) {
-    if (
-      bond.type === "double" &&
-      (bond.stereo === "up" || bond.stereo === "down")
-    ) {
+    if (bond.type === "double" && (bond.stereo === "up" || bond.stereo === "down")) {
       // Check that the double bond has appropriate substituents for stereo
       const atom1Subs = getSubstituentCount(bond.atom1, atoms, bonds);
       const atom2Subs = getSubstituentCount(bond.atom2, atoms, bonds);

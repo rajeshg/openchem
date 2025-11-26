@@ -5,6 +5,47 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2025-11-25
+
+### Added
+- **Complete Tautomer Enumeration System** - 100% RDKit coverage with comprehensive rule set
+  - `scoreTautomer()` - RDKit-compatible scoring system with:
+    - +250 per all-carbon aromatic ring (benzene)
+    - +100 per heteroaromatic ring (pyridine, pyrrole)
+    - +25 for benzoquinone patterns
+    - +4 for oximes (C=N-OH)
+    - +2 per carbonyl (C=O, N=O, P=O)
+    - +1 per methyl group
+    - -10 per formal charge
+    - -4 for aci-nitro forms
+    - -1 per H on P, S, Se, Te
+  - **25 tautomer transformation rules** (100% RDKit coverage - all 18 standard bidirectional rules):
+    - **Phase 1 (Conservative)**: 1,3 and 1,5 (thio)keto-enol, imine-enamine (aliphatic + aromatic), amide-imidol, lactam-lactim, nitro-aci-nitro
+    - **Phase 2 (Important)**: 1,5/1,7/1,9 aromatic heteroatom H shift (pyrrole, indole, extended conjugation), furanone, oxim/nitroso via phenol, thione-thiol, nitroso-oxime, phosphonic acid, guanidine, tetrazole, imidazole
+    - **Phase 3 (Edge Cases)**: 1,11 aromatic shift, keten/ynol, cyano/isocyanic acid, formamidinesulfinic acid, isocyanide, sulfoxide
+  - Comprehensive test suite (51 tests, 90 expect() calls)
+    - Scoring system tests (22 tests)
+    - Rule-specific tests (19 tests - all 26 rules covered)
+    - Integration tests (10 tests)
+  - Example file: `docs/examples/example-tautomers.ts`
+
+### Documentation
+- Added "Tautomer Analysis (2)" category to API Reference
+- Detailed API documentation for `enumerateTautomers()` and `canonicalTautomer()`
+- Updated README with tautomer enumeration section highlighting 100% RDKit coverage
+- Added RDKit comparison document: `docs/rdkit-tautomer-comparison.md`
+- Updated THIRD-PARTY-LICENSES.md with RDKit tautomer scoring attribution
+- Added inline RDKit attribution in `tautomer-scoring.ts` source code
+
+### Changed
+- Replaced simple tautomer scoring (+1 aromatic, -10 charge) with RDKit-compatible algorithm
+- Updated tautomer rule metadata (version 0.4.0 - milestone release)
+- Function count: 36 → 38 functions (added scoring helpers)
+
+### Fixed
+- Improved tautomer deduplication with fingerprint-based pre-filtering
+- Fixed phase-based enumeration to properly seed next phase with all discovered tautomers
+
 ## [0.2.5] - 2025-11-23
 
 ### Added

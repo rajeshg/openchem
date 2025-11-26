@@ -101,9 +101,7 @@ describe("Comprehensive P-44.1 Functional Group Coverage", () => {
     expect(functionalGroups.length).toBeGreaterThan(0);
 
     // Carboxylic acid should have higher priority than amine
-    const carboxylicAcid = functionalGroups.find(
-      (g) => g.name === "carboxylic acid",
-    );
+    const carboxylicAcid = functionalGroups.find((g) => g.name === "carboxylic acid");
     const amine = functionalGroups.find((g) => g.name === "amine");
 
     if (carboxylicAcid && amine) {
@@ -127,9 +125,7 @@ describe("Comprehensive P-44.1 Functional Group Coverage", () => {
     const nitrile = functionalGroups.find((g) => g.type === "C#N");
     expect(nitrile).toBeDefined();
 
-    console.log(
-      `✓ Nitrile detected: ${nitrile?.name} (Priority: ${nitrile?.priority})`,
-    );
+    console.log(`✓ Nitrile detected: ${nitrile?.name} (Priority: ${nitrile?.priority})`);
   });
 
   test("should integrate with full naming pipeline", () => {
@@ -167,9 +163,7 @@ describe("Comprehensive P-44.1 Functional Group Coverage", () => {
     const functionalGroups = detector.detectFunctionalGroups(molecule);
 
     // Sort by priority to verify hierarchy
-    const sortedGroups = [...functionalGroups].sort(
-      (a, b) => a.priority - b.priority,
-    );
+    const sortedGroups = [...functionalGroups].sort((a, b) => a.priority - b.priority);
 
     console.log("\n=== P-44.1 Priority Hierarchy Demonstration ===");
     for (const group of sortedGroups) {
@@ -179,8 +173,7 @@ describe("Comprehensive P-44.1 Functional Group Coverage", () => {
     // Verify that carboxylic acid (priority 1) comes before alcohol (priority 4)
     if (sortedGroups.length >= 2) {
       const firstPriority = sortedGroups[0]?.priority || 999;
-      const lastPriority =
-        sortedGroups[sortedGroups.length - 1]?.priority || 999;
+      const lastPriority = sortedGroups[sortedGroups.length - 1]?.priority || 999;
       expect(firstPriority).toBeLessThan(lastPriority);
     }
   });
@@ -259,9 +252,7 @@ describe("P-44.1 Implementation Summary", () => {
     for (const smiles of testMolecules) {
       const parseResult = parseSMILES(smiles);
       if (parseResult.molecules.length > 0) {
-        const groups = detector.detectFunctionalGroups(
-          parseResult.molecules[0]!,
-        );
+        const groups = detector.detectFunctionalGroups(parseResult.molecules[0]!);
         totalGroupsDetected += groups.length;
         console.log(`${smiles}: ${groups.length} functional group(s) detected`);
       }
@@ -271,21 +262,11 @@ describe("P-44.1 Implementation Summary", () => {
     console.log(`✓ Total functional groups detected: ${totalGroupsDetected}`);
 
     console.log("\n=== Key Features ===");
-    console.log(
-      "• OPSIN Integration: Uses official OPSIN functional group patterns",
-    );
-    console.log(
-      "• P-44.1 Compliance: Follows IUPAC Blue Book priority hierarchy",
-    );
-    console.log(
-      "• Comprehensive Coverage: 113+ functional group patterns available",
-    );
-    console.log(
-      "• Priority-Based: Correctly prioritizes functional groups per P-44.1",
-    );
+    console.log("• OPSIN Integration: Uses official OPSIN functional group patterns");
+    console.log("• P-44.1 Compliance: Follows IUPAC Blue Book priority hierarchy");
+    console.log("• Comprehensive Coverage: 113+ functional group patterns available");
+    console.log("• Priority-Based: Correctly prioritizes functional groups per P-44.1");
     console.log("• SMARTS Patterns: Uses industry-standard SMARTS notation");
-    console.log(
-      "• Educational: Demonstrates complete functional group analysis",
-    );
+    console.log("• Educational: Demonstrates complete functional group analysis");
   });
 });

@@ -101,8 +101,7 @@ export const FUNCTIONAL_GROUP_CONTRACT: LayerContract = {
       name: "atomicAnalysis",
       type: DependencyType.ATOMIC_ANALYSIS,
       description: "Basic atomic properties (valence, hybridization, etc.)",
-      validation: (data: unknown): boolean =>
-        Boolean(data && typeof data === "object"),
+      validation: (data: unknown): boolean => Boolean(data && typeof data === "object"),
       required: true,
     },
   ],
@@ -111,14 +110,12 @@ export const FUNCTIONAL_GROUP_CONTRACT: LayerContract = {
       name: "functionalGroups",
       type: "FunctionalGroup[]",
       description: "All functional groups found in the molecule",
-      validation: (data: unknown): boolean =>
-        Array.isArray(data) && data.length >= 0,
+      validation: (data: unknown): boolean => Array.isArray(data) && data.length >= 0,
     },
     {
       name: "principalGroup",
       type: "FunctionalGroup",
-      description:
-        "The highest priority functional group (principal characteristic group)",
+      description: "The highest priority functional group (principal characteristic group)",
       validation: (data: unknown): boolean => {
         if (!data || typeof data !== "object") return false;
         const obj = data as { type?: unknown };
@@ -128,10 +125,8 @@ export const FUNCTIONAL_GROUP_CONTRACT: LayerContract = {
     {
       name: "functionalGroupPriority",
       type: "number",
-      description:
-        "Numeric priority of the principal group (lower = higher priority)",
-      validation: (data: unknown): boolean =>
-        typeof data === "number" && data >= 0,
+      description: "Numeric priority of the principal group (lower = higher priority)",
+      validation: (data: unknown): boolean => typeof data === "number" && data >= 0,
     },
   ],
   validationRules: [
@@ -148,9 +143,7 @@ export const FUNCTIONAL_GROUP_CONTRACT: LayerContract = {
         const ctx = context as ContextState;
         if (ctx.functionalGroups.length === 0) return true;
         const principal = ctx.principalGroup!;
-        return ctx.functionalGroups.every(
-          (group) => group.priority >= principal.priority,
-        );
+        return ctx.functionalGroups.every((group) => group.priority >= principal.priority);
       },
       severity: "error",
     },
@@ -169,16 +162,14 @@ export const PARENT_STRUCTURE_CONTRACT: LayerContract = {
       name: "functionalGroups",
       type: DependencyType.FUNCTIONAL_GROUPS,
       description: "Functional groups for determining parent structure",
-      validation: (data: unknown): boolean =>
-        Array.isArray(data) && data.length >= 0,
+      validation: (data: unknown): boolean => Array.isArray(data) && data.length >= 0,
       required: true,
     },
     {
       name: "atomicAnalysis",
       type: DependencyType.ATOMIC_ANALYSIS,
       description: "Atomic properties for chain/ring analysis",
-      validation: (data: unknown): boolean =>
-        Boolean(data && typeof data === "object"),
+      validation: (data: unknown): boolean => Boolean(data && typeof data === "object"),
       required: true,
     },
   ],
@@ -202,18 +193,15 @@ export const PARENT_STRUCTURE_CONTRACT: LayerContract = {
     {
       name: "nomenclatureMethod",
       type: "NomenclatureMethod",
-      description:
-        "Selected nomenclature method (substitutive, functional class, etc.)",
-      validation: (data: unknown): boolean =>
-        Boolean(data && typeof data === "string"),
+      description: "Selected nomenclature method (substitutive, functional class, etc.)",
+      validation: (data: unknown): boolean => Boolean(data && typeof data === "string"),
     },
   ],
   validationRules: [
     {
       name: "parentStructureSelected",
       description: "A parent structure must be selected",
-      check: (context) =>
-        (context as ContextState).parentStructure !== undefined,
+      check: (context) => (context as ContextState).parentStructure !== undefined,
       severity: "error",
     },
     {
@@ -293,10 +281,7 @@ export class ContractValidator {
   /**
    * Validate that a context satisfies a layer contract
    */
-  static validateContract(
-    contract: LayerContract,
-    context: unknown,
-  ): ContractValidationResult {
+  static validateContract(contract: LayerContract, context: unknown): ContractValidationResult {
     const errors: ContractValidationError[] = [];
     const warnings: ContractValidationError[] = [];
 
@@ -333,9 +318,7 @@ export class ContractValidator {
 
     // Check validation rules
     // If expected outputs are not yet provided, downgrade rule failures to warnings
-    const missingProvides = contract.provides.filter(
-      (p) => !this.checkOutput(p, context),
-    );
+    const missingProvides = contract.provides.filter((p) => !this.checkOutput(p, context));
     const shouldDowngrade = missingProvides.length > 0;
 
     for (const rule of contract.validationRules) {
@@ -371,10 +354,7 @@ export class ContractValidator {
   /**
    * Check if a dependency is satisfied
    */
-  private static checkDependency(
-    dep: DependencyRequirement,
-    context: unknown,
-  ): boolean {
+  private static checkDependency(dep: DependencyRequirement, context: unknown): boolean {
     const data = (context as Record<string, unknown>)[dep.name];
     return dep.validation(data);
   }
@@ -382,10 +362,7 @@ export class ContractValidator {
   /**
    * Check if an output is properly provided
    */
-  private static checkOutput(
-    output: DataStructureDefinition,
-    context: unknown,
-  ): boolean {
+  private static checkOutput(output: DataStructureDefinition, context: unknown): boolean {
     const data = (context as Record<string, unknown>)[output.name];
     return output.validation(data);
   }

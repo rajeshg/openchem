@@ -36,8 +36,7 @@ function normalizePriority(p: number): number {
 
 function isCarbonyl(atom1: Atom, atom2: Atom): boolean {
   return (
-    (atom1.symbol === "C" && atom2.symbol === "O") ||
-    (atom2.symbol === "C" && atom1.symbol === "O")
+    (atom1.symbol === "C" && atom2.symbol === "O") || (atom2.symbol === "C" && atom1.symbol === "O")
   );
 }
 
@@ -54,11 +53,8 @@ function findOHBond(carbon: Atom, molecules: Molecule): Bond | null {
         // Check for H bonded to O
         for (const bond2 of molecules.bonds) {
           if (bond2.atom1 === otherAtom.id || bond2.atom2 === otherAtom.id) {
-            const otherId2 =
-              bond2.atom1 === otherAtom.id ? bond2.atom2 : bond2.atom1;
-            const otherAtom2 = molecules.atoms.find(
-              (a: Atom) => a.id === otherId2,
-            );
+            const otherId2 = bond2.atom1 === otherAtom.id ? bond2.atom2 : bond2.atom1;
+            const otherAtom2 = molecules.atoms.find((a: Atom) => a.id === otherId2);
             if (otherAtom2 && otherAtom2.symbol === "H") {
               return bond2;
             }
@@ -73,9 +69,7 @@ function findOHBond(carbon: Atom, molecules: Molecule): Bond | null {
 /**
  * Detect carboxylic acid groups (-COOH)
  */
-function detectCarboxylicAcids(
-  context: ImmutableNamingContext,
-): RawFunctionalGroup[] {
+function detectCarboxylicAcids(context: ImmutableNamingContext): RawFunctionalGroup[] {
   const carboxylicAcids: RawFunctionalGroup[] = [];
   const molecules = context.getState().molecule;
 
@@ -91,12 +85,8 @@ function detectCarboxylicAcids(
         const ohBond = findOHBond(carbon, molecules);
 
         if (ohBond) {
-          const atom1 = molecules.atoms.find(
-            (a: Atom) => a.id === ohBond.atom1,
-          );
-          const atom2 = molecules.atoms.find(
-            (a: Atom) => a.id === ohBond.atom2,
-          );
+          const atom1 = molecules.atoms.find((a: Atom) => a.id === ohBond.atom1);
+          const atom2 = molecules.atoms.find((a: Atom) => a.id === ohBond.atom2);
           if (!atom1 || !atom2) continue;
 
           carboxylicAcids.push({
@@ -105,9 +95,7 @@ function detectCarboxylicAcids(
             bonds: [bond, ohBond],
             suffix: "oic acid",
             priority: normalizePriority(
-              context
-                .getDetector()
-                .getFunctionalGroupPriority("carboxylic_acid") || 0,
+              context.getDetector().getFunctionalGroupPriority("carboxylic_acid") || 0,
             ),
             isPrincipal: false,
             locants: [carbon.id],
@@ -130,8 +118,7 @@ function detectAlcohols(context: ImmutableNamingContext): RawFunctionalGroup[] {
   for (const atom of molecules.atoms) {
     if (atom.symbol === "O") {
       const bonds = molecules.bonds.filter(
-        (b: Bond) =>
-          (b.atom1 === atom.id || b.atom2 === atom.id) && b.type === "single",
+        (b: Bond) => (b.atom1 === atom.id || b.atom2 === atom.id) && b.type === "single",
       );
 
       // Check if oxygen is bonded to carbon and has one hydrogen (implicit or explicit)
@@ -155,8 +142,7 @@ function detectAlcohols(context: ImmutableNamingContext): RawFunctionalGroup[] {
         const carbonBond = carbonBonds[0];
         if (!carbonBond) continue;
 
-        const carbonId =
-          carbonBond.atom1 === atom.id ? carbonBond.atom2 : carbonBond.atom1;
+        const carbonId = carbonBond.atom1 === atom.id ? carbonBond.atom2 : carbonBond.atom1;
         const carbonAtom = molecules.atoms.find((a: Atom) => a.id === carbonId);
 
         if (process.env.VERBOSE) {
@@ -206,8 +192,7 @@ function detectAmines(context: ImmutableNamingContext): RawFunctionalGroup[] {
         console.log(`[detectAmines] Found N atom ID ${atom.id}`);
       }
       const bonds = molecules.bonds.filter(
-        (b: Bond) =>
-          (b.atom1 === atom.id || b.atom2 === atom.id) && b.type === "single",
+        (b: Bond) => (b.atom1 === atom.id || b.atom2 === atom.id) && b.type === "single",
       );
 
       if (process.env.VERBOSE) {
@@ -233,9 +218,7 @@ function detectAmines(context: ImmutableNamingContext): RawFunctionalGroup[] {
 
       if (carbonBonds.length > 0) {
         if (process.env.VERBOSE) {
-          console.log(
-            `[detectAmines]   Adding amine functional group for N atom ${atom.id}`,
-          );
+          console.log(`[detectAmines]   Adding amine functional group for N atom ${atom.id}`);
         }
         amines.push({
           type: "amine",
@@ -278,9 +261,7 @@ function detectKetones(context: ImmutableNamingContext): RawFunctionalGroup[] {
 
         // Simple heuristic: if carbon has two other carbon bonds, it's likely a ketone
         const carbonBonds = molecules.bonds.filter(
-          (b: Bond) =>
-            (b.atom1 === carbon.id || b.atom2 === carbon.id) &&
-            b.type === "single",
+          (b: Bond) => (b.atom1 === carbon.id || b.atom2 === carbon.id) && b.type === "single",
         );
 
         const carbonAtomBonds = carbonBonds.filter((b: Bond) => {
@@ -322,8 +303,7 @@ export const CARBOXYLIC_ACID_RULE: IUPACRule = {
   description: "Detect carboxylic acid functional groups",
   blueBookReference: "P-44.1 - Principal characteristic groups",
   priority: RulePriority.TEN, // 100 - Carboxylic acids have highest priority
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().molecule.bonds.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().molecule.bonds.length > 0,
   action: (context: ImmutableNamingContext) => {
     const carboxylicAcids: FunctionalGroup[] = detectCarboxylicAcids(context);
     let updatedContext = context;
@@ -343,9 +323,7 @@ export const CARBOXYLIC_ACID_RULE: IUPACRule = {
           ...state,
           principalGroup: carboxylicAcids[0],
           functionalGroupPriority:
-            context
-              .getDetector()
-              .getFunctionalGroupPriority("carboxylic_acid") || 0,
+            context.getDetector().getFunctionalGroupPriority("carboxylic_acid") || 0,
         }),
         "carboxylic-acid-detection",
         "Carboxylic Acid Detection",
@@ -370,8 +348,7 @@ export const ALCOHOL_DETECTION_RULE: IUPACRule = {
   description: "Detect alcohol functional groups",
   blueBookReference: "P-44.1 - Principal characteristic groups",
   priority: RulePriority.EIGHT, // 80 - Alcohols detected early
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().molecule.atoms.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().molecule.atoms.length > 0,
   action: (context: ImmutableNamingContext) => {
     const alcohols: FunctionalGroup[] = detectAlcohols(context);
     if (process.env.VERBOSE && alcohols.length > 0) {
@@ -413,8 +390,7 @@ export const AMINE_DETECTION_RULE: IUPACRule = {
   description: "Detect amine functional groups",
   blueBookReference: "P-44.1 - Principal characteristic groups",
   priority: RulePriority.SEVEN, // 70 - Amines detected early
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().molecule.atoms.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().molecule.atoms.length > 0,
   action: (context: ImmutableNamingContext) => {
     const amines: FunctionalGroup[] = detectAmines(context);
     if (process.env.VERBOSE) {
@@ -425,9 +401,7 @@ export const AMINE_DETECTION_RULE: IUPACRule = {
       // Append amine detections to pre-existing functional groups
       const existing = context.getState().functionalGroups || [];
       if (process.env.VERBOSE) {
-        console.log(
-          `[AMINE_DETECTION_RULE] Existing functional groups: ${existing.length}`,
-        );
+        console.log(`[AMINE_DETECTION_RULE] Existing functional groups: ${existing.length}`);
       }
       updatedContext = updatedContext.withFunctionalGroups(
         existing.concat(amines),
@@ -459,8 +433,7 @@ export const KETONE_DETECTION_RULE: IUPACRule = {
   description: "Detect ketone groups (>C=O)",
   blueBookReference: "P-44.1.8 - Ketones",
   priority: RulePriority.NINE, // 90 - Run before alcohol (80) but after carboxylic acid (100)
-  conditions: (context: ImmutableNamingContext) =>
-    context.getState().molecule.bonds.length > 0,
+  conditions: (context: ImmutableNamingContext) => context.getState().molecule.bonds.length > 0,
   action: (context: ImmutableNamingContext) => {
     const ketones: FunctionalGroup[] = detectKetones(context);
     let updatedContext = context;

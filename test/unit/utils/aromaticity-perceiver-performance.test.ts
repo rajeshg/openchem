@@ -245,9 +245,9 @@ describe("Aromaticity Perception - Performance Regression Tests", () => {
       const roundTrip = parseSMILES(canonical);
 
       expect(roundTrip.molecules).toHaveLength(1);
-      expect(
-        roundTrip.molecules[0]!.atoms.filter((a) => a.aromatic).length,
-      ).toBe(aromaticAtoms.length);
+      expect(roundTrip.molecules[0]!.atoms.filter((a) => a.aromatic).length).toBe(
+        aromaticAtoms.length,
+      );
     });
 
     it("should correctly handle partial aromaticity in fused systems", () => {

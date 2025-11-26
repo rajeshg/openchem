@@ -12,9 +12,7 @@ async function initializeRDKit(): Promise<any> {
   try {
     const rdkitModule = await import("@rdkit/rdkit").catch(() => null);
     if (!rdkitModule) {
-      throw new Error(
-        "RDKit is not available. Install with: npm install @rdkit/rdkit",
-      );
+      throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
     }
     const initRDKitModule = rdkitModule.default;
     rdkitInstance = await (initRDKitModule as any)();
@@ -84,9 +82,7 @@ describe("RDKit Symmetry Detection Validation", () => {
         const rdkitCanonical = await getRDKitCanonical(smiles);
 
         if (rdkitCanonical === "RDKIT_UNAVAILABLE") {
-          throw new Error(
-            "RDKit is not available. Install with: npm install @rdkit/rdkit",
-          );
+          throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
         }
 
         expect(rdkitCanonical).not.toBe("PARSE_ERROR");
@@ -135,9 +131,7 @@ describe("RDKit Symmetry Detection Validation", () => {
         const rdkitCanonical = await getRDKitCanonical(smiles);
 
         if (rdkitCanonical === "RDKIT_UNAVAILABLE") {
-          throw new Error(
-            "RDKit is not available. Install with: npm install @rdkit/rdkit",
-          );
+          throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
         }
 
         expect(rdkitCanonical).not.toBe("PARSE_ERROR");
@@ -196,8 +190,7 @@ describe("RDKit Symmetry Detection Validation", () => {
         expect(result.errors).toHaveLength(0);
 
         const ourCanonical = generateSMILES(result.molecules[0]!, true);
-        const ourHasStereo =
-          ourCanonical.includes("/") || ourCanonical.includes("\\");
+        const ourHasStereo = ourCanonical.includes("/") || ourCanonical.includes("\\");
 
         // Check our implementation matches expected
         expect(ourHasStereo).toBe(shouldHaveStereo);
@@ -205,16 +198,13 @@ describe("RDKit Symmetry Detection Validation", () => {
         const rdkitCanonical = await getRDKitCanonical(smiles);
 
         if (rdkitCanonical === "RDKIT_UNAVAILABLE") {
-          throw new Error(
-            "RDKit is not available. Install with: npm install @rdkit/rdkit",
-          );
+          throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
         }
 
         expect(rdkitCanonical).not.toBe("PARSE_ERROR");
         expect(rdkitCanonical).not.toBe("RDKIT_ERROR");
 
-        const rdkitHasStereo =
-          rdkitCanonical.includes("/") || rdkitCanonical.includes("\\");
+        const rdkitHasStereo = rdkitCanonical.includes("/") || rdkitCanonical.includes("\\");
 
         // Both should agree on stereo presence
         expect(rdkitHasStereo).toBe(shouldHaveStereo);
@@ -280,9 +270,7 @@ describe("RDKit Symmetry Detection Validation", () => {
         const rdkitCanonical = await getRDKitCanonical(smiles);
 
         if (rdkitCanonical === "RDKIT_UNAVAILABLE") {
-          throw new Error(
-            "RDKit is not available. Install with: npm install @rdkit/rdkit",
-          );
+          throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
         }
 
         expect(rdkitCanonical).not.toBe("PARSE_ERROR");
@@ -342,9 +330,7 @@ describe("RDKit Symmetry Detection Validation", () => {
 
         const ourCanonical = generateSMILES(result.molecules[0]!, true);
         const ourHasStereo =
-          ourCanonical.includes("@") ||
-          ourCanonical.includes("/") ||
-          ourCanonical.includes("\\");
+          ourCanonical.includes("@") || ourCanonical.includes("/") || ourCanonical.includes("\\");
 
         // Check our implementation matches expected
         expect(ourHasStereo).toBe(shouldHaveStereo);
@@ -352,9 +338,7 @@ describe("RDKit Symmetry Detection Validation", () => {
         const rdkitCanonical = await getRDKitCanonical(smiles);
 
         if (rdkitCanonical === "RDKIT_UNAVAILABLE") {
-          throw new Error(
-            "RDKit is not available. Install with: npm install @rdkit/rdkit",
-          );
+          throw new Error("RDKit is not available. Install with: npm install @rdkit/rdkit");
         }
 
         expect(rdkitCanonical).not.toBe("PARSE_ERROR");

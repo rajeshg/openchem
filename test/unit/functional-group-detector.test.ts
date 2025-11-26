@@ -18,14 +18,8 @@ describe("functional group detector", () => {
     const mol = res.molecules[0]!;
     // ensure chain includes the sulfur atom for detection
     const sIdx = mol.atoms.findIndex((a) => a && a.symbol === "S");
-    const neighBond = mol.bonds.find(
-      (b) => b.atom1 === sIdx || b.atom2 === sIdx,
-    );
-    const cIdx = neighBond
-      ? neighBond.atom1 === sIdx
-        ? neighBond.atom2
-        : neighBond.atom1
-      : -1;
+    const neighBond = mol.bonds.find((b) => b.atom1 === sIdx || b.atom2 === sIdx);
+    const cIdx = neighBond ? (neighBond.atom1 === sIdx ? neighBond.atom2 : neighBond.atom1) : -1;
     const chain = cIdx >= 0 ? [cIdx, sIdx] : findLongestCarbonChain(mol);
     expect(getChainFunctionalGroupPriority(chain, mol)).toBeLessThanOrEqual(2);
   });
@@ -35,22 +29,13 @@ describe("functional group detector", () => {
     const am = parseSMILES("CC(=O)N");
     const ac = parseSMILES("CC(=O)Cl");
     expect(
-      getChainFunctionalGroupPriority(
-        findLongestCarbonChain(est.molecules[0]!),
-        est.molecules[0]!,
-      ),
+      getChainFunctionalGroupPriority(findLongestCarbonChain(est.molecules[0]!), est.molecules[0]!),
     ).toBeLessThanOrEqual(6);
     expect(
-      getChainFunctionalGroupPriority(
-        findLongestCarbonChain(am.molecules[0]!),
-        am.molecules[0]!,
-      ),
+      getChainFunctionalGroupPriority(findLongestCarbonChain(am.molecules[0]!), am.molecules[0]!),
     ).toBeLessThanOrEqual(6);
     expect(
-      getChainFunctionalGroupPriority(
-        findLongestCarbonChain(ac.molecules[0]!),
-        ac.molecules[0]!,
-      ),
+      getChainFunctionalGroupPriority(findLongestCarbonChain(ac.molecules[0]!), ac.molecules[0]!),
     ).toBeLessThanOrEqual(6);
   });
 
@@ -65,12 +50,9 @@ describe("functional group detector", () => {
       nIdx >= 0
         ? [
             nIdx,
-            nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!
-              .atom1 === nIdx
-              ? nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!
-                  .atom2
-              : nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!
-                  .atom1,
+            nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!.atom1 === nIdx
+              ? nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!.atom2
+              : nitrMol.bonds.find((b) => b.atom1 === nIdx || b.atom2 === nIdx)!.atom1,
           ]
         : findLongestCarbonChain(nitrMol);
 
@@ -80,24 +62,14 @@ describe("functional group detector", () => {
       nitroN >= 0
         ? [
             nitroN,
-            nitroMol.bonds.find(
-              (b) => b.atom1 === nitroN || b.atom2 === nitroN,
-            )!.atom1 === nitroN
-              ? nitroMol.bonds.find(
-                  (b) => b.atom1 === nitroN || b.atom2 === nitroN,
-                )!.atom2
-              : nitroMol.bonds.find(
-                  (b) => b.atom1 === nitroN || b.atom2 === nitroN,
-                )!.atom1,
+            nitroMol.bonds.find((b) => b.atom1 === nitroN || b.atom2 === nitroN)!.atom1 === nitroN
+              ? nitroMol.bonds.find((b) => b.atom1 === nitroN || b.atom2 === nitroN)!.atom2
+              : nitroMol.bonds.find((b) => b.atom1 === nitroN || b.atom2 === nitroN)!.atom1,
           ]
         : findLongestCarbonChain(nitro.molecules[0]!);
 
-    expect(
-      getChainFunctionalGroupPriority(nitrChain, nitrMol),
-    ).toBeLessThanOrEqual(17);
-    expect(
-      getChainFunctionalGroupPriority(nitroChain, nitroMol),
-    ).toBeLessThanOrEqual(17);
+    expect(getChainFunctionalGroupPriority(nitrChain, nitrMol)).toBeLessThanOrEqual(17);
+    expect(getChainFunctionalGroupPriority(nitroChain, nitroMol)).toBeLessThanOrEqual(17);
     expect(
       getChainFunctionalGroupPriority(
         findLongestCarbonChain(carbonyl.molecules[0]!),

@@ -78,10 +78,7 @@ function buildAtomRingsMap(rings: number[][]): Map<number, Set<number>> {
   return atomRings;
 }
 
-function buildBondRingsMap(
-  rings: number[][],
-  bonds: readonly Bond[],
-): Map<string, Set<number>> {
+function buildBondRingsMap(rings: number[][], bonds: readonly Bond[]): Map<string, Set<number>> {
   const bondRings = new Map<string, Set<number>>();
 
   rings.forEach((ring, ringIdx) => {
@@ -158,11 +155,7 @@ function determineHybridization(
   return "sp3";
 }
 
-function isRotatableBond(
-  bond: Bond,
-  mol: Molecule,
-  ringInfo: RingInfo,
-): boolean {
+function isRotatableBond(bond: Bond, mol: Molecule, ringInfo: RingInfo): boolean {
   if (bond.type !== "single") return false;
 
   if (ringInfo.isBondInRing(bond.atom1, bond.atom2)) return false;
@@ -181,14 +174,10 @@ function isRotatableBond(
   const atom1InRing = ringInfo.isAtomInRing(atom1.id);
   const atom2InRing = ringInfo.isAtomInRing(atom2.id);
 
-  if (
-    (atom1InRing && heavyNeighbors2 === 1) ||
-    (atom2InRing && heavyNeighbors1 === 1)
-  )
+  if ((atom1InRing && heavyNeighbors2 === 1) || (atom2InRing && heavyNeighbors1 === 1))
     return false;
 
-  if (hasTripleBond(mol.bonds, atom1.id) || hasTripleBond(mol.bonds, atom2.id))
-    return false;
+  if (hasTripleBond(mol.bonds, atom1.id) || hasTripleBond(mol.bonds, atom2.id)) return false;
 
   const hasDoubleBond1 = !atom1.aromatic && hasDoubleBond(mol.bonds, atom1.id);
   const hasDoubleBond2 = !atom2.aromatic && hasDoubleBond(mol.bonds, atom2.id);

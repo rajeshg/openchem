@@ -30,9 +30,7 @@ describe("molecule-enrichment", () => {
       const enriched = enrichMolecule(result.molecules[0]!);
 
       expect(enriched.atoms.every((a) => a.isInRing)).toBe(true);
-      expect(
-        enriched.atoms.every((a) => a.ringIds && a.ringIds.length > 0),
-      ).toBe(true);
+      expect(enriched.atoms.every((a) => a.ringIds && a.ringIds.length > 0)).toBe(true);
     });
 
     it("marks non-ring atoms correctly", () => {
@@ -84,9 +82,7 @@ describe("molecule-enrichment", () => {
       const enriched = enrichMolecule(result.molecules[0]!);
 
       expect(enriched.bonds.every((b) => b.isInRing)).toBe(true);
-      expect(
-        enriched.bonds.every((b) => b.ringIds && b.ringIds.length > 0),
-      ).toBe(true);
+      expect(enriched.bonds.every((b) => b.ringIds && b.ringIds.length > 0)).toBe(true);
     });
 
     it("marks non-ring bonds correctly", () => {
@@ -145,9 +141,7 @@ describe("molecule-enrichment", () => {
       expect(enriched.rings!.length).toBe(2); // SSSR has 2 rings
 
       // Fusion atoms are in both SSSR rings (2 rings each)
-      const fusionAtoms = enriched.atoms.filter(
-        (a) => a.ringIds && a.ringIds.length === 2,
-      );
+      const fusionAtoms = enriched.atoms.filter((a) => a.ringIds && a.ringIds.length === 2);
       expect(fusionAtoms.length).toBe(2);
     });
 
@@ -157,9 +151,7 @@ describe("molecule-enrichment", () => {
 
       expect(enriched.rings!.length).toBe(2);
 
-      const spiroAtom = enriched.atoms.find(
-        (a) => a.ringIds && a.ringIds.length === 2,
-      );
+      const spiroAtom = enriched.atoms.find((a) => a.ringIds && a.ringIds.length === 2);
       expect(spiroAtom).toBeDefined();
     });
 

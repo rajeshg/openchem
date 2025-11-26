@@ -1,9 +1,5 @@
 import type { Molecule } from "types";
-import type {
-  FunctionalGroup,
-  ParentStructure,
-  MultipleBond,
-} from "../../types";
+import type { FunctionalGroup, ParentStructure, MultipleBond } from "../../types";
 import type { OPSINService } from "../../opsin-service";
 import { getMultiplicativePrefix, collectConnectedAtomsInSet } from "./utils";
 
@@ -20,9 +16,7 @@ export function buildChainName(
   // For amines, count only carbons in the chain (nitrogen is not counted in parent name)
   const principalGroup = functionalGroups.find((g) => g.isPrincipal);
   const isAmine = principalGroup?.type === "amine";
-  const length = isAmine
-    ? chain.atoms.filter((a) => a.symbol === "C").length
-    : chain.length;
+  const length = isAmine ? chain.atoms.filter((a) => a.symbol === "C").length : chain.length;
 
   // Base chain name
   const chainNames = [
@@ -57,13 +51,9 @@ export function buildChainName(
 
   // Add unsaturation suffixes based on multiple bonds
   const doubleBonds =
-    chain.multipleBonds?.filter(
-      (bond: MultipleBond) => bond.type === "double",
-    ) || [];
+    chain.multipleBonds?.filter((bond: MultipleBond) => bond.type === "double") || [];
   const tripleBonds =
-    chain.multipleBonds?.filter(
-      (bond: MultipleBond) => bond.type === "triple",
-    ) || [];
+    chain.multipleBonds?.filter((bond: MultipleBond) => bond.type === "triple") || [];
 
   if (tripleBonds.length > 0 && doubleBonds.length === 0) {
     baseName = baseName.replace(/[aeiou]+$/, ""); // Remove trailing vowels
@@ -73,8 +63,7 @@ export function buildChainName(
       .sort((a: number, b: number) => a - b);
     // IUPAC rule: Omit locant for propyne (C3), include for but-1-yne (C4+)
     // propyne (no locant), but-1-yne vs but-2-yne
-    const locantStr =
-      locants.length > 0 && length >= 4 ? `-${locants.join(",")}-` : "";
+    const locantStr = locants.length > 0 && length >= 4 ? `-${locants.join(",")}-` : "";
     baseName = `${baseName}${locantStr}yne`;
   } else if (doubleBonds.length > 0 && tripleBonds.length === 0) {
     baseName = baseName.replace(/[aeiou]+$/, ""); // Remove trailing vowels
@@ -85,8 +74,7 @@ export function buildChainName(
 
     // IUPAC 2013 rule: Omit locant for propene (C3), include for but-1-ene (C4+)
     // ethene (no locant), propene (no locant), but-1-ene vs but-2-ene
-    const locantStr =
-      locants.length > 0 && length >= 4 ? `-${locants.join(",")}-` : "";
+    const locantStr = locants.length > 0 && length >= 4 ? `-${locants.join(",")}-` : "";
 
     // If there are multiple double bonds (dienes, trienes, ...), use multiplicative prefix
     // e.g., buta-1,3-diene (doubleBonds.length === 2)
@@ -112,9 +100,7 @@ export function buildChainName(
       .map((bond: MultipleBond) => bond.locant)
       .filter(Boolean)
       .sort((a: number, b: number) => a - b);
-    const allLocants = [...doubleLocants, ...tripleLocants].sort(
-      (a: number, b: number) => a - b,
-    );
+    const allLocants = [...doubleLocants, ...tripleLocants].sort((a: number, b: number) => a - b);
     const locantStr = allLocants.length > 0 ? `-${allLocants.join(",")}-` : "";
     baseName = `${baseName}${locantStr}en-yne`;
   } else {
@@ -132,11 +118,7 @@ export function findLongestCarbonChainFromRoot(
   // First, use DFS to get an initial estimate of the longest chain length
   let estimatedMaxLength = 0;
 
-  function estimateDfs(
-    currentIdx: number,
-    currentChain: number[],
-    visited: Set<number>,
-  ): void {
+  function estimateDfs(currentIdx: number, currentChain: number[], visited: Set<number>): void {
     const currentAtom = molecule.atoms[currentIdx];
     if (!currentAtom || currentAtom.symbol !== "C") return;
     if (!allowedAtoms.has(currentIdx)) return;
@@ -154,11 +136,7 @@ export function findLongestCarbonChainFromRoot(
       if (bond.atom1 === currentIdx) nextIdx = bond.atom2;
       else if (bond.atom2 === currentIdx) nextIdx = bond.atom1;
 
-      if (
-        nextIdx !== -1 &&
-        !visited.has(nextIdx) &&
-        allowedAtoms.has(nextIdx)
-      ) {
+      if (nextIdx !== -1 && !visited.has(nextIdx) && allowedAtoms.has(nextIdx)) {
         const nextAtom = molecule.atoms[nextIdx];
         if (nextAtom?.symbol === "C") {
           estimateDfs(nextIdx, currentChain, visited);
@@ -198,11 +176,7 @@ export function findLongestCarbonChainFromRoot(
         if (bond.atom1 === currentIdx) nextIdx = bond.atom2;
         else if (bond.atom2 === currentIdx) nextIdx = bond.atom1;
 
-        if (
-          nextIdx !== -1 &&
-          !visited.has(nextIdx) &&
-          allowedAtoms.has(nextIdx)
-        ) {
+        if (nextIdx !== -1 && !visited.has(nextIdx) && allowedAtoms.has(nextIdx)) {
           const nextAtom = molecule.atoms[nextIdx];
           if (nextAtom?.symbol === "C") {
             findChainsOfLength(nextIdx, currentChain, visited, targetLength);
@@ -217,11 +191,7 @@ export function findLongestCarbonChainFromRoot(
 
   // Try to find chains of increasing length starting from the DFS estimate
   let confirmedMaxLength = estimatedMaxLength;
-  for (
-    let targetLength = estimatedMaxLength;
-    targetLength <= allowedAtoms.size;
-    targetLength++
-  ) {
+  for (let targetLength = estimatedMaxLength; targetLength <= allowedAtoms.size; targetLength++) {
     allChains.length = 0; // Clear previous results
     findChainsOfLength(rootIdx, [], new Set(), targetLength);
 
@@ -331,15 +301,8 @@ export function nameChainSubstituent(
     }
 
     // Collect the alkyl group attached to oxygen
-    const alkoxyAtoms = collectConnectedAtomsInSet(
-      molecule,
-      carbonIdx,
-      startIdx,
-      allowedAtoms,
-    );
-    const carbonCount = alkoxyAtoms.filter(
-      (idx) => molecule.atoms[idx]?.symbol === "C",
-    ).length;
+    const alkoxyAtoms = collectConnectedAtomsInSet(molecule, carbonIdx, startIdx, allowedAtoms);
+    const carbonCount = alkoxyAtoms.filter((idx) => molecule.atoms[idx]?.symbol === "C").length;
 
     const alkoxyNames: Record<number, string> = {
       1: "methoxy",
@@ -356,12 +319,7 @@ export function nameChainSubstituent(
       if (chainAtom?.symbol === "C") {
         // Count other carbons attached to chain carbon (excluding the chain itself)
         const otherCarbons = molecule.bonds.filter((b) => {
-          const otherIdx =
-            b.atom1 === chainIdx
-              ? b.atom2
-              : b.atom2 === chainIdx
-                ? b.atom1
-                : -1;
+          const otherIdx = b.atom1 === chainIdx ? b.atom2 : b.atom2 === chainIdx ? b.atom1 : -1;
           if (otherIdx === -1 || otherIdx === startIdx) return false;
           const otherAtom = molecule.atoms[otherIdx];
           return otherAtom?.symbol === "C";
@@ -381,21 +339,12 @@ export function nameChainSubstituent(
 
   // Handle carbon substituents (alkyl groups)
   if (atom.symbol === "C") {
-    const alkylAtoms = collectConnectedAtomsInSet(
-      molecule,
-      startIdx,
-      chainIdx,
-      allowedAtoms,
-    );
-    const carbonCount = alkylAtoms.filter(
-      (idx) => molecule.atoms[idx]?.symbol === "C",
-    ).length;
+    const alkylAtoms = collectConnectedAtomsInSet(molecule, startIdx, chainIdx, allowedAtoms);
+    const carbonCount = alkylAtoms.filter((idx) => molecule.atoms[idx]?.symbol === "C").length;
 
     // Check for methoxymethyl pattern: -CH2-O-CH3
     // This occurs when we have a carbon substituent containing an oxygen
-    const hasOxygen = alkylAtoms.some(
-      (idx) => molecule.atoms[idx]?.symbol === "O",
-    );
+    const hasOxygen = alkylAtoms.some((idx) => molecule.atoms[idx]?.symbol === "O");
 
     if (hasOxygen && carbonCount === 2) {
       // Check if this is specifically -CH2-O-CH3

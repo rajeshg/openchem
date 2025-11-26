@@ -17,8 +17,7 @@ interface PatternFinderFunction {
  * using comprehensive SMARTS patterns from opsin-rules.json
  */
 export class OPSINFunctionalGroupDetector {
-  private matchPatternCache: WeakMap<Molecule, Map<string, number[]>> =
-    new WeakMap();
+  private matchPatternCache: WeakMap<Molecule, Map<string, number[]>> = new WeakMap();
   private functionalGroups: Map<string, FunctionalGroupData> = new Map();
 
   constructor() {
@@ -33,8 +32,7 @@ export class OPSINFunctionalGroupDetector {
 
     for (const [pattern, data] of allGroups.entries()) {
       // Look up priority by NAME from OPSIN rules, not pattern
-      const priority =
-        rawRules.functionalGroupPriorities?.[data.name] ?? data.priority ?? 999;
+      const priority = rawRules.functionalGroupPriorities?.[data.name] ?? data.priority ?? 999;
 
       this.functionalGroups.set(pattern, {
         ...data,
@@ -216,9 +214,7 @@ export class OPSINFunctionalGroupDetector {
         const atomsMatched = check.finder(atoms, bonds, molecule.rings);
         if (atomsMatched && atomsMatched.length > 0) {
           // Check if any of these atoms are already claimed by a higher-priority group
-          const hasOverlap = atomsMatched.some((atomId) =>
-            claimedAtoms.has(atomId),
-          );
+          const hasOverlap = atomsMatched.some((atomId) => claimedAtoms.has(atomId));
           if (hasOverlap) {
             // Skip this pattern - atoms already claimed
             continue;
@@ -287,11 +283,7 @@ export class OPSINFunctionalGroupDetector {
                 suffix: fgEntry?.suffix || "",
                 prefix: fgEntry?.prefix || undefined,
                 priority: fgEntry?.priority || check.priority,
-                atoms: [
-                  atomsMatched[i]!,
-                  atomsMatched[i + 1]!,
-                  atomsMatched[i + 2]!,
-                ],
+                atoms: [atomsMatched[i]!, atomsMatched[i + 1]!, atomsMatched[i + 2]!],
                 pattern: check.pattern,
               });
               // Claim these atoms
@@ -299,10 +291,7 @@ export class OPSINFunctionalGroupDetector {
               claimedAtoms.add(atomsMatched[i + 1]!);
               claimedAtoms.add(atomsMatched[i + 2]!);
             }
-          } else if (
-            check.pattern === "[CX3](=O)[CX4]" &&
-            atomsMatched.length > 2
-          ) {
+          } else if (check.pattern === "[CX3](=O)[CX4]" && atomsMatched.length > 2) {
             // Special case: For ketones, create one functional group per C=O pair
             // since each ketone should be counted separately for dione, trione, etc.
             // atomsMatched contains pairs: [C1, O1, C2, O2, ...]
@@ -331,11 +320,7 @@ export class OPSINFunctionalGroupDetector {
                 suffix: fgEntry?.suffix || "",
                 prefix: fgEntry?.prefix || undefined,
                 priority: fgEntry?.priority || check.priority,
-                atoms: [
-                  atomsMatched[i]!,
-                  atomsMatched[i + 1]!,
-                  atomsMatched[i + 2]!,
-                ],
+                atoms: [atomsMatched[i]!, atomsMatched[i + 1]!, atomsMatched[i + 2]!],
                 pattern: check.pattern,
               });
               // Claim these atoms
@@ -353,11 +338,7 @@ export class OPSINFunctionalGroupDetector {
                 suffix: fgEntry?.suffix || "",
                 prefix: fgEntry?.prefix || undefined,
                 priority: fgEntry?.priority || check.priority,
-                atoms: [
-                  atomsMatched[i]!,
-                  atomsMatched[i + 1]!,
-                  atomsMatched[i + 2]!,
-                ],
+                atoms: [atomsMatched[i]!, atomsMatched[i + 1]!, atomsMatched[i + 2]!],
                 pattern: check.pattern,
               });
               // Claim these atoms
@@ -375,11 +356,7 @@ export class OPSINFunctionalGroupDetector {
                 suffix: fgEntry?.suffix || "",
                 prefix: fgEntry?.prefix || undefined,
                 priority: fgEntry?.priority || check.priority,
-                atoms: [
-                  atomsMatched[i]!,
-                  atomsMatched[i + 1]!,
-                  atomsMatched[i + 2]!,
-                ],
+                atoms: [atomsMatched[i]!, atomsMatched[i + 1]!, atomsMatched[i + 2]!],
                 pattern: check.pattern,
               });
               // Claim these atoms
@@ -435,10 +412,7 @@ export class OPSINFunctionalGroupDetector {
               // Claim this atom
               claimedAtoms.add(oxygenId);
             }
-          } else if (
-            check.pattern === "[N+](=O)[O-]" &&
-            atomsMatched.length > 3
-          ) {
+          } else if (check.pattern === "[N+](=O)[O-]" && atomsMatched.length > 3) {
             // Special case: For nitro groups, create one functional group per NO2 triple
             // since each nitro should be counted separately for dinitro, trinitro, etc.
             // atomsMatched contains triples: [N1, O1, O2, N2, O3, O4, ...]
@@ -449,11 +423,7 @@ export class OPSINFunctionalGroupDetector {
                 suffix: fgEntry?.suffix || "",
                 prefix: fgEntry?.prefix || undefined,
                 priority: fgEntry?.priority || check.priority,
-                atoms: [
-                  atomsMatched[i]!,
-                  atomsMatched[i + 1]!,
-                  atomsMatched[i + 2]!,
-                ],
+                atoms: [atomsMatched[i]!, atomsMatched[i + 1]!, atomsMatched[i + 2]!],
                 pattern: check.pattern,
               });
               // Claim these atoms
@@ -467,9 +437,7 @@ export class OPSINFunctionalGroupDetector {
               console.log(`  check.pattern: ${check.pattern}`);
               console.log(`  check.priority: ${check.priority}`);
               console.log(`  fgEntry:`, fgEntry);
-              console.log(
-                `  final priority: ${fgEntry?.priority || check.priority}`,
-              );
+              console.log(`  final priority: ${fgEntry?.priority || check.priority}`);
             }
             detectedGroups.push({
               type: check.pattern,
@@ -539,8 +507,7 @@ export class OPSINFunctionalGroupDetector {
         const atom = atoms.find((a) => a.id === atomId);
         if (atom) {
           const singleBondsForAtom = bonds.filter(
-            (b) =>
-              (b.atom1 === atomId || b.atom2 === atomId) && b.type === "single",
+            (b) => (b.atom1 === atomId || b.atom2 === atomId) && b.type === "single",
           );
           const nonOxygenNeighbors = singleBondsForAtom
             .map((b) => this.getBondedAtom(b, atomId, atoms))
@@ -659,10 +626,7 @@ export class OPSINFunctionalGroupDetector {
 
   // Specific pattern matching methods for high-priority functional groups
 
-  private findCarboxylicAcidPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findCarboxylicAcidPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL carboxylic acid groups (C=O-OH), not just the first one
     const carboxylicAcids: number[] = [];
 
@@ -708,11 +672,7 @@ export class OPSINFunctionalGroupDetector {
 
         if (hydrogenBond || nonCarbonylNeighbors.length === 0) {
           // Get the carbonyl oxygen from the double bond
-          const carbonylOxygen = this.getBondedAtom(
-            doubleBondOxygen,
-            atom.id,
-            atoms,
-          )!;
+          const carbonylOxygen = this.getBondedAtom(doubleBondOxygen, atom.id, atoms)!;
           // Add all three atoms: carbonyl carbon, carbonyl oxygen, hydroxyl oxygen
           carboxylicAcids.push(atom.id, carbonylOxygen.id, oxygen.id);
         }
@@ -721,10 +681,7 @@ export class OPSINFunctionalGroupDetector {
     return carboxylicAcids;
   }
 
-  private findAlcoholPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findAlcoholPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL oxygen atoms with carbon and hydrogen bonds (alcohols)
     const alcohols: number[] = [];
 
@@ -753,9 +710,7 @@ export class OPSINFunctionalGroupDetector {
         const other = this.getBondedAtom(bond, atom.id, atoms);
         if (!other) return false;
         // Heteroatoms are elements other than C, H, O
-        return (
-          other.symbol !== "C" && other.symbol !== "H" && other.symbol !== "O"
-        );
+        return other.symbol !== "C" && other.symbol !== "H" && other.symbol !== "O";
       });
 
       // Don't detect as alcohol if bonded to heteroatoms (e.g., O-N in aminooxy)
@@ -766,20 +721,14 @@ export class OPSINFunctionalGroupDetector {
       // Accept explicit alcohols (carbon+bonded hydrogen) or implicit alcohols
       // where the oxygen is terminal (bonded to only one carbon and hydrogens
       // are implicit in parsed SMILES).
-      if (
-        (carbonBonds.length >= 1 && hydrogenBonds.length >= 1) ||
-        carbonBonds.length === 1
-      ) {
+      if ((carbonBonds.length >= 1 && hydrogenBonds.length >= 1) || carbonBonds.length === 1) {
         alcohols.push(atom.id);
       }
     }
     return alcohols;
   }
 
-  private findKetonePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findKetonePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL carbonyl carbons with two carbon substituents
     const ketones: number[] = [];
 
@@ -788,9 +737,7 @@ export class OPSINFunctionalGroupDetector {
       if (!atom || atom.symbol !== "C") continue;
 
       const doubleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "double",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "double",
       );
 
       if (doubleBonds.length !== 1) continue;
@@ -849,9 +796,7 @@ export class OPSINFunctionalGroupDetector {
 
       // If the nitrogen is bonded to a carbonyl carbon (amide), treat as amide
       // UNLESS nitrogen is tertiary (3+ non-H neighbors), which means C=O is an N-acyl substituent
-      const nitrogenBonds = bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const nitrogenBonds = bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
       const nitrogenNeighbors = nitrogenBonds
         .map((b) => this.getBondedAtom(b, atom.id, atoms))
         .filter((a): a is Atom => a !== undefined && a.symbol !== "H");
@@ -872,10 +817,7 @@ export class OPSINFunctionalGroupDetector {
           return !!doubleToO;
         });
 
-      if (
-        !hasAmideBond &&
-        (carbonSingleBonds.length >= 1 || hydrogenBonds.length >= 1)
-      ) {
+      if (!hasAmideBond && (carbonSingleBonds.length >= 1 || hydrogenBonds.length >= 1)) {
         if (process.env.VERBOSE) {
           console.log(
             `[findAminePattern] Found amine at N=${atom.id} (tertiary=${isTertiaryAmine})`,
@@ -887,10 +829,7 @@ export class OPSINFunctionalGroupDetector {
     return allAmines;
   }
 
-  private findNitroPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findNitroPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     const allNitro: number[] = [];
 
     for (let i = 0; i < atoms.length; i++) {
@@ -899,9 +838,7 @@ export class OPSINFunctionalGroupDetector {
 
       let oxygenDoubleCount = 0;
       let oxygenSingleCount = 0;
-      const nitrogenBonds = bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const nitrogenBonds = bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
 
       for (const bond of nitrogenBonds) {
         const neighborId = bond.atom1 === atom.id ? bond.atom2 : bond.atom1;
@@ -915,10 +852,7 @@ export class OPSINFunctionalGroupDetector {
         }
       }
 
-      if (
-        oxygenDoubleCount === 2 ||
-        (oxygenDoubleCount === 1 && oxygenSingleCount === 1)
-      ) {
+      if (oxygenDoubleCount === 2 || (oxygenDoubleCount === 1 && oxygenSingleCount === 1)) {
         if (process.env.VERBOSE) {
           console.log(
             `[findNitroPattern] Found nitro at N=${atom.id} (O=: ${oxygenDoubleCount}, O-: ${oxygenSingleCount})`,
@@ -939,10 +873,7 @@ export class OPSINFunctionalGroupDetector {
     return allNitro;
   }
 
-  private findNAcylPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findNAcylPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Detect N-acyl substituents: R-C(=O)-N< where N is tertiary
     // Examples: N-formyl (CHO-N<), N-acetyl (CH3CO-N<), etc.
     // Returns the acyl carbon atoms (the C in C=O bonded to tertiary N)
@@ -979,13 +910,8 @@ export class OPSINFunctionalGroupDetector {
         // Count non-H neighbors of nitrogen
         let nonHNeighborCount = 0;
         for (const bond of bonds) {
-          if (
-            bond.atom1 !== nitrogenNeighborId &&
-            bond.atom2 !== nitrogenNeighborId
-          )
-            continue;
-          const neighborId =
-            bond.atom1 === nitrogenNeighborId ? bond.atom2 : bond.atom1;
+          if (bond.atom1 !== nitrogenNeighborId && bond.atom2 !== nitrogenNeighborId) continue;
+          const neighborId = bond.atom1 === nitrogenNeighborId ? bond.atom2 : bond.atom1;
           const neighbor = atoms[neighborId];
           if (neighbor && neighbor.symbol !== "H") {
             nonHNeighborCount++;
@@ -1021,17 +947,13 @@ export class OPSINFunctionalGroupDetector {
     // IMPORTANT: Only detect imines in simple hydrocarbon rings (C and N only)
     // Do NOT detect C=N in heterocycles (rings containing S, O, etc.)
     if (process.env.VERBOSE) {
-      console.log(
-        `[findImineInRingPattern] Called with ${rings?.length || 0} rings`,
-      );
+      console.log(`[findImineInRingPattern] Called with ${rings?.length || 0} rings`);
     }
     if (!rings || rings.length === 0) return [];
 
     for (const ring of rings) {
       if (process.env.VERBOSE) {
-        console.log(
-          `[findImineInRingPattern] Checking ring: [${ring.join(", ")}]`,
-        );
+        console.log(`[findImineInRingPattern] Checking ring: [${ring.join(", ")}]`);
       }
 
       // Check if this ring is a heterocycle (contains heteroatoms other than the N in C=N)
@@ -1087,10 +1009,7 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findEtherPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findEtherPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL oxygens bonded to two carbons (ROR)
     const etherOxygens: number[] = [];
 
@@ -1113,9 +1032,7 @@ export class OPSINFunctionalGroupDetector {
 
       if (carbonBonds.length === 2) {
         // Exclude oxygens that are part of esters (i.e., bonded to a carbonyl carbon)
-        const carbons = carbonBonds.map((b) =>
-          this.getBondedAtom(b, atom.id, atoms),
-        );
+        const carbons = carbonBonds.map((b) => this.getBondedAtom(b, atom.id, atoms));
         const isPartOfCarbonyl = carbons.some((c) => {
           if (!c) return false;
           const doubleToO = bonds.find(
@@ -1135,10 +1052,7 @@ export class OPSINFunctionalGroupDetector {
     return etherOxygens;
   }
 
-  private findThioetherPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findThioetherPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL sulfurs bonded to two carbons (RSR)
     const thioetherSulfurs: number[] = [];
 
@@ -1161,9 +1075,7 @@ export class OPSINFunctionalGroupDetector {
 
       if (carbonBonds.length === 2) {
         // Exclude sulfurs that are part of thioesters (i.e., bonded to a carbonyl carbon)
-        const carbons = carbonBonds.map((b) =>
-          this.getBondedAtom(b, atom.id, atoms),
-        );
+        const carbons = carbonBonds.map((b) => this.getBondedAtom(b, atom.id, atoms));
         const isPartOfCarbonyl = carbons.some((c) => {
           if (!c) return false;
           const doubleToO = bonds.find(
@@ -1183,10 +1095,7 @@ export class OPSINFunctionalGroupDetector {
     return thioetherSulfurs;
   }
 
-  private findThiocyanatePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findThiocyanatePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for S-C≡N pattern (thiocyanate group)
     if (process.env.VERBOSE) {
       console.log("[findThiocyanatePattern] Searching for S-C≡N pattern");
@@ -1213,9 +1122,7 @@ export class OPSINFunctionalGroupDetector {
       for (const carbonBond of carbonBonds) {
         const carbon = this.getBondedAtom(carbonBond, atom.id, atoms)!;
         if (process.env.VERBOSE) {
-          console.log(
-            `[findThiocyanatePattern] Checking C=${carbon.id} bonded to S=${atom.id}`,
-          );
+          console.log(`[findThiocyanatePattern] Checking C=${carbon.id} bonded to S=${atom.id}`);
         }
 
         const tripleBond = bonds.find(
@@ -1242,19 +1149,14 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findNitrilePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findNitrilePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for carbon-triple bond-nitrogen
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
       if (!atom || atom.symbol !== "C") continue;
 
       const tripleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "triple",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "triple",
       );
 
       if (tripleBonds.length >= 1) {
@@ -1358,15 +1260,10 @@ export class OPSINFunctionalGroupDetector {
     return allAmides;
   }
 
-  private isHeterocycleWithCarbonyl(
-    ring: readonly number[],
-    atoms: readonly Atom[],
-  ): boolean {
+  private isHeterocycleWithCarbonyl(ring: readonly number[], atoms: readonly Atom[]): boolean {
     // Check if this is a heterocycle with a carbonyl (lactam rings)
     // Lactams: cyclic amides with C=O in the ring (e.g., pyrrolidin-2-one, piperidin-2-one, piperazin-2-one)
-    const ringAtoms = ring
-      .map((idx) => atoms[idx])
-      .filter((a): a is Atom => a !== undefined);
+    const ringAtoms = ring.map((idx) => atoms[idx]).filter((a): a is Atom => a !== undefined);
 
     const ringSize = ringAtoms.length;
     const nitrogenCount = ringAtoms.filter((a) => a.symbol === "N").length;
@@ -1396,19 +1293,14 @@ export class OPSINFunctionalGroupDetector {
     return false;
   }
 
-  private findSulfonicAcidPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findSulfonicAcidPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for sulfur with double bonds to oxygen
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
       if (!atom || atom.symbol !== "S") continue;
 
       const doubleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "double",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "double",
       );
 
       const oxygenDoubleBonds = doubleBonds.filter(
@@ -1422,19 +1314,14 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findSulfonylPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findSulfonylPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for sulfur with exactly 2 double bonds to oxygen: -S(=O)(=O)-
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
       if (!atom || atom.symbol !== "S") continue;
 
       const doubleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "double",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "double",
       );
 
       const oxygenDoubleBonds = doubleBonds.filter(
@@ -1445,9 +1332,7 @@ export class OPSINFunctionalGroupDetector {
       if (oxygenDoubleBonds.length === 2) {
         // Must have at least 1 single bond to carbon or other atom (not sulfonic acid)
         const singleBonds = bonds.filter(
-          (bond) =>
-            (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-            bond.type === "single",
+          (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "single",
         );
 
         if (singleBonds.length >= 1) {
@@ -1462,19 +1347,14 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findSulfinylPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findSulfinylPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for sulfur with exactly 1 double bond to oxygen: -S(=O)-
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
       if (!atom || atom.symbol !== "S") continue;
 
       const doubleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "double",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "double",
       );
 
       const oxygenDoubleBonds = doubleBonds.filter(
@@ -1485,18 +1365,12 @@ export class OPSINFunctionalGroupDetector {
       if (oxygenDoubleBonds.length === 1) {
         // Must have at least 2 single bonds to carbon or other atoms
         const singleBonds = bonds.filter(
-          (bond) =>
-            (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-            bond.type === "single",
+          (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "single",
         );
 
         if (singleBonds.length >= 2) {
           // Return sulfur and oxygen atom to prevent oxygen being detected separately
-          const oxygenId = this.getBondedAtom(
-            oxygenDoubleBonds[0]!,
-            atom.id,
-            atoms,
-          )!.id;
+          const oxygenId = this.getBondedAtom(oxygenDoubleBonds[0]!, atom.id, atoms)!.id;
           return [atom.id, oxygenId];
         }
       }
@@ -1504,19 +1378,14 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findPhosphorylPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findPhosphorylPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for phosphorus with exactly 1 double bond to oxygen: -P(=O)-
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
       if (!atom || atom.symbol !== "P") continue;
 
       const doubleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "double",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "double",
       );
 
       const oxygenDoubleBonds = doubleBonds.filter(
@@ -1536,10 +1405,7 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findPhosphanylPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findPhosphanylPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for phosphorus without double bonds to oxygen (not phosphoryl)
     // This is a trivalent or higher valent phosphorus substituent: -PR2, -PR3, etc.
     const phosphanylAtoms: number[] = [];
@@ -1550,17 +1416,13 @@ export class OPSINFunctionalGroupDetector {
     if (phosphorusAtoms.length === 1) {
       const pAtom = phosphorusAtoms[0];
       if (!pAtom) return [];
-      const pBonds = bonds.filter(
-        (b) => b.atom1 === pAtom.id || b.atom2 === pAtom.id,
-      );
+      const pBonds = bonds.filter((b) => b.atom1 === pAtom.id || b.atom2 === pAtom.id);
       const neighbors = pBonds
         .map((b) => this.getBondedAtom(b, pAtom.id, atoms))
         .filter((a): a is Atom => a !== undefined);
 
       // If all neighbors are C or H, this is likely a heteroatom parent (e.g., methylphosphine)
-      const allCarbonOrHydrogen = neighbors.every(
-        (a) => a.symbol === "C" || a.symbol === "H",
-      );
+      const allCarbonOrHydrogen = neighbors.every((a) => a.symbol === "C" || a.symbol === "H");
       if (allCarbonOrHydrogen) {
         return []; // Don't detect as phosphanyl - let heteroatom parent rule handle it
       }
@@ -1589,9 +1451,7 @@ export class OPSINFunctionalGroupDetector {
 
         // Claim all bonded heteroatoms (O, N, S, etc.) to prevent them from being
         // detected as separate functional groups (e.g., "oxide")
-        const pBonds = bonds.filter(
-          (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-        );
+        const pBonds = bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
         for (const bond of pBonds) {
           const neighbor = this.getBondedAtom(bond, atom.id, atoms);
           if (neighbor && neighbor.symbol !== "C" && neighbor.symbol !== "H") {
@@ -1604,10 +1464,7 @@ export class OPSINFunctionalGroupDetector {
     return phosphanylAtoms;
   }
 
-  private findBoranePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findBoranePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for boron atoms with only C/H neighbors (trialkylborane, dialkylborane, etc.)
     // Borane functional class nomenclature: R₃B → trialkylborane
     const boraneAtoms: number[] = [];
@@ -1622,17 +1479,13 @@ export class OPSINFunctionalGroupDetector {
       }
 
       // Get all neighbors of boron
-      const bBonds = bonds.filter(
-        (b) => b.atom1 === atom.id || b.atom2 === atom.id,
-      );
+      const bBonds = bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
       const neighbors = bBonds
         .map((b) => this.getBondedAtom(b, atom.id, atoms))
         .filter((a): a is Atom => a !== undefined);
 
       // Borane should have only C or H neighbors (no heteroatoms like O, N, etc.)
-      const allCarbonOrHydrogen = neighbors.every(
-        (a) => a.symbol === "C" || a.symbol === "H",
-      );
+      const allCarbonOrHydrogen = neighbors.every((a) => a.symbol === "C" || a.symbol === "H");
 
       if (allCarbonOrHydrogen && neighbors.length > 0) {
         boraneAtoms.push(atom.id);
@@ -1642,10 +1495,7 @@ export class OPSINFunctionalGroupDetector {
     return boraneAtoms;
   }
 
-  private findAldehydePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findAldehydePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for carbonyl carbon with hydrogen
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
@@ -1673,9 +1523,7 @@ export class OPSINFunctionalGroupDetector {
       // non-oxygen heavy atom (i.e., one carbon neighbor) as an aldehyde, but
       // exclude esters (where the single-bonded oxygen is bonded to carbon).
       const singleBonds = bonds.filter(
-        (bond) =>
-          (bond.atom1 === atom.id || bond.atom2 === atom.id) &&
-          bond.type === "single",
+        (bond) => (bond.atom1 === atom.id || bond.atom2 === atom.id) && bond.type === "single",
       );
       const nonOxygenNeighbors = singleBonds
         .map((b) => this.getBondedAtom(b, atom.id, atoms))
@@ -1685,13 +1533,10 @@ export class OPSINFunctionalGroupDetector {
 
       // Check if C=O is bonded to a tertiary nitrogen (N-acyl substituent, not aldehyde)
       // For N-formyl groups attached to tertiary amines, the C=O should not be classified as aldehyde
-      const nitrogenNeighbor = nonOxygenNeighbors.find(
-        (a) => a?.symbol === "N",
-      );
+      const nitrogenNeighbor = nonOxygenNeighbors.find((a) => a?.symbol === "N");
       if (nitrogenNeighbor) {
         const nitrogenBonds = bonds.filter(
-          (b) =>
-            b.atom1 === nitrogenNeighbor.id || b.atom2 === nitrogenNeighbor.id,
+          (b) => b.atom1 === nitrogenNeighbor.id || b.atom2 === nitrogenNeighbor.id,
         );
         const nitrogenNeighborCount = nitrogenBonds
           .map((b) => this.getBondedAtom(b, nitrogenNeighbor.id, atoms))
@@ -1716,9 +1561,7 @@ export class OPSINFunctionalGroupDetector {
       let oxygenLinkedToCarbon = false;
       for (const ox of bondedOxygens) {
         if (!ox) continue;
-        const oxBonds = bonds.filter(
-          (b) => b.atom1 === ox.id || b.atom2 === ox.id,
-        );
+        const oxBonds = bonds.filter((b) => b.atom1 === ox.id || b.atom2 === ox.id);
         const oxCarbonNeighbors = oxBonds
           .map((b) => this.getBondedAtom(b, ox.id, atoms))
           .filter((a) => a && a.symbol === "C" && a.id !== atom.id);
@@ -1728,20 +1571,14 @@ export class OPSINFunctionalGroupDetector {
         }
       }
 
-      if (
-        hydrogenBond ||
-        (nonOxygenNeighbors.length === 1 && !oxygenLinkedToCarbon)
-      ) {
+      if (hydrogenBond || (nonOxygenNeighbors.length === 1 && !oxygenLinkedToCarbon)) {
         return [atom.id, oxygen.id];
       }
     }
     return [];
   }
 
-  private findEsterPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findEsterPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for ALL carbonyl carbons (C=O) single-bonded to oxygen which is bonded to carbon
     const esters: number[] = [];
 
@@ -1795,11 +1632,7 @@ export class OPSINFunctionalGroupDetector {
           );
         }
         if (oxCarbonNeighbor) {
-          const carbonylOxygen = this.getBondedAtom(
-            doubleBondOxygen,
-            atom.id,
-            atoms,
-          )!;
+          const carbonylOxygen = this.getBondedAtom(doubleBondOxygen, atom.id, atoms)!;
           if (process.env.VERBOSE) {
             console.log(
               `[findEsterPattern] ✓ ESTER FOUND: C=${atom.id}, O=${carbonylOxygen.id}, O=${oxygen.id}`,
@@ -1812,10 +1645,7 @@ export class OPSINFunctionalGroupDetector {
     return esters;
   }
 
-  private findThioesterPattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findThioesterPattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for carbonyl carbons (C=O) single-bonded to sulfur: C(=O)-S-R
     // BUT NOT bonded to oxygen ester (C(=O)-S-R where there's also C(=O)-O would be an ester with sulfanyl substituent)
     const thioesters: number[] = [];
@@ -1858,11 +1688,7 @@ export class OPSINFunctionalGroupDetector {
 
       // This is a true thioester: C(=O)-S-R (no oxygen ester linkage)
       const sulfur = this.getBondedAtom(singleBondedSulfur, atom.id, atoms)!;
-      const carbonylOxygen = this.getBondedAtom(
-        doubleBondOxygen,
-        atom.id,
-        atoms,
-      )!;
+      const carbonylOxygen = this.getBondedAtom(doubleBondOxygen, atom.id, atoms)!;
       thioesters.push(atom.id, carbonylOxygen.id, sulfur.id);
     }
     return thioesters;
@@ -1936,10 +1762,7 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findCyanatePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findCyanatePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for O-C≡N pattern
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
@@ -1969,10 +1792,7 @@ export class OPSINFunctionalGroupDetector {
     return [];
   }
 
-  private findPeroxidePattern(
-    atoms: readonly Atom[],
-    bonds: readonly Bond[],
-  ): number[] {
+  private findPeroxidePattern(atoms: readonly Atom[], bonds: readonly Bond[]): number[] {
     // Look for O-O single bond
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
@@ -2035,28 +1855,16 @@ export class OPSINFunctionalGroupDetector {
     // Simple string-based matching for basic patterns
     switch (pattern) {
       case "Br":
-        matches.push(
-          ...atoms
-            .filter((atom) => atom.symbol === "Br")
-            .map((atom) => atom.id),
-        );
+        matches.push(...atoms.filter((atom) => atom.symbol === "Br").map((atom) => atom.id));
         break;
       case "Cl":
-        matches.push(
-          ...atoms
-            .filter((atom) => atom.symbol === "Cl")
-            .map((atom) => atom.id),
-        );
+        matches.push(...atoms.filter((atom) => atom.symbol === "Cl").map((atom) => atom.id));
         break;
       case "F":
-        matches.push(
-          ...atoms.filter((atom) => atom.symbol === "F").map((atom) => atom.id),
-        );
+        matches.push(...atoms.filter((atom) => atom.symbol === "F").map((atom) => atom.id));
         break;
       case "I":
-        matches.push(
-          ...atoms.filter((atom) => atom.symbol === "I").map((atom) => atom.id),
-        );
+        matches.push(...atoms.filter((atom) => atom.symbol === "I").map((atom) => atom.id));
         break;
       case "O":
         // Filter out oxygen atoms that are part of rings (heterocycles like oxirane, furan)
@@ -2095,11 +1903,7 @@ export class OPSINFunctionalGroupDetector {
     return matches;
   }
 
-  private getBondedAtom(
-    bond: Bond,
-    atomId: number,
-    atoms: readonly Atom[],
-  ): Atom | undefined {
+  private getBondedAtom(bond: Bond, atomId: number, atoms: readonly Atom[]): Atom | undefined {
     const otherAtomId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
     return atoms.find((atom) => atom.id === otherAtomId);
   }

@@ -51,10 +51,7 @@ export interface ScaffoldResult {
  * const scaffold = getMurckoScaffold(ibuprofen);
  * // Result: c1ccccc1 (benzene ring only)
  */
-export function getMurckoScaffold(
-  mol: Molecule,
-  opts: MurckoOptions = {},
-): Molecule {
+export function getMurckoScaffold(mol: Molecule, opts: MurckoOptions = {}): Molecule {
   const { includeLinkers = true } = opts;
 
   let current = enrichMolecule(mol);

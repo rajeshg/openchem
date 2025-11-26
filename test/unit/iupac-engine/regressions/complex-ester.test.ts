@@ -9,8 +9,7 @@ describe("Regression: complex ester handling", () => {
   it("handles a substituted anilino butanoate", () => {
     const engine = new RuleEngine();
     const smiles = "CCCC(=O)OC(C)(C)C(=O)NC1=CC(=C(C=C1)[N+](=O)[O-])C(F)(F)F";
-    const expected =
-      "[2-methyl-1-[4-nitro-3-(trifluoromethyl)anilino]-1-oxopropan-2-yl] butanoate";
+    const expected = "[2-methyl-1-[4-nitro-3-(trifluoromethyl)anilino]-1-oxopropan-2-yl] butanoate";
 
     const parsed = parseSMILES(smiles);
     expect(parsed.errors).toHaveLength(0);

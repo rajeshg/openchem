@@ -17,8 +17,7 @@ import { ExecutionPhase } from "../../immutable-context";
 export const RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE: IUPACRule = {
   id: "re-analyze-alkoxy-after-parent",
   name: "Fix Pending Alkoxy Functional Groups",
-  description:
-    "For chains: remove alkoxy FGs (duplicates). For rings: analyze and set prefix",
+  description: "For chains: remove alkoxy FGs (duplicates). For rings: analyze and set prefix",
   blueBookReference: "P-63.2.2 - Ethers as substituents",
   priority: 5, // Run AFTER parent chain selection complete (priority 100) - using low number since sort is descending
   conditions: (context: ImmutableNamingContext) => {
@@ -27,9 +26,7 @@ export const RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE: IUPACRule = {
     // Run if we have a parent structure and pending alkoxy groups
     return (
       parentStructure !== undefined &&
-      functionalGroups.some(
-        (g) => g.type === "alkoxy" && g.prefix === "pending-analysis",
-      )
+      functionalGroups.some((g) => g.type === "alkoxy" && g.prefix === "pending-analysis")
     );
   },
   action: (context: ImmutableNamingContext) => {
@@ -39,17 +36,14 @@ export const RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE: IUPACRule = {
     const isChain = parentStructure?.type === "chain";
 
     if (process.env.VERBOSE) {
-      console.log(
-        `[RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE] Parent is ${isChain ? "chain" : "ring"}`,
-      );
+      console.log(`[RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE] Parent is ${isChain ? "chain" : "ring"}`);
     }
 
     let updatedGroups;
     if (isChain) {
       // For chains: Remove alkoxy groups entirely (they're duplicates)
       updatedGroups = functionalGroups.filter((fg) => {
-        const shouldRemove =
-          fg.type === "alkoxy" && fg.prefix === "pending-analysis";
+        const shouldRemove = fg.type === "alkoxy" && fg.prefix === "pending-analysis";
         if (shouldRemove && process.env.VERBOSE) {
           console.log(
             `  Removing alkoxy FG at oxygen ${fg.atoms?.[0] ? (typeof fg.atoms[0] === "number" ? fg.atoms[0] : fg.atoms[0].id) : "unknown"}`,
@@ -80,9 +74,7 @@ export const RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE: IUPACRule = {
     return context.withFunctionalGroups(
       updatedGroups,
       "re-analyze-alkoxy-after-parent",
-      isChain
-        ? "Remove Pending Alkoxy Functional Groups"
-        : "Analyze Pending Alkoxy Prefixes",
+      isChain ? "Remove Pending Alkoxy Functional Groups" : "Analyze Pending Alkoxy Prefixes",
       "P-63.2.2",
       ExecutionPhase.PARENT_STRUCTURE,
       isChain
@@ -96,10 +88,7 @@ export const RE_ANALYZE_ALKOXY_AFTER_PARENT_RULE: IUPACRule = {
  * Analyze an alkoxy functional group to determine its name (methoxy, ethoxy, etc.)
  * This is a simplified version of the analysis in functional-groups-layer.ts
  */
-function analyzeAlkoxyGroup(
-  mol: Molecule,
-  fg: { atoms?: (Atom | number)[] },
-): string {
+function analyzeAlkoxyGroup(mol: Molecule, fg: { atoms?: (Atom | number)[] }): string {
   if (!fg.atoms || fg.atoms.length === 0) return "oxy";
 
   // Find the oxygen atom
@@ -117,9 +106,7 @@ function analyzeAlkoxyGroup(
   // Find carbons bonded to oxygen
   const bondedCarbons = mol.bonds
     .filter(
-      (bond) =>
-        (bond.atom1 === oxygenId || bond.atom2 === oxygenId) &&
-        bond.type === "single",
+      (bond) => (bond.atom1 === oxygenId || bond.atom2 === oxygenId) && bond.type === "single",
     )
     .map((bond) => {
       const otherId = bond.atom1 === oxygenId ? bond.atom2 : bond.atom1;
@@ -164,11 +151,7 @@ function analyzeAlkoxyGroup(
  * Get the size of a carbon chain starting from a carbon atom
  * Stop at the oxygen atom (don't traverse back through it)
  */
-function getChainSize(
-  mol: Molecule,
-  startCarbon: Atom,
-  oxygenAtom: Atom,
-): number {
+function getChainSize(mol: Molecule, startCarbon: Atom, oxygenAtom: Atom): number {
   const visited = new Set<number>([oxygenAtom.id]);
   const queue = [startCarbon];
   let count = 0;
@@ -184,16 +167,13 @@ function getChainSize(
     const neighbors = mol.bonds
       .filter(
         (bond) =>
-          (bond.atom1 === current.id || bond.atom2 === current.id) &&
-          bond.type === "single",
+          (bond.atom1 === current.id || bond.atom2 === current.id) && bond.type === "single",
       )
       .map((bond) => {
         const otherId = bond.atom1 === current.id ? bond.atom2 : bond.atom1;
         return mol.atoms[otherId];
       })
-      .filter(
-        (atom): atom is Atom => atom !== undefined && !visited.has(atom.id),
-      );
+      .filter((atom): atom is Atom => atom !== undefined && !visited.has(atom.id));
 
     queue.push(...neighbors);
   }

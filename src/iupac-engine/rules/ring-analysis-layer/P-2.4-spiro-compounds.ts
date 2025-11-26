@@ -20,17 +20,11 @@ export const P2_4_SPIRO_COMPOUNDS_RULE: IUPACRule = {
   priority: RulePriority.SEVEN,
   conditions: (context) => {
     const candidateRings = context.getState().candidateRings;
-    if (
-      !candidateRings ||
-      candidateRings.length === 0 ||
-      context.getState().parentStructure
-    ) {
+    if (!candidateRings || candidateRings.length === 0 || context.getState().parentStructure) {
       return false;
     }
     // Check if any ring system contains multiple rings (spiro)
-    return candidateRings.some(
-      (rs: RingSystem) => rs.rings && rs.rings.length > 1,
-    );
+    return candidateRings.some((rs: RingSystem) => rs.rings && rs.rings.length > 1);
   },
   action: (context) => {
     const candidateRings = context.getState().candidateRings;
@@ -76,10 +70,7 @@ export const P2_4_SPIRO_COMPOUNDS_RULE: IUPACRule = {
 /**
  * Helper function to generate spiro names
  */
-function generateSpiroPolycyclicName(
-  spiroRings: number[][],
-  molecule: Molecule,
-): string | null {
+function generateSpiroPolycyclicName(spiroRings: number[][], molecule: Molecule): string | null {
   // Use the engine's own naming function
   const { generateSpiroName } = require("../../naming/iupac-rings/index");
   return generateSpiroName(spiroRings, molecule);

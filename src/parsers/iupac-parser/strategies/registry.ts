@@ -27,9 +27,7 @@ export class StrategyRegistry {
 
   findStrategy(ctx: TokenContext): SubstituentBuildStrategy | null {
     if (process.env.VERBOSE) {
-      console.log(
-        `[registry] Trying to match against ${this.strategies.length} strategies`,
-      );
+      console.log(`[registry] Trying to match against ${this.strategies.length} strategies`);
       console.log(`[registry] Context:`, {
         parents: ctx.parentTokens.map((t) => t.value),
         suffixes: ctx.suffixTokens.map((t) => t.value),

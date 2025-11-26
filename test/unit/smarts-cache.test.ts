@@ -58,13 +58,7 @@ describe("SMARTS Pattern Cache", () => {
   it("should preload multiple patterns", () => {
     clearSMARTSCache();
 
-    const patterns = [
-      "c1ccccc1",
-      "[C,N;H2,H3]",
-      "[#6]=[#6]",
-      "[O;H]",
-      "invalid[[[",
-    ];
+    const patterns = ["c1ccccc1", "[C,N;H2,H3]", "[#6]=[#6]", "[O;H]", "invalid[[["];
 
     const loaded = preloadSMARTSPatterns(patterns);
     expect(loaded).toBe(4); // 4 valid, 1 invalid
@@ -121,8 +115,7 @@ describe("SMARTS Pattern Cache", () => {
       parseSMARTSCached(pattern);
       missTimings.push(performance.now() - start);
     }
-    const avgMissTime =
-      missTimings.reduce((a, b) => a + b, 0) / missTimings.length;
+    const avgMissTime = missTimings.reduce((a, b) => a + b, 0) / missTimings.length;
 
     // Measure cache hits (multiple samples)
     const hitTimings: number[] = [];
@@ -131,8 +124,7 @@ describe("SMARTS Pattern Cache", () => {
       parseSMARTSCached(pattern);
       hitTimings.push(performance.now() - start);
     }
-    const avgHitTime =
-      hitTimings.reduce((a, b) => a + b, 0) / hitTimings.length;
+    const avgHitTime = hitTimings.reduce((a, b) => a + b, 0) / hitTimings.length;
 
     // Cache hits should be faster (very lenient threshold for CI environments)
     // We just verify that caching doesn't make it slower
@@ -173,8 +165,7 @@ describe("SMARTS Pattern Cache", () => {
       if (!mol) continue;
 
       const result = matchSMARTS(pattern, mol) as MatchResult;
-      const hasMatches =
-        result.success && result.matches && result.matches.length > 0;
+      const hasMatches = result.success && result.matches && result.matches.length > 0;
 
       if (testCase.shouldMatch) {
         expect(hasMatches).toBe(true);

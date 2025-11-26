@@ -217,10 +217,7 @@ export function computeRingAlignmentTransform(
   targetTemplate: Vec2[],
   targetCoords: [Vec2, Vec2],
 ): Transform {
-  const [targetP1, targetP2] = [
-    targetTemplate[targetEdge[0]]!,
-    targetTemplate[targetEdge[1]]!,
-  ];
+  const [targetP1, targetP2] = [targetTemplate[targetEdge[0]]!, targetTemplate[targetEdge[1]]!];
 
   const [placedP1, placedP2] = targetCoords;
 

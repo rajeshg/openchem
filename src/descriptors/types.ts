@@ -93,9 +93,7 @@ export interface ChiProperties {
 }
 
 export interface MolecularProperties
-  extends BasicProperties,
-    PhysicochemicalProperties,
-    StructuralProperties {
+  extends BasicProperties, PhysicochemicalProperties, StructuralProperties {
   lipinskiPass: boolean;
   veberPass: boolean;
   bbbPenetration: boolean;

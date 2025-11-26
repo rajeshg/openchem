@@ -17,9 +17,7 @@ describe("Phosphorus Compounds - Comprehensive", () => {
     });
 
     it("should name triphenylphosphine oxide (TPPO)", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1P(=O)(c2ccccc2)c3ccccc3",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1P(=O)(c2ccccc2)c3ccccc3");
       expect(result.name).toBeDefined();
       // Note: Current IUPAC engine generates "phenylbenzene" for complex phosphorus compounds
       // Full phosphorus support would be needed for proper naming
@@ -98,9 +96,7 @@ describe("Phosphorus Compounds - Comprehensive", () => {
     });
 
     it("should name triphenylphosphine sulfide", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1P(=S)(c2ccccc2)c3ccccc3",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1P(=S)(c2ccccc2)c3ccccc3");
       expect(result.name).toBeDefined();
     });
 
@@ -112,9 +108,7 @@ describe("Phosphorus Compounds - Comprehensive", () => {
 
   describe("Phosphonium salts", () => {
     it("should name tetraphenylphosphonium cation", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1[P+](c2ccccc2)(c3ccccc3)c4ccccc4",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1[P+](c2ccccc2)(c3ccccc3)c4ccccc4");
       expect(result.name).toBeDefined();
     });
 
@@ -124,9 +118,7 @@ describe("Phosphorus Compounds - Comprehensive", () => {
     });
 
     it("should name triphenylmethylphosphonium cation", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1[P+](c2ccccc2)(C)c3ccccc3",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1[P+](c2ccccc2)(C)c3ccccc3");
       expect(result.name).toBeDefined();
     });
   });
@@ -187,9 +179,7 @@ describe("Phosphorus Compounds - Comprehensive", () => {
     });
 
     it("should name 4-diphenylphosphinylbenzene", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccc(P(=O)(c2ccccc2)c3ccccc3)cc1",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccc(P(=O)(c2ccccc2)c3ccccc3)cc1");
       expect(result.name).toBeDefined();
     });
 
@@ -230,16 +220,12 @@ describe("Phosphorus Compounds - Comprehensive", () => {
     });
 
     it("should name 1,2-bis(diphenylphosphino)ethane (dppe ligand)", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1P(c2ccccc2)CCP(c3ccccc3)c4ccccc4",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1P(c2ccccc2)CCP(c3ccccc3)c4ccccc4");
       expect(result.name).toBeDefined();
     });
 
     it("should name 1,3-bis(diphenylphosphino)propane", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccccc1P(c2ccccc2)CCCP(c3ccccc3)c4ccccc4",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccccc1P(c2ccccc2)CCCP(c3ccccc3)c4ccccc4");
       expect(result.name).toBeDefined();
     });
   });
@@ -285,16 +271,12 @@ describe("Phosphorus Compounds - Comprehensive", () => {
 
   describe("Complex polycyclic phosphorus", () => {
     it("should name phenanthrene with phosphine", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1cc2ccc3cccc4ccc(P(=O)(C)C)c(c1)c2c34",
-      );
+      const result = generateIUPACNameFromSMILES("c1cc2ccc3cccc4ccc(P(=O)(C)C)c(c1)c2c34");
       expect(result.name).toBeDefined();
     });
 
     it("should name anthracene with phosphine oxide", () => {
-      const result = generateIUPACNameFromSMILES(
-        "c1ccc2cc3ccccc3cc2c1P(=O)(C)C",
-      );
+      const result = generateIUPACNameFromSMILES("c1ccc2cc3ccccc3cc2c1P(=O)(C)C");
       expect(result.name).toBeDefined();
     });
   });

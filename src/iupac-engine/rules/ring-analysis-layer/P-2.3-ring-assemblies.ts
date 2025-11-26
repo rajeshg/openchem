@@ -15,17 +15,13 @@ import { generateRingLocants } from "./helpers";
 export const P2_3_RING_ASSEMBLIES_RULE: IUPACRule = {
   id: "P-2.3",
   name: "Ring Assemblies (von Baeyer System)",
-  description:
-    "Apply von Baeyer bicyclo/tricyclo nomenclature for bridged systems (P-2.3)",
+  description: "Apply von Baeyer bicyclo/tricyclo nomenclature for bridged systems (P-2.3)",
   blueBookReference: BLUE_BOOK_RULES.P2_3,
   priority: RulePriority.SEVEN,
   conditions: (context) => {
     const candidateRings = context.getState().candidateRings;
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-2.3 CONDITION] candidateRings count:",
-        candidateRings?.length,
-      );
+      console.log("[P-2.3 CONDITION] candidateRings count:", candidateRings?.length);
       console.log(
         "[P-2.3 CONDITION] candidateRings:",
         JSON.stringify(
@@ -37,20 +33,11 @@ export const P2_3_RING_ASSEMBLIES_RULE: IUPACRule = {
           2,
         ),
       );
-      console.log(
-        "[P-2.3 CONDITION] parentStructure:",
-        context.getState().parentStructure,
-      );
+      console.log("[P-2.3 CONDITION] parentStructure:", context.getState().parentStructure);
     }
-    if (
-      !candidateRings ||
-      candidateRings.length === 0 ||
-      context.getState().parentStructure
-    ) {
+    if (!candidateRings || candidateRings.length === 0 || context.getState().parentStructure) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[P-2.3 CONDITION] Returning false - no rings or parent already selected",
-        );
+        console.log("[P-2.3 CONDITION] Returning false - no rings or parent already selected");
       }
       return false;
     }
@@ -77,9 +64,7 @@ export const P2_3_RING_ASSEMBLIES_RULE: IUPACRule = {
 
     // Check if this is a known fused aromatic system (anthracene, phenanthrene, naphthalene, etc.)
     // These should be handled by P-2.5 (Fused Ring Systems), not P-2.3 (von Baeyer)
-    const {
-      identifyPolycyclicPattern,
-    } = require("../../naming/iupac-rings/fused-naming");
+    const { identifyPolycyclicPattern } = require("../../naming/iupac-rings/fused-naming");
     const molecule = context.getState().molecule;
     const allRings = context.getState().molecule.rings || [];
     const polycyclicPattern = identifyPolycyclicPattern(allRings, molecule);
@@ -91,10 +76,7 @@ export const P2_3_RING_ASSEMBLIES_RULE: IUPACRule = {
     // Skip von Baeyer nomenclature for known fused aromatic systems
     if (polycyclicPattern) {
       if (process.env.VERBOSE) {
-        console.log(
-          "[P-2.3 ACTION] Skipping - known fused system:",
-          polycyclicPattern,
-        );
+        console.log("[P-2.3 ACTION] Skipping - known fused system:", polycyclicPattern);
       }
       return context;
     }
@@ -105,20 +87,14 @@ export const P2_3_RING_ASSEMBLIES_RULE: IUPACRule = {
       context.getState().molecule.bonds,
     );
     if (process.env.VERBOSE) {
-      console.log(
-        "[P-2.3 ACTION] ringClassification.bridged:",
-        ringClassification.bridged.length,
-      );
+      console.log("[P-2.3 ACTION] ringClassification.bridged:", ringClassification.bridged.length);
     }
     if (ringClassification.bridged.length > 0) {
       // Generate bicyclo/tricyclo name
       const molecule = context.getState().molecule;
       // Combine fused and bridged rings to get the polycyclic core
       // Exclude isolated rings (these are substituents, not part of the core)
-      const polycyclicCoreRings = [
-        ...ringClassification.fused,
-        ...ringClassification.bridged,
-      ];
+      const polycyclicCoreRings = [...ringClassification.fused, ...ringClassification.bridged];
       const coreRingCount = polycyclicCoreRings.length;
 
       if (process.env.VERBOSE) {
@@ -168,8 +144,6 @@ function generateBridgedPolycyclicName(
   ringCount: number,
 ): { name: string; vonBaeyerNumbering?: Map<number, number> } | null {
   // Use the engine's own naming function
-  const {
-    generateClassicPolycyclicName,
-  } = require("../../naming/iupac-rings/utils");
+  const { generateClassicPolycyclicName } = require("../../naming/iupac-rings/utils");
   return generateClassicPolycyclicName(molecule, bridgedRings, ringCount);
 }

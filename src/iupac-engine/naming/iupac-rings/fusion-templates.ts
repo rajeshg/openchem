@@ -38,43 +38,13 @@ export const FUSION_TEMPLATES: FusionTemplate[] = [
   {
     name: "anthraceno",
     smiles: "c1cccc2c3ccccc3ccc12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "4a",
-      "4b",
-      "5",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "10",
-      "10a",
-    ],
+    labels: ["1", "2", "3", "4", "4a", "4b", "5", "6", "7", "8", "8a", "9", "10", "10a"],
     aliases: ["anthra"],
   },
   {
     name: "phenanthreno",
     smiles: "c1cccc2c3ccccc3ccc12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "3a",
-      "4",
-      "5",
-      "5a",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "10",
-      "10a",
-    ],
+    labels: ["1", "2", "3", "3a", "4", "5", "5a", "6", "7", "8", "8a", "9", "10", "10a"],
     aliases: [],
   },
   {
@@ -128,22 +98,7 @@ export const FUSION_TEMPLATES: FusionTemplate[] = [
   {
     name: "acridino",
     smiles: "c1cccc2nc3ccccc3cc12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "4a",
-      "10",
-      "10a",
-      "5",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "9a",
-    ],
+    labels: ["1", "2", "3", "4", "4a", "10", "10a", "5", "6", "7", "8", "8a", "9", "9a"],
     aliases: [],
   },
   {
@@ -167,62 +122,19 @@ export const FUSION_TEMPLATES: FusionTemplate[] = [
   {
     name: "carbazol",
     smiles: "c1cccc2c3ccccc3[nH]c12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "4a",
-      "4b",
-      "5",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "9a",
-    ],
+    labels: ["1", "2", "3", "4", "4a", "4b", "5", "6", "7", "8", "8a", "9", "9a"],
     aliases: [],
   },
   {
     name: "fluoreno",
     smiles: "c1cccc2c3ccccc3[cH2]c12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "4a",
-      "4b",
-      "5",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "9a",
-    ],
+    labels: ["1", "2", "3", "4", "4a", "4b", "5", "6", "7", "8", "8a", "9", "9a"],
     aliases: [],
   },
   {
     name: "xantheno",
     smiles: "c1cccc2oc3ccccc3[cH2]c12",
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "4a",
-      "10",
-      "10a",
-      "5",
-      "6",
-      "7",
-      "8",
-      "8a",
-      "9",
-      "9a",
-    ],
+    labels: ["1", "2", "3", "4", "4a", "10", "10a", "5", "6", "7", "8", "8a", "9", "9a"],
     aliases: [],
   },
   // Add more templates as needed
@@ -258,9 +170,7 @@ export function findMatchingFusionTemplate(
   }
 
   if (ringCount === 3 && heteroAtoms.length === 0) {
-    const ringSizes = rings
-      .map((r: number[]) => r.length)
-      .sort((a, b) => a - b);
+    const ringSizes = rings.map((r: number[]) => r.length).sort((a, b) => a - b);
 
     // Check for fluorene (5-6-6 system with CH2 bridge)
     if (ringSizes[0] === 5 && ringSizes[1] === 6 && ringSizes[2] === 6) {
@@ -281,13 +191,8 @@ export function findMatchingFusionTemplate(
     }
   }
 
-  if (
-    ringCount === 2 &&
-    heteroAtoms.some((a) => molecule.atoms[a]?.symbol === "N")
-  ) {
-    const nCount = heteroAtoms.filter(
-      (a) => molecule.atoms[a]?.symbol === "N",
-    ).length;
+  if (ringCount === 2 && heteroAtoms.some((a) => molecule.atoms[a]?.symbol === "N")) {
+    const nCount = heteroAtoms.filter((a) => molecule.atoms[a]?.symbol === "N").length;
     if (nCount === 1) {
       const ringSizes = rings.map((r: number[]) => r.length).sort();
 
@@ -299,10 +204,7 @@ export function findMatchingFusionTemplate(
       }
 
       // Check for indole (5-membered + 6/7-membered with N)
-      if (
-        ringSizes.includes(5) &&
-        (ringSizes.includes(6) || ringSizes.includes(7))
-      ) {
+      if (ringSizes.includes(5) && (ringSizes.includes(6) || ringSizes.includes(7))) {
         return FUSION_TEMPLATES.find((t) => t.name === "indole") || null;
       }
     }
@@ -315,9 +217,7 @@ export function findMatchingFusionTemplate(
 /**
  * Parse a fusion template into a molecule with locant mapping
  */
-export function parseFusionTemplate(
-  template: FusionTemplate,
-): ParsedFusionTemplate | null {
+export function parseFusionTemplate(template: FusionTemplate): ParsedFusionTemplate | null {
   try {
     const result = parseSMILES(template.smiles);
     if (!result.molecules[0]) return null;
@@ -327,11 +227,7 @@ export function parseFusionTemplate(
 
     // Map labels to atom indices (assuming labels correspond to SMILES atom order)
     // This is a simplification - in practice, need to handle ring closures etc.
-    for (
-      let i = 0;
-      i < Math.min(template.labels.length, molecule.atoms.length);
-      i++
-    ) {
+    for (let i = 0; i < Math.min(template.labels.length, molecule.atoms.length); i++) {
       const label = template.labels[i];
       if (label) {
         locantMap.set(i, label);

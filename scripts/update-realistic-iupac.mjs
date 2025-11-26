@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 
-const datasetPath =
-  "test/unit/iupac-engine/smiles-to-iupac-realistic-dataset.json";
+const datasetPath = "test/unit/iupac-engine/smiles-to-iupac-realistic-dataset.json";
 
 async function fetchIupacForSmiles(smiles) {
   const encoded = encodeURIComponent(smiles);
@@ -55,9 +54,7 @@ async function main() {
   }
 
   await fs.writeFile(datasetPath, JSON.stringify(data, null, 2) + "\n", "utf8");
-  console.log(
-    `Done. Updated ${updated} entries. Backup saved to ${datasetPath}.bak`,
-  );
+  console.log(`Done. Updated ${updated} entries. Backup saved to ${datasetPath}.bak`);
 }
 
 main().catch((e) => {

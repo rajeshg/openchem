@@ -1,6 +1,4 @@
-export function sortSubstituentsAlphabetically(
-  substituentParts: string[],
-): string[] {
+export function sortSubstituentsAlphabetically(substituentParts: string[]): string[] {
   return substituentParts.sort((a, b) => {
     // Extract name after locants: "2,2-dichloro" → "dichloro" or "2-[1-(2-methylbutoxy)ethoxy]" → "[1-(2-methylbutoxy)ethoxy]"
     const aName = a.split("-").slice(1).join("-");
