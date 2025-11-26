@@ -5,6 +5,15 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.10] - 2025-11-26
+
+### Fixed
+- **TypeScript declaration paths** - Fixed path resolution in .d.ts files
+  - Added `tsc-alias` to resolve path aliases in generated declarations
+  - Converts path aliases (`types`, `src/*`) to relative paths (`./types`, `./src/*`)
+  - Fixes TypeScript type resolution for package consumers
+  - Resolves "Cannot find module" errors when importing from openchem
+
 ## [0.2.9] - 2025-11-26
 
 ### Added

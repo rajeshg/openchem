@@ -1,6 +1,6 @@
 {
   "name": "openchem",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "A fast TypeScript / JavaScript chemistry toolkit for working with molecular structures: parsing & generation (SMILES, MOL, SDF), canonicalization, pattern matching (SMARTS), 2D rendering, and molecular descriptors.",
   "author": "rajeshg",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "test:verbose": "VERBOSE=1 bun test",
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
     "build": "bun build index.ts --outdir ./dist --format esm && bun run build:types",
-    "build:types": "tsc --project tsconfig.build.json",
+    "build:types": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "serve": "bun run build && bun ./serve-playground.js",
     "mcp:remote": "bun run src/mcp-server-remote.ts",
     "mcp:dev": "bun --watch src/mcp-server-remote.ts",
@@ -56,7 +56,8 @@
     "@rdkit/rdkit": "latest",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/bun": "latest",
-    "@types/node": "^24.10.1"
+    "@types/node": "^24.10.1",
+    "tsc-alias": "^1.8.16"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"

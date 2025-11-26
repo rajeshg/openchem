@@ -7,7 +7,9 @@
     "noEmit": false,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {}
   },
   "include": ["index.ts", "types.ts", "src/**/*"],
   "exclude": [
