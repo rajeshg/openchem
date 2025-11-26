@@ -1,3 +1,17 @@
+// Core types - essential for TypeScript users
+export type {
+  Atom,
+  Bond,
+  Molecule,
+  ParseResult,
+  ParseError,
+  RingInfo,
+  Chain,
+  MultipleBond,
+} from "types";
+export { BondType, StereoType } from "types";
+
+// Morgan fingerprints
 export {
   computeMorganFingerprint,
   tanimotoSimilarity,
