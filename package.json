@@ -1,6 +1,6 @@
 {
   "name": "openchem",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "A fast TypeScript / JavaScript chemistry toolkit for working with molecular structures: parsing & generation (SMILES, MOL, SDF), canonicalization, pattern matching (SMARTS), 2D rendering, and molecular descriptors.",
   "author": "rajeshg",
   "license": "MIT",
@@ -24,30 +24,27 @@
     "typescript",
     "javascript"
   ],
-  "module": "index.ts",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     }
   },
   "files": [
     "dist",
-    "index.ts",
-    "types.ts",
     "README.md",
-    "LICENSE",
-    "src/third-party"
+    "LICENSE"
   ],
   "scripts": {
     "test": "bun test",
     "test:full": "RUN_RDKIT_BULK=1 bun test",
     "test:verbose": "VERBOSE=1 bun test",
     "typecheck": "bunx tsc --noEmit --skipLibCheck",
-    "build": "bun build index.ts --outdir ./dist --format esm",
+    "build": "bun build index.ts --outdir ./dist --format esm && bun run build:types",
+    "build:types": "tsc --project tsconfig.build.json",
     "serve": "bun run build && bun ./serve-playground.js",
     "mcp:remote": "bun run src/mcp-server-remote.ts",
     "mcp:dev": "bun --watch src/mcp-server-remote.ts",

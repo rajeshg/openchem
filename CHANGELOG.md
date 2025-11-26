@@ -5,6 +5,21 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] - 2025-11-26
+
+### Added
+- **Core TypeScript type exports** - Export essential types for TypeScript users
+  - Exported types: `Atom`, `Bond`, `Molecule`, `ParseResult`, `ParseError`, `RingInfo`, `Chain`, `MultipleBond`
+  - Exported enums: `BondType`, `StereoType`
+  - Enables proper type checking for package consumers
+
+### Changed
+- **Modern ESM-only package** - Simplified to ESM-only with proper TypeScript declarations
+  - Generate `.d.ts` declaration files during build
+  - Modern `exports` field with `types` condition
+  - Publish only built artifacts (dist/) instead of source files
+  - Cleaner package structure following 2024/2025 best practices
+
 ## [0.2.8] - 2025-11-26
 
 ### Added
