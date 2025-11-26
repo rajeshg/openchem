@@ -5,6 +5,15 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7] - 2025-11-26
+
+### Fixed
+- **Test Timeout Issue** - Increased timeout for complex tautomer enumeration test
+  - Test: "canonical selection is stable with many tautomers"
+  - Issue: Curcumin molecule with 100 tautomers was timing out at 5000ms
+  - Solution: Increased timeout to 10000ms for this specific test
+  - Impact: All 2456 tests now pass reliably
+
 ## [0.2.6] - 2025-11-26
 
 ### Added

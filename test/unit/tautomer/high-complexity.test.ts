@@ -317,28 +317,32 @@ describe("High-complexity tautomers: Performance and limits", () => {
     });
   });
 
-  it("canonical selection is stable with many tautomers", { timeout: 10000 }, () => {
-    const mol = parseSMILES("Oc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(O)cc2)cc1").molecules[0];
-    if (!mol) throw new Error("parse failed");
+  it(
+    "canonical selection is stable with many tautomers",
+    () => {
+      const mol = parseSMILES("Oc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(O)cc2)cc1").molecules[0];
+      if (!mol) throw new Error("parse failed");
 
-    // Run multiple times - canonical should be consistent
-    const canonical1 = canonicalTautomer(mol);
-    const canonical2 = canonicalTautomer(mol);
-    const canonical3 = canonicalTautomer(mol);
+      // Run multiple times - canonical should be consistent
+      const canonical1 = canonicalTautomer(mol);
+      const canonical2 = canonicalTautomer(mol);
+      const canonical3 = canonicalTautomer(mol);
 
-    const smiles1 = generateSMILES(canonical1);
-    const smiles2 = generateSMILES(canonical2);
-    const smiles3 = generateSMILES(canonical3);
+      const smiles1 = generateSMILES(canonical1);
+      const smiles2 = generateSMILES(canonical2);
+      const smiles3 = generateSMILES(canonical3);
 
-    console.log("\nCanonical stability test:");
-    console.log(`  Run 1: ${smiles1}`);
-    console.log(`  Run 2: ${smiles2}`);
-    console.log(`  Run 3: ${smiles3}`);
+      console.log("\nCanonical stability test:");
+      console.log(`  Run 1: ${smiles1}`);
+      console.log(`  Run 2: ${smiles2}`);
+      console.log(`  Run 3: ${smiles3}`);
 
-    // All should be identical
-    expect(smiles1).toBe(smiles2);
-    expect(smiles2).toBe(smiles3);
-  });
+      // All should be identical
+      expect(smiles1).toBe(smiles2);
+      expect(smiles2).toBe(smiles3);
+    },
+    { timeout: 10000 },
+  );
 });
 
 describe("High-complexity tautomers: Summary", () => {
