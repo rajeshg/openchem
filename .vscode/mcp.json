@@ -1,7 +1,7 @@
 {
 	"servers": {
 		"openchem": {
-			"url": "http://localhost:3000/mcp",
+			"url": "http://localhost:4141/mcp",
 			"type": "http"
 			// /mcp supports streamable HTTP (SSE) at /mcp/sse automatically — only the base url is needed
 		}

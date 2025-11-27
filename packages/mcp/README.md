@@ -31,7 +31,7 @@ openchem-mcp --port 8080
 PORT=9000 openchem-mcp
 ```
 
-The server will start on `http://localhost:3000` by default.
+The server will start on `http://localhost:4141` by default.
 
 ## Available Tools
 
@@ -136,7 +136,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 {
   "mcpServers": {
     "openchem": {
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:4141/mcp"
     }
   }
 }
@@ -160,7 +160,7 @@ const client = new Client(
 );
 
 const transport = new StreamableHTTPClientTransport(
-  new URL("http://localhost:3000/mcp")
+  new URL("http://localhost:4141/mcp")
 );
 
 await client.connect(transport);

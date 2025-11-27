@@ -29,11 +29,11 @@ USAGE:
   openchem-mcp [OPTIONS]
 
 OPTIONS:
-  --port, -p <PORT>    Server port (default: 3000)
+  --port, -p <PORT>    Server port (default: 4141)
   --help, -h           Show this help message
 
 EXAMPLES:
-  openchem-mcp                  # Start on port 3000
+  openchem-mcp                  # Start on port 4141
   openchem-mcp --port 8080      # Start on port 8080
   PORT=9000 openchem-mcp        # Start on port 9000 (via env var)
 
@@ -63,7 +63,7 @@ For detailed integration guides, see:
 // For now, hardcode and update on release
 const VERSION = "0.1.0";
 
-const PORT = customPort ? Number.parseInt(customPort, 10) : Number.parseInt(process.env.PORT || "3000", 10);
+const PORT = customPort ? Number.parseInt(customPort, 10) : Number.parseInt(process.env.PORT || "4141", 10);
 
 if (Number.isNaN(PORT) || PORT < 1 || PORT > 65535) {
   console.error(`Error: Invalid port number: ${customPort || process.env.PORT}`);
