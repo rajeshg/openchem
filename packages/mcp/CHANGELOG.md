@@ -5,6 +5,21 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-11-27
+
+### Added
+
+- **PNG export support** - Render tool now supports PNG format alongside SVG
+- Uses `@resvg/resvg-js` for high-quality SVG to PNG conversion
+- Base64-encoded PNG output in MCP responses
+
+### Changed
+
+- **Build system optimized** - Switched from bundling to TypeScript compilation
+- **Dist size reduced by 98.5%** - From 3.28 MB to 48 KB
+- Updated documentation to reflect PNG support
+- Render tool now accepts `format` parameter: `"svg"` or `"png"` (default: `"svg"`)
+
 ## [0.1.2] - 2025-11-27
 
 ### Changed

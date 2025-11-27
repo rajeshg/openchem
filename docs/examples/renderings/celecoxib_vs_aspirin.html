@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Celecoxib vs Aspirin</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 28px; }
+    .row { display:flex; gap:24px; align-items:start; }
+    .card { border:1px solid #eee; padding:12px; border-radius:8px; width:420px; }
+    .svg { background: #fff; border:1px solid #ddd; padding:8px; }
+    h2 { margin:8px 0 6px; }
+    pre { background:#f7f7f7; padding:8px; overflow:auto }
+  </style>
+</head>
+<body>
+  <h1>Celecoxib vs Aspirin</h1>
+  <div class="row">
+    <div class="card">
+      <h2>Celecoxib</h2>
+      <div class="svg"><img src="./celecoxib.svg" width="400" height="400" alt="Celecoxib"/></div>
+      <pre>SMILES: CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(F)(F)F
+IUPAC: 4-[5-(4-methylphenyl)-3-(trifluoromethyl)-1H-pyrazol-1-yl]benzenesulfonamide
+MolWeight: 381.37
+logP: 3.42
+TPSA: 75.76</pre>
+    </div>
+
+    <div class="card">
+      <h2>Aspirin</h2>
+      <div class="svg"><img src="./aspirin.svg" width="400" height="400" alt="Aspirin"/></div>
+      <pre>SMILES: CC(=O)Oc1ccccc1C(=O)O
+IUPAC: 2-ethoxybenzen-1-carboxylic acid (reported by analyzer)
+MolWeight: 180.16
+logP: 1.31
+TPSA: 63.6</pre>
+    </div>
+  </div>
+
+  <p style="margin-top:18px">Notes: Sulfonamide SMARTS matches for celecoxib: <code>S(=O)(=O)N</code> — sulfonamide located on the fragment shown in the celecoxib structure.</p>
+</body>
+</html>

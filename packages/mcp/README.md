@@ -93,10 +93,11 @@ Search for SMARTS patterns:
 
 ### 4. **render** - 2D Structure Visualization
 
-Generate publication-quality SVG:
+Generate publication-quality images in SVG or PNG format:
 - Automatic layout
 - Stereochemistry display
 - Customizable size
+- Vector (SVG) or raster (PNG) output
 
 **Example:**
 ```typescript
@@ -104,6 +105,7 @@ Generate publication-quality SVG:
   "name": "render",
   "arguments": {
     "smiles": "c1ccccc1",
+    "format": "png",
     "width": 400,
     "height": 400
   }

@@ -17,6 +17,17 @@ import {
   getMurckoScaffold,
 } from "openchem";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { Resvg } from "@resvg/resvg-js";
+
+/**
+ * Convert SVG string to PNG buffer using resvg-js
+ */
+function convertSvgToPng(svgString: string): Buffer {
+  const resvg = new Resvg(svgString);
+  const pngData = resvg.render();
+  const pngBuffer = pngData.asPng();
+  return Buffer.from(pngBuffer);
+}
 
 export function registerTools(mcpServer: McpServer) {
   // Tool 1: Analyze - All-in-one molecular analysis
@@ -202,20 +213,24 @@ export function registerTools(mcpServer: McpServer) {
     "render",
     {
       description:
-        "Generate publication-quality 2D SVG rendering of molecular structure with customizable dimensions",
+        "Generate publication-quality 2D rendering of molecular structure. Supports SVG (vector) and PNG (raster) formats with customizable dimensions.",
       inputSchema: {
         smiles: z.string().describe("SMILES of molecule to render"),
+        format: z
+          .enum(["svg", "png"])
+          .optional()
+          .describe("Output format: svg (vector) or png (raster). Default: svg"),
         width: z
           .number()
           .optional()
-          .describe("SVG width in pixels (default: 300)"),
+          .describe("Image width in pixels (default: 300)"),
         height: z
           .number()
           .optional()
-          .describe("SVG height in pixels (default: 300)"),
+          .describe("Image height in pixels (default: 300)"),
       },
     },
-    async ({ smiles, width, height }) => {
+    async ({ smiles, format, width, height }) => {
       const molResult = parseSMILES(smiles);
       if (molResult.errors.length > 0) {
         throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
@@ -226,10 +241,36 @@ export function registerTools(mcpServer: McpServer) {
         throw new Error("No molecule parsed");
       }
 
+      const outputFormat = format ?? "svg";
       const svg = renderSVG(mol, {
         width: width ?? 300,
         height: height ?? 300,
       });
+
+      if (outputFormat === "svg") {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  smiles,
+                  format: "svg",
+                  svg: svg.svg,
+                  width: svg.width,
+                  height: svg.height,
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      }
+
+      // Convert to PNG
+      const imageBuffer = convertSvgToPng(svg.svg);
+      const base64Image = imageBuffer.toString("base64");
 
       return {
         content: [
@@ -238,9 +279,12 @@ export function registerTools(mcpServer: McpServer) {
             text: JSON.stringify(
               {
                 smiles,
-                svg: svg.svg,
+                format: "png",
                 width: svg.width,
                 height: svg.height,
+                mimeType: "image/png",
+                data: base64Image,
+                note: "Image data is base64 encoded. Decode to get raw bytes.",
               },
               null,
               2
