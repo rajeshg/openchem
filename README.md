@@ -96,6 +96,54 @@ The playground automatically detects if the full openchem library is available a
 
 **Note:** The HTML playground requires a web server to load the openchem library due to ES module security restrictions. Use `bun run serve` to start a local server, then open `http://localhost:3000/smiles-playground.html` in your browser.
 
+## Model Context Protocol (MCP) Server
+
+The MCP server for AI assistant integration is now available as a separate package: **[@openchem/mcp](https://npmjs.com/package/@openchem/mcp)**
+
+### Quick Start
+
+```bash
+# Install MCP server
+npm install -g @openchem/mcp
+
+# Start server
+openchem-mcp
+
+# Server runs on http://localhost:3000
+```
+
+### Connect to Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "openchem": {
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop and try: _"Analyze aspirin using SMILES CC(=O)Oc1ccccc1C(=O)O"_
+
+### Available MCP Tools
+
+- **analyze** — Complete molecular analysis (40+ descriptors, drug-likeness, IUPAC name, optional rendering)
+- **compare** — Molecular similarity (Morgan fingerprints, Tanimoto similarity, property comparison)
+- **search** — Substructure matching (SMARTS patterns with match counts and indices)
+- **render** — 2D structure visualization (publication-quality SVG)
+- **convert** — Format conversion (canonical SMILES, IUPAC names, Murcko scaffolds)
+
+### Documentation
+
+- **[@openchem/mcp Package](https://npmjs.com/package/@openchem/mcp)** — Full MCP server documentation
+- **[MCP Integration Guide](docs/mcp-integration-guide.md)** — Complete integration guide (Claude Desktop, custom clients, deployment)
+- **[MCP Server Reference](docs/mcp-server-remote.md)** — API documentation, tool schemas, examples
+
+## Code Examples
+
 ```typescript
 import { parseSMILES, generateSMILES, parseMolfile, generateMolfile, parseSDF, writeSDF } from 'openchem';
 

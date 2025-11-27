@@ -5,6 +5,42 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.11] - 2025-11-27
+
+### Changed
+- **MCP server extracted to `@openchem/mcp` package**
+  - The Model Context Protocol server has been moved to a separate package for better separation of concerns
+  - Core `openchem` library now has **zero dependencies**
+  - Smaller bundle size for library-only users
+  - Browser-friendly (no Node.js-specific imports in core library)
+
+### Removed
+- MCP server and CLI (moved to `@openchem/mcp` package)
+- Dependencies: `@modelcontextprotocol/sdk`, `zod` (moved to `@openchem/mcp`)
+- npm scripts: `mcp:remote`, `mcp:dev` (use `@openchem/mcp` package instead)
+- CLI command: `openchem` (use `openchem-mcp` from `@openchem/mcp` package)
+
+### Migration Guide
+
+**For library-only users:** No changes needed! Just upgrade to v0.2.11.
+
+**For MCP server users:**
+
+Before (v0.2.10):
+\`\`\`bash
+npm install openchem
+bun run mcp:remote  # or: bun run src/mcp-server-remote.ts
+\`\`\`
+
+After (v0.2.11):
+\`\`\`bash
+npm install openchem           # Core library
+npm install -g @openchem/mcp   # MCP server
+openchem-mcp                   # Start server
+\`\`\`
+
+For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@openchem/mcp)
+
 ## [0.2.10] - 2025-11-26
 
 ### Fixed

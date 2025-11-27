@@ -5,17 +5,17 @@
  */
 
 import * as z from "zod/v4";
-import { parseSMILES } from "./parsers/smiles-parser.js";
-import { generateSMILES } from "./generators/smiles-generator.js";
-import { Descriptors } from "./descriptors/index.js";
 import {
+  parseSMILES,
+  generateSMILES,
+  Descriptors,
   computeMorganFingerprint,
   tanimotoSimilarity,
-} from "./utils/morgan-fingerprint.js";
-import { matchSMARTS } from "./matchers/smarts-matcher.js";
-import { renderSVG } from "./generators/svg-renderer.js";
-import { generateIUPACNameFromSMILES } from "../index.js";
-import { getMurckoScaffold } from "./utils/murcko-scaffold.js";
+  matchSMARTS,
+  renderSVG,
+  generateIUPACNameFromSMILES,
+  getMurckoScaffold,
+} from "openchem";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export function registerTools(mcpServer: McpServer) {
