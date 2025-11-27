@@ -5,6 +5,19 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-11-27
+
+### Fixed
+
+- **Stateless transport mode** - Use `sessionIdGenerator: undefined` to avoid "Server not initialized" errors
+- **Request body parsing** - Properly parse JSON body for POST requests before passing to `handleRequest`
+- **Transport cleanup** - Close transport when request ends to prevent memory leaks
+- **Error handling** - Add try/catch around MCP request handling with proper 500 error responses
+
+### Changed
+
+- `.vscode/mcp.json` - Updated default port from 8080 to 3000 to match server default
+
 ## [0.1.0] - 2025-11-27
 
 ### 🎉 Initial Release

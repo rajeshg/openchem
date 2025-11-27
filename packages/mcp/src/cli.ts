@@ -104,12 +104,46 @@ const httpServer = createServer(async (req, res) => {
 
   // MCP endpoints - support both /mcp and /mcp/sse
   if (req.url === "/mcp" || req.url?.startsWith("/mcp?") || req.url === "/mcp/sse" || req.url?.startsWith("/mcp/sse?")) {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
+    try {
+      // Use stateless mode (sessionIdGenerator: undefined) to avoid session issues
+      // This means we create a new transport for each request
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+      });
 
-    await mcpServer.connect(transport);
-    await transport.handleRequest(req, res);
+      await mcpServer.connect(transport);
+
+      // Parse request body for POST requests
+      let body;
+      if (req.method === "POST") {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const rawBody = Buffer.concat(chunks).toString("utf-8");
+        body = rawBody ? JSON.parse(rawBody) : undefined;
+      }
+
+      await transport.handleRequest(req, res, body);
+
+      // Clean up when request closes
+      res.on("close", () => {
+        transport.close();
+      });
+    } catch (error) {
+      console.error("Error handling MCP request:", error);
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          error: {
+            code: -32603,
+            message: "Internal server error",
+          },
+          id: null,
+        })
+      );
+    }
     return;
   }
 
