@@ -12,12 +12,47 @@ import type { Molecule, ParseResult, Bond } from "types";
 import { generateCoordinates } from "src/generators/coordinate-generator";
 import { StereoType as StereoEnum, BondType } from "types";
 import { kekulize } from "src/utils/kekulize";
+import { matchSMARTSOptimized } from "src/matchers/smarts-matcher-optimized";
 
 // ============================================================================
 // Types
 // ============================================================================
 
 export type AtomCoordinates = { x: number; y: number };
+
+/**
+ * Highlight specification for individual atoms.
+ */
+export interface AtomHighlight {
+  atoms: number[];
+  color?: string;
+  opacity?: number;
+  radius?: number;
+}
+
+/**
+ * Highlight specification for individual bonds.
+ */
+export interface BondHighlight {
+  bonds: Array<[number, number]>;
+  color?: string;
+  width?: number;
+  opacity?: number;
+}
+
+/**
+ * Substructure highlight using SMARTS pattern or explicit atom/bond indices.
+ */
+export interface SubstructureHighlight {
+  smarts?: string;
+  atoms?: number[];
+  bonds?: Array<[number, number]>;
+  color?: string;
+  atomColor?: string;
+  bondColor?: string;
+  opacity?: number;
+  label?: string;
+}
 
 export interface SVGRendererOptions {
   width?: number;
@@ -36,6 +71,9 @@ export interface SVGRendererOptions {
   showStereoBonds?: boolean;
   atomCoordinates?: Array<[number, number]> | AtomCoordinates[];
   moleculeSpacing?: number;
+  highlights?: SubstructureHighlight[];
+  atomHighlights?: AtomHighlight[];
+  bondHighlights?: BondHighlight[];
 }
 
 export interface SVGRenderResult {
@@ -237,6 +275,111 @@ function svgText(
     `<rect x="${rectX}" y="${rectY}" width="${rectW}" height="${rectH}" rx="2" ry="2" style="fill:${bgColor};stroke:none;" />` +
     `<text x="${x}" y="${y}" fill="${color}" font-size="${fontSize}" font-family="${fontFamily}" text-anchor="middle" alignment-baseline="middle">${text}</text>`
   );
+}
+
+// ============================================================================
+// Highlighting Functions
+// ============================================================================
+
+/**
+ * Renders a colored circle highlight around an atom.
+ */
+function renderAtomHighlight(
+  x: number,
+  y: number,
+  options: { color?: string; opacity?: number; radius?: number },
+): string {
+  const { color = "#FFFF00", opacity = 0.3, radius = 1.5 } = options;
+  const r = 8 * radius;
+  return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${color}" opacity="${opacity}" />`;
+}
+
+/**
+ * Renders a thick colored line highlight over a bond.
+ */
+function renderBondHighlight(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  options: { color?: string; width?: number; opacity?: number },
+): string {
+  const { color = "#FF0000", width = 2.0, opacity = 0.8 } = options;
+  const lineWidth = 2 * width;
+  return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${lineWidth}" opacity="${opacity}" stroke-linecap="round" />`;
+}
+
+/**
+ * Finds all bonds connecting atoms in the given set.
+ */
+function inferBondsBetweenAtoms(molecule: Molecule, atoms: number[]): Array<[number, number]> {
+  const atomSet = new Set(atoms);
+  const bonds: Array<[number, number]> = [];
+
+  for (const bond of molecule.bonds) {
+    if (atomSet.has(bond.atom1) && atomSet.has(bond.atom2)) {
+      bonds.push([bond.atom1, bond.atom2]);
+    }
+  }
+
+  return bonds;
+}
+
+/**
+ * Converts SubstructureHighlight specifications to explicit atom/bond highlights.
+ * Processes SMARTS patterns and returns concrete rendering instructions.
+ */
+function processHighlights(
+  molecule: Molecule,
+  highlights: SubstructureHighlight[],
+): { atomHighlights: AtomHighlight[]; bondHighlights: BondHighlight[] } {
+  const atomHighlights: AtomHighlight[] = [];
+  const bondHighlights: BondHighlight[] = [];
+
+  for (const hl of highlights) {
+    let atoms: number[] = [];
+    let bonds: Array<[number, number]> = [];
+
+    if (hl.smarts) {
+      try {
+        const result = matchSMARTSOptimized(hl.smarts, molecule);
+        if (result.success && result.matches.length > 0) {
+          const firstMatch = result.matches[0];
+          if (firstMatch) {
+            // Convert molecule indices to atom IDs
+            const atomIndices = firstMatch.atoms.map((am) => am.moleculeIndex);
+            atoms = atomIndices.map((idx) => molecule.atoms[idx]?.id ?? idx);
+            bonds = inferBondsBetweenAtoms(molecule, atoms);
+          }
+        }
+      } catch (error) {
+        if (process.env.VERBOSE) {
+          console.warn(`Failed to match SMARTS pattern "${hl.smarts}":`, error);
+        }
+      }
+    } else {
+      atoms = hl.atoms || [];
+      bonds = hl.bonds || [];
+    }
+
+    if (atoms.length > 0) {
+      atomHighlights.push({
+        atoms,
+        color: hl.atomColor || hl.color || "#FFFF00",
+        opacity: hl.opacity ?? 0.3,
+      });
+    }
+
+    if (bonds.length > 0) {
+      bondHighlights.push({
+        bonds,
+        color: hl.bondColor || hl.color || "#FF0000",
+        opacity: hl.opacity ?? 0.8,
+      });
+    }
+  }
+
+  return { atomHighlights, bondHighlights };
 }
 
 // ============================================================================
@@ -830,6 +973,8 @@ interface MoleculeWithCoords {
   coords: AtomCoordinates[];
   offsetX: number;
   offsetY: number;
+  atomHighlights?: AtomHighlight[];
+  bondHighlights?: BondHighlight[];
 }
 
 export function renderSVG(
@@ -868,6 +1013,15 @@ function renderSingleMolecule(
   options: SVGRendererOptions = {},
 ): SVGRenderResult {
   molecule = assignStereoBondsFromChirality(molecule);
+
+  // Process highlights BEFORE kekulization so aromatic SMARTS patterns work
+  let processedHighlights: {
+    atomHighlights: AtomHighlight[];
+    bondHighlights: BondHighlight[];
+  } | null = null;
+  if (options.highlights) {
+    processedHighlights = processHighlights(molecule, options.highlights);
+  }
 
   const shouldKekulize = options.kekulize !== false;
   if (shouldKekulize) {
@@ -1083,6 +1237,61 @@ function renderSingleMolecule(
     for (const bond of aromRing.bonds) {
       const bondIdx = molecule.bonds.indexOf(bond);
       bondsInAromaticRings.add(bondIdx);
+    }
+  }
+
+  // Render highlights as background layer (before bonds and atoms)
+  if (processedHighlights || options.atomHighlights || options.bondHighlights) {
+    let allAtomHighlights: AtomHighlight[] = [];
+    let allBondHighlights: BondHighlight[] = [];
+
+    if (processedHighlights) {
+      allAtomHighlights.push(...processedHighlights.atomHighlights);
+      allBondHighlights.push(...processedHighlights.bondHighlights);
+    }
+
+    if (options.atomHighlights) {
+      allAtomHighlights.push(...options.atomHighlights);
+    }
+
+    if (options.bondHighlights) {
+      allBondHighlights.push(...options.bondHighlights);
+    }
+
+    // Render bond highlights first (behind atom highlights)
+    for (const bondHL of allBondHighlights) {
+      for (const [atomId1, atomId2] of bondHL.bonds) {
+        const idx1 = atomIdToIndex.get(atomId1);
+        const idx2 = atomIdToIndex.get(atomId2);
+        if (idx1 === undefined || idx2 === undefined) continue;
+
+        const coord1 = svgCoords[idx1];
+        const coord2 = svgCoords[idx2];
+        if (!coord1 || !coord2) continue;
+
+        svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
+          color: bondHL.color,
+          width: bondHL.width,
+          opacity: bondHL.opacity,
+        });
+      }
+    }
+
+    // Render atom highlights on top of bond highlights
+    for (const atomHL of allAtomHighlights) {
+      for (const atomId of atomHL.atoms) {
+        const idx = atomIdToIndex.get(atomId);
+        if (idx === undefined) continue;
+
+        const coord = svgCoords[idx];
+        if (!coord) continue;
+
+        svgBody += renderAtomHighlight(coord.x, coord.y, {
+          color: atomHL.color,
+          opacity: atomHL.opacity,
+          radius: atomHL.radius,
+        });
+      }
     }
   }
 
@@ -1327,6 +1536,25 @@ function renderMultipleMolecules(
 
   for (const mol of molecules) {
     let processed = assignStereoBondsFromChirality(mol);
+
+    // Process highlights BEFORE kekulization so aromatic SMARTS patterns work
+    let atomHighlights: AtomHighlight[] = [];
+    let bondHighlights: BondHighlight[] = [];
+
+    if (options.highlights) {
+      const processedHighlights = processHighlights(processed, options.highlights);
+      atomHighlights.push(...processedHighlights.atomHighlights);
+      bondHighlights.push(...processedHighlights.bondHighlights);
+    }
+
+    if (options.atomHighlights) {
+      atomHighlights.push(...options.atomHighlights);
+    }
+
+    if (options.bondHighlights) {
+      bondHighlights.push(...options.bondHighlights);
+    }
+
     const shouldKekulize = options.kekulize !== false;
     if (shouldKekulize) {
       processed = kekulize(processed);
@@ -1344,6 +1572,8 @@ function renderMultipleMolecules(
       coords,
       offsetX: 0,
       offsetY: 0,
+      atomHighlights: atomHighlights.length > 0 ? atomHighlights : undefined,
+      bondHighlights: bondHighlights.length > 0 ? bondHighlights : undefined,
     });
   }
 
@@ -1444,6 +1674,38 @@ function renderMultipleMolecules(
 
     const atomsToShow = determineVisibleAtoms(molecule, options.showCarbonLabels ?? false);
     const aromaticRings = detectAromaticRings(molecule);
+
+    // Render highlights (background layer)
+    if (mwc.bondHighlights) {
+      for (const bh of mwc.bondHighlights) {
+        for (const [atomId1, atomId2] of bh.bonds) {
+          const coord1 = atomIdToCoords.get(atomId1);
+          const coord2 = atomIdToCoords.get(atomId2);
+          if (coord1 && coord2) {
+            svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
+              color: bh.color,
+              width: bh.width,
+              opacity: bh.opacity,
+            });
+          }
+        }
+      }
+    }
+
+    if (mwc.atomHighlights) {
+      for (const ah of mwc.atomHighlights) {
+        for (const atomId of ah.atoms) {
+          const coord = atomIdToCoords.get(atomId);
+          if (coord) {
+            svgBody += renderAtomHighlight(coord.x, coord.y, {
+              color: ah.color,
+              opacity: ah.opacity,
+              radius: ah.radius,
+            });
+          }
+        }
+      }
+    }
 
     // Compute heteroatoms that belong to rings for this molecule and force
     // their labels to be centered (so they overlap ring lines) and avoid

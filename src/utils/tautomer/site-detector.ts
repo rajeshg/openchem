@@ -1034,7 +1034,9 @@ export function detectCyanoIsocyanicSites(mol: Molecule): TransformationSite[] {
     // Find C=O double bond
     const cBonds = mol.bonds.filter(
       (b) =>
-        (b.atom1 === carbon.id || b.atom2 === carbon.id) && b.type === BondType.DOUBLE && b !== bond1,
+        (b.atom1 === carbon.id || b.atom2 === carbon.id) &&
+        b.type === BondType.DOUBLE &&
+        b !== bond1,
     );
 
     for (const bond2 of cBonds) {
@@ -1231,8 +1233,7 @@ export function detectSpecialImineSites(mol: Molecule): TransformationSite[] {
         const otherCIdx = c === atom1 ? atom2Idx : atom1Idx;
 
         const cBonds = mol.bonds.filter(
-          (b) =>
-            (b.atom1 === c.id || b.atom2 === c.id) && b.type === BondType.SINGLE && b !== bond,
+          (b) => (b.atom1 === c.id || b.atom2 === c.id) && b.type === BondType.SINGLE && b !== bond,
         );
 
         for (const nBond of cBonds) {
@@ -1497,7 +1498,9 @@ export function detectFormamidineSulfinicSites(mol: Molecule): TransformationSit
       // Find S=O
       const sBonds = mol.bonds.filter(
         (b) =>
-          (b.atom1 === sulfur.id || b.atom2 === sulfur.id) && b.type === BondType.DOUBLE && b !== bond,
+          (b.atom1 === sulfur.id || b.atom2 === sulfur.id) &&
+          b.type === BondType.DOUBLE &&
+          b !== bond,
       );
 
       for (const soBond of sBonds) {
@@ -1565,7 +1568,6 @@ export function detectIsocyanideSites(mol: Molecule): TransformationSite[] {
         metadata: { direction: "forward", carbon: cIdx, nitrogen: nIdx },
       });
     }
-
   }
 
   // Also check for C=N (no charges, double bond) that can transform to [C-]#[N+]

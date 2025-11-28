@@ -5,6 +5,29 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12] - 2025-11-28
+
+### Added
+- **SVG substructure highlighting** - Highlight specific atoms and bonds in rendered molecules
+  - New types: `AtomHighlight`, `BondHighlight`, `SubstructureHighlight`
+  - Support for SMARTS-based highlighting (automatically finds and highlights patterns)
+  - Support for explicit atom/bond highlighting by index
+  - Support for both single molecule and multi-molecule grid rendering
+  - Customizable colors, opacity, and sizes
+  - Highlights rendered as background layer (before bonds and atoms)
+  - 38 comprehensive tests covering all highlighting features
+  - Enables visual highlighting of functional groups, pharmacophores, and structural features
+
+### Technical Details
+- Highlights are processed BEFORE kekulization to support aromatic SMARTS patterns
+- Multi-molecule rendering: each molecule is independently processed for highlights
+- Atom highlights render as colored circles with adjustable radius
+- Bond highlights render as thick colored lines with adjustable width
+- SMARTS patterns automatically extract matched atoms and infer bonds between them
+- Invalid indices and malformed SMARTS are handled gracefully (skipped with optional verbose logging)
+- Multiple highlights can be rendered with different colors
+- Coordinate transforms properly applied for grid positioning
+
 ## [0.2.11] - 2025-11-27
 
 ### Changed

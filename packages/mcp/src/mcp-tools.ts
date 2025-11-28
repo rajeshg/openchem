@@ -49,7 +49,9 @@ export function registerTools(mcpServer: McpServer) {
         includeRendering: z
           .boolean()
           .optional()
-          .describe("Include 2D SVG rendering as text (default: false). For image display in chat, use 'render' tool with format='png'."),
+          .describe(
+            "Include 2D SVG rendering as text (default: false). For image display in chat, use 'render' tool with format='png'.",
+          ),
         renderWidth: z.number().optional().describe("SVG width in pixels (default: 300)"),
         renderHeight: z.number().optional().describe("SVG height in pixels (default: 300)"),
       },
@@ -96,12 +98,12 @@ export function registerTools(mcpServer: McpServer) {
                 rendering,
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 2: Compare - Molecular similarity and property comparison
@@ -113,10 +115,7 @@ export function registerTools(mcpServer: McpServer) {
       inputSchema: {
         smiles1: z.string().describe("SMILES of first molecule"),
         smiles2: z.string().describe("SMILES of second molecule"),
-        fingerprintRadius: z
-          .number()
-          .optional()
-          .describe("Morgan fingerprint radius (default: 2)"),
+        fingerprintRadius: z.number().optional().describe("Morgan fingerprint radius (default: 2)"),
       },
     },
     async ({ smiles1, smiles2, fingerprintRadius }) => {
@@ -164,12 +163,12 @@ export function registerTools(mcpServer: McpServer) {
                 },
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 3: Search - Substructure and pattern matching
@@ -208,12 +207,12 @@ export function registerTools(mcpServer: McpServer) {
                 matches: matchResult.matches,
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 4: Render - 2D structure visualization
@@ -221,29 +220,73 @@ export function registerTools(mcpServer: McpServer) {
     "render",
     {
       description:
-        "Generate 2D molecular structure visualization. Use format='png' to display images inline in chat (recommended for visual display). Use format='svg' for lightweight vector graphics. Optionally save to disk with outputPath parameter.",
+        "Generate 2D molecular structure visualization. Use format='png' to display images inline in chat (recommended for visual display). Use format='svg' for lightweight vector graphics. Optionally save to disk with outputPath parameter. Supports highlighting of substructures using SMARTS patterns or explicit atom indices.",
       inputSchema: {
         smiles: z.string().describe("SMILES string of the molecule to render"),
         format: z
           .enum(["svg", "png"])
           .optional()
           .default("png")
-          .describe("Output format: 'png' (displays image inline in chat - RECOMMENDED), 'svg' (lightweight vector XML). Default: png"),
+          .describe(
+            "Output format: 'png' (displays image inline in chat - RECOMMENDED), 'svg' (lightweight vector XML). Default: png",
+          ),
         width: z
           .number()
           .optional()
-          .describe("Image width in pixels (default: 300). Recommended: 400-600 for better visibility"),
+          .describe(
+            "Image width in pixels (default: 300). Recommended: 400-600 for better visibility",
+          ),
         height: z
           .number()
           .optional()
-          .describe("Image height in pixels (default: 300). Recommended: 400-600 for better visibility"),
+          .describe(
+            "Image height in pixels (default: 300). Recommended: 400-600 for better visibility",
+          ),
         outputPath: z
           .string()
           .optional()
-          .describe("Optional: file path to save the image (e.g., '/tmp/molecule.png'). If omitted, image displays inline in chat."),
+          .describe(
+            "Optional: file path to save the image (e.g., '/tmp/molecule.png'). If omitted, image displays inline in chat.",
+          ),
+        highlights: z
+          .array(
+            z.object({
+              smarts: z
+                .string()
+                .optional()
+                .describe("SMARTS pattern to highlight (e.g., 'c1ccccc1' for benzene ring)"),
+              atoms: z.array(z.number()).optional().describe("Explicit atom indices to highlight"),
+              bonds: z
+                .array(z.tuple([z.number(), z.number()]))
+                .optional()
+                .describe("Explicit bonds to highlight as [atom1, atom2] pairs"),
+              color: z
+                .string()
+                .optional()
+                .describe(
+                  "Highlight color (hex or CSS name, e.g., '#FFFF00', 'yellow'). Default: yellow for atoms, red for bonds",
+                ),
+              atomColor: z.string().optional().describe("Override color for atom highlights"),
+              bondColor: z.string().optional().describe("Override color for bond highlights"),
+              opacity: z
+                .number()
+                .min(0)
+                .max(1)
+                .optional()
+                .describe("Highlight opacity (0-1). Default: 0.3 for atoms, 0.8 for bonds"),
+              label: z
+                .string()
+                .optional()
+                .describe("Optional label for legend (not yet implemented)"),
+            }),
+          )
+          .optional()
+          .describe(
+            "Array of substructure highlights. Use SMARTS patterns for automatic matching or explicit atom/bond indices.",
+          ),
       },
     },
-    async ({ smiles, format, width, height, outputPath }) => {
+    async ({ smiles, format, width, height, outputPath, highlights }) => {
       const molResult = parseSMILES(smiles);
       if (molResult.errors.length > 0) {
         throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
@@ -258,6 +301,7 @@ export function registerTools(mcpServer: McpServer) {
       const svg = renderSVG(mol, {
         width: width ?? 300,
         height: height ?? 300,
+        highlights,
       });
 
       if (outputFormat === "svg") {
@@ -280,7 +324,7 @@ export function registerTools(mcpServer: McpServer) {
                     message: `SVG saved to ${outputPath}`,
                   },
                   null,
-                  2
+                  2,
                 ),
               },
             ],
@@ -300,7 +344,7 @@ export function registerTools(mcpServer: McpServer) {
                   height: svg.height,
                 },
                 null,
-                2
+                2,
               ),
             },
           ],
@@ -331,7 +375,7 @@ export function registerTools(mcpServer: McpServer) {
                   message: `PNG saved to ${outputPath} (${imageBuffer.length} bytes)`,
                 },
                 null,
-                2
+                2,
               ),
             },
           ],
@@ -359,12 +403,12 @@ export function registerTools(mcpServer: McpServer) {
                 note: "Image embedded above as PNG. To save to file, provide outputPath parameter.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 5: Convert - Format conversion and canonicalization
@@ -375,9 +419,7 @@ export function registerTools(mcpServer: McpServer) {
         "Convert between molecular formats: SMILES ↔ canonical SMILES, SMILES → IUPAC name, extract Murcko scaffold",
       inputSchema: {
         smiles: z.string().describe("Input SMILES string"),
-        outputFormat: z
-          .enum(["canonical", "iupac", "scaffold"])
-          .describe("Desired output format"),
+        outputFormat: z.enum(["canonical", "iupac", "scaffold"]).describe("Desired output format"),
       },
     },
     async ({ smiles, outputFormat }) => {
@@ -424,12 +466,12 @@ export function registerTools(mcpServer: McpServer) {
                 ...output,
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 6: Identifiers - InChI and InChIKey generation
@@ -480,7 +522,7 @@ export function registerTools(mcpServer: McpServer) {
           }
           inchiKey = await generateInChIKey(inchi);
         }
-      } catch (error) {
+      } catch (_error) {
         // InChI generation failed - continue without it
       }
 
@@ -499,12 +541,12 @@ export function registerTools(mcpServer: McpServer) {
                 note: "Use InChIKey for exact database matching (PubChem, ChEMBL). InChI provides detailed structure layers.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 7: Tautomers - Enumerate and score tautomers
@@ -557,12 +599,12 @@ export function registerTools(mcpServer: McpServer) {
                 note: "Canonical tautomer is the most stable form. Scores based on tautomer scoring rules (higher = more stable).",
               },
               null,
-              2
+              2,
             ),
           },
         ],
       };
-    }
+    },
   );
 
   // Tool 8: FileConvert - MOL and SDF file format conversion
@@ -575,9 +617,7 @@ export function registerTools(mcpServer: McpServer) {
         operation: z
           .enum(["smilesToMol", "molToSmiles", "smilesToSDF", "sdfToSmiles"])
           .describe("Conversion operation to perform"),
-        input: z
-          .string()
-          .describe("Input data: SMILES string or MOL/SDF file content"),
+        input: z.string().describe("Input data: SMILES string or MOL/SDF file content"),
         properties: z
           .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
           .optional()
@@ -677,6 +717,6 @@ export function registerTools(mcpServer: McpServer) {
           },
         ],
       };
-    }
+    },
   );
 }

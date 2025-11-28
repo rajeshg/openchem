@@ -31,7 +31,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       // Furanone detection requires specific pattern
       // May or may not detect depending on exact implementation
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites.length > 0 && sites[0]) {
         expect(sites[0].type).toBe("furanone");
         expect(sites[0].atoms.length).toBeGreaterThanOrEqual(3);
@@ -41,7 +41,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
     it("should detect furanone sites when pattern matches", () => {
       // Pattern requires O/S/N with H in 5-membered ring
       // Try a simpler 5-membered ring with OH
-      const mol = parseSMILES("O1CCCC1").molecules[0];  // Tetrahydrofuran
+      const mol = parseSMILES("O1CCCC1").molecules[0]; // Tetrahydrofuran
       if (!mol) throw new Error("Failed to parse");
 
       const sites = detectFuranoneSites(mol);
@@ -55,7 +55,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       if (!mol) throw new Error("Failed to parse");
 
       expect(() => detectFuranoneSites(mol)).not.toThrow();
-      
+
       const sites = detectFuranoneSites(mol);
       // Verify it returns an array
       expect(Array.isArray(sites)).toBe(true);
@@ -70,7 +70,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectKetenYnolSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("keten-ynol");
         expect(sites[0].atoms.length).toBe(3); // C, C, O
@@ -129,7 +129,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectCyanoIsocyanicSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("cyano-isocyanic");
         expect(sites[0].atoms.length).toBe(3); // C, N, O
@@ -187,7 +187,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectAmideImidolSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("amide-imidol");
         expect(sites[0].atoms.length).toBe(3); // C, O, N
@@ -260,7 +260,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectNitroAciSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("nitro-aci");
         expect(sites[0].atoms.length).toBe(4); // N, O, O, C
@@ -341,7 +341,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectPhosphonicAcidSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("phosphonic-acid");
         expect(sites[0].atoms.length).toBe(2); // P, O
@@ -393,7 +393,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectFormamidineSulfinicSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites[0]) {
         const result = applySiteTransformation(mol, sites[0]);
         // Should either succeed or fail gracefully
@@ -420,7 +420,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectIsocyanideSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(1);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("isocyanide");
         expect(sites[0].atoms.length).toBe(2); // C, N
@@ -465,12 +465,12 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
         if (result.success && result.molecule) {
           // Find C and N atoms
           const carbon = result.molecule.atoms.find(
-            (a) => a.symbol === "C" && a.id === sites[0]!.atoms[0]
+            (a) => a.symbol === "C" && a.id === sites[0]!.atoms[0],
           );
           const nitrogen = result.molecule.atoms.find(
-            (a) => a.symbol === "N" && a.id === sites[0]!.atoms[1]
+            (a) => a.symbol === "N" && a.id === sites[0]!.atoms[1],
           );
-          
+
           if (carbon && nitrogen) {
             // After transformation, charges should be different
             expect(carbon.charge).toBe(0);
@@ -490,7 +490,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       const sites = detectSpecialImineSites(mol);
       // May or may not detect depending on exact pattern
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("special-imine");
         expect(sites[0].priority).toBe(75);
@@ -504,7 +504,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = detectSpecialImineSites(mol);
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites[0]) {
         const result = applySiteTransformation(mol, sites[0]);
         expect(result).toBeDefined();
@@ -536,7 +536,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       const sites = detectOximePhenolSites(mol);
       // Requires specific conjugation pattern
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites[0]) {
         expect(sites[0].type).toBe("oxime-phenol");
         expect(sites[0].priority).toBe(70);
@@ -577,7 +577,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       const sites = detect17AromaticHShift(mol);
       // May detect 1,7 shifts in suitable systems
       expect(sites.length).toBeGreaterThanOrEqual(0);
-      
+
       if (sites[0]) {
         expect(sites[0].priority).toBe(70);
       }
@@ -600,7 +600,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites17 = detect17AromaticHShift(mol);
       const sites19 = detect19And111AromaticHShift(mol);
-      
+
       // At least one detection method should work on extended aromatics
       expect(sites17.length + sites19.length).toBeGreaterThanOrEqual(0);
     });
@@ -645,7 +645,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       if (!mol) throw new Error("Failed to parse");
 
       const sites = identifyAllTransformationSites(mol);
-      
+
       // Should detect amide-imidol transformation
       const amideImidolSites = sites.filter((s) => s.type === "amide-imidol");
       expect(amideImidolSites.length).toBeGreaterThanOrEqual(1);
@@ -656,7 +656,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       if (!mol) throw new Error("Failed to parse");
 
       const sites = identifyAllTransformationSites(mol);
-      
+
       // Sites should be sorted by priority (higher first)
       if (sites.length > 1) {
         for (let i = 0; i < sites.length - 1; i++) {
@@ -743,12 +743,12 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
     it("should handle edge cases gracefully", () => {
       // Test various edge cases
       const testCases = [
-        "C=C=O",           // Ketene
-        "N=C=O",           // Isocyanic acid
-        "CC(=O)N",         // Acetamide
-        "C[N+](=O)[O-]",   // Nitromethane
-        "[C-]#[N+]C",      // Methyl isocyanide
-        "CP(=O)(O)O",      // Methylphosphonic acid
+        "C=C=O", // Ketene
+        "N=C=O", // Isocyanic acid
+        "CC(=O)N", // Acetamide
+        "C[N+](=O)[O-]", // Nitromethane
+        "[C-]#[N+]C", // Methyl isocyanide
+        "CP(=O)(O)O", // Methylphosphonic acid
       ];
 
       for (const smiles of testCases) {
@@ -761,7 +761,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
           // Should either succeed or fail with error message
           expect(result).toBeDefined();
           expect(result.success !== undefined).toBe(true);
-          
+
           if (result.success) {
             expect(result.molecule).toBeDefined();
           } else {
@@ -874,9 +874,9 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       // Should handle aromatic H-shift detection
       const sites17 = detect17AromaticHShift(mol);
       const sites19 = detect19And111AromaticHShift(mol);
-      
+
       expect(sites17.length + sites19.length).toBeGreaterThanOrEqual(0);
-      
+
       // Should not timeout or crash
       const allSites = identifyAllTransformationSites(mol);
       expect(allSites).toBeDefined();
@@ -895,7 +895,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       // Should not crash on peptide structures
       const allSites = identifyAllTransformationSites(mol);
       expect(allSites).toBeDefined();
-      
+
       // Should transform sites successfully if detected
       for (const site of sites) {
         const result = applySiteTransformation(mol, site);
@@ -914,7 +914,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
       const sites = identifyAllTransformationSites(mol);
       expect(sites).toBeDefined();
-      
+
       // Should handle complex bridged ring systems
       for (const site of sites) {
         expect(() => applySiteTransformation(mol, site)).not.toThrow();
@@ -970,7 +970,8 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
     it("should maintain performance on large molecules", () => {
       // Heme B (porphyrin with iron) - large conjugated system
-      const hemeB = "CC1=C(C(=CC2=NC(=CC3=NC(=C(C4=NC(=C(C(=N1)C=C2)C)C=C4)C)C(=C3C)CCC(=O)O)C=C)C)CCC(=O)O)C";
+      const hemeB =
+        "CC1=C(C(=CC2=NC(=CC3=NC(=C(C4=NC(=C(C(=N1)C=C2)C)C=C4)C)C(=C3C)CCC(=O)O)C=C)C)CCC(=O)O)C";
       const mol = parseSMILES(hemeB).molecules[0];
       if (!mol) throw new Error("Failed to parse heme");
 
@@ -990,7 +991,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       if (!mol) throw new Error("Failed to parse complex molecule");
 
       const sites = identifyAllTransformationSites(mol);
-      
+
       // Should detect multiple types
       const types = new Set(sites.map((s) => s.type));
       expect(types.size).toBeGreaterThan(0);
@@ -1047,7 +1048,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
       // Should detect aromatic H-shifts
       const sites17 = detect17AromaticHShift(mol);
       const sites19 = detect19And111AromaticHShift(mol);
-      
+
       expect(sites17.length + sites19.length).toBeGreaterThanOrEqual(0);
 
       // Should not crash on large aromatic systems
@@ -1078,7 +1079,8 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
         expect(sites).toBeDefined();
 
         // Should transform without errors
-        for (const site of sites.slice(0, 3)) { // Test first 3 sites only
+        for (const site of sites.slice(0, 3)) {
+          // Test first 3 sites only
           const result = applySiteTransformation(mol, site);
           expect(result).toBeDefined();
           expect(result.success !== undefined).toBe(true);
@@ -1106,7 +1108,7 @@ describe("New Tautomer Transformations - RDKit Complete Rules", () => {
 
         if (matchingSites.length > 0 && matchingSites[0]) {
           const result = applySiteTransformation(mol, matchingSites[0]);
-          
+
           if (result.success) {
             expect(result.molecule).toBeDefined();
             const smiles = generateSMILES(result.molecule!);

@@ -860,7 +860,7 @@ function transformCyanoIsocyanic(mol: Molecule, site: TransformationSite): Trans
   // Forward (O-C#N → N=C=O): [O, C, N]
   // Reverse (N=C=O → O-C#N): [N, C, O]
   const metadata = site.metadata;
-  
+
   let carbonIdx: number;
   let nitrogenIdx: number;
   let oxygenIdx: number;
@@ -1062,7 +1062,10 @@ function transformPhosphonicAcid(mol: Molecule, site: TransformationSite): Trans
   return { success: true, molecule: final };
 }
 
-function transformFormamidineSulfinic(mol: Molecule, site: TransformationSite): TransformationResult {
+function transformFormamidineSulfinic(
+  mol: Molecule,
+  site: TransformationSite,
+): TransformationResult {
   const sulfurIdx = site.atoms[0];
   const oxygenIdx = site.atoms[1];
 

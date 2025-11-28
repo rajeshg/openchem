@@ -2,7 +2,7 @@
 
 /**
  * OpenChem MCP Server CLI
- * 
+ *
  * Usage:
  *   openchem-mcp                    # Start in stdio mode (for VS Code, IDEs)
  *   openchem-mcp --http             # Start HTTP server (for Claude Desktop)
@@ -20,7 +20,7 @@ import { registerTools } from "./mcp-tools.js";
 const args = process.argv.slice(2);
 const help = args.includes("--help") || args.includes("-h");
 const useHttp = args.includes("--http");
-const portIndex = args.findIndex(arg => arg === "--port" || arg === "-p");
+const portIndex = args.findIndex((arg) => arg === "--port" || arg === "-p");
 const customPort = portIndex >= 0 ? args[portIndex + 1] : undefined;
 
 if (help) {
@@ -112,7 +112,7 @@ if (useHttp) {
 async function startStdioServer() {
   const transport = new StdioServerTransport();
   await mcpServer.connect(transport);
-  
+
   // Log to stderr so it doesn't interfere with stdio communication
   console.error("✨ OpenChem MCP Server (stdio mode)");
   console.error("🔌 Connected via stdio transport");
@@ -120,7 +120,9 @@ async function startStdioServer() {
 }
 
 function startHttpServer() {
-  const PORT = customPort ? Number.parseInt(customPort, 10) : Number.parseInt(process.env.PORT || "4141", 10);
+  const PORT = customPort
+    ? Number.parseInt(customPort, 10)
+    : Number.parseInt(process.env.PORT || "4141", 10);
 
   if (Number.isNaN(PORT) || PORT < 1 || PORT > 65535) {
     console.error(`Error: Invalid port number: ${customPort || process.env.PORT}`);
@@ -143,14 +145,17 @@ function startHttpServer() {
     // Health check
     if (req.url === "/health" && req.method === "GET") {
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({ status: "ok", service: "openchem-mcp", version: VERSION })
-      );
+      res.end(JSON.stringify({ status: "ok", service: "openchem-mcp", version: VERSION }));
       return;
     }
 
     // MCP endpoints - support both /mcp and /mcp/sse
-    if (req.url === "/mcp" || req.url?.startsWith("/mcp?") || req.url === "/mcp/sse" || req.url?.startsWith("/mcp/sse?")) {
+    if (
+      req.url === "/mcp" ||
+      req.url?.startsWith("/mcp?") ||
+      req.url === "/mcp/sse" ||
+      req.url?.startsWith("/mcp/sse?")
+    ) {
       try {
         const transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: undefined,
@@ -185,7 +190,7 @@ function startHttpServer() {
               message: "Internal server error",
             },
             id: null,
-          })
+          }),
         );
       }
       return;

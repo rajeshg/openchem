@@ -5,6 +5,50 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2025-11-28
+
+### Added
+
+- **Substructure highlighting in `render` tool** - Visual highlighting of molecular features
+  - New `highlights` parameter accepts array of substructure highlights
+  - SMARTS-based highlighting - automatically finds and highlights patterns (e.g., benzene rings, functional groups)
+  - Explicit atom/bond highlighting by index
+  - Customizable colors, opacity, and sizes for each highlight
+  - Multiple highlights with different colors supported
+  - Enables visualization of pharmacophores, PAINS alerts, functional groups, and binding sites
+
+### Changed
+
+- **Dependency**: Requires `openchem@0.2.12` or higher (for highlighting API)
+- Enhanced `render` tool description to mention highlighting capabilities
+
+### Examples
+
+Highlight benzene ring in aspirin:
+```json
+{
+  "tool": "render",
+  "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+  "highlights": [{
+    "smarts": "c1ccccc1",
+    "color": "#FFFF00",
+    "opacity": 0.4
+  }]
+}
+```
+
+Highlight multiple functional groups:
+```json
+{
+  "tool": "render",
+  "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+  "highlights": [
+    { "smarts": "C(=O)O", "color": "#FF0000", "label": "Carboxylic acid" },
+    { "smarts": "OC(=O)C", "color": "#00FF00", "label": "Ester" }
+  ]
+}
+```
+
 ## [0.1.6] - 2025-11-28
 
 ### Added - Phase 1: Critical User-Facing Features

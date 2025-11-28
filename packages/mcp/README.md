@@ -109,8 +109,9 @@ Generate publication-quality images in SVG or PNG format:
 - Stereochemistry display
 - Customizable size
 - Vector (SVG) or raster (PNG) output
+- **NEW:** Substructure highlighting (pharmacophores, functional groups, PAINS)
 
-**Example:**
+**Basic Example:**
 ```typescript
 {
   "name": "render",
@@ -122,6 +123,43 @@ Generate publication-quality images in SVG or PNG format:
   }
 }
 ```
+
+**Highlighting Example:**
+```typescript
+{
+  "name": "render",
+  "arguments": {
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "format": "png",
+    "width": 500,
+    "height": 500,
+    "highlights": [
+      {
+        "smarts": "c1ccccc1",
+        "color": "#FFFF00",
+        "opacity": 0.4,
+        "label": "Aromatic ring"
+      },
+      {
+        "smarts": "C(=O)O",
+        "color": "#FF0000",
+        "opacity": 0.5,
+        "label": "Carboxylic acid"
+      }
+    ]
+  }
+}
+```
+
+**Highlight Options:**
+- `smarts`: SMARTS pattern to match (e.g., `"c1ccccc1"` for benzene)
+- `atoms`: Array of atom indices to highlight (e.g., `[0, 1, 2]`)
+- `bonds`: Array of bond pairs to highlight (e.g., `[[0, 1], [1, 2]]`)
+- `color`: Hex color or CSS name (default: yellow for atoms, red for bonds)
+- `atomColor`: Override atom highlight color
+- `bondColor`: Override bond highlight color
+- `opacity`: 0-1 (default: 0.3 for atoms, 0.8 for bonds)
+- `label`: Optional label (reserved for future legend feature)
 
 ### 5. **convert** - Format Conversion
 
