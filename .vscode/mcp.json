@@ -3,7 +3,7 @@
 		"openchem": {
 			"command": "npx",
 			"args": [
-				"@openchem/mcp@0.1.6"
+				"@openchem/mcp@latest",
 			],
 			"env": {},
 			"type": "stdio"
