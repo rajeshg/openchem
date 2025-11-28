@@ -29,5 +29,6 @@
        "types": ["types.ts"],
        "index": ["index.ts"]
      }
-   }
+   },
+   "exclude": ["packages/*/src", "packages/*/dist", "node_modules", "dist"]
 }
