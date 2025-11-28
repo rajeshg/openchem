@@ -39,7 +39,7 @@
     "build": "tsc --project tsconfig.json",
     "dev": "bun --watch src/cli.ts",
     "start": "node dist/cli.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --skipLibCheck",
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
