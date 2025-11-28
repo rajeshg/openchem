@@ -1,6 +1,6 @@
 {
   "name": "@openchem/mcp",
-  "version": "0.1.3",
+  "version": "0.1.6",
   "description": "Model Context Protocol (MCP) server for OpenChem - AI assistant integration for chemistry analysis",
   "author": "rajeshg",
   "license": "MIT",

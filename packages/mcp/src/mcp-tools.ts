@@ -15,6 +15,14 @@ import {
   renderSVG,
   generateIUPACNameFromSMILES,
   getMurckoScaffold,
+  enumerateTautomers,
+  canonicalTautomer,
+  generateInChI,
+  generateInChIKey,
+  generateMolfile,
+  parseMolfile,
+  parseSDF,
+  writeSDF,
 } from "openchem";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Resvg } from "@resvg/resvg-js";
@@ -35,15 +43,15 @@ export function registerTools(mcpServer: McpServer) {
     "analyze",
     {
       description:
-        "Comprehensive molecular analysis: parse SMILES, compute all properties (40+ descriptors), check drug-likeness, generate IUPAC name, and optionally render 2D structure",
+        "Comprehensive molecular analysis: parse SMILES, compute 40+ descriptors, check drug-likeness (Lipinski/Veber rules), generate IUPAC name, and optionally render 2D structure as SVG. Note: For displaying molecular images in chat, use the 'render' tool with format='png' instead.",
       inputSchema: {
-        smiles: z.string().describe("SMILES string of the molecule"),
+        smiles: z.string().describe("SMILES string of the molecule to analyze"),
         includeRendering: z
           .boolean()
           .optional()
-          .describe("Include 2D SVG rendering (default: false)"),
-        renderWidth: z.number().optional().describe("SVG width in pixels"),
-        renderHeight: z.number().optional().describe("SVG height in pixels"),
+          .describe("Include 2D SVG rendering as text (default: false). For image display in chat, use 'render' tool with format='png'."),
+        renderWidth: z.number().optional().describe("SVG width in pixels (default: 300)"),
+        renderHeight: z.number().optional().describe("SVG height in pixels (default: 300)"),
       },
     },
     async ({ smiles, includeRendering, renderWidth, renderHeight }) => {
@@ -213,24 +221,29 @@ export function registerTools(mcpServer: McpServer) {
     "render",
     {
       description:
-        "Generate publication-quality 2D rendering of molecular structure. Supports SVG (vector) and PNG (raster) formats with customizable dimensions.",
+        "Generate 2D molecular structure visualization. Use format='png' to display images inline in chat (recommended for visual display). Use format='svg' for lightweight vector graphics. Optionally save to disk with outputPath parameter.",
       inputSchema: {
-        smiles: z.string().describe("SMILES of molecule to render"),
+        smiles: z.string().describe("SMILES string of the molecule to render"),
         format: z
           .enum(["svg", "png"])
           .optional()
-          .describe("Output format: svg (vector) or png (raster). Default: svg"),
+          .default("png")
+          .describe("Output format: 'png' (displays image inline in chat - RECOMMENDED), 'svg' (lightweight vector XML). Default: png"),
         width: z
           .number()
           .optional()
-          .describe("Image width in pixels (default: 300)"),
+          .describe("Image width in pixels (default: 300). Recommended: 400-600 for better visibility"),
         height: z
           .number()
           .optional()
-          .describe("Image height in pixels (default: 300)"),
+          .describe("Image height in pixels (default: 300). Recommended: 400-600 for better visibility"),
+        outputPath: z
+          .string()
+          .optional()
+          .describe("Optional: file path to save the image (e.g., '/tmp/molecule.png'). If omitted, image displays inline in chat."),
       },
     },
-    async ({ smiles, format, width, height }) => {
+    async ({ smiles, format, width, height, outputPath }) => {
       const molResult = parseSMILES(smiles);
       if (molResult.errors.length > 0) {
         throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
@@ -241,13 +254,39 @@ export function registerTools(mcpServer: McpServer) {
         throw new Error("No molecule parsed");
       }
 
-      const outputFormat = format ?? "svg";
+      const outputFormat = format ?? "png";
       const svg = renderSVG(mol, {
         width: width ?? 300,
         height: height ?? 300,
       });
 
       if (outputFormat === "svg") {
+        // Save to file if path provided
+        if (outputPath) {
+          const fs = await import("node:fs/promises");
+          await fs.writeFile(outputPath, svg.svg, "utf-8");
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(
+                  {
+                    smiles,
+                    format: "svg",
+                    width: svg.width,
+                    height: svg.height,
+                    saved: true,
+                    path: outputPath,
+                    message: `SVG saved to ${outputPath}`,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        }
+
         return {
           content: [
             {
@@ -270,10 +309,44 @@ export function registerTools(mcpServer: McpServer) {
 
       // Convert to PNG
       const imageBuffer = convertSvgToPng(svg.svg);
-      const base64Image = imageBuffer.toString("base64");
 
+      // Save to file if path provided
+      if (outputPath) {
+        const fs = await import("node:fs/promises");
+        await fs.writeFile(outputPath, imageBuffer);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  smiles,
+                  format: "png",
+                  width: svg.width,
+                  height: svg.height,
+                  mimeType: "image/png",
+                  saved: true,
+                  path: outputPath,
+                  size: imageBuffer.length,
+                  message: `PNG saved to ${outputPath} (${imageBuffer.length} bytes)`,
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      }
+
+      // Return as embedded image (MCP protocol supports image content type)
+      const base64Image = imageBuffer.toString("base64");
       return {
         content: [
+          {
+            type: "image",
+            data: base64Image,
+            mimeType: "image/png",
+          },
           {
             type: "text",
             text: JSON.stringify(
@@ -282,9 +355,8 @@ export function registerTools(mcpServer: McpServer) {
                 format: "png",
                 width: svg.width,
                 height: svg.height,
-                mimeType: "image/png",
-                data: base64Image,
-                note: "Image data is base64 encoded. Decode to get raw bytes.",
+                size: imageBuffer.length,
+                note: "Image embedded above as PNG. To save to file, provide outputPath parameter.",
               },
               null,
               2
@@ -354,6 +426,254 @@ export function registerTools(mcpServer: McpServer) {
               null,
               2
             ),
+          },
+        ],
+      };
+    }
+  );
+
+  // Tool 6: Identifiers - InChI and InChIKey generation
+  mcpServer.registerTool(
+    "identifiers",
+    {
+      description:
+        "Generate standard molecular identifiers for database lookups and structure representation: InChI (International Chemical Identifier with structure layers), InChIKey (hash for exact matching in PubChem/ChEMBL/DrugBank), canonical SMILES, and molecular formula.",
+      inputSchema: {
+        smiles: z.string().describe("SMILES string to convert to identifiers"),
+        includeInChI: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe("Generate InChI structure identifier (default: true)"),
+        includeInChIKey: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe("Generate InChIKey hash for database lookups (default: true)"),
+      },
+    },
+    async ({ smiles, includeInChI, includeInChIKey }) => {
+      const molResult = parseSMILES(smiles);
+      if (molResult.errors.length > 0) {
+        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+      }
+
+      const mol = molResult.molecules[0];
+      if (!mol) {
+        throw new Error("No molecule parsed");
+      }
+
+      const canonicalSmiles = generateSMILES(mol);
+      const properties = Descriptors.basic(mol);
+
+      let inchi: string | undefined;
+      let inchiKey: string | undefined;
+
+      try {
+        if (includeInChI ?? true) {
+          inchi = await generateInChI(mol);
+        }
+
+        if (includeInChIKey ?? true) {
+          if (!inchi) {
+            inchi = await generateInChI(mol);
+          }
+          inchiKey = await generateInChIKey(inchi);
+        }
+      } catch (error) {
+        // InChI generation failed - continue without it
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                inputSmiles: smiles,
+                canonicalSmiles,
+                inchi,
+                inchiKey,
+                formula: properties.formula,
+                molecularWeight: properties.exactMass,
+                note: "Use InChIKey for exact database matching (PubChem, ChEMBL). InChI provides detailed structure layers.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    }
+  );
+
+  // Tool 7: Tautomers - Enumerate and score tautomers
+  mcpServer.registerTool(
+    "tautomers",
+    {
+      description:
+        "Enumerate and score molecular tautomers (keto-enol, imine-enamine, amide-imidol, etc.). Returns canonical tautomer with highest stability score using tautomer scoring. Essential for drug discovery and docking studies where tautomeric form affects binding.",
+      inputSchema: {
+        smiles: z.string().describe("SMILES string to enumerate tautomers for"),
+        maxTautomers: z
+          .number()
+          .optional()
+          .default(10)
+          .describe("Maximum number of tautomers to return (default: 10)"),
+        returnCanonical: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe("Include canonical (highest-scored) tautomer (default: true)"),
+      },
+    },
+    async ({ smiles, maxTautomers, returnCanonical }) => {
+      const molResult = parseSMILES(smiles);
+      if (molResult.errors.length > 0) {
+        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+      }
+
+      const mol = molResult.molecules[0];
+      if (!mol) {
+        throw new Error("No molecule parsed");
+      }
+
+      const tautomers = enumerateTautomers(mol, { maxTautomers: maxTautomers ?? 10 });
+      const canonicalMol = returnCanonical ? canonicalTautomer(mol) : null;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                inputSmiles: smiles,
+                canonicalTautomer: canonicalMol ? generateSMILES(canonicalMol) : null,
+                tautomerCount: tautomers.length,
+                tautomers: tautomers.map((t) => ({
+                  smiles: t.smiles,
+                  score: t.score,
+                })),
+                note: "Canonical tautomer is the most stable form. Scores based on tautomer scoring rules (higher = more stable).",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    }
+  );
+
+  // Tool 8: FileConvert - MOL and SDF file format conversion
+  mcpServer.registerTool(
+    "fileConvert",
+    {
+      description:
+        "Convert between molecular file formats: SMILES ↔ MOL (V2000/V3000), SMILES ↔ SDF (multi-molecule files with properties). Industry-standard formats for data exchange with ChemDraw, PyMOL, molecular dynamics software, and chemical databases.",
+      inputSchema: {
+        operation: z
+          .enum(["smilesToMol", "molToSmiles", "smilesToSDF", "sdfToSmiles"])
+          .describe("Conversion operation to perform"),
+        input: z
+          .string()
+          .describe("Input data: SMILES string or MOL/SDF file content"),
+        properties: z
+          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+          .optional()
+          .describe("Properties to include in SDF output (key-value pairs)"),
+        moleculeName: z
+          .string()
+          .optional()
+          .describe("Name for the molecule (used in MOL/SDF header)"),
+      },
+    },
+    async ({ operation, input, properties, moleculeName }) => {
+      let result: {
+        format: string;
+        content?: string;
+        smiles?: string | string[];
+        moleculeCount?: number;
+      };
+
+      switch (operation) {
+        case "smilesToMol": {
+          const molResult = parseSMILES(input);
+          if (molResult.errors.length > 0) {
+            throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+          }
+          const mol = molResult.molecules[0];
+          if (!mol) {
+            throw new Error("No molecule parsed");
+          }
+          const molfile = generateMolfile(mol, { title: moleculeName || "" });
+          result = {
+            format: "molfile",
+            content: molfile,
+          };
+          break;
+        }
+
+        case "molToSmiles": {
+          const molResult = parseMolfile(input);
+          if (!molResult.molecule) {
+            throw new Error("Failed to parse MOL file");
+          }
+          const smiles = generateSMILES(molResult.molecule);
+          result = {
+            format: "smiles",
+            smiles,
+          };
+          break;
+        }
+
+        case "smilesToSDF": {
+          const molResult = parseSMILES(input);
+          if (molResult.errors.length > 0) {
+            throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+          }
+          const mol = molResult.molecules[0];
+          if (!mol) {
+            throw new Error("No molecule parsed");
+          }
+          const record = {
+            molecule: mol,
+            properties: properties as Record<string, string | number | boolean> | undefined,
+          };
+          const sdfResult = writeSDF(record);
+          if (sdfResult.errors.length > 0) {
+            throw new Error(`SDF generation failed: ${sdfResult.errors.join(", ")}`);
+          }
+          result = {
+            format: "sdf",
+            content: sdfResult.sdf,
+            moleculeCount: 1,
+          };
+          break;
+        }
+
+        case "sdfToSmiles": {
+          const sdfResult = parseSDF(input);
+          if (sdfResult.errors.length > 0) {
+            throw new Error(`SDF parsing errors: ${sdfResult.errors.join(", ")}`);
+          }
+          const smilesList = sdfResult.records
+            .filter((r) => r.molecule !== null)
+            .map((r) => generateSMILES(r.molecule!));
+          result = {
+            format: "smiles",
+            smiles: smilesList,
+            moleculeCount: smilesList.length,
+          };
+          break;
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
           },
         ],
       };

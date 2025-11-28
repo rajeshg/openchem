@@ -22,10 +22,11 @@ OpenChem provides a **Model Context Protocol (MCP) server** that exposes chemist
 
 ### Key Features
 
-- **Remote-first**: HTTP + Server-Sent Events (SSE) transport
+- **Dual transport modes**: stdio (for IDEs) and HTTP (for remote clients)
 - **5 Composite Tools**: Complete chemistry workflows in single calls
-- **Lightweight**: 87 lines, no Express, pure Node.js HTTP
+- **Lightweight**: Minimal dependencies, pure Node.js implementation
 - **Production-ready**: Works with Node.js and Bun
+- **Zero-config**: Install via npm and run
 
 ### Available Tools
 
@@ -41,13 +42,16 @@ OpenChem provides a **Model Context Protocol (MCP) server** that exposes chemist
 
 ## Architecture Overview
 
-### Current Implementation
+### Transport Modes
 
-OpenChem MCP uses **Streamable HTTP transport** (not WebSocket):
+OpenChem MCP supports **two transport modes**:
+
+1. **stdio transport** (default) - For VS Code, Cursor, and IDE integrations
+2. **HTTP + SSE transport** (`--http` flag) - For Claude Desktop and remote clients
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ src/mcp-server-remote.ts (87 lines)                 │
+│ @openchem/mcp package                                │
 │                                                      │
 │ ┌──────────────────────────────────────────────┐   │
 │ │ Node.js HTTP Server                          │   │
@@ -97,46 +101,51 @@ This is the official MCP SDK's `StreamableHTTPServerTransport`, not a custom Web
 
 ## Quick Start
 
-### 1. Start the Server Locally
+### Installation
 
 ```bash
-# Clone and install (if not already done)
-git clone https://github.com/rajeshg/openchem.git
-cd openchem
-bun install
+# Install globally via npm
+npm install -g @openchem/mcp
 
-# Start MCP server
-bun run mcp:remote
+# Or use with npx (no installation)
+npx @openchem/mcp --help
+```
+
+### 1. Start in HTTP Mode (for Claude Desktop, remote clients)
+
+```bash
+# Start HTTP server
+openchem-mcp --http
 
 # Or with custom port
-PORT=8080 bun run mcp:remote
+openchem-mcp --http --port 8080
 ```
 
 Expected output:
 ```
-✨ OpenChem MCP Server (Remote)
-📍 Running on http://localhost:3000
-🏥 Health: http://localhost:3000/health
+✨ OpenChem MCP Server v0.1.4 (HTTP mode)
+📍 Running on http://localhost:4141
+🏥 Health: http://localhost:4141/health
 🔌 MCP endpoints:
-   • http://localhost:3000/mcp
-   • http://localhost:3000/mcp/sse
+   • http://localhost:4141/mcp
+   • http://localhost:4141/mcp/sse
 
 🧪 Available tools:
    • analyze   - Complete molecular analysis
    • compare   - Similarity comparison
    • search    - Substructure matching
-   • render    - 2D visualization
+   • render    - 2D visualization (SVG/PNG)
    • convert   - Format conversion
 ```
 
-### 2. Test with curl
+### 2. Test HTTP Mode with curl
 
 ```bash
 # Health check
-curl http://localhost:3000/health
+curl http://localhost:4141/health
 
 # Initialize MCP session
-curl -X POST http://localhost:3000/mcp \
+curl -X POST http://localhost:4141/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -150,11 +159,61 @@ curl -X POST http://localhost:3000/mcp \
   }'
 ```
 
+### 3. Use in VS Code (stdio mode)
+
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "openchem": {
+      "command": "npx",
+      "args": ["@openchem/mcp"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+Restart VS Code and the server will be automatically spawned when needed.
+
 ---
 
 ## Integration Methods
 
-### Method 1: Claude Desktop (Recommended)
+### Method 1: VS Code Copilot (Recommended for Development)
+
+VS Code Copilot has native MCP support via `.vscode/mcp.json`.
+
+**Configuration:**
+
+Create or edit `.vscode/mcp.json` in your workspace:
+
+```json
+{
+  "servers": {
+    "openchem": {
+      "command": "npx",
+      "args": ["@openchem/mcp"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+**Steps:**
+
+1. Install VS Code with Copilot enabled
+2. Create `.vscode/mcp.json` in your workspace root
+3. Add the configuration above
+4. Restart VS Code
+5. Test: Ask Copilot to "Analyze aspirin using SMILES CC(=O)Oc1ccccc1C(=O)O"
+
+VS Code will automatically spawn the server when needed (no manual start required).
+
+---
+
+### Method 2: Claude Desktop
 
 Claude Desktop has native MCP support via `claude_desktop_config.json`.
 
@@ -170,7 +229,7 @@ Claude Desktop has native MCP support via `claude_desktop_config.json`.
 {
   "mcpServers": {
     "openchem": {
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:4141/mcp"
     }
   }
 }
@@ -178,7 +237,7 @@ Claude Desktop has native MCP support via `claude_desktop_config.json`.
 
 **Steps:**
 
-1. Start OpenChem MCP server: `bun run mcp:remote`
+1. Start OpenChem MCP server: `openchem-mcp --http`
 2. Edit `claude_desktop_config.json` (create if missing)
 3. Add the configuration above
 4. Restart Claude Desktop
@@ -188,7 +247,7 @@ Claude will automatically discover and use the `analyze` tool.
 
 ---
 
-### Method 2: ChatGPT Desktop (Custom Actions)
+### Method 3: ChatGPT Desktop (Custom Actions)
 
 ChatGPT does **not** natively support MCP protocol. You need to:
 

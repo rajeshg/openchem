@@ -155,7 +155,96 @@ This document provides 7 interesting questions to ask the OpenChem MCP server, s
 
 ---
 
-## 7. Functional Group Analysis + Scaffold Extraction (Multiple Tools: `search` + `convert` + `analyze` + `render`)
+## 7. Molecular Identifiers for Database Lookup (Single Tool: `identifiers`)
+
+**Question:**
+> "Generate the InChI and InChIKey for aspirin (CC(=O)Oc1ccccc1C(=O)O). I need to look it up in PubChem and ChEMBL databases."
+
+**What it demonstrates:**
+- InChI generation (standard molecular identifier)
+- InChIKey generation (hashed identifier for exact matching)
+- Canonical SMILES
+- Molecular formula
+- Database integration workflow
+
+**Expected results:**
+- InChI: InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)
+- InChIKey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N
+- Canonical SMILES: CC(=O)Oc1ccccc1C(=O)O
+- Formula: C9H8O4
+- MW: 180.16
+
+**Tools used:** `identifiers`
+
+---
+
+## 8. Tautomer Enumeration for Docking (Single Tool: `tautomers`)
+
+**Question:**
+> "I'm preparing guanine (NC1=Nc2c(ncn2)C(=O)N1) for molecular docking. What are its possible tautomers, and which one is the most stable?"
+
+**What it demonstrates:**
+- Tautomer enumeration (keto-enol, imine-enamine)
+- Canonical tautomer selection (most stable)
+- RDKit-compatible scoring
+- Drug discovery workflow
+- Tautomer impact on docking studies
+
+**Expected results:**
+- Multiple tautomers found (4-6 tautomers typical for guanine)
+- Canonical tautomer: Most stable keto form
+- Scores ranked in descending order
+- All tautomers returned as valid SMILES
+
+**Tools used:** `tautomers`
+
+---
+
+## 9. MOL File Conversion for ChemDraw (Single Tool: `fileConvert`)
+
+**Question:**
+> "Convert benzene (c1ccccc1) to MOL file format so I can open it in ChemDraw."
+
+**What it demonstrates:**
+- SMILES → MOL conversion
+- V2000 format output
+- 2D coordinate generation
+- Data exchange with other chemistry tools
+
+**Expected results:**
+- Valid MOL file (V2000 format)
+- Contains molecule name "Benzene"
+- 6 atoms, 6 bonds
+- 2D coordinates included
+- Can be imported into ChemDraw, Maestro, PyMOL
+
+**Tools used:** `fileConvert` (operation: smilesToMol)
+
+---
+
+## 10. SDF Multi-Molecule Export (Single Tool: `fileConvert`)
+
+**Question:**
+> "I have three molecules: benzene (c1ccccc1), toluene (Cc1ccccc1), and naphthalene (c1ccc2ccccc2c1). Export them to SDF format with their names and molecular weights."
+
+**What it demonstrates:**
+- Multi-molecule SDF generation
+- Property data preservation
+- Batch processing
+- Database export workflow
+
+**Expected results:**
+- Single SDF file with 3 records
+- Each record has molecule structure + properties
+- Properties include NAME and MW
+- Separated by $$$$ delimiters
+- Can be imported into molecular databases
+
+**Tools used:** `fileConvert` (operation: smilesToSDF)
+
+---
+
+## 11. Functional Group Analysis + Scaffold Extraction (Multiple Tools: `search` + `convert` + `analyze` + `render`)
 
 **Question:**
 > "Analyze the antibiotic amoxicillin (CC1(C(N2C(S1)C(C2=O)NC(=O)C(C3=CC=C(C=C3)O)N)C(=O)O)C). Find all amide groups (SMARTS: C(=O)N). Extract its Murcko scaffold. Then compare the scaffold's properties to the full molecule. Show me both structures (full molecule and scaffold) as PNG images side-by-side."
@@ -186,6 +275,45 @@ This document provides 7 interesting questions to ask the OpenChem MCP server, s
 - PNG images show how substituents add drug-like properties
 
 **Tools used:** `search`, `convert` (scaffold), `analyze` (×2), `render` (×2, format="png")
+
+---
+
+## 12. Complete Drug Discovery Pipeline (All 8 Tools)
+
+**Question:**
+> "I'm designing a new drug candidate similar to ibuprofen (CC(C)Cc1ccc(cc1)C(C)C(=O)O). First, analyze its drug-likeness. Generate its InChI and InChIKey for database lookup. Enumerate possible tautomers. Find carboxylic acid groups (SMARTS: C(=O)O). Compare it to aspirin (CC(=O)Oc1ccccc1C(=O)O). Extract the Murcko scaffold. Show me both structures as PNG images. Finally, export both molecules to an SDF file with their properties."
+
+**What it demonstrates:**
+- Complete 8-tool workflow
+- Database integration (InChI/InChIKey)
+- Tautomer analysis
+- Substructure matching
+- Similarity comparison
+- Scaffold extraction
+- Visual comparison
+- Data export
+
+**Expected workflow:**
+1. **Analyze ibuprofen** → Drug-likeness, properties, IUPAC name
+2. **Generate identifiers** → InChI/InChIKey for PubChem lookup
+3. **Enumerate tautomers** → Find possible forms for docking
+4. **Search COOH** → Find carboxylic acid pharmacophore
+5. **Compare to aspirin** → Structural similarity analysis
+6. **Extract scaffold** → Core structure identification
+7. **Render both** → Visual comparison (PNG images)
+8. **Export SDF** → Save both molecules with properties
+
+**Expected results:**
+- Ibuprofen passes all drug-likeness rules
+- InChIKey: HEFNNWSXXWATRW-UHFFFAOYSA-N
+- 1-2 tautomers (limited by saturated structure)
+- 1 carboxylic acid group found
+- Tanimoto similarity to aspirin: ~0.15-0.25
+- Scaffold: p-substituted benzene core
+- PNG images show structural differences
+- SDF contains both molecules with MW, LogP, IUPAC names
+
+**Tools used:** All 8 tools - `analyze`, `identifiers`, `tautomers`, `search`, `compare`, `convert`, `render`, `fileConvert`
 
 ---
 

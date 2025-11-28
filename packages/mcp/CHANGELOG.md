@@ -5,6 +5,72 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2025-11-28
+
+### Added - Phase 1: Critical User-Facing Features
+
+- **Tool 6: `identifiers`** - Generate InChI, InChIKey, and canonical molecular identifiers
+  - InChI generation with full structural information
+  - InChIKey for exact molecular matching (database lookups)
+  - Canonical SMILES and molecular formula
+  - Essential for PubChem, ChEMBL, DrugBank integration
+- **Tool 7: `tautomers`** - Enumerate and score molecular tautomers
+  - Enumerate all tautomers up to configurable limit
+  - RDKit-compatible scoring (higher = more stable)
+  - Returns canonical (most stable) tautomer
+  - Essential for drug discovery and docking studies
+- **Tool 8: `fileConvert`** - MOL/SDF file format conversion
+  - 4 operations: smilesToMol, molToSmiles, smilesToSDF, sdfToSmiles
+  - V2000 MOL format support
+  - SDF multi-molecule support with property preservation
+  - Essential for data exchange with other chemistry tools
+
+### Changed
+
+- **Coverage increased from 40% → 65%** - 8 tools now available (was 5)
+- PNG is now the default format for `render` tool (better inline display)
+- Enhanced tool descriptions for better LLM discoverability
+- Improved help text in CLI to list all 8 tools
+
+### Impact
+
+- **Professional chemistry workflows** - Database lookups, tautomer analysis, file conversion
+- **Better LLM integration** - AI assistants can now discover PNG rendering automatically
+- **Data exchange ready** - MOL/SDF support enables integration with ChemDraw, Maestro, PyMOL, etc.
+
+## [0.1.5] - 2025-11-28
+
+### Added
+
+- **PNG inline display in Copilot Chat** - PNG images now display directly in GitHub Copilot chat window
+- **Optional file output** - Added `outputPath` parameter to save PNG/SVG files to disk
+- MCP standard `image` content type for proper inline rendering
+
+### Changed
+
+- PNG images now returned as MCP `image` content type (displays inline in Copilot)
+- Improved image handling with optional file saving capability
+
+## [0.1.4] - 2025-11-28
+
+### Added
+
+- **stdio transport support** - Server now works with VS Code, Cursor, and other IDE integrations
+- Dual transport mode: stdio (default) and HTTP (with `--http` flag)
+- `--http` flag to explicitly start HTTP server mode
+
+### Changed
+
+- **Default mode is now stdio** - Better IDE integration experience
+- Server name: `openchem` (stdio mode) vs `openchem-remote` (HTTP mode)
+- Updated help text and documentation to reflect both transport modes
+- Improved startup logging (stderr for stdio mode, stdout for HTTP mode)
+
+### Fixed
+
+- **VS Code Copilot integration** - Server now properly responds to `initialize` requests in stdio mode
+- IDE spawned processes work correctly with stdio transport
+
 ## [0.1.3] - 2025-11-27
 
 ### Added

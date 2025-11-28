@@ -4,9 +4,9 @@ Model Context Protocol (MCP) server for [OpenChem](https://npmjs.com/package/ope
 
 ## Features
 
-- 🚀 **Streamable HTTP + SSE transport** for remote AI assistant connections
-- 🧪 **5 composite chemistry tools** for complete workflows
-- 🔌 **Claude Desktop integration** out of the box
+- 🚀 **Dual transport modes** - stdio (for IDEs) and HTTP (for remote clients)
+- 🧪 **8 composite chemistry tools** for complete workflows
+- 🔌 **VS Code & Claude Desktop integration** out of the box
 - 📦 **Zero-config CLI** - just run `openchem-mcp`
 - 🏥 **Built-in health check** endpoint
 
@@ -20,18 +20,29 @@ This will install both `@openchem/mcp` and its peer dependency `openchem`.
 
 ## Quick Start
 
+### stdio Mode (for VS Code, Cursor, IDEs)
+
 ```bash
-# Start MCP server
+# Default mode - stdio transport
 openchem-mcp
-
-# Start on custom port
-openchem-mcp --port 8080
-
-# Or via environment variable
-PORT=9000 openchem-mcp
 ```
 
-The server will start on `http://localhost:4141` by default.
+This mode is designed for IDE integrations where the server is spawned as a child process.
+
+### HTTP Mode (for Claude Desktop, remote clients)
+
+```bash
+# Start HTTP server
+openchem-mcp --http
+
+# Start on custom port
+openchem-mcp --http --port 8080
+
+# Or via environment variable
+PORT=9000 openchem-mcp --http
+```
+
+The HTTP server will start on `http://localhost:4141` by default.
 
 ## Available Tools
 
@@ -130,9 +141,160 @@ Convert between formats:
 }
 ```
 
-## Integration with Claude Desktop
+### 6. **identifiers** - Molecular Identifiers
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Generate standard identifiers for database lookups:
+- InChI (International Chemical Identifier)
+- InChIKey (hashed identifier for exact matching)
+- Canonical SMILES
+- Molecular formula
+- Essential for PubChem, ChEMBL, DrugBank integration
+
+**Example:**
+```typescript
+{
+  "name": "identifiers",
+  "arguments": {
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O"
+  }
+}
+```
+
+**Output:**
+```json
+{
+  "canonicalSmiles": "CC(=O)Oc1ccccc1C(=O)O",
+  "inchi": "InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)",
+  "inchiKey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
+  "formula": "C9H8O4",
+  "molecularWeight": 180.16
+}
+```
+
+### 7. **tautomers** - Tautomer Enumeration
+
+Enumerate and score molecular tautomers:
+- Keto-enol tautomers
+- Imine-enamine tautomers
+- Amide-imidol forms
+- RDKit-compatible scoring (higher = more stable)
+- Returns canonical (most stable) tautomer
+- Essential for drug discovery and docking studies
+
+**Example:**
+```typescript
+{
+  "name": "tautomers",
+  "arguments": {
+    "smiles": "CC(=O)CC(=O)C",
+    "maxTautomers": 10,
+    "returnCanonical": true
+  }
+}
+```
+
+**Output:**
+```json
+{
+  "canonicalTautomer": "CC(O)=CC(=O)C",
+  "tautomerCount": 2,
+  "tautomers": [
+    { "smiles": "CC(O)=CC(=O)C", "score": 1.8 },
+    { "smiles": "CC(=O)CC(O)=C", "score": 1.5 }
+  ]
+}
+```
+
+### 8. **fileConvert** - MOL/SDF File Format Conversion
+
+Convert between industry-standard molecular file formats:
+- SMILES → MOL (V2000 format)
+- MOL → SMILES
+- SMILES → SDF (with properties)
+- SDF → SMILES (multi-molecule support)
+- Property data preservation
+- Essential for data exchange with ChemDraw, Maestro, PyMOL, etc.
+
+**Operations:**
+
+#### smilesToMol
+```typescript
+{
+  "name": "fileConvert",
+  "arguments": {
+    "operation": "smilesToMol",
+    "input": "c1ccccc1",
+    "moleculeName": "Benzene"
+  }
+}
+```
+
+#### molToSmiles
+```typescript
+{
+  "name": "fileConvert",
+  "arguments": {
+    "operation": "molToSmiles",
+    "input": "<MOL file content>"
+  }
+}
+```
+
+#### smilesToSDF
+```typescript
+{
+  "name": "fileConvert",
+  "arguments": {
+    "operation": "smilesToSDF",
+    "input": "[\"c1ccccc1\", \"Cc1ccccc1\"]",
+    "properties": [
+      { "NAME": "Benzene", "MW": "78.11" },
+      { "NAME": "Toluene", "MW": "92.14" }
+    ]
+  }
+}
+```
+
+#### sdfToSmiles
+```typescript
+{
+  "name": "fileConvert",
+  "arguments": {
+    "operation": "sdfToSmiles",
+    "input": "<SDF file content>"
+  }
+}
+```
+
+## Integration
+
+### VS Code Copilot
+
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "openchem": {
+      "command": "npx",
+      "args": ["@openchem/mcp"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+Restart VS Code and the server will be automatically spawned when needed.
+
+### Claude Desktop
+
+First, start the HTTP server:
+
+```bash
+openchem-mcp --http
+```
+
+Then add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -183,14 +345,20 @@ console.log(result);
 
 ## Configuration
 
+### Command-Line Options
+
+- `--http` - Start HTTP server mode (default: stdio mode)
+- `--port <PORT>` - Server port (default: 4141, HTTP mode only)
+- `--help` - Show help message
+
 ### Environment Variables
 
-- `PORT` - Server port (default: 3000)
+- `PORT` - Server port (default: 4141, HTTP mode only)
 - `VERBOSE` - Enable debug logging (set to "1")
 
 ### CORS
 
-CORS is enabled by default (`Access-Control-Allow-Origin: *`). For production, consider restricting origins.
+CORS is enabled by default in HTTP mode (`Access-Control-Allow-Origin: *`). For production, consider restricting origins.
 
 ## Requirements
 
