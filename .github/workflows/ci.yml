@@ -21,7 +21,7 @@ jobs:
       run: bun install
 
     - name: Type check
-      run: bun run tsc
+      run: bun run typecheck
 
     - name: Run tests
       run: bun test
