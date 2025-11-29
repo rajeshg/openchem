@@ -89,7 +89,7 @@ For detailed integration guides, see:
   process.exit(0);
 }
 
-const VERSION = "0.1.6";
+const VERSION = "0.1.8";
 
 // Create MCP server
 const mcpServer = new McpServer({
