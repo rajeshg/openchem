@@ -5,6 +5,23 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2025-11-29
+
+### Changed
+
+- **Dependency**: Updated to `openchem@^0.2.13` for automatic molecular orientation optimization
+- All rendered molecules now appear in canonical, chemically intuitive orientations
+- Linear fused rings (naphthalene, anthracene) render horizontally
+- Single rings (benzene) render with flat-top orientation
+- Linear chains (n-hexane) render horizontally
+- ~1ms performance overhead per molecule for orientation optimization
+
+### Technical Details
+
+- PCA-based principal axis calculation ensures consistent orientation
+- Molecule type detection (8 categories) with type-specific heuristics
+- Fully backward compatible - orientation optimization can be disabled if needed
+
 ## [0.1.7] - 2025-11-28
 
 ### Added
