@@ -30,5 +30,12 @@
        "index": ["index.ts"]
      }
    },
-   "exclude": ["packages/*/src", "packages/*/dist", "node_modules", "dist"]
+   "exclude": [
+     "packages/*/src",
+     "packages/*/dist",
+     "node_modules",
+     "dist",
+     "test-*.ts",
+     "scripts/debug-*.ts"
+   ]
 }
