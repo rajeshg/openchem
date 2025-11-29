@@ -5,6 +5,29 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.13] - 2025-11-29
+
+### Added
+- **Automatic molecular orientation optimization** - Molecules now render in canonical, chemically intuitive orientations
+  - PCA-based principal axis calculation for intelligent orientation detection
+  - Molecule type detection system (8 categories: linear-fused-rings, single-ring, linear-chain, branched-chain, bridged-rings, spiro, mixed-rings, isolated-atom)
+  - Type-specific orientation heuristics (e.g., naphthalene renders horizontally, benzene renders flat-top)
+  - Integrated as Step 9 in coordinate generation pipeline (after bond length normalization)
+  - New `optimizeOrientation` option in `generateCoordinatesV2` (default: true)
+  - 48 comprehensive tests covering simple molecules, complex drugs, PAHs, bridged systems, and edge cases
+  - ~1ms performance overhead per molecule
+  - Fully backward compatible (can disable with `optimizeOrientation: false`)
+
+### Technical Details
+- Principal Component Analysis (PCA) computes molecular major axis via covariance matrix eigenvalues
+- Rotation applied to all coordinates around centroid
+- Aspect ratio validation ensures correct orientation (horizontal for linear systems, square for compact molecules)
+- Validated against 48 diverse molecules: naphthalene (1.73 aspect ratio), anthracene (2.60), n-hexane (infinite), benzene (1.15)
+- Complex molecules handled: caffeine, ibuprofen, paracetamol, testosterone, codeine, cholesterol, vitamin E
+
+### Fixed
+- TypeScript typecheck now excludes debug scripts (test-*.ts, scripts/debug-*.ts) to prevent errors from uncommitted utility files
+
 ## [0.2.12] - 2025-11-28
 
 ### Added
