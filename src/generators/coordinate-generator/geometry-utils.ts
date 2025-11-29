@@ -316,3 +316,77 @@ export function distanceToSegment(p: Vec2, a: Vec2, b: Vec2): number {
   const closest = closestPointOnSegment(p, a, b);
   return distance(p, closest);
 }
+
+// ============================================================================
+// Bond Length Normalization
+// ============================================================================
+
+/**
+ * Normalize bond lengths to enforce uniform length across entire molecule.
+ * Uses iterative refinement to converge to uniform bond lengths while
+ * preserving overall molecular geometry.
+ *
+ * Algorithm:
+ * 1. Multiple iterations to converge
+ * 2. For each bond, adjust both atoms symmetrically to reach target length
+ * 3. Keep first atom fixed as anchor
+ *
+ * @param bonds - Array of bonds (each has atom1, atom2)
+ * @param coords - Map of atom ID → coordinate (modified in place)
+ * @param targetBondLength - Desired bond length
+ * @param iterations - Number of refinement iterations (default: 50)
+ */
+export function normalizeBondLengths(
+  bonds: ReadonlyArray<{ readonly atom1: number; readonly atom2: number }>,
+  coords: Map<number, Vec2>,
+  targetBondLength: number,
+  iterations: number = 50,
+): void {
+  if (coords.size === 0 || bonds.length === 0) return;
+
+  // Keep first atom fixed as anchor
+  const firstAtom = Array.from(coords.keys())[0];
+  if (firstAtom === undefined) return;
+
+  // Iterative refinement
+  for (let iter = 0; iter < iterations; iter++) {
+    for (const bond of bonds) {
+      const coord1 = coords.get(bond.atom1);
+      const coord2 = coords.get(bond.atom2);
+
+      if (!coord1 || !coord2) continue;
+
+      // Compute current distance
+      const dx = coord2.x - coord1.x;
+      const dy = coord2.y - coord1.y;
+      const currentLength = Math.sqrt(dx * dx + dy * dy);
+
+      if (currentLength < 0.0001) continue;
+
+      // Compute how much we need to move
+      const error = targetBondLength - currentLength;
+      const correction = error * 0.5; // Move each atom by half the error
+
+      // Direction vector (normalized)
+      const dirX = dx / currentLength;
+      const dirY = dy / currentLength;
+
+      // Move both atoms (unless it's the anchor atom)
+      if (bond.atom1 !== firstAtom) {
+        coord1.x -= dirX * correction;
+        coord1.y -= dirY * correction;
+      }
+
+      if (bond.atom2 !== firstAtom) {
+        coord2.x += dirX * correction;
+        coord2.y += dirY * correction;
+      } else {
+        // If atom2 is anchor, move atom1 by full correction
+        if (bond.atom1 !== firstAtom) {
+          coord1.x -= dirX * correction;
+          coord1.y -= dirY * correction;
+        }
+      }
+    }
+  }
+}

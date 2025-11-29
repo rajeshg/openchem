@@ -20,6 +20,7 @@ import { placeFusedRingSystem } from "./fused-ring-placer";
 import { attachSubstituents } from "./substituent-placer";
 import { relaxCoordinates } from "./constrained-relaxer";
 import { resolveOverlaps } from "./overlap-resolver";
+import { normalizeBondLengths } from "./geometry-utils";
 
 export interface GenerateOptions {
   bondLength?: number;
@@ -30,8 +31,11 @@ export interface GenerateOptions {
 }
 
 /**
- * Generate 2D coordinates for molecule atoms.
- * Returns Map of atom ID → {x, y} coordinates.
+ * Generate 2D coordinates for molecule atoms with uniform bond lengths.
+ *
+ * This is the primary coordinate generation algorithm that produces
+ * professional-quality 2D structures with uniform bond lengths throughout
+ * the entire molecule.
  *
  * Algorithm:
  * 1. Detect ring systems (fused, spiro, bridged)
@@ -39,11 +43,16 @@ export interface GenerateOptions {
  * 3. Attach substituents via BFS
  * 4. Apply force-directed relaxation
  * 5. Resolve any remaining overlaps
+ * 6. Normalize all bond lengths for uniformity (critical step for SVG rendering)
+ *
+ * @param molecule - Molecule to generate coordinates for
+ * @param options - Generation options
+ * @returns Array of coordinates indexed by atom ID
  */
-export function generateCoordinatesV2(
+export function generateCoordinates(
   molecule: Molecule,
   options: GenerateOptions = {},
-): Map<number, Vec2> {
+): Array<{ x: number; y: number }> {
   const bondLength = options.bondLength ?? DEFAULT_COORDINATE_OPTIONS.bondLength;
   const relaxIterations = options.relaxIterations ?? 0; // No relaxation to preserve terminal atom placement
   const resolveOverlapsEnabled = options.resolveOverlapsEnabled ?? true;
@@ -180,31 +189,47 @@ export function generateCoordinatesV2(
     });
   }
 
-  return coords;
+  // Step 8: Normalize all bond lengths to enforce uniformity
+  // This is critical for professional-looking diagrams with consistent bond lengths
+  normalizeBondLengths(molecule.bonds, coords, bondLength);
+
+  // Convert Map to array indexed by atom ID
+  const coordsArray: Array<{ x: number; y: number }> = [];
+  for (const atom of molecule.atoms) {
+    const coord = coords.get(atom.id);
+    if (coord) {
+      coordsArray[atom.id] = { x: coord.x, y: coord.y };
+    } else {
+      // Fallback: place at origin if coordinate missing
+      coordsArray[atom.id] = { x: 0, y: 0 };
+    }
+  }
+
+  return coordsArray;
 }
 
 /**
- * Generate 2D coordinates as array format.
- * For backward compatibility with code expecting array-indexed coordinates.
+ * Generate 2D coordinates as Map format (for advanced use cases).
+ * Most users should use `generateCoordinates` instead.
+ *
+ * @internal
  */
-export function generateCoordinates(
+export function generateCoordinatesV2(
   molecule: Molecule,
   options: GenerateOptions = {},
-): Array<{ x: number; y: number }> {
-  const coordsMap = generateCoordinatesV2(molecule, options);
+): Map<number, Vec2> {
+  // Generate using main function
+  const coordsArray = generateCoordinates(molecule, options);
 
-  // Convert Map to array indexed by atom ID
-  const coords: Array<{ x: number; y: number }> = [];
-  for (const atom of molecule.atoms) {
-    const coord = coordsMap.get(atom.id);
+  // Convert array back to Map
+  const coordsMap = new Map<number, Vec2>();
+  for (let i = 0; i < coordsArray.length; i++) {
+    const coord = coordsArray[i];
     if (coord) {
-      coords[atom.id] = { x: coord.x, y: coord.y };
-    } else {
-      // Fallback: place at origin if coordinate missing
-      coords[atom.id] = { x: 0, y: 0 };
+      coordsMap.set(i, coord);
     }
   }
-  return coords;
+  return coordsMap;
 }
 
 /**
