@@ -390,3 +390,162 @@ export function normalizeBondLengths(
     }
   }
 }
+
+// ============================================================================
+// Molecular Orientation Optimization
+// ============================================================================
+
+/**
+ * Calculate principal axis of molecule using PCA (Principal Component Analysis).
+ * Returns angle of major axis in radians [-π, π].
+ *
+ * The principal axis is the direction of maximum variance, corresponding to
+ * the longest dimension of the molecule. This is useful for:
+ * - Orienting linear molecules horizontally
+ * - Aligning fused ring systems
+ * - Creating canonical views
+ *
+ * Algorithm:
+ * 1. Compute centroid (center of mass)
+ * 2. Compute covariance matrix (Ixx, Iyy, Ixy)
+ * 3. Find eigenvalues (λ1, λ2) where λ1 ≥ λ2
+ * 4. Find eigenvector for λ1 (direction of maximum variance)
+ * 5. Return angle of eigenvector
+ *
+ * @param coords - Map of atom coordinates
+ * @returns Angle of principal axis in radians
+ */
+export function computePrincipalAxis(coords: Map<number, Vec2>): number {
+  if (coords.size === 0) return 0;
+  if (coords.size === 1) return 0; // Single atom: no orientation
+
+  // Step 1: Compute centroid
+  const center = { x: 0, y: 0 };
+  for (const coord of coords.values()) {
+    center.x += coord.x;
+    center.y += coord.y;
+  }
+  center.x /= coords.size;
+  center.y /= coords.size;
+
+  // Step 2: Compute covariance matrix (second moment of inertia)
+  let Ixx = 0,
+    Iyy = 0,
+    Ixy = 0;
+  for (const coord of coords.values()) {
+    const dx = coord.x - center.x;
+    const dy = coord.y - center.y;
+    Ixx += dx * dx;
+    Iyy += dy * dy;
+    Ixy += dx * dy;
+  }
+
+  // Step 3: Compute eigenvalues
+  // For 2×2 symmetric matrix:
+  // λ = (trace ± sqrt(trace² - 4*det)) / 2
+  const trace = Ixx + Iyy;
+  const det = Ixx * Iyy - Ixy * Ixy;
+  const discriminant = trace * trace - 4 * det;
+
+  // Handle numerical edge cases
+  if (discriminant < 0) {
+    // Should not happen for positive semi-definite covariance matrix
+    // Fall back to average orientation
+    return Math.atan2(Iyy - Ixx, 2 * Ixy);
+  }
+
+  const sqrtDisc = Math.sqrt(discriminant);
+  const lambda1 = (trace + sqrtDisc) / 2; // Larger eigenvalue
+
+  // Step 4: Compute eigenvector for λ1
+  // For eigenvector [vx, vy] corresponding to λ1:
+  // (Ixx - λ1) * vx + Ixy * vy = 0
+  // => vx = Ixy, vy = λ1 - Ixx
+  // OR
+  // Ixy * vx + (Iyy - λ1) * vy = 0
+  // => vx = λ1 - Iyy, vy = Ixy
+
+  let vx: number, vy: number;
+
+  if (Math.abs(Ixy) > 1e-10) {
+    // Use first equation if Ixy is non-zero
+    vx = Ixy;
+    vy = lambda1 - Ixx;
+  } else {
+    // Diagonal matrix (Ixy ≈ 0): eigenvectors are coordinate axes
+    if (Ixx > Iyy) {
+      vx = 1;
+      vy = 0;
+    } else {
+      vx = 0;
+      vy = 1;
+    }
+  }
+
+  // Step 5: Return angle of eigenvector
+  return Math.atan2(vy, vx);
+}
+
+/**
+ * Rotate all coordinates around centroid by given angle.
+ * Modifies coords in-place.
+ *
+ * @param coords - Map of atom coordinates (modified in place)
+ * @param angle - Rotation angle in radians (positive = counterclockwise)
+ */
+export function rotateMolecule(coords: Map<number, Vec2>, angle: number): void {
+  if (coords.size === 0) return;
+  if (Math.abs(angle) < 1e-10) return; // No rotation needed
+
+  // Compute centroid
+  const center = { x: 0, y: 0 };
+  for (const coord of coords.values()) {
+    center.x += coord.x;
+    center.y += coord.y;
+  }
+  center.x /= coords.size;
+  center.y /= coords.size;
+
+  // Rotate each coordinate around centroid
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  for (const coord of coords.values()) {
+    // Translate to origin
+    const dx = coord.x - center.x;
+    const dy = coord.y - center.y;
+
+    // Rotate
+    const newX = dx * cos - dy * sin;
+    const newY = dx * sin + dy * cos;
+
+    // Translate back
+    coord.x = newX + center.x;
+    coord.y = newY + center.y;
+  }
+}
+
+/**
+ * Get bounding box aspect ratio (width / height).
+ * Useful for determining if molecule is linear, compact, or square.
+ *
+ * @param coords - Map of atom coordinates
+ * @returns Aspect ratio (width / height), or 1.0 if single point, or Infinity if linear
+ */
+export function getAspectRatio(coords: Map<number, Vec2>): number {
+  if (coords.size === 0) return 1.0;
+  if (coords.size === 1) return 1.0;
+
+  const points = Array.from(coords.values());
+  const bbox = boundingBox(points);
+
+  const width = bbox.max.x - bbox.min.x;
+  const height = bbox.max.y - bbox.min.y;
+
+  // Perfectly linear molecule (all atoms on horizontal or vertical line)
+  if (height < 1e-6 && width > 1e-6) return Infinity;
+  if (width < 1e-6 && height > 1e-6) return 0; // Vertical line
+  if (width < 1e-6 && height < 1e-6) return 1.0; // Single point
+
+  return width / height;
+}

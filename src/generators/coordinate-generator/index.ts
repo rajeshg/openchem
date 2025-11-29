@@ -21,6 +21,7 @@ import { attachSubstituents } from "./substituent-placer";
 import { relaxCoordinates } from "./constrained-relaxer";
 import { resolveOverlaps } from "./overlap-resolver";
 import { normalizeBondLengths } from "./geometry-utils";
+import { optimizeMolecularOrientation } from "./orientation-optimizer";
 
 export interface GenerateOptions {
   bondLength?: number;
@@ -28,6 +29,7 @@ export interface GenerateOptions {
   resolveOverlapsEnabled?: boolean;
   lockRingAtoms?: boolean;
   overlapResolutionIterations?: number;
+  optimizeOrientation?: boolean;
 }
 
 /**
@@ -44,6 +46,7 @@ export interface GenerateOptions {
  * 4. Apply force-directed relaxation
  * 5. Resolve any remaining overlaps
  * 6. Normalize all bond lengths for uniformity (critical step for SVG rendering)
+ * 7. Optimize molecular orientation (rotate to canonical view)
  *
  * @param molecule - Molecule to generate coordinates for
  * @param options - Generation options
@@ -58,6 +61,7 @@ export function generateCoordinates(
   const resolveOverlapsEnabled = options.resolveOverlapsEnabled ?? true;
   const lockRingAtoms = options.lockRingAtoms ?? true;
   const overlapResolutionIterations = options.overlapResolutionIterations ?? 100;
+  const optimizeOrientation = options.optimizeOrientation ?? true;
 
   // Initialize coordinate map
   const coords = new Map<number, Vec2>();
@@ -192,6 +196,12 @@ export function generateCoordinates(
   // Step 8: Normalize all bond lengths to enforce uniformity
   // This is critical for professional-looking diagrams with consistent bond lengths
   normalizeBondLengths(molecule.bonds, coords, bondLength);
+
+  // Step 9: Optimize molecular orientation for canonical view
+  // Rotate molecule to match chemical drawing conventions (horizontal rings, etc.)
+  if (optimizeOrientation) {
+    optimizeMolecularOrientation(molecule, ringSystems, coords);
+  }
 
   // Convert Map to array indexed by atom ID
   const coordsArray: Array<{ x: number; y: number }> = [];
