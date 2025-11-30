@@ -54,7 +54,9 @@ export function registerTools(mcpServer: McpServer) {
       description:
         "Parse molecular structures from any format (SMILES, IUPAC name, MOL file, SDF file) to internal representation. Returns canonical SMILES and optionally converts to other formats.",
       inputSchema: {
-        input: z.string().describe("Input string: SMILES, IUPAC name, MOL file content, or SDF content"),
+        input: z
+          .string()
+          .describe("Input string: SMILES, IUPAC name, MOL file content, or SDF content"),
         format: z
           .enum(["smiles", "iupac", "mol", "sdf", "auto"])
           .optional()
@@ -78,7 +80,7 @@ export function registerTools(mcpServer: McpServer) {
           parsedFormat = "mol";
         } else if (input.includes("\n") && input.includes("$$$$")) {
           parsedFormat = "sdf";
-        } else if (/^[A-Za-z0-9\-\(\)]+$/.test(input)) {
+        } else if (/^[A-Za-z0-9\-()]+$/.test(input)) {
           parsedFormat = "iupac";
         } else {
           parsedFormat = "smiles";
@@ -203,15 +205,7 @@ export function registerTools(mcpServer: McpServer) {
         smiles: z.string().describe("SMILES string of the molecule to analyze"),
         include: z
           .array(
-            z.enum([
-              "basic",
-              "structural",
-              "drugLikeness",
-              "topology",
-              "chi",
-              "surface",
-              "all",
-            ]),
+            z.enum(["basic", "structural", "drugLikeness", "topology", "chi", "surface", "all"]),
           )
           .optional()
           .default(["all"])
@@ -658,12 +652,16 @@ export function registerTools(mcpServer: McpServer) {
           .number()
           .optional()
           .default(400)
-          .describe("Image width in pixels (default: 400). Recommended: 400-600 for better visibility"),
+          .describe(
+            "Image width in pixels (default: 400). Recommended: 400-600 for better visibility",
+          ),
         height: z
           .number()
           .optional()
           .default(400)
-          .describe("Image height in pixels (default: 400). Recommended: 400-600 for better visibility"),
+          .describe(
+            "Image height in pixels (default: 400). Recommended: 400-600 for better visibility",
+          ),
         outputPath: z
           .string()
           .optional()
@@ -873,7 +871,7 @@ export function registerTools(mcpServer: McpServer) {
         // Parse all SMILES in library to molecules
         const molecules: Molecule[] = [];
         const parseErrors: string[] = [];
-        
+
         for (let i = 0; i < library.length; i++) {
           const parseResult = parseSMILES(library[i]!);
           if (parseResult.errors.length > 0 || !parseResult.molecules[0]) {
@@ -884,7 +882,9 @@ export function registerTools(mcpServer: McpServer) {
         }
 
         if (parseErrors.length > 0 && molecules.length === 0) {
-          throw new Error(`All molecules failed to parse. Errors: ${parseErrors.slice(0, 3).join("; ")}`);
+          throw new Error(
+            `All molecules failed to parse. Errors: ${parseErrors.slice(0, 3).join("; ")}`,
+          );
         }
 
         switch (operation) {
@@ -904,7 +904,8 @@ export function registerTools(mcpServer: McpServer) {
                       librarySize: library.length,
                       parsedCount: molecules.length,
                       parseErrors: parseErrors.length,
-                      matchCount: matchResults.moleculeMatches.filter((m) => m.matches.length > 0).length,
+                      matchCount: matchResults.moleculeMatches.filter((m) => m.matches.length > 0)
+                        .length,
                       results: matchResults.moleculeMatches.map((m) => ({
                         smiles: library[m.moleculeIndex],
                         matchCount: m.matches.length,
@@ -947,11 +948,13 @@ export function registerTools(mcpServer: McpServer) {
                       parsedCount: molecules.length,
                       parseErrors: parseErrors.length,
                       similarCount: similarityResults.length,
-                      results: similarityResults.map((r: { targetIndex: number; similarity: number }) => ({
-                        smiles: library[r.targetIndex],
-                        similarity: r.similarity,
-                        index: r.targetIndex,
-                      })),
+                      results: similarityResults.map(
+                        (r: { targetIndex: number; similarity: number }) => ({
+                          smiles: library[r.targetIndex],
+                          similarity: r.similarity,
+                          index: r.targetIndex,
+                        }),
+                      ),
                     },
                     null,
                     2,
@@ -997,13 +1000,19 @@ export function registerTools(mcpServer: McpServer) {
                       },
                       statistics: {
                         lipinskiPercentage:
-                          ((filterResults.lipinskiPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                          ((filterResults.lipinskiPassers.length / molecules.length) * 100).toFixed(
+                            1,
+                          ) + "%",
                         veberPercentage:
-                          ((filterResults.veberPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                          ((filterResults.veberPassers.length / molecules.length) * 100).toFixed(
+                            1,
+                          ) + "%",
                         bbbPercentage:
-                          ((filterResults.bbbPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                          ((filterResults.bbbPassers.length / molecules.length) * 100).toFixed(1) +
+                          "%",
                         allPassingPercentage:
-                          ((filterResults.allPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                          ((filterResults.allPassers.length / molecules.length) * 100).toFixed(1) +
+                          "%",
                       },
                     },
                     null,

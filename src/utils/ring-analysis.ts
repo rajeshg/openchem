@@ -3,6 +3,75 @@ import { bondKey } from "./bond-utils";
 import { MoleculeGraph } from "./molecular-graph";
 
 /**
+ * Validates that a ring has all required bonds between consecutive atoms.
+ *
+ * @param ring - Array of atom IDs forming a potential ring
+ * @param bonds - Array of all bonds in the molecule
+ * @returns true if all consecutive atoms (including last→first) are bonded, false otherwise
+ */
+function isValidRing(ring: number[], bonds: readonly Bond[]): boolean {
+  if (ring.length < 3) return false;
+
+  // Build bond lookup for O(1) checks
+  const bondSet = new Set<string>();
+  for (const bond of bonds) {
+    const key = `${Math.min(bond.atom1, bond.atom2)}-${Math.max(bond.atom1, bond.atom2)}`;
+    bondSet.add(key);
+  }
+
+  // Check all consecutive pairs have bonds
+  for (let i = 0; i < ring.length; i++) {
+    const atom1 = ring[i]!;
+    const atom2 = ring[(i + 1) % ring.length]!;
+    const key = `${Math.min(atom1, atom2)}-${Math.max(atom1, atom2)}`;
+
+    if (!bondSet.has(key)) {
+      return false; // Missing bond between consecutive atoms
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Converts a cycle to canonical form (lexicographically smallest rotation).
+ * This preserves the cycle topology unlike simple sorting.
+ *
+ * @param ring - Array of atom IDs in cycle order
+ * @returns Canonical form (smallest rotation, considering both directions)
+ */
+function canonicalizeCycle(ring: number[]): number[] {
+  if (ring.length === 0) return ring;
+
+  // Find all rotations in both directions
+  const rotations: number[][] = [];
+
+  // Forward direction
+  for (let i = 0; i < ring.length; i++) {
+    const rotation = [...ring.slice(i), ...ring.slice(0, i)];
+    rotations.push(rotation);
+  }
+
+  // Reverse direction
+  const reversed = [...ring].reverse();
+  for (let i = 0; i < reversed.length; i++) {
+    const rotation = [...reversed.slice(i), ...reversed.slice(0, i)];
+    rotations.push(rotation);
+  }
+
+  // Find lexicographically smallest
+  rotations.sort((a, b) => {
+    for (let i = 0; i < a.length; i++) {
+      if (a[i]! < b[i]!) return -1;
+      if (a[i]! > b[i]!) return 1;
+    }
+    return 0;
+  });
+
+  return rotations[0]!;
+}
+
+/**
  * Detects all simple cycles (elementary rings) in a molecular graph using depth-first search.
  *
  * This function finds every elementary cycle in the molecule, including cycles that may
@@ -48,11 +117,14 @@ export function findRings(atoms: readonly Atom[], bonds: readonly Bond[]): numbe
       visitedEdges.add(edgeKey);
 
       if (neighborId === startId && path.length >= 3) {
-        const ring = [...path].sort((a, b) => a - b);
-        const ringKey = ring.join(",");
-        if (!ringSet.has(ringKey)) {
-          ringSet.add(ringKey);
-          rings.push(ring);
+        // Validate in path order first, then use canonical form for deduplication
+        if (isValidRing(path, bonds)) {
+          const canonical = canonicalizeCycle(path);
+          const ringKey = canonical.join(",");
+          if (!ringSet.has(ringKey)) {
+            ringSet.add(ringKey);
+            rings.push(canonical);
+          }
         }
       } else if (!pathSet.has(neighborId)) {
         const newPathSet = new Set(pathSet);

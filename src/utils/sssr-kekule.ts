@@ -1,5 +1,74 @@
 import type { Atom, Bond } from "types";
 
+/**
+ * Validates that a ring has all required bonds between consecutive atoms.
+ *
+ * @param ring - Array of atom IDs forming a potential ring
+ * @param bonds - Array of all bonds in the molecule
+ * @returns true if all consecutive atoms (including last→first) are bonded, false otherwise
+ */
+function isValidRing(ring: number[], bonds: Bond[]): boolean {
+  if (ring.length < 3) return false;
+
+  // Build bond lookup for O(1) checks
+  const bondSet = new Set<string>();
+  for (const bond of bonds) {
+    const key = `${Math.min(bond.atom1, bond.atom2)}-${Math.max(bond.atom1, bond.atom2)}`;
+    bondSet.add(key);
+  }
+
+  // Check all consecutive pairs have bonds
+  for (let i = 0; i < ring.length; i++) {
+    const atom1 = ring[i]!;
+    const atom2 = ring[(i + 1) % ring.length]!;
+    const key = `${Math.min(atom1, atom2)}-${Math.max(atom1, atom2)}`;
+
+    if (!bondSet.has(key)) {
+      return false; // Missing bond between consecutive atoms
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Converts a cycle to canonical form (lexicographically smallest rotation).
+ * This preserves the cycle topology unlike simple sorting.
+ *
+ * @param ring - Array of atom IDs in cycle order
+ * @returns Canonical form (smallest rotation, considering both directions)
+ */
+function canonicalizeCycle(ring: number[]): number[] {
+  if (ring.length === 0) return ring;
+
+  // Find all rotations in both directions
+  const rotations: number[][] = [];
+
+  // Forward direction
+  for (let i = 0; i < ring.length; i++) {
+    const rotation = [...ring.slice(i), ...ring.slice(0, i)];
+    rotations.push(rotation);
+  }
+
+  // Reverse direction
+  const reversed = [...ring].reverse();
+  for (let i = 0; i < reversed.length; i++) {
+    const rotation = [...reversed.slice(i), ...reversed.slice(0, i)];
+    rotations.push(rotation);
+  }
+
+  // Find lexicographically smallest
+  rotations.sort((a, b) => {
+    for (let i = 0; i < a.length; i++) {
+      if (a[i]! < b[i]!) return -1;
+      if (a[i]! > b[i]!) return 1;
+    }
+    return 0;
+  });
+
+  return rotations[0]!;
+}
+
 function buildAdj(atoms: Atom[], bonds: Bond[]): Record<number, Set<number>> {
   const adj: Record<number, Set<number>> = {};
   for (const atom of atoms) adj[atom.id] = new Set();
@@ -78,6 +147,7 @@ function extractFundamentalCycle(
   v: number,
   parent: Map<number, number>,
   ancestors: Map<number, number[]>,
+  _bonds: Bond[],
 ): number[] {
   const pathU = ancestors.get(u) || [];
   const pathV = ancestors.get(v) || [];
@@ -125,6 +195,9 @@ function extractFundamentalCycle(
   return uniqueCycle.length >= 3 ? uniqueCycle : [];
 }
 
+// Note: extractFundamentalCycle needs bonds parameter for validation
+// Update signature in next refactor
+
 // Find all simple cycles using spanning tree algorithm (optimized method).
 // CHEMISTRY OPTIMIZATION: Uses spanning tree + back edges for cycle detection
 // supplemented with limited BFS for small cycles.
@@ -169,15 +242,15 @@ export function findAllCycles(atoms: Atom[], bonds: Bond[], maxLen: number = 40)
 
   for (const [u, v] of treeResult.backEdges) {
     try {
-      const cycle = extractFundamentalCycle(u, v, treeResult.parent, treeResult.ancestors);
+      const cycle = extractFundamentalCycle(u, v, treeResult.parent, treeResult.ancestors, bonds);
 
-      if (cycle && cycle.length <= maxLen && cycle.length >= 3) {
-        // Normalize: sort atom IDs
-        const normalized = [...cycle].sort((a, b) => a - b);
-        const cycleKey = normalized.join(",");
+      if (cycle && cycle.length <= maxLen && cycle.length >= 3 && isValidRing(cycle, bonds)) {
+        // Normalize: use canonical form (preserves cycle topology)
+        const canonical = canonicalizeCycle(cycle);
+        const cycleKey = canonical.join(",");
         if (!cycleSet.has(cycleKey)) {
           cycleSet.add(cycleKey);
-          cycles.push(normalized);
+          cycles.push(canonical);
         }
       }
     } catch {
@@ -189,7 +262,7 @@ export function findAllCycles(atoms: Atom[], bonds: Bond[], maxLen: number = 40)
   // OPTIMIZATION 4: Use BFS for small cycles (up to size 12)
   // This finds small cycles that BFS is efficient for, especially in dense rings
   // BFS finds cycles starting from each node up to practical drug-like ring sizes
-  const smallCycles = _findSmallCyclesBFS(atoms, adj, 12, cycleSet);
+  const smallCycles = _findSmallCyclesBFS(atoms, adj, 12, cycleSet, bonds);
   cycles.push(...smallCycles);
 
   // Sort by size (smallest first) for better SSSR selection
@@ -204,6 +277,7 @@ function _findSmallCyclesBFS(
   adj: Record<number, Set<number>>,
   maxLen: number,
   existingCycles: Set<string>,
+  bonds: Bond[],
 ): number[][] {
   const cycles: number[][] = [];
 
@@ -221,12 +295,14 @@ function _findSmallCyclesBFS(
 
       for (const next of neighbors) {
         if (next === start && path.length > 2) {
-          // Found cycle back to start
-          const ring = [...path].sort((a, b) => a - b);
-          const cycleKey = ring.join(",");
-          if (!existingCycles.has(cycleKey)) {
-            existingCycles.add(cycleKey);
-            cycles.push(ring);
+          // Found cycle back to start - validate in path order first!
+          if (isValidRing(path, bonds)) {
+            const canonical = canonicalizeCycle(path);
+            const cycleKey = canonical.join(",");
+            if (!existingCycles.has(cycleKey)) {
+              existingCycles.add(cycleKey);
+              cycles.push(canonical);
+            }
           }
         } else if (!pathSet.has(next) && path.length < maxLen) {
           const newPath = [...path, next];

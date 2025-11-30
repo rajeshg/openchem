@@ -22,6 +22,7 @@ import { relaxCoordinates } from "./constrained-relaxer";
 import { resolveOverlaps } from "./overlap-resolver";
 import { normalizeBondLengths } from "./geometry-utils";
 import { optimizeMolecularOrientation } from "./orientation-optimizer";
+import { findMatchingTemplate, applyTemplate } from "./polycyclic-templates";
 
 export interface GenerateOptions {
   bondLength?: number;
@@ -30,6 +31,8 @@ export interface GenerateOptions {
   lockRingAtoms?: boolean;
   overlapResolutionIterations?: number;
   optimizeOrientation?: boolean;
+  normalizeBondLengths?: boolean;
+  useTemplates?: boolean; // Use pre-computed templates for known scaffolds
 }
 
 /**
@@ -91,8 +94,24 @@ export function generateCoordinates(
   // Track which systems have been placed
   const placedSystems = new Set<number>();
 
+  const useTemplates = options.useTemplates ?? false; // Templates disabled by default (atom mapping needs graph isomorphism)
+
   for (const system of ringSystems) {
-    const systemCoords = placeFusedRingSystem(system, molecule, bondLength);
+    let systemCoords: Map<number, Vec2>;
+
+    // Try template-based placement first (if enabled)
+    if (useTemplates) {
+      const template = findMatchingTemplate(system, molecule);
+      if (template) {
+        systemCoords = applyTemplate(template, system, bondLength, molecule);
+      } else {
+        // No template found, fall back to standard placement
+        systemCoords = placeFusedRingSystem(system, molecule, bondLength);
+      }
+    } else {
+      // Templates disabled, use standard placement
+      systemCoords = placeFusedRingSystem(system, molecule, bondLength);
+    }
 
     // Check if this system is connected to an already-placed system via a bond
     let connectedToPlaced = false;
@@ -193,11 +212,47 @@ export function generateCoordinates(
     });
   }
 
-  // Step 8: Normalize all bond lengths to enforce uniformity
-  // This is critical for professional-looking diagrams with consistent bond lengths
-  normalizeBondLengths(molecule.bonds, coords, bondLength);
+  // Step 8: Auto-detect complex polycyclic molecules for special handling
+  // Complex molecules have bridgehead atoms (atoms in 3+ rings)
+  let hasComplexRingSystem = false;
+  if (molecule.rings && molecule.rings.length >= 3) {
+    for (const ring of molecule.rings) {
+      // Check if any atom in ring is part of 3+ rings (bridgehead atom)
+      for (const atomId of ring) {
+        let ringCount = 0;
+        for (const r of molecule.rings) {
+          if (r.includes(atomId)) ringCount++;
+        }
+        if (ringCount >= 3) {
+          hasComplexRingSystem = true;
+          break;
+        }
+      }
+      if (hasComplexRingSystem) break;
+    }
+  }
 
-  // Step 9: Optimize molecular orientation for canonical view
+  // Step 9: Force-field angle optimization for complex polycyclic systems (EXPERIMENTAL)
+  // DISABLED: Rotating atoms to fix angles breaks bond connectivity with other atoms
+  // The approach needs constraint-aware optimization that respects all bonds simultaneously
+  // Future work: implement full force-field minimization with bond length + angle constraints
+  // if (needsOptimization(molecule)) {
+  //   optimizeCoordinates(molecule, coords, bondLength, {
+  //     maxIterations: 100,
+  //     stepSize: 0.1,
+  //     tolerance: 0.01,
+  //   });
+  // }
+
+  // Step 10: Normalize all bond lengths to enforce uniformity (optional)
+  // Note: Disabling this allows better angle preservation in complex ring systems
+  // For complex polycyclic molecules, default to flexible bonds for better ring geometry
+  const shouldNormalizeBondLengths = options.normalizeBondLengths ?? !hasComplexRingSystem;
+  if (shouldNormalizeBondLengths) {
+    normalizeBondLengths(molecule.bonds, coords, bondLength);
+  }
+
+  // Step 11: Optimize molecular orientation for canonical view
   // Rotate molecule to match chemical drawing conventions (horizontal rings, etc.)
   if (optimizeOrientation) {
     optimizeMolecularOrientation(molecule, ringSystems, coords);

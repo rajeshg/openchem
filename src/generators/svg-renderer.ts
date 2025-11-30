@@ -1240,11 +1240,12 @@ function renderSingleMolecule(
     }
   }
 
-  // Render highlights as background layer (before bonds and atoms)
-  if (processedHighlights || options.atomHighlights || options.bondHighlights) {
-    let allAtomHighlights: AtomHighlight[] = [];
-    let allBondHighlights: BondHighlight[] = [];
+  // Prepare highlights to render after bonds (so they appear on top of bonds)
+  // but before atom labels (so labels remain readable)
+  let allAtomHighlights: AtomHighlight[] = [];
+  let allBondHighlights: BondHighlight[] = [];
 
+  if (processedHighlights || options.atomHighlights || options.bondHighlights) {
     if (processedHighlights) {
       allAtomHighlights.push(...processedHighlights.atomHighlights);
       allBondHighlights.push(...processedHighlights.bondHighlights);
@@ -1256,42 +1257,6 @@ function renderSingleMolecule(
 
     if (options.bondHighlights) {
       allBondHighlights.push(...options.bondHighlights);
-    }
-
-    // Render bond highlights first (behind atom highlights)
-    for (const bondHL of allBondHighlights) {
-      for (const [atomId1, atomId2] of bondHL.bonds) {
-        const idx1 = atomIdToIndex.get(atomId1);
-        const idx2 = atomIdToIndex.get(atomId2);
-        if (idx1 === undefined || idx2 === undefined) continue;
-
-        const coord1 = svgCoords[idx1];
-        const coord2 = svgCoords[idx2];
-        if (!coord1 || !coord2) continue;
-
-        svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
-          color: bondHL.color,
-          width: bondHL.width,
-          opacity: bondHL.opacity,
-        });
-      }
-    }
-
-    // Render atom highlights on top of bond highlights
-    for (const atomHL of allAtomHighlights) {
-      for (const atomId of atomHL.atoms) {
-        const idx = atomIdToIndex.get(atomId);
-        if (idx === undefined) continue;
-
-        const coord = svgCoords[idx];
-        if (!coord) continue;
-
-        svgBody += renderAtomHighlight(coord.x, coord.y, {
-          color: atomHL.color,
-          opacity: atomHL.opacity,
-          radius: atomHL.radius,
-        });
-      }
     }
   }
 
@@ -1453,6 +1418,42 @@ function renderSingleMolecule(
       svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
     }
     svgBody += "\n";
+  }
+
+  // Render highlights after bonds but before atom labels
+  // This ensures highlights appear on top of bonds but labels remain readable
+  for (const bondHL of allBondHighlights) {
+    for (const [atomId1, atomId2] of bondHL.bonds) {
+      const idx1 = atomIdToIndex.get(atomId1);
+      const idx2 = atomIdToIndex.get(atomId2);
+      if (idx1 === undefined || idx2 === undefined) continue;
+
+      const coord1 = svgCoords[idx1];
+      const coord2 = svgCoords[idx2];
+      if (!coord1 || !coord2) continue;
+
+      svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
+        color: bondHL.color,
+        width: bondHL.width,
+        opacity: bondHL.opacity,
+      });
+    }
+  }
+
+  for (const atomHL of allAtomHighlights) {
+    for (const atomId of atomHL.atoms) {
+      const idx = atomIdToIndex.get(atomId);
+      if (idx === undefined) continue;
+
+      const coord = svgCoords[idx];
+      if (!coord) continue;
+
+      svgBody += renderAtomHighlight(coord.x, coord.y, {
+        color: atomHL.color,
+        opacity: atomHL.opacity,
+        radius: atomHL.radius,
+      });
+    }
   }
 
   for (let i = 0; i < molecule.atoms.length; ++i) {
@@ -1675,38 +1676,6 @@ function renderMultipleMolecules(
     const atomsToShow = determineVisibleAtoms(molecule, options.showCarbonLabels ?? false);
     const aromaticRings = detectAromaticRings(molecule);
 
-    // Render highlights (background layer)
-    if (mwc.bondHighlights) {
-      for (const bh of mwc.bondHighlights) {
-        for (const [atomId1, atomId2] of bh.bonds) {
-          const coord1 = atomIdToCoords.get(atomId1);
-          const coord2 = atomIdToCoords.get(atomId2);
-          if (coord1 && coord2) {
-            svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
-              color: bh.color,
-              width: bh.width,
-              opacity: bh.opacity,
-            });
-          }
-        }
-      }
-    }
-
-    if (mwc.atomHighlights) {
-      for (const ah of mwc.atomHighlights) {
-        for (const atomId of ah.atoms) {
-          const coord = atomIdToCoords.get(atomId);
-          if (coord) {
-            svgBody += renderAtomHighlight(coord.x, coord.y, {
-              color: ah.color,
-              opacity: ah.opacity,
-              radius: ah.radius,
-            });
-          }
-        }
-      }
-    }
-
     // Compute heteroatoms that belong to rings for this molecule and force
     // their labels to be centered (so they overlap ring lines) and avoid
     // bond shortening around them.
@@ -1889,6 +1858,39 @@ function renderMultipleMolecules(
         svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
       }
       svgBody += "\n";
+    }
+
+    // Render highlights after bonds but before atom labels
+    // This ensures highlights appear on top of bonds but labels remain readable
+    if (mwc.bondHighlights) {
+      for (const bh of mwc.bondHighlights) {
+        for (const [atomId1, atomId2] of bh.bonds) {
+          const coord1 = atomIdToCoords.get(atomId1);
+          const coord2 = atomIdToCoords.get(atomId2);
+          if (coord1 && coord2) {
+            svgBody += renderBondHighlight(coord1.x, coord1.y, coord2.x, coord2.y, {
+              color: bh.color,
+              width: bh.width,
+              opacity: bh.opacity,
+            });
+          }
+        }
+      }
+    }
+
+    if (mwc.atomHighlights) {
+      for (const ah of mwc.atomHighlights) {
+        for (const atomId of ah.atoms) {
+          const coord = atomIdToCoords.get(atomId);
+          if (coord) {
+            svgBody += renderAtomHighlight(coord.x, coord.y, {
+              color: ah.color,
+              opacity: ah.opacity,
+              radius: ah.radius,
+            });
+          }
+        }
+      }
     }
 
     for (let i = 0; i < molecule.atoms.length; ++i) {

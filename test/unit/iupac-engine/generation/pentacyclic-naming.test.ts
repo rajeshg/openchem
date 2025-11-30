@@ -49,9 +49,12 @@ describe("Pentacyclic ring nomenclature", () => {
     const result = parseSMILES(smiles);
     const molecule = result.molecules[0]!;
 
-    // The ring system (core pentacyclic structure) has:
-    // M = 25 bonds, N = 21 atoms
-    // SSSR rank = M - N + 1 = 25 - 21 + 1 = 5
+    // The molecule has 6 SSSR rings total:
+    // - 1 five-membered ring
+    // - 1 six-membered ring (substituent phenyl)
+    // - 4 six-membered rings (core pentacyclic structure)
+    // M = 30 bonds, N = 25 ring atoms
+    // SSSR rank = M - N + 1 = 30 - 25 + 1 = 6
 
     // Get all ring atoms
     const ringAtoms = new Set<number>();
@@ -72,6 +75,6 @@ describe("Pentacyclic ring nomenclature", () => {
     }
 
     const ringSSSRRank = ringBonds - ringAtoms.size + 1;
-    expect(ringSSSRRank).toBe(5);
+    expect(ringSSSRRank).toBe(6);
   });
 });
