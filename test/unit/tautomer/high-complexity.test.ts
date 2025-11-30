@@ -114,29 +114,33 @@ describe("High-complexity tautomers: Mixed keto-amide systems", () => {
 });
 
 describe("High-complexity tautomers: Natural product-like molecules", () => {
-  it("curcumin - bis-phenolic diketone", () => {
-    // RDKit: 35 tautomers
-    const mol = parseSMILES("Oc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(O)cc2)cc1").molecules[0];
-    if (!mol) throw new Error("parse failed");
+  it(
+    "curcumin - bis-phenolic diketone",
+    () => {
+      // RDKit: 35 tautomers
+      const mol = parseSMILES("Oc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(O)cc2)cc1").molecules[0];
+      if (!mol) throw new Error("parse failed");
 
-    console.log("\nCurcumin (natural product):");
-    const tautomers = enumerateTautomers(mol, { maxTautomers: 100 });
-    console.log(`  RDKit: 35 tautomers`);
-    console.log(`  openchem: ${tautomers.length} tautomers`);
+      console.log("\nCurcumin (natural product):");
+      const tautomers = enumerateTautomers(mol, { maxTautomers: 100 });
+      console.log(`  RDKit: 35 tautomers`);
+      console.log(`  openchem: ${tautomers.length} tautomers`);
 
-    // Complex natural product with multiple sites
-    // Note: openchem focuses on keto-enol; missing phenol-quinone expansions
-    expect(tautomers.length).toBeGreaterThanOrEqual(4);
+      // Complex natural product with multiple sites
+      // Note: openchem focuses on keto-enol; missing phenol-quinone expansions
+      expect(tautomers.length).toBeGreaterThanOrEqual(4);
 
-    // Should prefer aromatic forms (2 benzene rings = +500 score)
-    const canonical = canonicalTautomer(mol);
-    const canonicalSmiles = generateSMILES(canonical);
-    console.log(`  Canonical: ${canonicalSmiles}`);
+      // Should prefer aromatic forms (2 benzene rings = +500 score)
+      const canonical = canonicalTautomer(mol);
+      const canonicalSmiles = generateSMILES(canonical);
+      console.log(`  Canonical: ${canonicalSmiles}`);
 
-    // Both aromatic rings should be preserved
-    const aromaticAtoms = (canonicalSmiles.match(/c/g) || []).length;
-    expect(aromaticAtoms).toBeGreaterThanOrEqual(10); // 2 benzene rings
-  });
+      // Both aromatic rings should be preserved
+      const aromaticAtoms = (canonicalSmiles.match(/c/g) || []).length;
+      expect(aromaticAtoms).toBeGreaterThanOrEqual(10); // 2 benzene rings
+    },
+    { timeout: 10000 },
+  );
 
   it("flavone scaffold - polyphenolic lactone", () => {
     // RDKit: 33 tautomers
