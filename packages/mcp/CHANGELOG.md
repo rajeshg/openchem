@@ -5,6 +5,47 @@ All notable changes to @openchem/mcp will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2025-11-30
+
+### Added
+
+- **NEW Tool: `parse`** - Universal molecular structure parser supporting SMILES, IUPAC names, MOL files, and SDF files with auto-detection
+- **NEW Tool: `analyze`** - Comprehensive molecular property analysis with 40+ descriptors across 6 categories (basic, structural, drug-likeness, topology, chi indices)
+- **NEW Tool: `compare`** - Side-by-side molecular comparison using Morgan fingerprints and Tanimoto similarity
+- **NEW Tool: `search`** - Substructure search using SMARTS patterns with detailed match reporting
+- **NEW Tool: `identifiers`** - Generate standard molecular identifiers (InChI, InChIKey, IUPAC, canonical SMILES, formula)
+- **NEW Tool: `tautomers`** - Tautomer enumeration and scoring with canonical tautomer identification
+- **NEW Tool: `scaffold`** - Extract Murcko scaffolds, Bemis-Murcko frameworks, and scaffold trees
+- **NEW Tool: `render`** - 2D structure visualization with SVG/PNG output and substructure highlighting
+- **NEW Tool: `bulk`** - Batch operations for virtual screening (SMARTS matching, similarity search, drug-likeness filtering)
+
+### Changed
+
+- **Complete tool redesign** following Unix philosophy ("do one thing well")
+- 9 specific, single-purpose tools instead of mixed capability tools
+- Improved tool descriptions with clear boundaries and minimal parameters
+- Better LLM tool selection accuracy due to specific tool purposes
+- Enhanced error handling and validation across all tools
+- Parse errors now reported with context in bulk operations
+
+### Technical Details
+
+- IUPAC→SMILES parsing now integrated (using `parseIUPACName().molecule`)
+- Bulk operations automatically parse SMILES arrays to molecules
+- Formula access via `Descriptors.formula()` instead of direct property
+- Surface descriptors removed from API (not yet available in core library)
+- All operations return structured JSON with success/error states
+- Backward compatible - can add legacy tool aliases if needed
+
+### Benefits
+
+- 100% coverage of openchem library capabilities
+- Cleaner separation of concerns
+- Easier to extend with new tools
+- Better performance through targeted operations
+- Improved debugging and error reporting
+- Matches industry best practices (Anthropic/OpenAI MCP guidelines)
+
 ## [0.1.8] - 2025-11-29
 
 ### Changed

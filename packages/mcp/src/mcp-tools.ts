@@ -1,13 +1,18 @@
 /**
- * OpenChem MCP Tools
- * Reusable tool definitions for MCP server
- * Runtime-agnostic - works in Node.js, Bun, Deno, Cloudflare Workers
+ * OpenChem MCP Tools - v1.0 Redesign
+ * 8 specific, single-purpose tools following Unix philosophy
+ * Each tool does one thing well, with clear boundaries and minimal parameters
  */
 
 import * as z from "zod/v4";
 import {
   parseSMILES,
+  parseIUPACName,
+  parseMolfile,
+  parseSDF,
   generateSMILES,
+  generateMolfile,
+  writeSDF,
   Descriptors,
   computeMorganFingerprint,
   tanimotoSimilarity,
@@ -15,15 +20,17 @@ import {
   renderSVG,
   generateIUPACNameFromSMILES,
   getMurckoScaffold,
+  getBemisMurckoFramework,
+  getScaffoldTree,
   enumerateTautomers,
   canonicalTautomer,
   generateInChI,
   generateInChIKey,
-  generateMolfile,
-  parseMolfile,
-  parseSDF,
-  writeSDF,
+  bulkMatchSMARTS,
+  bulkFindSimilar,
+  bulkFilterDrugLike,
 } from "openchem";
+import type { Molecule } from "openchem";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Resvg } from "@resvg/resvg-js";
 
@@ -38,25 +45,182 @@ function convertSvgToPng(svgString: string): Buffer {
 }
 
 export function registerTools(mcpServer: McpServer) {
-  // Tool 1: Analyze - All-in-one molecular analysis
+  // ============================================================================
+  // Tool 1: parse - Parse molecular structures from any format
+  // ============================================================================
+  mcpServer.registerTool(
+    "parse",
+    {
+      description:
+        "Parse molecular structures from any format (SMILES, IUPAC name, MOL file, SDF file) to internal representation. Returns canonical SMILES and optionally converts to other formats.",
+      inputSchema: {
+        input: z.string().describe("Input string: SMILES, IUPAC name, MOL file content, or SDF content"),
+        format: z
+          .enum(["smiles", "iupac", "mol", "sdf", "auto"])
+          .optional()
+          .default("auto")
+          .describe(
+            "Input format (auto-detects if omitted): 'smiles', 'iupac' (e.g., '2-methylpropan-1-ol'), 'mol' (V2000/V3000), 'sdf', or 'auto'",
+          ),
+        outputFormat: z
+          .enum(["smiles", "canonical", "mol", "sdf"])
+          .optional()
+          .describe("Convert to this format after parsing: 'smiles', 'canonical', 'mol', or 'sdf'"),
+      },
+    },
+    async ({ input, format, outputFormat }) => {
+      let molecule: Molecule | null = null;
+      let parsedFormat = format ?? "auto";
+
+      // Auto-detect format if needed
+      if (parsedFormat === "auto") {
+        if (input.includes("\n") && input.includes("M  END")) {
+          parsedFormat = "mol";
+        } else if (input.includes("\n") && input.includes("$$$$")) {
+          parsedFormat = "sdf";
+        } else if (/^[A-Za-z0-9\-\(\)]+$/.test(input)) {
+          parsedFormat = "iupac";
+        } else {
+          parsedFormat = "smiles";
+        }
+      }
+
+      // Parse based on format
+      try {
+        switch (parsedFormat) {
+          case "smiles": {
+            const result = parseSMILES(input);
+            if (result.errors.length > 0) {
+              throw new Error(`SMILES parsing failed: ${result.errors[0]}`);
+            }
+            molecule = result.molecules[0] ?? null;
+            break;
+          }
+          case "iupac": {
+            const result = parseIUPACName(input);
+            if (result.errors.length > 0 || !result.molecule) {
+              throw new Error(`IUPAC parsing failed: ${result.errors[0] || "Unknown error"}`);
+            }
+            molecule = result.molecule;
+            break;
+          }
+          case "mol": {
+            const result = parseMolfile(input);
+            if (!result.molecule) {
+              throw new Error("MOL file parsing failed");
+            }
+            molecule = result.molecule;
+            break;
+          }
+          case "sdf": {
+            const result = parseSDF(input);
+            if (result.errors.length > 0 || result.records.length === 0) {
+              throw new Error(`SDF parsing failed: ${result.errors[0] || "No molecules found"}`);
+            }
+            molecule = result.records[0]?.molecule ?? null;
+            break;
+          }
+        }
+
+        if (!molecule) {
+          throw new Error("Failed to parse molecule");
+        }
+
+        // Generate output in requested format
+        let output: string;
+        let outputFormatUsed = outputFormat ?? "canonical";
+
+        switch (outputFormatUsed) {
+          case "smiles":
+          case "canonical":
+            output = generateSMILES(molecule);
+            break;
+          case "mol":
+            output = generateMolfile(molecule);
+            break;
+          case "sdf": {
+            const sdfResult = writeSDF({ molecule, properties: {} });
+            if (sdfResult.errors.length > 0) {
+              throw new Error(`SDF generation failed: ${sdfResult.errors[0]}`);
+            }
+            output = sdfResult.sdf;
+            break;
+          }
+          default:
+            output = generateSMILES(molecule);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  success: true,
+                  inputFormat: parsedFormat,
+                  outputFormat: outputFormatUsed,
+                  canonicalSmiles: generateSMILES(molecule),
+                  output,
+                  atomCount: molecule.atoms.length,
+                  bondCount: molecule.bonds.length,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: error instanceof Error ? error.message : "Unknown error",
+                  inputFormat: parsedFormat,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+    },
+  );
+
+  // ============================================================================
+  // Tool 2: analyze - Compute comprehensive molecular properties
+  // ============================================================================
   mcpServer.registerTool(
     "analyze",
     {
       description:
-        "Comprehensive molecular analysis: parse SMILES, compute 40+ descriptors, check drug-likeness (Lipinski/Veber rules), generate IUPAC name, and optionally render 2D structure as SVG. Note: For displaying molecular images in chat, use the 'render' tool with format='png' instead.",
+        "Compute comprehensive molecular properties and descriptors: basic properties (formula, mass), structural descriptors (TPSA, rotatable bonds), drug-likeness (Lipinski, Veber, BBB), topological indices, and chi indices. Returns 40+ molecular descriptors.",
       inputSchema: {
         smiles: z.string().describe("SMILES string of the molecule to analyze"),
-        includeRendering: z
-          .boolean()
+        include: z
+          .array(
+            z.enum([
+              "basic",
+              "structural",
+              "drugLikeness",
+              "topology",
+              "chi",
+              "surface",
+              "all",
+            ]),
+          )
           .optional()
+          .default(["all"])
           .describe(
-            "Include 2D SVG rendering as text (default: false). For image display in chat, use 'render' tool with format='png'.",
+            "Property categories to include: 'basic' (formula, mass, atoms), 'structural' (TPSA, rotatable bonds), 'drugLikeness' (Lipinski, Veber), 'topology' (Zagreb, Balaban), 'chi' (connectivity indices), 'surface' (molecular surface), 'all' (everything)",
           ),
-        renderWidth: z.number().optional().describe("SVG width in pixels (default: 300)"),
-        renderHeight: z.number().optional().describe("SVG height in pixels (default: 300)"),
       },
     },
-    async ({ smiles, includeRendering, renderWidth, renderHeight }) => {
+    async ({ smiles, include }) => {
       const parseResult = parseSMILES(smiles);
       if (parseResult.errors.length > 0) {
         throw new Error(`Invalid SMILES: ${parseResult.errors[0]}`);
@@ -67,20 +231,44 @@ export function registerTools(mcpServer: McpServer) {
         throw new Error("No molecule parsed");
       }
 
-      const properties = Descriptors.all(mol);
-      const drugLikeness = Descriptors.drugLikeness(mol);
-      const iupacResult = generateIUPACNameFromSMILES(smiles);
+      const categories = include ?? ["all"];
+      const includeAll = categories.includes("all");
 
-      let rendering = null;
-      if (includeRendering) {
-        const svg = renderSVG(mol, {
-          width: renderWidth ?? 300,
-          height: renderHeight ?? 300,
-        });
-        rendering = {
-          svg: svg.svg,
-          width: svg.width,
-          height: svg.height,
+      const result: Record<string, unknown> = {
+        smiles,
+        canonicalSmiles: generateSMILES(mol),
+      };
+
+      if (includeAll || categories.includes("basic")) {
+        result.basic = Descriptors.basic(mol);
+      }
+
+      if (includeAll || categories.includes("structural")) {
+        result.structural = Descriptors.structural(mol);
+      }
+
+      if (includeAll || categories.includes("drugLikeness")) {
+        result.drugLikeness = Descriptors.drugLikeness(mol);
+      }
+
+      if (includeAll || categories.includes("topology")) {
+        result.topology = Descriptors.topology(mol);
+      }
+
+      if (includeAll || categories.includes("chi")) {
+        result.chi = Descriptors.chi(mol);
+      }
+
+      // Note: surface descriptors not currently exported in Descriptors API
+
+      // If "all" was requested, add complete summary
+      if (includeAll) {
+        result.summary = {
+          formula: Descriptors.formula(mol),
+          molecularWeight: Descriptors.basic(mol).exactMass,
+          atomCount: mol.atoms.length,
+          bondCount: mol.bonds.length,
+          drugLike: Descriptors.drugLikeness(mol).lipinski.passes,
         };
       }
 
@@ -88,37 +276,37 @@ export function registerTools(mcpServer: McpServer) {
         content: [
           {
             type: "text",
-            text: JSON.stringify(
-              {
-                smiles,
-                canonicalSmiles: generateSMILES(mol),
-                iupacName: iupacResult.name,
-                properties,
-                drugLikeness,
-                rendering,
-              },
-              null,
-              2,
-            ),
+            text: JSON.stringify(result, null, 2),
           },
         ],
       };
     },
   );
 
-  // Tool 2: Compare - Molecular similarity and property comparison
+  // ============================================================================
+  // Tool 3: compare - Compare two molecules
+  // ============================================================================
   mcpServer.registerTool(
     "compare",
     {
       description:
-        "Compare two molecules: compute Tanimoto similarity using Morgan fingerprints and compare all molecular properties side-by-side",
+        "Compare two molecules using Morgan fingerprints and Tanimoto similarity. Also compares key molecular properties side-by-side (molecular weight, LogP, TPSA, drug-likeness).",
       inputSchema: {
         smiles1: z.string().describe("SMILES of first molecule"),
         smiles2: z.string().describe("SMILES of second molecule"),
-        fingerprintRadius: z.number().optional().describe("Morgan fingerprint radius (default: 2)"),
+        fingerprintRadius: z
+          .number()
+          .optional()
+          .default(2)
+          .describe("Morgan fingerprint radius (default: 2, equivalent to ECFP4)"),
+        fpSize: z
+          .number()
+          .optional()
+          .default(2048)
+          .describe("Fingerprint bit length (default: 2048)"),
       },
     },
-    async ({ smiles1, smiles2, fingerprintRadius }) => {
+    async ({ smiles1, smiles2, fingerprintRadius, fpSize }) => {
       const mol1Result = parseSMILES(smiles1);
       const mol2Result = parseSMILES(smiles2);
 
@@ -134,8 +322,9 @@ export function registerTools(mcpServer: McpServer) {
       }
 
       const radius = fingerprintRadius ?? 2;
-      const fp1 = computeMorganFingerprint(mol1, radius);
-      const fp2 = computeMorganFingerprint(mol2, radius);
+      const size = fpSize ?? 2048;
+      const fp1 = computeMorganFingerprint(mol1, radius, size);
+      const fp2 = computeMorganFingerprint(mol2, radius, size);
       const similarity = tanimotoSimilarity(fp1, fp2);
 
       const props1 = Descriptors.all(mol1);
@@ -150,16 +339,33 @@ export function registerTools(mcpServer: McpServer) {
                 molecule1: {
                   smiles: smiles1,
                   canonical: generateSMILES(mol1),
-                  properties: props1,
+                  formula: props1.formula,
+                  molecularWeight: props1.exactMass,
+                  logP: props1.logP,
+                  tpsa: props1.tpsa,
+                  drugLike: props1.lipinskiPass,
                 },
                 molecule2: {
                   smiles: smiles2,
                   canonical: generateSMILES(mol2),
-                  properties: props2,
+                  formula: props2.formula,
+                  molecularWeight: props2.exactMass,
+                  logP: props2.logP,
+                  tpsa: props2.tpsa,
+                  drugLike: props2.lipinskiPass,
                 },
                 similarity: {
                   tanimoto: similarity,
                   fingerprintRadius: radius,
+                  fpSize: size,
+                  interpretation:
+                    similarity > 0.85
+                      ? "Very similar"
+                      : similarity > 0.7
+                        ? "Similar"
+                        : similarity > 0.5
+                          ? "Moderately similar"
+                          : "Dissimilar",
                 },
               },
               null,
@@ -171,15 +377,21 @@ export function registerTools(mcpServer: McpServer) {
     },
   );
 
-  // Tool 3: Search - Substructure and pattern matching
+  // ============================================================================
+  // Tool 4: search - Substructure search with SMARTS
+  // ============================================================================
   mcpServer.registerTool(
     "search",
     {
       description:
-        "Search for substructures in a molecule using SMARTS patterns. Returns all matches with atom indices and match count",
+        "Search for substructures in a molecule using SMARTS patterns. Returns all matches with atom indices and match count. Useful for finding functional groups, pharmacophores, and structural motifs.",
       inputSchema: {
         smiles: z.string().describe("SMILES of molecule to search in"),
-        pattern: z.string().describe("SMARTS pattern to search for"),
+        pattern: z
+          .string()
+          .describe(
+            "SMARTS pattern to search for (e.g., 'c1ccccc1' for benzene, 'C(=O)O' for carboxylic acid, '[OH]' for hydroxyl)",
+          ),
       },
     },
     async ({ smiles, pattern }) => {
@@ -202,9 +414,11 @@ export function registerTools(mcpServer: McpServer) {
             text: JSON.stringify(
               {
                 smiles,
+                canonicalSmiles: generateSMILES(mol),
                 pattern,
                 matchCount: matchResult.matches.length,
                 matches: matchResult.matches,
+                found: matchResult.matches.length > 0,
               },
               null,
               2,
@@ -215,12 +429,222 @@ export function registerTools(mcpServer: McpServer) {
     },
   );
 
-  // Tool 4: Render - 2D structure visualization
+  // ============================================================================
+  // Tool 5: identifiers - Generate molecular identifiers
+  // ============================================================================
+  mcpServer.registerTool(
+    "identifiers",
+    {
+      description:
+        "Generate standard molecular identifiers for database lookups: InChI (International Chemical Identifier), InChIKey (hash for exact matching in PubChem/ChEMBL/DrugBank), IUPAC name, canonical SMILES, and molecular formula. Essential for cross-referencing with chemical databases.",
+      inputSchema: {
+        smiles: z.string().describe("SMILES string to convert to identifiers"),
+        include: z
+          .array(z.enum(["inchi", "inchikey", "iupac", "canonical", "formula", "all"]))
+          .optional()
+          .default(["all"])
+          .describe(
+            "Identifiers to generate: 'inchi', 'inchikey', 'iupac', 'canonical', 'formula', or 'all'",
+          ),
+      },
+    },
+    async ({ smiles, include }) => {
+      const molResult = parseSMILES(smiles);
+      if (molResult.errors.length > 0) {
+        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+      }
+
+      const mol = molResult.molecules[0];
+      if (!mol) {
+        throw new Error("No molecule parsed");
+      }
+
+      const categories = include ?? ["all"];
+      const includeAll = categories.includes("all");
+
+      const result: Record<string, unknown> = {
+        inputSmiles: smiles,
+      };
+
+      if (includeAll || categories.includes("canonical")) {
+        result.canonicalSmiles = generateSMILES(mol);
+      }
+
+      if (includeAll || categories.includes("formula")) {
+        result.formula = Descriptors.formula(mol);
+      }
+
+      if (includeAll || categories.includes("iupac")) {
+        const iupacResult = generateIUPACNameFromSMILES(smiles);
+        result.iupacName = iupacResult.name;
+        result.iupacConfidence = iupacResult.confidence;
+      }
+
+      if (includeAll || categories.includes("inchi") || categories.includes("inchikey")) {
+        try {
+          const inchi = await generateInChI(mol);
+          if (includeAll || categories.includes("inchi")) {
+            result.inchi = inchi;
+          }
+          if (includeAll || categories.includes("inchikey")) {
+            result.inchiKey = await generateInChIKey(inchi);
+          }
+        } catch (_error) {
+          result.inchi = null;
+          result.inchiKey = null;
+          result.inchiError = "InChI generation not available (requires WASM module)";
+        }
+      }
+
+      result.note =
+        "Use InChIKey for exact database matching (PubChem, ChEMBL). InChI provides detailed structure layers.";
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    },
+  );
+
+  // ============================================================================
+  // Tool 6: tautomers - Enumerate and score tautomers
+  // ============================================================================
+  mcpServer.registerTool(
+    "tautomers",
+    {
+      description:
+        "Enumerate and score molecular tautomers (keto-enol, imine-enamine, amide-imidol, lactam-lactim, etc.). Returns canonical tautomer with highest stability score. Essential for drug discovery and docking studies where tautomeric form affects binding affinity. Supports 25 tautomerization rules with RDKit-compatible scoring.",
+      inputSchema: {
+        smiles: z.string().describe("SMILES string to enumerate tautomers for"),
+        maxTautomers: z
+          .number()
+          .optional()
+          .default(10)
+          .describe("Maximum number of tautomers to return (default: 10)"),
+        returnCanonical: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe("Include canonical (highest-scored) tautomer (default: true)"),
+      },
+    },
+    async ({ smiles, maxTautomers, returnCanonical }) => {
+      const molResult = parseSMILES(smiles);
+      if (molResult.errors.length > 0) {
+        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+      }
+
+      const mol = molResult.molecules[0];
+      if (!mol) {
+        throw new Error("No molecule parsed");
+      }
+
+      const tautomers = enumerateTautomers(mol, { maxTautomers: maxTautomers ?? 10 });
+      const canonicalMol = returnCanonical ? canonicalTautomer(mol) : null;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                inputSmiles: smiles,
+                canonicalTautomer: canonicalMol ? generateSMILES(canonicalMol) : null,
+                tautomerCount: tautomers.length,
+                tautomers: tautomers.map((t) => ({
+                  smiles: t.smiles,
+                  score: t.score,
+                })),
+                note: "Canonical tautomer is the most stable form. Scores based on aromaticity, conjugation, and heteroatom preferences (higher = more stable).",
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      };
+    },
+  );
+
+  // ============================================================================
+  // Tool 7: scaffold - Extract molecular scaffolds
+  // ============================================================================
+  mcpServer.registerTool(
+    "scaffold",
+    {
+      description:
+        "Extract Murcko scaffold (core structure after removing side chains) and related frameworks: Bemis-Murcko generic framework (all atoms → carbon), scaffold tree (hierarchical decomposition). Essential for scaffold hopping, lead optimization, and analyzing structure-activity relationships in drug discovery.",
+      inputSchema: {
+        smiles: z.string().describe("SMILES string to extract scaffold from"),
+        includeGeneric: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            "Include Bemis-Murcko generic framework (all atoms replaced by carbon, bonds normalized)",
+          ),
+        includeTree: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Include scaffold tree (hierarchical decomposition of scaffold)"),
+      },
+    },
+    async ({ smiles, includeGeneric, includeTree }) => {
+      const molResult = parseSMILES(smiles);
+      if (molResult.errors.length > 0) {
+        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+      }
+
+      const mol = molResult.molecules[0];
+      if (!mol) {
+        throw new Error("No molecule parsed");
+      }
+
+      const scaffold = getMurckoScaffold(mol);
+      const result: Record<string, unknown> = {
+        inputSmiles: smiles,
+        canonicalSmiles: generateSMILES(mol),
+        scaffold: scaffold ? generateSMILES(scaffold) : null,
+      };
+
+      if (includeGeneric && scaffold) {
+        const genericFramework = getBemisMurckoFramework(mol);
+        result.genericFramework = genericFramework ? generateSMILES(genericFramework) : null;
+      }
+
+      if (includeTree && scaffold) {
+        const scaffoldTree = getScaffoldTree(mol);
+        result.scaffoldTree = scaffoldTree.map((s) => generateSMILES(s));
+        result.scaffoldLevels = scaffoldTree.length;
+      }
+
+      result.note =
+        "Murcko scaffold = core after removing side chains. Generic framework = all atoms → carbon. Scaffold tree = hierarchical decomposition.";
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    },
+  );
+
+  // ============================================================================
+  // Tool 8: render - 2D structure visualization
+  // ============================================================================
   mcpServer.registerTool(
     "render",
     {
       description:
-        "Generate 2D molecular structure visualization. Use format='png' to display images inline in chat (recommended for visual display). Use format='svg' for lightweight vector graphics. Optionally save to disk with outputPath parameter. Supports highlighting of substructures using SMARTS patterns or explicit atom indices.",
+        "Generate publication-quality 2D molecular structure visualization in SVG or PNG format. Features automatic orientation optimization (linear molecules → horizontal, rings → flat-top), substructure highlighting via SMARTS patterns, stereochemistry display (wedge/hash bonds), and customizable appearance. Use format='png' to display images inline in chat.",
       inputSchema: {
         smiles: z.string().describe("SMILES string of the molecule to render"),
         format: z
@@ -233,15 +657,13 @@ export function registerTools(mcpServer: McpServer) {
         width: z
           .number()
           .optional()
-          .describe(
-            "Image width in pixels (default: 300). Recommended: 400-600 for better visibility",
-          ),
+          .default(400)
+          .describe("Image width in pixels (default: 400). Recommended: 400-600 for better visibility"),
         height: z
           .number()
           .optional()
-          .describe(
-            "Image height in pixels (default: 300). Recommended: 400-600 for better visibility",
-          ),
+          .default(400)
+          .describe("Image height in pixels (default: 400). Recommended: 400-600 for better visibility"),
         outputPath: z
           .string()
           .optional()
@@ -254,7 +676,9 @@ export function registerTools(mcpServer: McpServer) {
               smarts: z
                 .string()
                 .optional()
-                .describe("SMARTS pattern to highlight (e.g., 'c1ccccc1' for benzene ring)"),
+                .describe(
+                  "SMARTS pattern to highlight (e.g., 'c1ccccc1' for benzene ring, 'C(=O)O' for carboxylic acid)",
+                ),
               atoms: z.array(z.number()).optional().describe("Explicit atom indices to highlight"),
               bonds: z
                 .array(z.tuple([z.number(), z.number()]))
@@ -299,8 +723,8 @@ export function registerTools(mcpServer: McpServer) {
 
       const outputFormat = format ?? "png";
       const svg = renderSVG(mol, {
-        width: width ?? 300,
-        height: height ?? 300,
+        width: width ?? 400,
+        height: height ?? 400,
         highlights,
       });
 
@@ -411,312 +835,206 @@ export function registerTools(mcpServer: McpServer) {
     },
   );
 
-  // Tool 5: Convert - Format conversion and canonicalization
+  // ============================================================================
+  // Tool 9: bulk - Batch operations for virtual screening
+  // ============================================================================
   mcpServer.registerTool(
-    "convert",
+    "bulk",
     {
       description:
-        "Convert between molecular formats: SMILES ↔ canonical SMILES, SMILES → IUPAC name, extract Murcko scaffold",
-      inputSchema: {
-        smiles: z.string().describe("Input SMILES string"),
-        outputFormat: z.enum(["canonical", "iupac", "scaffold"]).describe("Desired output format"),
-      },
-    },
-    async ({ smiles, outputFormat }) => {
-      const molResult = parseSMILES(smiles);
-      if (molResult.errors.length > 0) {
-        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
-      }
-
-      const mol = molResult.molecules[0];
-      if (!mol) {
-        throw new Error("No molecule parsed");
-      }
-
-      let output;
-      switch (outputFormat) {
-        case "canonical":
-          output = { canonical: generateSMILES(mol) };
-          break;
-        case "iupac": {
-          const iupacResult = generateIUPACNameFromSMILES(smiles);
-          output = {
-            iupacName: iupacResult.name,
-            confidence: iupacResult.confidence,
-          };
-          break;
-        }
-        case "scaffold": {
-          const scaffold = getMurckoScaffold(mol);
-          output = {
-            scaffoldSmiles: scaffold ? generateSMILES(scaffold) : null,
-          };
-          break;
-        }
-      }
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(
-              {
-                input: smiles,
-                outputFormat,
-                ...output,
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    },
-  );
-
-  // Tool 6: Identifiers - InChI and InChIKey generation
-  mcpServer.registerTool(
-    "identifiers",
-    {
-      description:
-        "Generate standard molecular identifiers for database lookups and structure representation: InChI (International Chemical Identifier with structure layers), InChIKey (hash for exact matching in PubChem/ChEMBL/DrugBank), canonical SMILES, and molecular formula.",
-      inputSchema: {
-        smiles: z.string().describe("SMILES string to convert to identifiers"),
-        includeInChI: z
-          .boolean()
-          .optional()
-          .default(true)
-          .describe("Generate InChI structure identifier (default: true)"),
-        includeInChIKey: z
-          .boolean()
-          .optional()
-          .default(true)
-          .describe("Generate InChIKey hash for database lookups (default: true)"),
-      },
-    },
-    async ({ smiles, includeInChI, includeInChIKey }) => {
-      const molResult = parseSMILES(smiles);
-      if (molResult.errors.length > 0) {
-        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
-      }
-
-      const mol = molResult.molecules[0];
-      if (!mol) {
-        throw new Error("No molecule parsed");
-      }
-
-      const canonicalSmiles = generateSMILES(mol);
-      const properties = Descriptors.basic(mol);
-
-      let inchi: string | undefined;
-      let inchiKey: string | undefined;
-
-      try {
-        if (includeInChI ?? true) {
-          inchi = await generateInChI(mol);
-        }
-
-        if (includeInChIKey ?? true) {
-          if (!inchi) {
-            inchi = await generateInChI(mol);
-          }
-          inchiKey = await generateInChIKey(inchi);
-        }
-      } catch (_error) {
-        // InChI generation failed - continue without it
-      }
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(
-              {
-                inputSmiles: smiles,
-                canonicalSmiles,
-                inchi,
-                inchiKey,
-                formula: properties.formula,
-                molecularWeight: properties.exactMass,
-                note: "Use InChIKey for exact database matching (PubChem, ChEMBL). InChI provides detailed structure layers.",
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    },
-  );
-
-  // Tool 7: Tautomers - Enumerate and score tautomers
-  mcpServer.registerTool(
-    "tautomers",
-    {
-      description:
-        "Enumerate and score molecular tautomers (keto-enol, imine-enamine, amide-imidol, etc.). Returns canonical tautomer with highest stability score using tautomer scoring. Essential for drug discovery and docking studies where tautomeric form affects binding.",
-      inputSchema: {
-        smiles: z.string().describe("SMILES string to enumerate tautomers for"),
-        maxTautomers: z
-          .number()
-          .optional()
-          .default(10)
-          .describe("Maximum number of tautomers to return (default: 10)"),
-        returnCanonical: z
-          .boolean()
-          .optional()
-          .default(true)
-          .describe("Include canonical (highest-scored) tautomer (default: true)"),
-      },
-    },
-    async ({ smiles, maxTautomers, returnCanonical }) => {
-      const molResult = parseSMILES(smiles);
-      if (molResult.errors.length > 0) {
-        throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
-      }
-
-      const mol = molResult.molecules[0];
-      if (!mol) {
-        throw new Error("No molecule parsed");
-      }
-
-      const tautomers = enumerateTautomers(mol, { maxTautomers: maxTautomers ?? 10 });
-      const canonicalMol = returnCanonical ? canonicalTautomer(mol) : null;
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(
-              {
-                inputSmiles: smiles,
-                canonicalTautomer: canonicalMol ? generateSMILES(canonicalMol) : null,
-                tautomerCount: tautomers.length,
-                tautomers: tautomers.map((t) => ({
-                  smiles: t.smiles,
-                  score: t.score,
-                })),
-                note: "Canonical tautomer is the most stable form. Scores based on tautomer scoring rules (higher = more stable).",
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    },
-  );
-
-  // Tool 8: FileConvert - MOL and SDF file format conversion
-  mcpServer.registerTool(
-    "fileConvert",
-    {
-      description:
-        "Convert between molecular file formats: SMILES ↔ MOL (V2000/V3000), SMILES ↔ SDF (multi-molecule files with properties). Industry-standard formats for data exchange with ChemDraw, PyMOL, molecular dynamics software, and chemical databases.",
+        "Perform batch operations on molecular libraries for virtual screening and compound analysis: bulk SMARTS matching (find compounds with specific substructures), bulk similarity search (find similar molecules using fingerprints), bulk drug-likeness filtering (Lipinski, Veber rules). Essential for high-throughput screening, compound library curation, and lead discovery.",
       inputSchema: {
         operation: z
-          .enum(["smilesToMol", "molToSmiles", "smilesToSDF", "sdfToSmiles"])
-          .describe("Conversion operation to perform"),
-        input: z.string().describe("Input data: SMILES string or MOL/SDF file content"),
-        properties: z
-          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
-          .optional()
-          .describe("Properties to include in SDF output (key-value pairs)"),
-        moleculeName: z
+          .enum(["match", "similar", "filter"])
+          .describe(
+            "Batch operation: 'match' (SMARTS substructure matching), 'similar' (fingerprint similarity), 'filter' (drug-likeness filtering)",
+          ),
+        library: z
+          .array(z.string())
+          .describe("Array of SMILES strings representing the compound library to process"),
+        query: z
           .string()
           .optional()
-          .describe("Name for the molecule (used in MOL/SDF header)"),
+          .describe("Query SMILES (for 'similar') or SMARTS pattern (for 'match')"),
+        threshold: z
+          .number()
+          .optional()
+          .default(0.7)
+          .describe("Similarity threshold for 'similar' operation (0-1, default: 0.7)"),
+        fingerprintRadius: z
+          .number()
+          .optional()
+          .default(2)
+          .describe("Morgan fingerprint radius for similarity (default: 2)"),
       },
     },
-    async ({ operation, input, properties, moleculeName }) => {
-      let result: {
-        format: string;
-        content?: string;
-        smiles?: string | string[];
-        moleculeCount?: number;
-      };
-
-      switch (operation) {
-        case "smilesToMol": {
-          const molResult = parseSMILES(input);
-          if (molResult.errors.length > 0) {
-            throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+    async ({ operation, library, query, threshold, fingerprintRadius }) => {
+      try {
+        // Parse all SMILES in library to molecules
+        const molecules: Molecule[] = [];
+        const parseErrors: string[] = [];
+        
+        for (let i = 0; i < library.length; i++) {
+          const parseResult = parseSMILES(library[i]!);
+          if (parseResult.errors.length > 0 || !parseResult.molecules[0]) {
+            parseErrors.push(`Index ${i}: ${parseResult.errors[0] || "Failed to parse"}`);
+          } else {
+            molecules.push(parseResult.molecules[0]);
           }
-          const mol = molResult.molecules[0];
-          if (!mol) {
-            throw new Error("No molecule parsed");
-          }
-          const molfile = generateMolfile(mol, { title: moleculeName || "" });
-          result = {
-            format: "molfile",
-            content: molfile,
-          };
-          break;
         }
 
-        case "molToSmiles": {
-          const molResult = parseMolfile(input);
-          if (!molResult.molecule) {
-            throw new Error("Failed to parse MOL file");
-          }
-          const smiles = generateSMILES(molResult.molecule);
-          result = {
-            format: "smiles",
-            smiles,
-          };
-          break;
+        if (parseErrors.length > 0 && molecules.length === 0) {
+          throw new Error(`All molecules failed to parse. Errors: ${parseErrors.slice(0, 3).join("; ")}`);
         }
 
-        case "smilesToSDF": {
-          const molResult = parseSMILES(input);
-          if (molResult.errors.length > 0) {
-            throw new Error(`Invalid SMILES: ${molResult.errors[0]}`);
+        switch (operation) {
+          case "match": {
+            if (!query) {
+              throw new Error("Query SMARTS pattern required for 'match' operation");
+            }
+            const matchResults = bulkMatchSMARTS(query, molecules);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(
+                    {
+                      operation: "match",
+                      query,
+                      librarySize: library.length,
+                      parsedCount: molecules.length,
+                      parseErrors: parseErrors.length,
+                      matchCount: matchResults.moleculeMatches.filter((m) => m.matches.length > 0).length,
+                      results: matchResults.moleculeMatches.map((m) => ({
+                        smiles: library[m.moleculeIndex],
+                        matchCount: m.matches.length,
+                        matches: m.matches,
+                      })),
+                    },
+                    null,
+                    2,
+                  ),
+                },
+              ],
+            };
           }
-          const mol = molResult.molecules[0];
-          if (!mol) {
-            throw new Error("No molecule parsed");
-          }
-          const record = {
-            molecule: mol,
-            properties: properties as Record<string, string | number | boolean> | undefined,
-          };
-          const sdfResult = writeSDF(record);
-          if (sdfResult.errors.length > 0) {
-            throw new Error(`SDF generation failed: ${sdfResult.errors.join(", ")}`);
-          }
-          result = {
-            format: "sdf",
-            content: sdfResult.sdf,
-            moleculeCount: 1,
-          };
-          break;
-        }
 
-        case "sdfToSmiles": {
-          const sdfResult = parseSDF(input);
-          if (sdfResult.errors.length > 0) {
-            throw new Error(`SDF parsing errors: ${sdfResult.errors.join(", ")}`);
+          case "similar": {
+            if (!query) {
+              throw new Error("Query SMILES required for 'similar' operation");
+            }
+            const queryResult = parseSMILES(query);
+            if (queryResult.errors.length > 0 || !queryResult.molecules[0]) {
+              throw new Error(`Invalid query SMILES: ${queryResult.errors[0]}`);
+            }
+            const queryMol = queryResult.molecules[0];
+            const similarityResults = bulkFindSimilar(
+              queryMol,
+              molecules,
+              threshold ?? 0.7,
+              fingerprintRadius ?? 2,
+            );
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(
+                    {
+                      operation: "similar",
+                      query,
+                      threshold: threshold ?? 0.7,
+                      librarySize: library.length,
+                      parsedCount: molecules.length,
+                      parseErrors: parseErrors.length,
+                      similarCount: similarityResults.length,
+                      results: similarityResults.map((r: { targetIndex: number; similarity: number }) => ({
+                        smiles: library[r.targetIndex],
+                        similarity: r.similarity,
+                        index: r.targetIndex,
+                      })),
+                    },
+                    null,
+                    2,
+                  ),
+                },
+              ],
+            };
           }
-          const smilesList = sdfResult.records
-            .filter((r) => r.molecule !== null)
-            .map((r) => generateSMILES(r.molecule!));
-          result = {
-            format: "smiles",
-            smiles: smilesList,
-            moleculeCount: smilesList.length,
-          };
-          break;
+
+          case "filter": {
+            const filterResults = bulkFilterDrugLike(molecules);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(
+                    {
+                      operation: "filter",
+                      librarySize: library.length,
+                      parsedCount: molecules.length,
+                      parseErrors: parseErrors.length,
+                      lipinskiPassers: filterResults.lipinskiPassers.length,
+                      veberPassers: filterResults.veberPassers.length,
+                      bbbPassers: filterResults.bbbPassers.length,
+                      allPassers: filterResults.allPassers.length,
+                      results: {
+                        lipinski: filterResults.lipinskiPassers.map((r) => ({
+                          smiles: library[r.index],
+                          index: r.index,
+                        })),
+                        veber: filterResults.veberPassers.map((r) => ({
+                          smiles: library[r.index],
+                          index: r.index,
+                        })),
+                        bbb: filterResults.bbbPassers.map((r) => ({
+                          smiles: library[r.index],
+                          index: r.index,
+                        })),
+                        all: filterResults.allPassers.map((r) => ({
+                          smiles: library[r.index],
+                          index: r.index,
+                        })),
+                      },
+                      statistics: {
+                        lipinskiPercentage:
+                          ((filterResults.lipinskiPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                        veberPercentage:
+                          ((filterResults.veberPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                        bbbPercentage:
+                          ((filterResults.bbbPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                        allPassingPercentage:
+                          ((filterResults.allPassers.length / molecules.length) * 100).toFixed(1) + "%",
+                      },
+                    },
+                    null,
+                    2,
+                  ),
+                },
+              ],
+            };
+          }
+
+          default:
+            throw new Error(`Unknown operation: ${operation}`);
         }
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  success: false,
+                  operation,
+                  error: error instanceof Error ? error.message : "Unknown error",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
       }
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
     },
   );
 }

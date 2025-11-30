@@ -48,14 +48,15 @@ EXAMPLES:
   openchem-mcp --http --port 8080
 
 AVAILABLE TOOLS:
-  • analyze      - Complete molecular analysis (40+ descriptors, drug-likeness, IUPAC)
-  • compare      - Molecular similarity (Morgan fingerprints, Tanimoto)
-  • search       - Substructure matching (SMARTS patterns)
-  • render       - 2D structure visualization (SVG/PNG)
-  • convert      - Format conversion (canonical SMILES, IUPAC, scaffold)
-  • identifiers  - Generate InChI, InChIKey, canonical identifiers
-  • tautomers    - Enumerate and score molecular tautomers
-  • fileConvert  - MOL/SDF file format conversion
+  • parse        - Universal parser (SMILES, IUPAC, MOL, SDF) with auto-detection
+  • analyze      - Comprehensive properties (40+ descriptors across 6 categories)
+  • compare      - Side-by-side comparison (fingerprints, Tanimoto similarity)
+  • search       - Substructure matching (SMARTS patterns with match reporting)
+  • identifiers  - Standard identifiers (InChI, InChIKey, IUPAC, canonical SMILES)
+  • tautomers    - Tautomer enumeration and scoring (25 rules, RDKit-compatible)
+  • scaffold     - Murcko scaffolds and frameworks (scaffold trees, generic frameworks)
+  • render       - 2D visualization (SVG/PNG, substructure highlighting)
+  • bulk         - Batch operations (SMARTS matching, similarity, drug-likeness)
 
 VS CODE INTEGRATION:
   Add to .vscode/mcp.json:
@@ -89,7 +90,7 @@ For detailed integration guides, see:
   process.exit(0);
 }
 
-const VERSION = "0.1.8";
+const VERSION = "0.1.9";
 
 // Create MCP server
 const mcpServer = new McpServer({
@@ -208,15 +209,16 @@ function startHttpServer() {
     console.log(`🔌 MCP endpoints:`);
     console.log(`   • http://localhost:${PORT}/mcp`);
     console.log(`   • http://localhost:${PORT}/mcp/sse`);
-    console.log(`\n🧪 Available tools (8 total):`);
-    console.log(`   • analyze      - Complete molecular analysis`);
-    console.log(`   • compare      - Similarity comparison`);
-    console.log(`   • search       - Substructure matching`);
-    console.log(`   • render       - 2D visualization (SVG/PNG)`);
-    console.log(`   • convert      - Format conversion`);
-    console.log(`   • identifiers  - InChI/InChIKey generation`);
-    console.log(`   • tautomers    - Tautomer enumeration`);
-    console.log(`   • fileConvert  - MOL/SDF conversion`);
+    console.log(`\n🧪 Available tools (9 total):`);
+    console.log(`   • parse        - Universal parser (SMILES, IUPAC, MOL, SDF)`);
+    console.log(`   • analyze      - Comprehensive properties (40+ descriptors)`);
+    console.log(`   • compare      - Side-by-side comparison (fingerprints, similarity)`);
+    console.log(`   • search       - Substructure matching (SMARTS patterns)`);
+    console.log(`   • identifiers  - Standard identifiers (InChI, InChIKey, IUPAC)`);
+    console.log(`   • tautomers    - Tautomer enumeration and scoring`);
+    console.log(`   • scaffold     - Murcko scaffolds and frameworks`);
+    console.log(`   • render       - 2D visualization (SVG/PNG, highlighting)`);
+    console.log(`   • bulk         - Batch operations (matching, similarity, filtering)`);
     console.log(`\n💡 To connect Claude Desktop, add to config:`);
     console.log(`   ~/Library/Application Support/Claude/claude_desktop_config.json`);
     console.log(`\n   {`);
