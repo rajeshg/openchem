@@ -1,6 +1,6 @@
 {
   "name": "openchem",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "description": "A fast TypeScript / JavaScript chemistry toolkit for working with molecular structures: parsing & generation (SMILES, MOL, SDF), canonicalization, pattern matching (SMARTS), 2D rendering, and molecular descriptors.",
   "author": "rajeshg",
   "license": "MIT",
@@ -33,7 +33,6 @@
       "default": "./dist/index.js"
     }
   },
-
   "files": [
     "dist",
     "README.md",
@@ -61,7 +60,6 @@
   "peerDependencies": {
     "typescript": "^5.9.3"
   },
-
   "publishConfig": {
     "access": "public"
   },
