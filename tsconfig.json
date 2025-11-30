@@ -27,7 +27,8 @@
        "src/*": ["src/*"],
        "test/*": ["test/*"],
        "types": ["types.ts"],
-       "index": ["index.ts"]
+       "index": ["index.ts"],
+       "openchem": ["index.ts"]
      }
    },
    "exclude": [
