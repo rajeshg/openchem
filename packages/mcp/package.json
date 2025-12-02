@@ -1,6 +1,6 @@
 {
   "name": "@openchem/mcp",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Model Context Protocol (MCP) server for OpenChem - AI assistant integration for chemistry analysis",
   "author": "rajeshg",
   "license": "MIT",
@@ -48,11 +48,11 @@
     "zod": "^4.1.13"
   },
   "peerDependencies": {
-    "openchem": ">=0.2.13"
+    "openchem": ">=0.2.15"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "openchem": "^0.2.13",
+    "openchem": "^0.2.15",
     "typescript": "^5.9.3"
   },
   "publishConfig": {

@@ -5,6 +5,27 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.15] - 2025-12-02
+
+### Improved
+- **SVG rendering follows skeletal formula conventions**
+  - Carbon atoms are now implicit (no "C" labels) at vertices and endpoints
+  - Heteroatom labels combine with hydrogens (e.g., "OH" instead of separate "O" and "H")
+  - Use `showCarbonLabels: true` option to explicitly show carbon labels if needed
+
+### Changed
+- **Coordinate generator refactored to rigid-unit architecture**
+  - Better handling of polycyclic and bridged ring systems
+  - Improved bond length uniformity for fused aromatics (100% for naphthalene, pyrene, coronene)
+  - Bridged bicyclics (camphor, pinene) now have realistic 2D projections
+- **API rename**: `generateCoordinatesV2` → `generateCoordinatesMap` for clarity
+  - `generateCoordinates` returns `Array<{x, y}>` (main public API)
+  - `generateCoordinatesMap` returns `Map<number, Vec2>` (internal use)
+
+### Removed
+- Obsolete coordinate generation modules (replaced by rigid-unit architecture)
+- Development scripts for SVG debugging
+
 ## [0.2.14] - 2025-11-30
 
 ### Added
