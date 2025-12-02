@@ -1,55 +1,48 @@
 /**
- * Coordinate Generator v2 - Main Pipeline
+ * Coordinate Generator - Rigid Unit Architecture
  *
- * Canonicalization-independent 2D coordinate generation with:
- * - Ring system detection and placement
- * - Substituent attachment
- * - Force-directed relaxation
- * - Overlap resolution
+ * High-quality 2D coordinate generation using rigid unit placement:
+ * - Ring systems placed with perfect geometry (regular polygons)
+ * - Rigid body optimization preserves internal geometry
+ * - DOF-based minimization for optimal layout
  *
  * Usage:
- *   const coords = generateCoordinatesV2(molecule);
- *   // coords is Map<atomId, {x, y}>
+ *   const coords = generateCoordinates(molecule);
+ *   // coords is Array<{x, y}> indexed by atom ID
  */
 
 import type { Molecule } from "types";
 import type { Vec2, Ring } from "./types";
 import { DEFAULT_COORDINATE_OPTIONS } from "./types";
 import { detectFusedRingSystems } from "./ring-system-detector";
-import { placeFusedRingSystem } from "./fused-ring-placer";
-import { attachSubstituents } from "./substituent-placer";
-import { relaxCoordinates } from "./constrained-relaxer";
 import { resolveOverlaps } from "./overlap-resolver";
-import { normalizeBondLengths } from "./geometry-utils";
 import { optimizeMolecularOrientation } from "./orientation-optimizer";
-import { findMatchingTemplate, applyTemplate } from "./polycyclic-templates";
+import { detectRigidUnits } from "./rigid-unit-detector";
+import { placeRigidUnits } from "./rigid-unit-placer";
+import { minimizeRigidBodies } from "./rigid-body-minimizer";
+import { relaxBridgedSystems } from "./bridged-relaxer";
 
 export interface GenerateOptions {
   bondLength?: number;
-  relaxIterations?: number;
   resolveOverlapsEnabled?: boolean;
-  lockRingAtoms?: boolean;
   overlapResolutionIterations?: number;
   optimizeOrientation?: boolean;
-  normalizeBondLengths?: boolean;
-  useTemplates?: boolean; // Use pre-computed templates for known scaffolds
 }
 
 /**
  * Generate 2D coordinates for molecule atoms with uniform bond lengths.
  *
- * This is the primary coordinate generation algorithm that produces
- * professional-quality 2D structures with uniform bond lengths throughout
- * the entire molecule.
+ * Uses the rigid unit architecture for high-quality coordinate generation:
+ * 1. Detect rigid units (ring systems, chains)
+ * 2. Place each unit with perfect geometry (regular polygons for rings)
+ * 3. Optimize unit positions using DOF-based minimization
+ * 4. Resolve any remaining overlaps
+ * 5. Optimize molecular orientation (rotate to canonical view)
  *
- * Algorithm:
- * 1. Detect ring systems (fused, spiro, bridged)
- * 2. Place ring systems with correct geometry
- * 3. Attach substituents via BFS
- * 4. Apply force-directed relaxation
- * 5. Resolve any remaining overlaps
- * 6. Normalize all bond lengths for uniformity (critical step for SVG rendering)
- * 7. Optimize molecular orientation (rotate to canonical view)
+ * Benefits:
+ * - Perfect ring geometry (always regular polygons)
+ * - Atoms within a unit never move relative to each other
+ * - Consistent, professional-quality structures
  *
  * @param molecule - Molecule to generate coordinates for
  * @param options - Generation options
@@ -60,200 +53,51 @@ export function generateCoordinates(
   options: GenerateOptions = {},
 ): Array<{ x: number; y: number }> {
   const bondLength = options.bondLength ?? DEFAULT_COORDINATE_OPTIONS.bondLength;
-  const relaxIterations = options.relaxIterations ?? 0; // No relaxation to preserve terminal atom placement
-  const resolveOverlapsEnabled = options.resolveOverlapsEnabled ?? true;
-  const lockRingAtoms = options.lockRingAtoms ?? true;
-  const overlapResolutionIterations = options.overlapResolutionIterations ?? 100;
   const optimizeOrientation = options.optimizeOrientation ?? true;
-
-  // Initialize coordinate map
-  const coords = new Map<number, Vec2>();
+  const resolveOverlapsEnabled = options.resolveOverlapsEnabled ?? true;
 
   // Step 1: Convert molecule rings to Ring[] format
   const rings: Ring[] = (molecule.rings ?? []).map((atomIds, idx) => ({
     id: idx,
     atomIds: [...atomIds],
     size: atomIds.length,
-    aromatic: atomIds.some((id) => molecule.atoms[id]?.aromatic ?? false),
+    aromatic: atomIds.every((id) => molecule.atoms[id]?.aromatic ?? false),
   }));
 
   // Step 2: Detect ring systems
   const ringSystems = detectFusedRingSystems(rings, molecule);
 
-  // Track which atoms are in rings
-  const ringAtomIds = new Set<number>();
-  for (const system of ringSystems) {
-    for (const ring of system.rings) {
-      for (const atomId of ring.atomIds) {
-        ringAtomIds.add(atomId);
-      }
-    }
-  }
+  // Step 3: Detect rigid units
+  const rigidGraph = detectRigidUnits(molecule, ringSystems);
 
-  // Step 3: Place ring systems
-  // Track which systems have been placed
-  const placedSystems = new Set<number>();
+  // Step 4: Place rigid units with perfect geometry
+  const placement = placeRigidUnits(rigidGraph, molecule, { bondLength });
+  const coords = placement.coords;
 
-  const useTemplates = options.useTemplates ?? false; // Templates disabled by default (atom mapping needs graph isomorphism)
-
-  for (const system of ringSystems) {
-    let systemCoords: Map<number, Vec2>;
-
-    // Try template-based placement first (if enabled)
-    if (useTemplates) {
-      const template = findMatchingTemplate(system, molecule);
-      if (template) {
-        systemCoords = applyTemplate(template, system, bondLength, molecule);
-      } else {
-        // No template found, fall back to standard placement
-        systemCoords = placeFusedRingSystem(system, molecule, bondLength);
-      }
-    } else {
-      // Templates disabled, use standard placement
-      systemCoords = placeFusedRingSystem(system, molecule, bondLength);
-    }
-
-    // Check if this system is connected to an already-placed system via a bond
-    let connectedToPlaced = false;
-    let connectingBond: {
-      from: number;
-      to: number;
-      fromCoord?: Vec2;
-      toCoord?: Vec2;
-    } | null = null;
-
-    if (placedSystems.size > 0) {
-      // Check all bonds to see if any connect this system to a placed system
-      for (const bond of molecule.bonds) {
-        const fromInCurrent = system.atomIds.has(bond.atom1);
-        const toInCurrent = system.atomIds.has(bond.atom2);
-        const fromInPlaced = coords.has(bond.atom1);
-        const toInPlaced = coords.has(bond.atom2);
-
-        // Bond connects current system to already-placed system
-        if (fromInCurrent && toInPlaced) {
-          connectedToPlaced = true;
-          connectingBond = {
-            from: bond.atom2, // already placed atom
-            to: bond.atom1, // atom in current system
-            fromCoord: coords.get(bond.atom2),
-            toCoord: systemCoords.get(bond.atom1),
-          };
-          break;
-        } else if (toInCurrent && fromInPlaced) {
-          connectedToPlaced = true;
-          connectingBond = {
-            from: bond.atom1, // already placed atom
-            to: bond.atom2, // atom in current system
-            fromCoord: coords.get(bond.atom1),
-            toCoord: systemCoords.get(bond.atom2),
-          };
-          break;
-        }
-      }
-    }
-
-    // If connected, position the system relative to the connecting bond
-    if (connectedToPlaced && connectingBond?.fromCoord && connectingBond?.toCoord) {
-      // Calculate angle from 'to' atom in system to center of system
-      const centerX =
-        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.x, 0) / systemCoords.size;
-      const centerY =
-        Array.from(systemCoords.values()).reduce((sum, c) => sum + c.y, 0) / systemCoords.size;
-
-      const angle = Math.atan2(
-        centerY - connectingBond.toCoord.y,
-        centerX - connectingBond.toCoord.x,
-      );
-
-      // Position the system so the connecting atom is at bond-length distance
-      const targetX = connectingBond.fromCoord.x + bondLength * Math.cos(angle);
-      const targetY = connectingBond.fromCoord.y + bondLength * Math.sin(angle);
-
-      // Calculate translation
-      const dx = targetX - connectingBond.toCoord.x;
-      const dy = targetY - connectingBond.toCoord.y;
-
-      // Translate all atoms in this system
-      for (const coord of systemCoords.values()) {
-        coord.x += dx;
-        coord.y += dy;
-      }
-    }
-
-    // Merge system coords into main coords map
-    for (const [atomId, coord] of systemCoords.entries()) {
-      coords.set(atomId, coord);
-    }
-
-    placedSystems.add(system.id);
-  }
-
-  // Step 4: Handle molecules with no rings (acyclic molecules)
-  if (ringAtomIds.size === 0 && molecule.atoms.length > 0) {
-    // Place first atom at origin
-    coords.set(0, { x: 0, y: 0 });
-    ringAtomIds.add(0); // Seed the BFS from first atom
-  }
-
-  // Step 5: Attach substituents (non-ring atoms)
-  attachSubstituents(molecule, coords, ringAtomIds, bondLength);
-
-  // Step 6: Apply force-directed relaxation
-  relaxCoordinates(molecule, coords, ringAtomIds, bondLength, {
-    iterations: relaxIterations,
-    lockRingAtoms,
+  // Step 5: Optimize unit positions using DOF-based minimization
+  minimizeRigidBodies(rigidGraph, molecule, coords, {
+    bondLength,
+    rotationSteps: 12,
+    tryFlips: true,
+    refinementIterations: 50,
   });
 
-  // Step 7: Resolve overlaps (if enabled)
-  if (resolveOverlapsEnabled) {
-    resolveOverlaps(molecule, coords, bondLength, {
-      maxIterations: overlapResolutionIterations,
-    });
-  }
+  // Step 5.5: Relax bridged systems (they need special handling)
+  relaxBridgedSystems(rigidGraph, molecule, coords, bondLength);
 
-  // Step 8: Auto-detect complex polycyclic molecules for special handling
-  // Complex molecules have bridgehead atoms (atoms in 3+ rings)
-  let hasComplexRingSystem = false;
-  if (molecule.rings && molecule.rings.length >= 3) {
-    for (const ring of molecule.rings) {
-      // Check if any atom in ring is part of 3+ rings (bridgehead atom)
-      for (const atomId of ring) {
-        let ringCount = 0;
-        for (const r of molecule.rings) {
-          if (r.includes(atomId)) ringCount++;
-        }
-        if (ringCount >= 3) {
-          hasComplexRingSystem = true;
-          break;
-        }
-      }
-      if (hasComplexRingSystem) break;
+  // Step 6: Resolve any remaining overlaps
+  if (resolveOverlapsEnabled) {
+    for (let pass = 0; pass < 3; pass++) {
+      const hadOverlaps = resolveOverlaps(molecule, coords, bondLength, {
+        maxIterations: 50,
+        minDistance: 0.35,
+        pushFactor: 0.2,
+      });
+      if (!hadOverlaps) break;
     }
   }
 
-  // Step 9: Force-field angle optimization for complex polycyclic systems (EXPERIMENTAL)
-  // DISABLED: Rotating atoms to fix angles breaks bond connectivity with other atoms
-  // The approach needs constraint-aware optimization that respects all bonds simultaneously
-  // Future work: implement full force-field minimization with bond length + angle constraints
-  // if (needsOptimization(molecule)) {
-  //   optimizeCoordinates(molecule, coords, bondLength, {
-  //     maxIterations: 100,
-  //     stepSize: 0.1,
-  //     tolerance: 0.01,
-  //   });
-  // }
-
-  // Step 10: Normalize all bond lengths to enforce uniformity (optional)
-  // Note: Disabling this allows better angle preservation in complex ring systems
-  // For complex polycyclic molecules, default to flexible bonds for better ring geometry
-  const shouldNormalizeBondLengths = options.normalizeBondLengths ?? !hasComplexRingSystem;
-  if (shouldNormalizeBondLengths) {
-    normalizeBondLengths(molecule.bonds, coords, bondLength);
-  }
-
-  // Step 11: Optimize molecular orientation for canonical view
-  // Rotate molecule to match chemical drawing conventions (horizontal rings, etc.)
+  // Step 7: Optimize molecular orientation
   if (optimizeOrientation) {
     optimizeMolecularOrientation(molecule, ringSystems, coords);
   }
@@ -265,7 +109,6 @@ export function generateCoordinates(
     if (coord) {
       coordsArray[atom.id] = { x: coord.x, y: coord.y };
     } else {
-      // Fallback: place at origin if coordinate missing
       coordsArray[atom.id] = { x: 0, y: 0 };
     }
   }
@@ -274,12 +117,11 @@ export function generateCoordinates(
 }
 
 /**
- * Generate 2D coordinates as Map format (for advanced use cases).
- * Most users should use `generateCoordinates` instead.
- *
- * @internal
+ * Generate 2D coordinates as Map format.
+ * Used internally by helper functions like hasOverlaps, centerCoordinates, etc.
+ * Most users should use `generateCoordinates` instead which returns an array.
  */
-export function generateCoordinatesV2(
+export function generateCoordinatesMap(
   molecule: Molecule,
   options: GenerateOptions = {},
 ): Map<number, Vec2> {
@@ -393,8 +235,9 @@ export function scaleCoordinates(
  * Export all public APIs
  */
 export { detectFusedRingSystems } from "./ring-system-detector";
-export { placeFusedRingSystem } from "./fused-ring-placer";
-export { attachSubstituents } from "./substituent-placer";
-export { relaxCoordinates } from "./constrained-relaxer";
 export { resolveOverlaps, hasOverlaps, getOverlapStats } from "./overlap-resolver";
+export { detectRigidUnits, getPlacementOrder } from "./rigid-unit-detector";
+export { placeRigidUnits } from "./rigid-unit-placer";
+export { minimizeRigidBodies } from "./rigid-body-minimizer";
 export type { Vec2, CoordinateOptions, Ring, RingSystem } from "./types";
+export type { RigidUnit, RigidUnitGraph } from "./rigid-unit-detector";

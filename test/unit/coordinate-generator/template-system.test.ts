@@ -1,18 +1,15 @@
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "src/parsers/smiles-parser";
 import { generateCoordinates } from "src/generators/coordinate-generator";
-import { findMatchingTemplate } from "src/generators/coordinate-generator/polycyclic-templates";
-import { detectFusedRingSystems } from "src/generators/coordinate-generator/ring-system-detector";
 
-describe("Template System with Graph Isomorphism", () => {
-  it("should correctly map naphthalene atoms using connectivity", () => {
+describe("Fused Ring System Coordinate Generation", () => {
+  it("should correctly generate coordinates for naphthalene", () => {
     const result = parseSMILES("c1ccc2ccccc2c1");
     expect(result.errors).toHaveLength(0);
     const molecule = result.molecules[0]!;
     expect(molecule.atoms).toHaveLength(10);
 
-    // Generate coordinates with templates enabled
-    const coords = generateCoordinates(molecule, { useTemplates: true });
+    const coords = generateCoordinates(molecule);
 
     // All atoms should have coordinates
     expect(coords.length).toBeGreaterThanOrEqual(10);
@@ -38,7 +35,7 @@ describe("Template System with Graph Isomorphism", () => {
     const result = parseSMILES("c1ccc2ccccc2c1"); // Naphthalene
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinates(molecule, { useTemplates: true });
+    const coords = generateCoordinates(molecule);
 
     // Count unique coordinate positions (filter out undefined)
     const definedCoords = coords.filter((c) => c !== undefined);
@@ -48,40 +45,11 @@ describe("Template System with Graph Isomorphism", () => {
     expect(coordSet.size).toBe(10);
   });
 
-  it("should correctly identify template matches", () => {
-    const testCases = [
-      { smiles: "c1ccc2ccccc2c1", expectedTemplate: "naphthalene" },
-      { smiles: "c1ccc2cc3ccccc3cc2c1", expectedTemplate: "anthracene" },
-      { smiles: "c1ccc2c(c1)ccc1ccccc12", expectedTemplate: "phenanthrene" },
-      { smiles: "c1ccc2c(c1)[nH]c1ccccc12", expectedTemplate: "carbazole" },
-      { smiles: "c1ccc2c(c1)oc1ccccc12", expectedTemplate: "benzofuran" },
-    ];
-
-    for (const { smiles, expectedTemplate } of testCases) {
-      const result = parseSMILES(smiles);
-      const molecule = result.molecules[0]!;
-      const rings =
-        molecule.rings?.map((atomIds, idx) => ({
-          id: idx,
-          atomIds: [...atomIds],
-          size: atomIds.length,
-          aromatic: atomIds.some((id) => molecule.atoms[id]?.aromatic ?? false),
-        })) ?? [];
-
-      const systems = detectFusedRingSystems(rings, molecule);
-      expect(systems.length).toBeGreaterThan(0);
-
-      const template = findMatchingTemplate(systems[0]!, molecule);
-      expect(template).not.toBeNull();
-      expect(template?.name).toBe(expectedTemplate);
-    }
-  });
-
-  it("should maintain bond connectivity with template application", () => {
+  it("should maintain bond connectivity with fused ring systems", () => {
     const result = parseSMILES("c1ccc2cc3ccccc3cc2c1"); // Anthracene
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinates(molecule, { useTemplates: true });
+    const coords = generateCoordinates(molecule);
 
     // Verify all bonds connect properly placed atoms
     for (const bond of molecule.bonds) {
@@ -95,12 +63,12 @@ describe("Template System with Graph Isomorphism", () => {
       expect(coord2!.x).toBeDefined();
       expect(coord2!.y).toBeDefined();
 
-      // Bond length should be reasonable (20-40Å for default 30Å bonds)
+      // Bond length should be reasonable (25-45 for default 35 bonds)
       const dx = coord1!.x - coord2!.x;
       const dy = coord1!.y - coord2!.y;
       const length = Math.sqrt(dx * dx + dy * dy);
-      expect(length).toBeGreaterThan(20);
-      expect(length).toBeLessThan(40);
+      expect(length).toBeGreaterThan(25);
+      expect(length).toBeLessThan(45);
     }
   });
 
@@ -108,7 +76,7 @@ describe("Template System with Graph Isomorphism", () => {
     const result = parseSMILES("c1ccc2c(c1)[nH]c1ccccc12"); // Carbazole
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinates(molecule, { useTemplates: true });
+    const coords = generateCoordinates(molecule);
 
     // Find the nitrogen atom
     const nitrogenAtom = molecule.atoms.find((a) => a.symbol === "N");
@@ -126,27 +94,27 @@ describe("Template System with Graph Isomorphism", () => {
     expect(nBonds).toHaveLength(2);
   });
 
-  it("should produce valid coordinates for all template molecules", () => {
-    const templateMolecules = [
+  it("should produce valid coordinates for all fused ring molecules", () => {
+    const fusedMolecules = [
       "c1ccc2ccccc2c1", // Naphthalene
       "c1ccc2cc3ccccc3cc2c1", // Anthracene
       "c1ccc2c(c1)ccc1ccccc12", // Phenanthrene
       "c1cc2ccc3cccc4ccc(c1)c2c34", // Pyrene
       "c1ccc2c(c1)Cc1ccccc1-2", // Fluorene
       "c1ccc2c(c1)[nH]c1ccccc12", // Carbazole
-      "c1ccc2c(c1)oc1ccccc12", // Benzofuran
-      "c1ccc2c(c1)sc1ccccc12", // Benzothiophene
+      "c1ccc2c(c1)oc1ccccc12", // Benzofuran (fused)
+      "c1ccc2c(c1)sc1ccccc12", // Benzothiophene (fused)
       "c1ccc2c(c1)nccc2", // Quinoline
       "c1ccc2c(c1)cc[nH]2", // Indole
       "c1nc2ncnc2[nH]1", // Purine
     ];
 
-    for (const smiles of templateMolecules) {
+    for (const smiles of fusedMolecules) {
       const result = parseSMILES(smiles);
       expect(result.errors).toHaveLength(0);
       const molecule = result.molecules[0]!;
 
-      const coords = generateCoordinates(molecule, { useTemplates: true });
+      const coords = generateCoordinates(molecule);
 
       // All atoms should have valid coordinates
       const definedCoords = coords.filter((c) => c !== undefined);
@@ -155,13 +123,13 @@ describe("Template System with Graph Isomorphism", () => {
     }
   });
 
-  it("should fall back to BFS when no template matches", () => {
-    const result = parseSMILES("C1CCCCC1"); // Cyclohexane (no template)
+  it("should handle simple cyclic structures", () => {
+    const result = parseSMILES("C1CCCCC1"); // Cyclohexane
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinates(molecule, { useTemplates: true });
+    const coords = generateCoordinates(molecule);
 
-    // Should still generate valid coordinates
+    // Should generate valid coordinates
     const definedCoords = coords.filter((c) => c !== undefined);
     expect(definedCoords.length).toBe(molecule.atoms.length);
   });
@@ -172,7 +140,6 @@ describe("Template System with Graph Isomorphism", () => {
 
     const customBondLength = 25;
     const coords = generateCoordinates(molecule, {
-      useTemplates: true,
       bondLength: customBondLength,
     });
 
@@ -186,6 +153,6 @@ describe("Template System with Graph Isomorphism", () => {
     });
 
     const avgLength = bondLengths.reduce((a, b) => a + b, 0) / bondLengths.length;
-    expect(Math.abs(avgLength - customBondLength)).toBeLessThan(2); // Within 2Å tolerance
+    expect(Math.abs(avgLength - customBondLength)).toBeLessThan(2); // Within 2 tolerance
   });
 });

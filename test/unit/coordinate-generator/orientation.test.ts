@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from "bun:test";
 import { parseSMILES } from "index";
-import { generateCoordinatesV2 } from "src/generators/coordinate-generator";
+import { generateCoordinatesMap } from "src/generators/coordinate-generator";
 
 function getAspectRatio(coords: Map<number, { x: number; y: number }>): number {
   if (coords.size === 0) return 1.0;
@@ -39,7 +39,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccc2ccccc2c1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Naphthalene should be horizontal (width > height)
@@ -50,7 +50,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccc2cc3ccccc3cc2c1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Anthracene (3 linear rings) should be very horizontal
@@ -61,7 +61,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccc2cc3cc4ccccc4cc3cc2c1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Tetracene (4 linear rings) should be extremely horizontal
@@ -74,7 +74,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccc2ccccc2c1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       expect(aspectRatio).toBeGreaterThan(1.2);
@@ -86,7 +86,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccccc1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Benzene should be roughly square (aspect ratio near 1.0)
@@ -98,7 +98,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("C1CCCCC1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       expect(aspectRatio).toBeGreaterThan(0.7);
@@ -109,7 +109,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("C1CCCC1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Cyclopentane (pentagon) should have height >= width (point-top)
@@ -122,7 +122,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("CCCCCC");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // n-hexane should be horizontal (width > height), possibly perfectly horizontal (Infinity)
@@ -133,7 +133,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("CCCCCCCC");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // n-octane should be even more horizontal, possibly perfectly horizontal (Infinity)
@@ -144,7 +144,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("CCCCCCCCCC");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // n-decane should be very horizontal, possibly perfectly horizontal (Infinity)
@@ -157,7 +157,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("Cc1ccccc1");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Toluene (benzene + methyl) should be roughly square to slightly horizontal
@@ -169,7 +169,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("CC(=O)Oc1ccccc1C(=O)O");
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Aspirin should be horizontally oriented
@@ -187,7 +187,7 @@ describe("Molecular Orientation Optimization", () => {
       for (const smiles of smilesList) {
         const result = parseSMILES(smiles);
         const mol = result.molecules[0]!;
-        const coords = generateCoordinatesV2(mol);
+        const coords = generateCoordinatesMap(mol);
         aspectRatios.push(getAspectRatio(coords));
       }
 
@@ -204,7 +204,7 @@ describe("Molecular Orientation Optimization", () => {
       for (const smiles of smilesList) {
         const result = parseSMILES(smiles);
         const mol = result.molecules[0]!;
-        const coords = generateCoordinatesV2(mol);
+        const coords = generateCoordinatesMap(mol);
         const aspectRatio = getAspectRatio(coords);
 
         // All should be horizontal
@@ -218,7 +218,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("c1ccc2cc3ccccc3cc2c1"); // Anthracene
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // After optimization, anthracene should be horizontal
@@ -229,7 +229,7 @@ describe("Molecular Orientation Optimization", () => {
       const result = parseSMILES("C1C2CC3CC1CC(C2)C3"); // Adamantane
       const mol = result.molecules[0]!;
 
-      const coords = generateCoordinatesV2(mol);
+      const coords = generateCoordinatesMap(mol);
       const aspectRatio = getAspectRatio(coords);
 
       // Adamantane is compact, should be roughly square
@@ -244,7 +244,7 @@ describe("Molecular Orientation Optimization", () => {
       const mol = result.molecules[0]!;
 
       // Generate with optimization disabled
-      const coords = generateCoordinatesV2(mol, { optimizeOrientation: false });
+      const coords = generateCoordinatesMap(mol, { optimizeOrientation: false });
 
       // Should still generate valid coordinates
       expect(coords.size).toBe(10);

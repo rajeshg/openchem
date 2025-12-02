@@ -85,7 +85,7 @@ export function detectMoleculeType(
  * A linear system has each ring connected to at most 2 other rings,
  * and the rings form a chain (not a branched tree).
  */
-function checkLinearFusion(system: RingSystem, coords: Map<number, Vec2>): boolean {
+function checkLinearFusion(system: RingSystem, _coords: Map<number, Vec2>): boolean {
   if (system.rings.length < 3) return false;
 
   // Build adjacency graph of rings
@@ -118,9 +118,9 @@ function checkLinearFusion(system: RingSystem, coords: Map<number, Vec2>): boole
     else return false; // Branched or cyclic
   }
 
-  // Aspect ratio check: linear systems should be elongated
-  const aspectRatio = getAspectRatio(coords);
-  return endCount === 2 && aspectRatio > 1.3;
+  // Linear topology: exactly 2 ends (first and last ring in chain)
+  // Don't check aspect ratio here - it may be wrong before orientation optimization
+  return endCount === 2;
 }
 
 /**
@@ -227,10 +227,15 @@ export function determineTargetOrientation(
       return 0;
 
     case "branched-chain":
-    case "compact":
-    default:
-      // No strong preference: align principal axis horizontally
       return 0;
+
+    case "compact":
+    default: {
+      // For compact molecules (bridged polycyclics like morphine, codeine),
+      // use principal axis alignment to achieve horizontal orientation.
+      // Don't force aromatic ring positioning - let natural placement work.
+      return 0; // Target horizontal principal axis
+    }
   }
 }
 

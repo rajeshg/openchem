@@ -61,12 +61,26 @@ function parseSingleSMILES(
     return `${min}-${max}`;
   };
 
+  // Helper to determine effective bond type based on aromaticity
+  // Per OpenSMILES: implicit bonds between aromatic atoms are aromatic
+  const getEffectiveBondType = (
+    explicit: boolean,
+    explicitType: BondType,
+    prevAromatic: boolean,
+    currAromatic: boolean,
+  ): BondType => {
+    if (explicit) return explicitType;
+    if (prevAromatic && currAromatic) return BondType.AROMATIC;
+    return BondType.SINGLE;
+  };
+
   let i = 0;
   let prevAtomId: number | null = null;
+  let prevAtomAromatic = false;
   let pendingBondType = BondType.SINGLE;
   let pendingBondStereo = StereoType.NONE;
   let pendingBondExplicit = false;
-  const branchStack: number[] = [];
+  const branchStack: { atomId: number; aromatic: boolean }[] = [];
   const bookmarks = new Map<
     number,
     {
@@ -74,6 +88,7 @@ function parseSingleSMILES(
       bondType: BondType;
       bondStereo: StereoType;
       explicit: boolean;
+      aromatic: boolean;
     }[]
   >();
 
@@ -108,27 +123,41 @@ function parseSingleSMILES(
         continue;
       }
       atoms.push(atom);
+      const currAromatic = atom.aromatic;
       if (prevAtomId !== null) {
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          prevAtomAromatic,
+          currAromatic,
+        );
         bonds.push({
           atom1: prevAtomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
         if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          bp.aromatic,
+          currAromatic,
+        );
         bonds.push({
-          atom1: bp,
+          atom1: bp.atomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit) explicitBonds.add(bondKey(bp, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(bp.atomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       }
       prevAtomId = atom.id;
+      prevAtomAromatic = currAromatic;
       pendingBondType = BondType.SINGLE;
       pendingBondExplicit = false;
       continue;
@@ -138,27 +167,41 @@ function parseSingleSMILES(
     if (ch === "*") {
       const atom = createAtom("*", atomId++, false, false, 0) as MutableAtom;
       atoms.push(atom);
+      const currAromatic = false; // Wildcard is not aromatic by default
       if (prevAtomId !== null) {
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          prevAtomAromatic,
+          currAromatic,
+        );
         bonds.push({
           atom1: prevAtomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
         if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          bp.aromatic,
+          currAromatic,
+        );
         bonds.push({
-          atom1: bp,
+          atom1: bp.atomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit) explicitBonds.add(bondKey(bp, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(bp.atomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       }
       prevAtomId = atom.id;
+      prevAtomAromatic = currAromatic;
       pendingBondType = BondType.SINGLE;
       pendingBondExplicit = false;
       i++;
@@ -196,8 +239,8 @@ function parseSingleSMILES(
         continue;
       }
       const isAromaticOrganic = /^[bcnops]$/.test(symbol);
-      const aromatic = isAromaticOrganic;
-      const atom = createAtom(symbol, atomId++, aromatic, false, 0) as MutableAtom | null;
+      const currAromatic = isAromaticOrganic;
+      const atom = createAtom(symbol, atomId++, currAromatic, false, 0) as MutableAtom | null;
       if (!atom) {
         errors.push({ message: `Unknown atom symbol: ${symbol}`, position: i });
         i++;
@@ -205,26 +248,39 @@ function parseSingleSMILES(
       }
       atoms.push(atom);
       if (prevAtomId !== null) {
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          prevAtomAromatic,
+          currAromatic,
+        );
         bonds.push({
           atom1: prevAtomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
         if (pendingBondExplicit) explicitBonds.add(bondKey(prevAtomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       } else if (branchStack.length > 0) {
         const bp = branchStack[branchStack.length - 1]!;
+        const effectiveType = getEffectiveBondType(
+          pendingBondExplicit,
+          pendingBondType,
+          bp.aromatic,
+          currAromatic,
+        );
         bonds.push({
-          atom1: bp,
+          atom1: bp.atomId,
           atom2: atom.id,
-          type: pendingBondType,
+          type: effectiveType,
           stereo: pendingBondStereo,
         });
-        if (pendingBondExplicit) explicitBonds.add(bondKey(bp, atom.id));
+        if (pendingBondExplicit) explicitBonds.add(bondKey(bp.atomId, atom.id));
         pendingBondStereo = StereoType.NONE;
       }
       prevAtomId = atom.id;
+      prevAtomAromatic = currAromatic;
       pendingBondType = BondType.SINGLE;
       pendingBondExplicit = false;
       i++;
@@ -277,7 +333,7 @@ function parseSingleSMILES(
 
     // Branching
     if (ch === "(") {
-      branchStack.push(prevAtomId!);
+      branchStack.push({ atomId: prevAtomId!, aromatic: prevAtomAromatic });
       prevAtomId = null;
       i++;
       continue;
@@ -286,7 +342,9 @@ function parseSingleSMILES(
       if (branchStack.length === 0) {
         errors.push({ message: "Unmatched closing parenthesis", position: i });
       } else {
-        prevAtomId = branchStack.pop()!;
+        const bp = branchStack.pop()!;
+        prevAtomId = bp.atomId;
+        prevAtomAromatic = bp.aromatic;
       }
       i++;
       continue;
@@ -307,6 +365,7 @@ function parseSingleSMILES(
           bondType: pendingBondType,
           bondStereo: pendingBondStereo,
           explicit: pendingBondExplicit,
+          aromatic: prevAtomAromatic,
         });
         bookmarks.set(d, list);
         i++;
@@ -333,6 +392,7 @@ function parseSingleSMILES(
           bondType: pendingBondType,
           bondStereo: pendingBondStereo,
           explicit: pendingBondExplicit,
+          aromatic: prevAtomAromatic,
         });
         bookmarks.set(d, list);
         i += 3;
@@ -407,7 +467,11 @@ function parseSingleSMILES(
         bondStereo = second.bondStereo || StereoType.NONE;
         isExplicit = second.explicit;
       } else {
-        // Both are SINGLE, check if either is explicit
+        // Both are SINGLE (implicit), check if both atoms are aromatic
+        // Per OpenSMILES: implicit bonds between aromatic atoms are aromatic
+        if (first.aromatic && second.aromatic) {
+          bondType = BondType.AROMATIC;
+        }
         isExplicit = first.explicit || second.explicit;
       }
 

@@ -17,7 +17,7 @@
     },
     "packages/mcp": {
       "name": "@openchem/mcp",
-      "version": "0.1.7",
+      "version": "0.1.9",
       "bin": {
         "openchem-mcp": "./dist/cli.js",
       },
@@ -28,11 +28,11 @@
       },
       "devDependencies": {
         "@types/node": "^24.10.1",
-        "openchem": "^0.2.12",
+        "openchem": "^0.2.13",
         "typescript": "^5.9.3",
       },
       "peerDependencies": {
-        "openchem": ">=0.2.12",
+        "openchem": ">=0.2.13",
       },
     },
   },
@@ -241,7 +241,7 @@
 
     "once": ["once@1.4.0", "", { "dependencies": { "wrappy": "1" } }, "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="],
 
-    "openchem": ["openchem@0.2.12", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-aWCgHm2ZlAAdIspjnn8r0Vh1n3d9850faV53q+sNe0APzUXC7VPtHa3Ure1gbwNfiG5LRILkE6OjouuH6gkxMQ=="],
+    "openchem": ["openchem@0.2.14", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-3sCCdY4jHU/UddwmJXkuV7g7SdQIF9g8dYyOFXEk1QFRMen7i77H+A21pbuGNDpUT/OEKCmuGUBTL2bg53wpWg=="],
 
     "parseurl": ["parseurl@1.3.3", "", {}, "sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ=="],
 

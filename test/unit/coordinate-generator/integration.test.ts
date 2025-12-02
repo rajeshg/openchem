@@ -6,7 +6,7 @@
 import { describe, test, expect } from "bun:test";
 import { parseSMILES } from "index";
 import {
-  generateCoordinatesV2,
+  generateCoordinatesMap,
   hasValidCoordinates,
   getBoundingBox,
   centerCoordinates,
@@ -19,7 +19,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(2);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -37,7 +37,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(5);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -49,7 +49,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(6);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -68,7 +68,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(6);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -80,7 +80,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(10);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -97,7 +97,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(4);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -109,7 +109,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(14);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -121,7 +121,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(7);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -133,7 +133,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(10);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -144,7 +144,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     const result = parseSMILES("c1ccccc1");
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
     centerCoordinates(coords);
 
     // Check that coordinates are centered around origin
@@ -158,7 +158,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     const result = parseSMILES("CC");
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule, { bondLength: 50 });
+    const coords = generateCoordinatesMap(molecule, { bondLength: 50 });
 
     const c1 = coords.get(0)!;
     const c2 = coords.get(1)!;
@@ -174,7 +174,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(12);
     expect(hasValidCoordinates(coords)).toBe(true);
@@ -186,7 +186,7 @@ describe("Coordinate Generator V2 - Integration Tests", () => {
     expect(result.errors).toEqual([]);
     const molecule = result.molecules[0]!;
 
-    const coords = generateCoordinatesV2(molecule);
+    const coords = generateCoordinatesMap(molecule);
 
     expect(coords.size).toBe(13);
     expect(hasValidCoordinates(coords)).toBe(true);

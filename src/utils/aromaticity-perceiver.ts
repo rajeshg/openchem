@@ -173,23 +173,6 @@ function countPiElectronsRDKit(
     atomBonds,
   );
 
-  // Helper to check if nitrogen has exocyclic bond to electronegative atom
-  // that prevents lone pair donation (C-N breaks aromaticity, but N-O doesn't)
-  const hasExocyclicToElectronegative = (nAtom: Atom): boolean => {
-    if (!atomMap) return false;
-    const exocyclicBonds = atomBonds.filter((b) => {
-      const otherId = b.atom1 === nAtom.id ? b.atom2 : b.atom1;
-      return !ringAtoms.has(otherId);
-    });
-    return exocyclicBonds.some((b) => {
-      const otherId = b.atom1 === nAtom.id ? b.atom2 : b.atom1;
-      const otherAtom = atomMap.get(otherId);
-      // N-O (N-oxide) and N-N can still donate lone pair, so they don't break aromaticity
-      // Only N-C (alkyl) substituents prevent lone pair donation
-      return otherAtom && ["C"].includes(otherAtom.symbol);
-    });
-  };
-
   // Helper to check if exocyclic double bond is specifically to oxygen (carbonyl/amide)
   const hasExocyclicCarbonylDouble = (): boolean => {
     const exocyclicBonds = atomBonds.filter((b) => {
@@ -249,14 +232,11 @@ function countPiElectronsRDKit(
       }
 
       // Nitrogen with 3 bonds (2 ring + 1 exocyclic)
+      // This is a pyrrolic-type nitrogen (like -NH- but with substituent)
+      // The lone pair is in the p-orbital and contributes to aromaticity
       if (bondCount === 3 && ringBonds.length === 2) {
-        // If exocyclic bond is to carbon (alkyl), nitrogen uses lone pair for bonding
-        // and contributes only 1 electron (pyridinic). Example: n-methyl imidazole
-        if (hasExocyclicToElectronegative(atom)) {
-          return 1;
-        }
-        // If exocyclic bond is to O, N, etc. (N-oxide, N-N), nitrogen can still
-        // donate lone pair and contributes 2 electrons. Example: c1nccn1O (N-oxide)
+        // Pyrrolic nitrogen with substituent always contributes 2 electrons
+        // Examples: N-methylpyrrole, N-methylimidazole (the N-CH3 nitrogen)
         return 2;
       }
 

@@ -13,9 +13,9 @@ export interface OverlapOptions {
 }
 
 const DEFAULT_OPTIONS: Required<OverlapOptions> = {
-  minDistance: 0.6, // 60% of bond length (realistic van der Waals radius)
-  maxIterations: 50,
-  pushFactor: 0.15, // Push atoms apart by 15% of overlap per iteration
+  minDistance: 0.35, // 35% of bond length - slightly above hasOverlaps threshold (0.3)
+  maxIterations: 100,
+  pushFactor: 0.2, // Push atoms apart by 20% of overlap per iteration
 };
 
 /**
@@ -52,8 +52,8 @@ export function resolveOverlaps(
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < 0.001) {
-        // Atoms at same position: push in random direction
-        const angle = Math.random() * 2 * Math.PI;
+        // Atoms at same position: push in deterministic direction based on atom IDs
+        const angle = ((atom1 * 137 + atom2 * 251) % 360) * (Math.PI / 180);
         coord1.x -= Math.cos(angle) * overlap * opts.pushFactor;
         coord1.y -= Math.sin(angle) * overlap * opts.pushFactor;
         coord2.x += Math.cos(angle) * overlap * opts.pushFactor;
@@ -77,7 +77,8 @@ export function resolveOverlaps(
 
 /**
  * Detect all atom overlaps (atoms too close together).
- * Only checks non-bonded atom pairs.
+ * Excludes bonded atoms AND 1-3 pairs (atoms connected through one intermediate).
+ * 1-3 pairs are geometrically constrained to be close due to bond angles.
  */
 function detectOverlaps(
   molecule: Molecule,
@@ -87,13 +88,33 @@ function detectOverlaps(
   const overlaps: Array<{ atom1: number; atom2: number; overlap: number }> = [];
   const atoms = Array.from(molecule.atoms);
 
-  // Build bond set for fast lookup
-  const bondSet = new Set<string>();
+  // Build adjacency list for quick lookup
+  const adjacency = new Map<number, number[]>();
+  for (const atom of molecule.atoms) {
+    adjacency.set(atom.id, []);
+  }
   for (const bond of molecule.bonds) {
-    const key1 = `${bond.atom1}-${bond.atom2}`;
-    const key2 = `${bond.atom2}-${bond.atom1}`;
-    bondSet.add(key1);
-    bondSet.add(key2);
+    adjacency.get(bond.atom1)!.push(bond.atom2);
+    adjacency.get(bond.atom2)!.push(bond.atom1);
+  }
+
+  // Build exclusion set: bonded pairs + 1-3 pairs
+  const excludedPairs = new Set<string>();
+
+  // Add directly bonded pairs
+  for (const bond of molecule.bonds) {
+    excludedPairs.add(`${bond.atom1}-${bond.atom2}`);
+    excludedPairs.add(`${bond.atom2}-${bond.atom1}`);
+  }
+
+  // Add 1-3 pairs (atoms connected through one intermediate)
+  for (const [_center, neighbors] of adjacency) {
+    for (let i = 0; i < neighbors.length; i++) {
+      for (let j = i + 1; j < neighbors.length; j++) {
+        excludedPairs.add(`${neighbors[i]}-${neighbors[j]}`);
+        excludedPairs.add(`${neighbors[j]}-${neighbors[i]}`);
+      }
+    }
   }
 
   for (let i = 0; i < atoms.length; i++) {
@@ -101,9 +122,8 @@ function detectOverlaps(
       const atom1 = atoms[i]!;
       const atom2 = atoms[j]!;
 
-      // Skip bonded atoms
-      const bondKey = `${atom1.id}-${atom2.id}`;
-      if (bondSet.has(bondKey)) continue;
+      // Skip excluded pairs
+      if (excludedPairs.has(`${atom1.id}-${atom2.id}`)) continue;
 
       const coord1 = coords.get(atom1.id);
       const coord2 = coords.get(atom2.id);

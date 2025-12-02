@@ -202,6 +202,8 @@ describe("SVG Aromatic Ring Rendering", () => {
     }
 
     const doubleBonds = bonds.filter((b) => b.paths.length === 2);
+    // With Kekulé rendering, 3 of the 6 bonds are rendered as double bonds
+    // (alternating single/double pattern like RDKit)
     expect(doubleBonds.length).toBe(3);
 
     for (const bond of doubleBonds) {
@@ -273,6 +275,7 @@ describe("SVG Aromatic Ring Rendering", () => {
     }
 
     const doubleBonds = bonds.filter((b) => b.paths.length === 2);
+    // With Kekulé rendering, 3 of the 6 bonds are rendered as double bonds
     expect(doubleBonds.length).toBe(3);
   });
 
@@ -348,10 +351,9 @@ describe("SVG Aromatic Ring Rendering", () => {
 
     const svg = result.svg;
 
+    // Oxygen with implicit hydrogen rendered as "OH" in oxygen color
     expect(svg).toContain('fill="#FF0D0D"');
-    expect(svg).toContain(">O<");
-    expect(svg).toContain('fill="#AAAAAA"');
-    expect(svg).toContain(">H<");
+    expect(svg).toContain(">OH<");
   });
 });
 

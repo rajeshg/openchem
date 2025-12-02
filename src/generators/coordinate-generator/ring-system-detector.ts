@@ -70,6 +70,16 @@ export function areRingsSpiro(ring1: Ring, ring2: Ring): boolean {
 
 /**
  * Classify ring system type based on fusion pattern.
+ *
+ * Types:
+ * - isolated: single ring
+ * - fused: rings share exactly 2 atoms (edge fusion)
+ * - spiro: rings share exactly 1 atom
+ * - bridged: TRUE cages like adamantane, cubane (high bridgehead density)
+ *
+ * Note: For "bridged fused" systems like morphine (mostly fused with some
+ * bridgehead atoms), we return "fused" because the fused placer handles
+ * these better than the force-field bridged placer.
  */
 export type SystemType = "isolated" | "fused" | "spiro" | "bridged";
 
@@ -81,9 +91,9 @@ export function classifyRingSystemType(
 
   let hasFused = false;
   let hasSpiro = false;
-  let bridgeheldCount = 0;
+  let hasOversharing = false; // rings sharing >2 atoms
 
-  // Count atoms that are in 3+ rings (bridgehead atoms)
+  // Count atoms that are in multiple rings
   const atomRingCount = new Map<number, number>();
   for (const ring of rings) {
     for (const atomId of ring.atomIds) {
@@ -91,12 +101,21 @@ export function classifyRingSystemType(
     }
   }
 
+  // Count bridgehead atoms (in 3+ rings)
+  let bridgeheadCount = 0;
   for (const count of atomRingCount.values()) {
-    if (count >= 3) bridgeheldCount++;
+    if (count >= 3) bridgeheadCount++;
   }
 
   for (let i = 0; i < rings.length; i++) {
     for (let j = i + 1; j < rings.length; j++) {
+      const shared = findSharedAtoms(rings[i]!, rings[j]!);
+
+      // If rings share more than 2 atoms, it's an oversharing (bridge-like)
+      if (shared.length > 2) {
+        hasOversharing = true;
+      }
+
       if (areRingsFused(rings[i]!, rings[j]!, bonds)) {
         hasFused = true;
       }
@@ -106,8 +125,30 @@ export function classifyRingSystemType(
     }
   }
 
-  if (bridgeheldCount > 0) return "bridged";
-  if (hasFused && !hasSpiro) return "fused";
+  // Only classify as "bridged" if it's a complex polycyclic structure:
+  // - TRUE cage structures (small + high bridgehead density)
+  // - OR complex polycyclics with multiple bridgeheads (morphine-like)
+  // - Larger flat fused systems (anthracene, phenanthrene, coronene) use fused placer
+  const totalAtoms = atomRingCount.size;
+  const bridgeheadDensity = bridgeheadCount / totalAtoms;
+
+  // Check if all rings are aromatic (flat polycyclic aromatic like coronene)
+  const allRingsAromatic = rings.every((r) => r.aromatic);
+
+  // TRUE cage structures:
+  // - Small molecules (<12 atoms) with ring oversharing (shared atoms > 2)
+  // - OR very high bridgehead density (>0.3) indicating a cage
+  // - OR complex polycyclics with 3+ bridgeheads (morphine, strychnine)
+  // BUT NOT fully aromatic systems (coronene, pyrene) which are flat
+  const isTrueCage =
+    !allRingsAromatic && // Exclude flat polycyclic aromatics
+    ((totalAtoms <= 12 && hasOversharing) || // Bicyclic bridged (norbornane, camphor)
+      bridgeheadDensity >= 0.3 ||
+      bridgeheadCount >= 3); // Complex polycyclics with many bridgeheads
+
+  if (isTrueCage) return "bridged";
+  // Fused takes precedence over spiro (many systems have both)
+  if (hasFused) return "fused";
   if (hasSpiro) return "spiro";
   return "isolated";
 }

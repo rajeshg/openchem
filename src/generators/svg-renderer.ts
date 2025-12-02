@@ -110,22 +110,18 @@ function determineVisibleAtoms(molecule: Molecule, showCarbonLabels: boolean): S
     const atom = molecule.atoms[i];
     if (!atom) continue;
 
+    // In skeletal formulas, only heteroatoms are labeled.
+    // Carbon atoms (including terminal methyls) are implicit at vertices/endpoints.
+    // Hydrogen atoms attached to carbon are also implicit.
     const isHeteroatom = atom.symbol !== "C" && atom.symbol !== "H";
     if (isHeteroatom) {
       atomsToShow.add(i);
       continue;
     }
 
-    if (showCarbonLabels) {
+    // Only show carbon labels if explicitly requested via options
+    if (showCarbonLabels && atom.symbol === "C") {
       atomsToShow.add(i);
-      continue;
-    }
-
-    if (atom.symbol === "C") {
-      const bonds = molecule.bonds.filter((b) => b.atom1 === atom.id || b.atom2 === atom.id);
-      if (bonds.length === 1) {
-        atomsToShow.add(i);
-      }
     }
   }
 
@@ -705,51 +701,16 @@ function detectAromaticRings(molecule: Molecule): AromaticRing[] {
       return ringAtomIds.includes(bond.atom1) && ringAtomIds.includes(bond.atom2);
     });
 
-    const allBondsAromatic =
-      ringBonds.length > 0 && ringBonds.every((bond) => bond.type === BondType.AROMATIC);
-
-    let allBondsAlternating = false;
-    if (ringBonds.length > 0 && ringBonds.length === ringAtomIds.length) {
-      const orderedBonds = orderBondsInRing(ringAtomIds, ringBonds);
-      allBondsAlternating = checkAlternatingBonds(orderedBonds);
-    }
-
-    if ((allBondsAromatic || allBondsAlternating) && ringBonds.length === ringAtomIds.length) {
+    // For aromatic ring detection, we rely on atom aromaticity flag which is preserved
+    // after kekulization. Bond types may be AROMATIC (pre-kekulize) or alternating
+    // SINGLE/DOUBLE (post-kekulize). In fused ring systems like coronene, kekulized
+    // bonds don't alternate within each ring, so we use atom aromaticity as the primary criterion.
+    if (allAromatic && ringBonds.length === ringAtomIds.length) {
       aromaticRings.push({ ringId: rid, atoms: ringAtomIds, bonds: ringBonds });
     }
   }
 
   return aromaticRings;
-}
-
-function orderBondsInRing(ringAtomIds: number[], ringBonds: Bond[]): Bond[] {
-  const orderedBonds: Bond[] = [];
-  for (let i = 0; i < ringAtomIds.length; i++) {
-    const a1 = ringAtomIds[i]!;
-    const a2 = ringAtomIds[(i + 1) % ringAtomIds.length]!;
-    const bond = ringBonds.find(
-      (b) => (b.atom1 === a1 && b.atom2 === a2) || (b.atom1 === a2 && b.atom2 === a1),
-    );
-    if (bond) orderedBonds.push(bond);
-  }
-  return orderedBonds;
-}
-
-function checkAlternatingBonds(orderedBonds: Bond[]): boolean {
-  if (orderedBonds.length === 0) return false;
-
-  let alternatingCount = 0;
-  for (let i = 1; i < orderedBonds.length; i++) {
-    const bond = orderedBonds[i]!;
-    const prevBond = orderedBonds[i - 1]!;
-    if (
-      (bond.type === BondType.SINGLE && prevBond.type === BondType.DOUBLE) ||
-      (bond.type === BondType.DOUBLE && prevBond.type === BondType.SINGLE)
-    ) {
-      alternatingCount++;
-    }
-  }
-  return alternatingCount >= orderedBonds.length - 2;
 }
 
 // ============================================================================
@@ -773,7 +734,8 @@ function svgDoubleBond(
   const len = Math.sqrt(dx * dx + dy * dy);
   let perpX = -dy / len;
   let perpY = dx / len;
-  const offset = width * 1.5;
+  // Scale offset proportionally to bond length (RDKit uses ~12-15% of bond length)
+  const offset = len * 0.06; // Half the total gap since we offset both lines
   let outerOffset = offset;
   let innerOffset = offset;
 
@@ -837,11 +799,12 @@ function svgDoubleBond(
       let line1Y1 = y1;
       let line1X2 = x2;
       let line1Y2 = y2;
-      const innerOffset = offset * 0.9;
-      let line2X1 = x1 + vx * innerOffset;
-      let line2Y1 = y1 + vy * innerOffset;
-      let line2X2 = x2 + vx * innerOffset;
-      let line2Y2 = y2 + vy * innerOffset;
+      // Use bond-length-proportional offset for ring double bonds
+      const ringInnerOffset = len * 0.14;
+      let line2X1 = x1 + vx * ringInnerOffset;
+      let line2Y1 = y1 + vy * ringInnerOffset;
+      let line2X2 = x2 + vx * ringInnerOffset;
+      let line2Y2 = y2 + vy * ringInnerOffset;
       const innerDx = line2X2 - line2X1;
       const innerDy = line2Y2 - line2Y1;
       const innerLen = Math.sqrt(innerDx * innerDx + innerDy * innerDy);
@@ -871,30 +834,31 @@ function svgDoubleBond(
   let line2Y2 = y2 - perpY * innerOffset;
 
   if (bond.isInRing && molecule.ringInfo) {
-    const ringId = bond.ringIds?.[0];
-    if (ringId !== undefined) {
-      const participatingRingIds = bond.ringIds ?? [];
-      let ringCenterX = 0;
-      let ringCenterY = 0;
-      let centerCount = 0;
+    const participatingRingIds = bond.ringIds ?? [];
+    if (participatingRingIds.length > 0) {
+      // Find the smallest ring containing this bond - draw double bond inside it
+      let smallestRingAtoms: readonly number[] | undefined;
+      let smallestRingSize = Infinity;
       for (const rid of participatingRingIds) {
         const ringAtoms = molecule.ringInfo.rings[rid];
         if (!ringAtoms) continue;
-        let cx = 0,
-          cy = 0,
-          count = 0;
-        for (const atomId of ringAtoms) {
-          const coord = atomIdToCoords.get(atomId);
-          if (coord) {
-            cx += coord.x;
-            cy += coord.y;
-            count++;
-          }
+        if (ringAtoms.length < smallestRingSize) {
+          smallestRingSize = ringAtoms.length;
+          smallestRingAtoms = ringAtoms;
         }
-        if (count === 0) continue;
-        ringCenterX += cx / count;
-        ringCenterY += cy / count;
-        centerCount++;
+      }
+      if (!smallestRingAtoms) return "";
+      // Calculate center of smallest ring
+      let ringCenterX = 0;
+      let ringCenterY = 0;
+      let centerCount = 0;
+      for (const atomId of smallestRingAtoms) {
+        const coord = atomIdToCoords.get(atomId);
+        if (coord) {
+          ringCenterX += coord.x;
+          ringCenterY += coord.y;
+          centerCount++;
+        }
       }
       if (centerCount === 0) return "";
       ringCenterX /= centerCount;
@@ -1047,11 +1011,12 @@ function renderSingleMolecule(
   const height = options.height ?? 200;
   const padding = options.padding ?? 20;
   const bondColor = options.bondColor ?? "#000000";
-  const bondLineWidth = options.bondLineWidth ?? 2;
+  const bondLineWidth = options.bondLineWidth ?? 1.5;
   const fontSize = options.fontSize ?? 16;
   const fontFamily = options.fontFamily ?? "sans-serif";
   const atomColors = { ...DEFAULT_COLORS, ...options.atomColors };
   const showStereoBonds = options.showStereoBonds ?? true;
+  const showImplicitHydrogens = options.showImplicitHydrogens ?? true;
 
   const [tx, ty] = createCoordinateTransforms(
     coords,
@@ -1150,7 +1115,7 @@ function renderSingleMolecule(
       if (atomsToShow.has(i)) {
         const atom = molecule.atoms[i]!;
         let label = atom.symbol;
-        if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
+        if (showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
           const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
           label = atom.symbol + hText;
         }
@@ -1240,6 +1205,16 @@ function renderSingleMolecule(
     }
   }
 
+  // Use kekulized bond types (SINGLE/DOUBLE) that were set by kekulize() function
+  // instead of computing a simplistic alternating pattern
+  const kekuleBonds = new Set<number>();
+  for (let i = 0; i < molecule.bonds.length; i++) {
+    const bond = molecule.bonds[i]!;
+    if (bond.type === BondType.DOUBLE) {
+      kekuleBonds.add(i);
+    }
+  }
+
   // Prepare highlights to render after bonds (so they appear on top of bonds)
   // but before atom labels (so labels remain readable)
   let allAtomHighlights: AtomHighlight[] = [];
@@ -1276,76 +1251,83 @@ function renderSingleMolecule(
 
       const bondClass = `bond-${bondIndex} atom-${bond.atom1} atom-${bond.atom2}`;
 
-      if (bond.type === BondType.SINGLE) {
-        svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
-      } else if (bond.type === BondType.DOUBLE || bond.type === BondType.AROMATIC) {
-        // For bonds that participate in aromatic rings, compute an orientation
-        // using the average center of all aromatic rings that include this bond.
-        // This makes the offset decision stable for fused rings (e.g., naphthalene)
-        // where a bond may belong to more than one ring.
-        const ringsForBond = aromaticRings.filter((r) => r.bonds.includes(bond));
-        if (ringsForBond.length > 0) {
-          let cx = 0,
-            cy = 0,
-            count = 0;
-          for (const ring of ringsForBond) {
-            for (const atomId of ring.atoms) {
-              const idx = molecule.atoms.findIndex((a) => a.id === atomId);
-              const c = coords[idx];
-              if (c) {
-                cx += c.x;
-                cy += c.y;
-                count++;
-              }
-            }
-          }
-          if (count > 0) {
-            cx /= count;
-            cy /= count;
-
-            const cxSvg = tx(cx);
-            const cySvg = ty(cy);
-
-            const mx = (x1 + x2) / 2;
-            const my = (y1 + y2) / 2;
-            let vx = cxSvg - mx;
-            let vy = cySvg - my;
-            const vlen = Math.sqrt(vx * vx + vy * vy);
-            if (vlen > 0) {
-              vx /= vlen;
-              vy /= vlen;
-            }
-
-            const offset = bondLineWidth * 3.0;
-            const innerOffset = offset * 0.9;
-
-            let line2X1 = x1 + vx * innerOffset;
-            let line2Y1 = y1 + vy * innerOffset;
-            let line2X2 = x2 + vx * innerOffset;
-            let line2Y2 = y2 + vy * innerOffset;
-
-            const innerDx = line2X2 - line2X1;
-            const innerDy = line2Y2 - line2Y1;
-            const innerLen = Math.sqrt(innerDx * innerDx + innerDy * innerDy);
-            const shortenAmount = innerLen * 0.11;
-            line2X1 += (innerDx / innerLen) * shortenAmount;
-            line2Y1 += (innerDy / innerLen) * shortenAmount;
-            line2X2 -= (innerDx / innerLen) * shortenAmount;
-            line2Y2 -= (innerDy / innerLen) * shortenAmount;
-
-            svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
-            svgBody += svgLine(
-              line2X1,
-              line2Y1,
-              line2X2,
-              line2Y2,
-              bondColor,
-              bondLineWidth,
-              bondClass,
-            );
+      // For aromatic rings, use Kekulé-style alternating double bonds
+      // kekuleBonds contains bond indices that should be rendered as double
+      const ringsForBond = aromaticRings.filter((r) => r.bonds.includes(bond));
+      const shouldRenderDouble = kekuleBonds.has(bondIndex);
+      if (ringsForBond.length > 0 && shouldRenderDouble) {
+        // Find the smallest ring containing this bond
+        let smallestRing = ringsForBond[0]!;
+        for (const ring of ringsForBond) {
+          if (ring.atoms.length < smallestRing.atoms.length) {
+            smallestRing = ring;
           }
         }
+
+        // Calculate center of smallest ring only
+        let cx = 0,
+          cy = 0,
+          count = 0;
+        for (const atomId of smallestRing.atoms) {
+          const idx = molecule.atoms.findIndex((a) => a.id === atomId);
+          const c = coords[idx];
+          if (c) {
+            cx += c.x;
+            cy += c.y;
+            count++;
+          }
+        }
+        if (count > 0) {
+          cx /= count;
+          cy /= count;
+
+          const cxSvg = tx(cx);
+          const cySvg = ty(cy);
+
+          const mx = (x1 + x2) / 2;
+          const my = (y1 + y2) / 2;
+          let vx = cxSvg - mx;
+          let vy = cySvg - my;
+          const vlen = Math.sqrt(vx * vx + vy * vy);
+          if (vlen > 0) {
+            vx /= vlen;
+            vy /= vlen;
+          }
+
+          // Calculate bond length to scale offset proportionally (RDKit uses ~15% of bond length)
+          const bondLen = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+          const innerOffset = bondLen * 0.14;
+
+          let line2X1 = x1 + vx * innerOffset;
+          let line2Y1 = y1 + vy * innerOffset;
+          let line2X2 = x2 + vx * innerOffset;
+          let line2Y2 = y2 + vy * innerOffset;
+
+          const innerDx = line2X2 - line2X1;
+          const innerDy = line2Y2 - line2Y1;
+          const innerLen = Math.sqrt(innerDx * innerDx + innerDy * innerDy);
+          const shortenAmount = innerLen * 0.11;
+          line2X1 += (innerDx / innerLen) * shortenAmount;
+          line2Y1 += (innerDy / innerLen) * shortenAmount;
+          line2X2 -= (innerDx / innerLen) * shortenAmount;
+          line2Y2 -= (innerDy / innerLen) * shortenAmount;
+
+          svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
+          svgBody += svgLine(
+            line2X1,
+            line2Y1,
+            line2X2,
+            line2Y2,
+            bondColor,
+            bondLineWidth,
+            bondClass,
+          );
+        }
+        svgBody += "\n";
+        continue;
       }
+      // Single bonds in aromatic rings - render as single line (Kekulé style)
+      svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
       svgBody += "\n";
       continue;
     }
@@ -1472,44 +1454,22 @@ function renderSingleMolecule(
 
       let label = atom.symbol;
 
-      if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
-        const hColor = atomColors["H"] ?? "#AAAAAA";
+      // Append hydrogens to heteroatom labels (e.g., "O" -> "OH", "N" -> "NH2")
+      if (showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
         const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
-
-        const atomWidth = label.length * fontSize * 0.6;
-        const hWidth = hText.length * fontSize * 0.6;
-
-        const isHeteroRing = heteroRingIndices.has(i);
-        svgBody += svgText(
-          labelX - hWidth / 2,
-          labelY,
-          label,
-          color,
-          fontSize,
-          fontFamily,
-          isHeteroRing ? { background: true } : undefined,
-        );
-        svgBody += svgText(
-          labelX + atomWidth / 2,
-          labelY,
-          hText,
-          hColor,
-          fontSize,
-          fontFamily,
-          isHeteroRing ? { background: true } : undefined,
-        );
-      } else {
-        const isHeteroRing = heteroRingIndices.has(i);
-        svgBody += svgText(
-          labelX,
-          labelY,
-          label,
-          color,
-          fontSize,
-          fontFamily,
-          isHeteroRing ? { background: true } : undefined,
-        );
+        label = atom.symbol + hText;
       }
+
+      const isHeteroRing = heteroRingIndices.has(i);
+      svgBody += svgText(
+        labelX,
+        labelY,
+        label,
+        color,
+        fontSize,
+        fontFamily,
+        isHeteroRing ? { background: true } : undefined,
+      );
 
       if (atom.charge !== 0) {
         const chargeSign = atom.charge > 0 ? "+" : "−";
@@ -1632,11 +1592,12 @@ function renderMultipleMolecules(
   const totalHeight = maxY;
 
   const bondColor = options.bondColor ?? "#000000";
-  const bondLineWidth = options.bondLineWidth ?? 2;
+  const bondLineWidth = options.bondLineWidth ?? 1.5;
   const fontSize = options.fontSize ?? 16;
   const fontFamily = options.fontFamily ?? "sans-serif";
   const atomColors = { ...DEFAULT_COLORS, ...options.atomColors };
   const showStereoBonds = options.showStereoBonds ?? true;
+  const showImplicitHydrogens = options.showImplicitHydrogens ?? true;
 
   const vbPadding = Math.max(8, Math.min(padding, 40));
   const vbX = -vbPadding;
@@ -1726,20 +1687,30 @@ function renderMultipleMolecules(
         if (bond.type === BondType.SINGLE) {
           svgBody += svgLine(x1, y1, x2, y2, bondColor, bondLineWidth, bondClass);
         } else if (bond.type === BondType.DOUBLE || bond.type === BondType.AROMATIC) {
+          // For bonds that participate in aromatic rings, compute an orientation
+          // using the smallest ring that contains this bond.
+          // This ensures the inner line is drawn toward the ring center.
           const ringsForBond = aromaticRings.filter((r) => r.bonds.includes(bond));
           if (ringsForBond.length > 0) {
+            // Find the smallest ring containing this bond
+            let smallestRing = ringsForBond[0]!;
+            for (const ring of ringsForBond) {
+              if (ring.atoms.length < smallestRing.atoms.length) {
+                smallestRing = ring;
+              }
+            }
+
+            // Calculate center of smallest ring only
             let cx = 0,
               cy = 0,
               count = 0;
-            for (const ring of ringsForBond) {
-              for (const atomId of ring.atoms) {
-                const idx = molecule.atoms.findIndex((a) => a.id === atomId);
-                const c = coords[idx];
-                if (c) {
-                  cx += c.x;
-                  cy += c.y;
-                  count++;
-                }
+            for (const atomId of smallestRing.atoms) {
+              const idx = molecule.atoms.findIndex((a) => a.id === atomId);
+              const c = coords[idx];
+              if (c) {
+                cx += c.x;
+                cy += c.y;
+                count++;
               }
             }
             if (count > 0) {
@@ -1759,8 +1730,9 @@ function renderMultipleMolecules(
                 vy /= vlen;
               }
 
-              const offset = bondLineWidth * 3.0;
-              const innerOffset = offset * 0.9;
+              // Calculate bond length to scale offset proportionally (RDKit uses ~15% of bond length)
+              const bondLen = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+              const innerOffset = bondLen * 0.14;
 
               let line2X1 = x1 + vx * innerOffset;
               let line2Y1 = y1 + vy * innerOffset;
@@ -1905,46 +1877,22 @@ function renderMultipleMolecules(
 
         let label = atom.symbol;
 
-        if (options.showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
-          const hColor = atomColors["H"] ?? "#AAAAAA";
+        // Append hydrogens to heteroatom labels (e.g., "O" -> "OH", "N" -> "NH2")
+        if (showImplicitHydrogens && atom.hydrogens > 0 && atom.symbol !== "C") {
           const hText = atom.hydrogens === 1 ? "H" : `H${atom.hydrogens}`;
-
-          const atomWidth = label.length * fontSize * 0.6;
-          const hWidth = hText.length * fontSize * 0.6;
-
-          const atomIdx = i;
-          const isHeteroRing = heteroRingIndices.has(atomIdx);
-          svgBody += svgText(
-            x - hWidth / 2,
-            y,
-            label,
-            color,
-            fontSize,
-            fontFamily,
-            isHeteroRing ? { background: true } : undefined,
-          );
-          svgBody += svgText(
-            x + atomWidth / 2,
-            y,
-            hText,
-            hColor,
-            fontSize,
-            fontFamily,
-            isHeteroRing ? { background: true } : undefined,
-          );
-        } else {
-          const atomIdx = i;
-          const isHeteroRing = heteroRingIndices.has(atomIdx);
-          svgBody += svgText(
-            x,
-            y,
-            label,
-            color,
-            fontSize,
-            fontFamily,
-            isHeteroRing ? { background: true } : undefined,
-          );
+          label = atom.symbol + hText;
         }
+
+        const isHeteroRing = heteroRingIndices.has(i);
+        svgBody += svgText(
+          x,
+          y,
+          label,
+          color,
+          fontSize,
+          fontFamily,
+          isHeteroRing ? { background: true } : undefined,
+        );
 
         if (atom.charge !== 0) {
           const chargeSign = atom.charge > 0 ? "+" : "−";

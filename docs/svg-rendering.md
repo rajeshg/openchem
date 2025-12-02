@@ -113,13 +113,13 @@ interface SVGRenderResult {
 
 ## Architecture
 
-openchem uses a specialized coordinate generation system focused on overlap-aware placement and perfect geometry:
+openchem uses a rigid unit architecture for coordinate generation, providing high-quality 2D layouts with perfect ring geometry:
 
 **Key features:**
-- ✅ **Overlap-aware fused ring placement** — Detects and resolves atom/bond collisions
+- ✅ **Rigid unit detection** — Ring systems and chains identified as rigid bodies
 - ✅ **Perfect regular polygons** — Mathematically precise ring geometry
-- ✅ **Radial terminal atom placement** — Clean geometry for OH, NH2, etc.
-- ✅ **Modular architecture** — 7 specialized modules (1,900+ lines)
+- ✅ **DOF-based optimization** — Only rotations and translations, no internal distortion
+- ✅ **Overlap resolution** — Automatic detection and resolution of atom collisions
 - ✅ **Clean separation** — Coordinate generator and renderer have distinct responsibilities
 
 ### 2D Layout Algorithm
@@ -129,15 +129,17 @@ The coordinate generation follows a multi-stage pipeline:
 ```
 1. Ring System Detection
    ↓
-2. Fused Ring Placement (overlap-aware)
+2. Rigid Unit Detection
    ↓
-3. Substituent Placement (radial extension)
+3. Rigid Unit Placement (perfect geometry)
    ↓
-4. Constrained Relaxation (preserves perfect geometry)
+4. DOF-Based Minimization (rotations/translations only)
    ↓
 5. Overlap Resolution
    ↓
-6. SVG Rendering (no geometry changes)
+6. Orientation Optimization
+   ↓
+7. SVG Rendering (no geometry changes)
 ```
 
 ### Stage 1: Ring System Detection
@@ -152,56 +154,47 @@ The coordinate generation follows a multi-stage pipeline:
 
 **Implementation:** `src/generators/coordinate-generator/ring-system-detector.ts`
 
-### Stage 2: Fused Ring Placement (Overlap-Aware)
+### Stage 2: Rigid Unit Detection
 
-**Purpose:** Place fused ring systems with perfect geometry and no overlaps
+**Purpose:** Identify rigid units (ring systems and chain segments)
+
+**Algorithm:**
+- Ring systems become single rigid units
+- Chains between ring systems become rigid chain units
+- Single atoms connected to multiple units become bridges
+- Build unit connectivity graph
+
+**Implementation:** `src/generators/coordinate-generator/rigid-unit-detector.ts`
+
+### Stage 3: Rigid Unit Placement
+
+**Purpose:** Place each rigid unit with perfect internal geometry
 
 **Algorithm:**
 - Generate perfect regular polygons for each ring size
-- For fused systems, place rings sequentially:
-  - Align shared bonds exactly
-  - Detect atom/bond overlaps
-  - Rotate/flip fused rings to minimize collisions
-  - Try multiple orientations (0°, 60°, 120°, 180°)
-- Use rigid group constraints to maintain perfect ring geometry
+- For fused ring systems, place rings sequentially:
+  - Align shared edges exactly
+  - Detect overlaps and flip rings as needed
+  - Use spiro placement for single-atom connections
+- Place chains with ideal 120° angles
 
-**Key feature:** This stage **prevents overlaps during placement** rather than requiring post-processing fixes.
+**Key feature:** Internal geometry is **never distorted** — rings are always perfect polygons.
 
-**Implementation:** `src/generators/coordinate-generator/fused-ring-placer.ts`
+**Implementation:** `src/generators/coordinate-generator/rigid-unit-placer.ts`
 
-### Stage 3: Substituent Placement (Radial Extension)
+### Stage 4: DOF-Based Minimization
 
-**Purpose:** Attach substituents and terminal atoms with clean geometry
-
-**Algorithm:**
-- Identify attachment points on rings
-- For terminal atoms (OH, NH2, etc.):
-  - Extend radially from parent atom
-  - Use ideal bond angles (120° for sp², 109.5° for sp³)
-  - Avoid collisions with existing atoms
-- For substituent chains:
-  - Grow recursively from attachment point
-  - Maintain staggered conformations
-  - Prefer anti/gauche orientations
-
-**Key feature:** **Radial extension** ensures terminal atoms don't overlap with ring systems.
-
-**Implementation:** `src/generators/coordinate-generator/substituent-placer.ts`
-
-### Stage 4: Constrained Relaxation
-
-**Purpose:** Fine-tune coordinates while preserving perfect ring geometry
+**Purpose:** Optimize unit positions without distorting internal geometry
 
 **Algorithm:**
-- Apply spring forces to equalize bond lengths
-- Use distance constraints to prevent distortion
-- **Lock ring atoms as rigid groups** — no regularization needed!
-- Allow only non-ring atoms to move
-- Iterate until forces converge (typically 5-10 iterations)
+- Each unit has only 3 degrees of freedom: translation (x, y) and rotation (θ)
+- Minimize bond length deviation for connecting bonds
+- Try multiple rotation angles and optional flips
+- Preserve perfect internal geometry throughout
 
-**Key feature:** By treating rings as **rigid groups**, we preserve the perfect polygons from Stage 2.
+**Key feature:** **Rigid body optimization** — atoms within a unit never move relative to each other.
 
-**Implementation:** `src/generators/coordinate-generator/constrained-relaxer.ts`
+**Implementation:** `src/generators/coordinate-generator/rigid-body-minimizer.ts`
 
 ### Stage 5: Overlap Resolution
 
@@ -211,11 +204,22 @@ The coordinate generation follows a multi-stage pipeline:
 - Compute pairwise atom distances
 - Identify overlaps (distance < threshold)
 - Apply repulsive forces to separate atoms
-- Re-run constrained relaxation if needed
+- Iterate until no overlaps remain
 
 **Implementation:** `src/generators/coordinate-generator/overlap-resolver.ts`
 
-### Stage 6: SVG Rendering
+### Stage 6: Orientation Optimization
+
+**Purpose:** Rotate molecule to canonical orientation
+
+**Algorithm:**
+- Identify principal ring system
+- Rotate to align largest ring horizontally
+- Position longest chain direction appropriately
+
+**Implementation:** `src/generators/coordinate-generator/orientation-optimizer.ts`
+
+### Stage 7: SVG Rendering
 
 **Purpose:** Convert coordinates to visual SVG elements
 
@@ -474,18 +478,18 @@ renderSVG(parseSMILES('C[C@@H](N)C(=O)O').molecules[0]);
 
 **Location:** `src/generators/coordinate-generator/`
 
-| Module | Lines | Purpose |
-|--------|-------|---------|
-| `index.ts` | 322 | Entry point, pipeline orchestration |
-| `ring-system-detector.ts` | 323 | Ring detection and classification |
-| `fused-ring-placer.ts` | 277 | Overlap-aware fused ring placement |
-| `substituent-placer.ts` | 220 | Terminal atom and chain placement |
-| `constrained-relaxer.ts` | 336 | Force-based optimization with rigid groups |
-| `overlap-resolver.ts` | 167 | Collision detection and resolution |
-| `geometry-utils.ts` | 321 | Vector math, rotations, distance checks |
-| `types.ts` | 113 | Type definitions |
-
-**Total:** ~2,000 lines of clean, modular code
+| Module | Purpose |
+|--------|---------|
+| `index.ts` | Entry point, pipeline orchestration |
+| `types.ts` | Type definitions |
+| `ring-system-detector.ts` | Ring detection and classification |
+| `rigid-unit-detector.ts` | Identify rigid units (ring systems, chains) |
+| `rigid-unit-placer.ts` | Place units with perfect geometry |
+| `rigid-body-minimizer.ts` | DOF-based optimization (rotation/translation only) |
+| `overlap-resolver.ts` | Collision detection and resolution |
+| `orientation-optimizer.ts` | Canonical orientation |
+| `geometry-utils.ts` | Vector math, rotations, distance checks |
+| `macrocycle-placer.ts` | Special handling for large rings |
 
 ### SVG Renderer
 
