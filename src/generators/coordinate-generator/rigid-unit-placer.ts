@@ -24,6 +24,7 @@ import { getPlacementOrder } from "./rigid-unit-detector";
 import { regularPolygon, radiusForEdgeLength, computeAlignmentTransform } from "./geometry-utils";
 import { findSharedAtoms, findBondedPair } from "./ring-system-detector";
 import { placeMacrocycle, isMacrocycle } from "./macrocycle-placer";
+import { findBridgedTemplate, applyBridgedTemplate } from "./bridged-templates";
 
 /** Options for rigid unit placement */
 export interface RigidUnitPlacementOptions {
@@ -91,6 +92,33 @@ function placeRingSystemUnit(
   localCoords: Map<number, Vec2>,
 ): void {
   if (unit.rings.length === 0) return;
+
+  // Try to match a bridged template (adamantane, cubane, norbornane, etc.)
+  // Only use templates for standalone bridged systems (no parent connection)
+  // This ensures templates work well for molecules like adamantane but don't interfere
+  // with complex molecules where the bridged system is part of a larger structure
+  if (unit.ringSystemType === "bridged" && !unit.bondToParent) {
+    const atomIds = [...unit.atomIds];
+    const bonds = molecule.bonds.map((b) => ({ atom1: b.atom1, atom2: b.atom2 }));
+    const templateMatch = findBridgedTemplate(atomIds, bonds);
+    
+    if (templateMatch) {
+      // Apply the template coordinates
+      const templateCoords = applyBridgedTemplate(
+        templateMatch.template,
+        templateMatch.atomMapping,
+        bondLength,
+      );
+      
+      // No parent connection, use template as-is (centered at origin)
+      for (const [atomId, coord] of templateCoords) {
+        localCoords.set(atomId, coord);
+      }
+      
+      // Successfully placed using template - done!
+      return;
+    }
+  }
 
   // If this unit has a parent, we need to position it relative to the parent
   const hasParentConnection = unit.bondToParent !== null;

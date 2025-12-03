@@ -3,7 +3,7 @@ import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 
 const server = Bun.serve({
-  port: 3000,
+  port: 4141,
   async fetch(req) {
     const url = new URL(req.url);
     let filePath = url.pathname === "/" ? "/smiles-playground.html" : url.pathname;

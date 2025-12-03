@@ -43,18 +43,18 @@ const ADAMANTANE_TEMPLATE: BridgedTemplate = {
     [1, 8],
     [3, 9],
   ],
-  // Pre-optimized coordinates for ~90% bond uniformity
+  // Coordinates from RDKit Compute2DCoords (excellent bond uniformity: 11/12 bonds uniform)
   coords: [
-    { x: -0.866, y: 0.5 }, // 0
-    { x: 0, y: 1.0 }, // 1 (bridgehead)
-    { x: 0.866, y: 0.5 }, // 2
-    { x: 0.866, y: -0.5 }, // 3 (bridgehead)
-    { x: 0, y: -1.0 }, // 4
-    { x: -0.866, y: -0.5 }, // 5 (bridgehead)
-    { x: -1.5, y: 0 }, // 6
-    { x: 0, y: 0 }, // 7 (bridgehead, center)
-    { x: 0, y: 1.8 }, // 8
-    { x: 1.5, y: 0 }, // 9
+    { x: -0.3333, y: -0.0201 }, // 0
+    { x: -0.0348, y: 0.5774 }, // 1 (bridgehead)
+    { x: 0.6318, y: 0.6176 }, // 2
+    { x: 1.0, y: 0.0603 }, // 3 (bridgehead)
+    { x: 0.7015, y: -0.5371 }, // 4
+    { x: 0.0348, y: -0.5774 }, // 5 (bridgehead)
+    { x: -0.6318, y: -0.6176 }, // 6
+    { x: -1.0, y: -0.0603 }, // 7 (bridgehead, center)
+    { x: -0.7015, y: 0.5371 }, // 8
+    { x: -0.4428, y: 0.3078 }, // 9
   ],
 };
 
