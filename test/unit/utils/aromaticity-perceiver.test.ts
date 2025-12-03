@@ -103,7 +103,8 @@ describe("Aromaticity Perception", () => {
       const result = parseSMILES("C(=O)(O)C1=CC=CC=C1");
       expect(result.errors).toHaveLength(0);
       const canonical = generateSMILES(result.molecules[0]!, true);
-      expect(canonical).toBe("OC(=O)c1ccccc1");
+      // C=O has higher bond order, so carbonyl carbon is visited first
+      expect(canonical).toBe("O=C(O)c1ccccc1");
     });
   });
 
@@ -119,14 +120,16 @@ describe("Aromaticity Perception", () => {
       const result = parseSMILES("C1=CCCCC1");
       expect(result.errors).toHaveLength(0);
       const canonical = generateSMILES(result.molecules[0]!, true);
-      expect(canonical).toBe("C1CCC=CC1");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(canonical).toBe("C1=CCCCC1");
     });
 
     it("should not convert cyclopentadiene to aromatic (4 pi electrons)", () => {
       const result = parseSMILES("C1=CC=CC1");
       expect(result.errors).toHaveLength(0);
       const canonical = generateSMILES(result.molecules[0]!, true);
-      expect(canonical).toBe("C1C=CC=C1");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(canonical).toBe("C=1C=CCC1");
     });
   });
 
@@ -159,7 +162,8 @@ describe("Aromaticity Perception", () => {
       const result = parseSMILES("C1CCCCC1C2=CC=CC=C2");
       expect(result.errors).toHaveLength(0);
       const canonical = generateSMILES(result.molecules[0]!, true);
-      expect(canonical).toBe("C1CCC(CC1)c2ccccc2");
+      // Aromatic ring has higher bond order sum, visited first
+      expect(canonical).toBe("c2ccc(cc2)C1CCCCC1");
     });
   });
 

@@ -4,6 +4,7 @@ import { applyMultiSiteTransformation } from "./site-transformer";
 import { CanonicalDeduplicator } from "./canonical-deduplicator";
 import { scoreTautomer } from "./tautomer-scoring";
 import { perceiveAromaticity } from "src/utils/aromaticity-perceiver";
+import { isValidTautomer } from "./tautomer-validator";
 
 const debugEnum = !!process.env.OPENCHEM_DEBUG_TAUTOMER;
 
@@ -84,6 +85,14 @@ export function enumerateTautomers(
         atoms: aromaticAtoms,
         bonds: aromaticBonds,
       } as Molecule;
+
+      // Validate tautomer before adding (filter out charged species, triple bonds, etc.)
+      if (!isValidTautomer(aromaticMol)) {
+        if (debugEnum) {
+          console.debug(`[tautomer] Skipping invalid tautomer`);
+        }
+        continue;
+      }
 
       // Try to add to deduplicator
       const isNew = dedup.add(aromaticMol);

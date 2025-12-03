@@ -194,9 +194,8 @@ describe("Comprehensive Canonicalization Tests", () => {
       const parsed = parseSMILES(smiles);
       expect(parsed.errors).toHaveLength(0);
       const canonical = generateSMILES(parsed.molecules[0]!, true);
-      // With heteroatom priority and bond order sum: O is preferred as root
-      // Bond order sum helps break ties between the two oxygens
-      expect(canonical).toBe("OC(=O)C");
+      // With bond order sum preference: C=O has higher bond order, carbonyl is visited first
+      expect(canonical).toBe("O=C(O)C");
     });
 
     it("should handle aromatic nitrogen correctly: pyridine", () => {

@@ -345,6 +345,23 @@ function generateComponentSMILES(
       const degB = getNeighbors(bId, subMol).length;
       if (degA !== degB) return degA - degB;
 
+      // NEW: Prefer atoms that participate in double bonds (for consistent kekulization)
+      // This ensures cyclohexadienone is canonicalized as O=C1C=CC=CC1, not O=C1CC=CC=C1
+      const getBondOrderSum = (atomId: number) => {
+        let sum = 0;
+        for (const [, bond] of getNeighbors(atomId, subMol)) {
+          if (bond.type === BondType.DOUBLE) sum += 2;
+          else if (bond.type === BondType.TRIPLE) sum += 3;
+          else if (bond.type === BondType.AROMATIC) sum += 1.5;
+          else sum += 1;
+        }
+        return sum;
+      };
+      const bondOrderA = getBondOrderSum(aId);
+      const bondOrderB = getBondOrderSum(bId);
+      // Higher bond order sum = atom has double bonds = should be visited first
+      if (bondOrderA !== bondOrderB) return bondOrderB - bondOrderA;
+
       // Aromaticity
       if (atomA.aromatic !== atomB.aromatic) {
         return atomA.aromatic ? -1 : 1;
@@ -469,6 +486,21 @@ function generateComponentSMILES(
       if (la > lb) return 1;
       const w = bondPriority(aBond) - bondPriority(bBond);
       if (w !== 0) return w;
+      // Prefer atoms with higher bond order sum (atoms that participate in double bonds)
+      // This ensures consistent kekulization for non-aromatic rings
+      const getBondOrderSum = (atomId: number) => {
+        let sum = 0;
+        for (const [, bond] of getNeighbors(atomId, subMol)) {
+          if (bond.type === BondType.DOUBLE) sum += 2;
+          else if (bond.type === BondType.TRIPLE) sum += 3;
+          else if (bond.type === BondType.AROMATIC) sum += 1.5;
+          else sum += 1;
+        }
+        return sum;
+      };
+      const bondOrderA = getBondOrderSum(aId);
+      const bondOrderB = getBondOrderSum(bId);
+      if (bondOrderA !== bondOrderB) return bondOrderB - bondOrderA;
       return aId - bId;
     });
 
@@ -562,6 +594,9 @@ function canonicalLabels(mol: Molecule): {
 
     // Compute bond order sum for additional symmetry breaking
     // Helps distinguish atoms with same degree but different bond orders
+    // For consistent kekulization of non-aromatic rings (e.g., cyclohexadienone),
+    // we want atoms with HIGHER bond order sum (atoms with double bonds) to have
+    // LOWER labels so they are visited first. Hence we invert the value.
     const neighbors = getNeighbors(a.id, mol);
     let bondOrderSum = 0;
     for (const [, bond] of neighbors) {
@@ -570,6 +605,8 @@ function canonicalLabels(mol: Molecule): {
       else if (bond.type === BondType.TRIPLE) bondOrderSum += 3;
       else if (bond.type === BondType.AROMATIC) bondOrderSum += 1.5;
     }
+    // Invert: higher bondOrderSum → lower label value → visited first
+    const invertedBondOrderSum = 100 - bondOrderSum;
 
     // Ring invariants: ring membership count and smallest ring size
     const ringsContaining = ringInfo.getRingsContainingAtom(a.id);
@@ -582,7 +619,7 @@ function canonicalLabels(mol: Molecule): {
       String(ringCount).padStart(2, "0"), // Ring membership count
       String(smallestRing).padStart(3, "0"), // Smallest ring size
       String(deg).padStart(3, "0"),
-      String(bondOrderSum.toFixed(1)).padStart(5, "0"), // Bond order sum for symmetry breaking
+      String(invertedBondOrderSum.toFixed(1)).padStart(5, "0"), // Inverted bond order sum (higher → lower label)
       String(a.atomicNumber).padStart(3, "0"),
       String(a.isotope || 0).padStart(3, "0"), // Isotope (prefer non-isotope atoms as root)
       String(a.hydrogens || 0).padStart(3, "0"), // Hydrogen count (for symmetry breaking [nH] vs [n])

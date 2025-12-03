@@ -5,8 +5,11 @@ export interface TransformationSite {
   type:
     | "keto-enol"
     | "enol-keto"
+    | "thione-enethiol"
+    | "enethiol-thione"
     | "lactam-lactim"
     | "amino-imine"
+    | "amidine"
     | "imine-enamine"
     | "nitroso-oxime"
     | "amide-imidol"
@@ -94,6 +97,16 @@ export function detectKetoEnolSites(mol: Molecule): TransformationSite[] {
         if (!alpha || alpha.symbol !== "C") continue;
         if ((alpha.hydrogens ?? 0) === 0) continue;
 
+        // Check if alpha carbon already has a C=C double bond (would create allene)
+        const alphaBonds = mol.bonds.filter((b) => b.atom1 === alpha.id || b.atom2 === alpha.id);
+        const alphaHasDoubleBondToCarbon = alphaBonds.some((b) => {
+          if (b.type !== BondType.DOUBLE) return false;
+          const neighborId = b.atom1 === alpha.id ? b.atom2 : b.atom1;
+          const neighbor = mol.atoms.find((a) => a.id === neighborId);
+          return neighbor?.symbol === "C";
+        });
+        if (alphaHasDoubleBondToCarbon) continue; // Skip - would create allene
+
         // Check if transformation would break aromaticity
         const wouldBreakAromatic =
           isAtomInAromaticRing(carbonyl, mol) || isAtomInAromaticRing(alpha, mol);
@@ -164,6 +177,9 @@ export function detectEnolKetoSites(mol: Molecule): TransformationSite[] {
 
   // Also detect: C-OH (non-aromatic) with adjacent C that has H
   // This handles partially ketonized forms like OC1CCC(=O)CC1
+  // DISABLED: This creates chemically invalid transformations (allenes)
+  // The standard enol-keto detection should handle proper C=C-OH patterns
+  /*
   for (let cIdx = 0; cIdx < mol.atoms.length; cIdx++) {
     const carbon = mol.atoms[cIdx];
     if (!carbon || carbon.symbol !== "C") continue;
@@ -221,6 +237,115 @@ export function detectEnolKetoSites(mol: Molecule): TransformationSite[] {
       });
     }
   }
+  */
+
+  return sites;
+}
+
+export function detectThioneEnethiolSites(mol: Molecule): TransformationSite[] {
+  const sites: TransformationSite[] = [];
+
+  // Pattern: C=S with alpha carbon that has H (thione → enethiol)
+  // Similar to keto-enol but with sulfur
+  for (let cIdx = 0; cIdx < mol.atoms.length; cIdx++) {
+    const thiocarbonyl = mol.atoms[cIdx];
+    if (!thiocarbonyl || thiocarbonyl.symbol !== "C") continue;
+
+    // Find C=S double bond
+    const bonds = mol.bonds.filter(
+      (b) => b.atom1 === thiocarbonyl.id || b.atom2 === thiocarbonyl.id,
+    );
+
+    for (const bond of bonds) {
+      if (bond.type !== BondType.DOUBLE) continue;
+
+      const otherId = bond.atom1 === thiocarbonyl.id ? bond.atom2 : bond.atom1;
+      const otherIdx = mol.atoms.findIndex((a) => a.id === otherId);
+      if (otherIdx === -1) continue;
+
+      const sulfur = mol.atoms[otherIdx];
+      if (!sulfur || sulfur.symbol !== "S") continue;
+
+      // Found C=S, now look for alpha carbon with H
+      const alphaNeighbors = bonds
+        .filter((b) => b !== bond && b.type === BondType.SINGLE)
+        .map((b) => (b.atom1 === thiocarbonyl.id ? b.atom2 : b.atom1))
+        .map((id) => mol.atoms.findIndex((a) => a.id === id))
+        .filter((idx) => idx !== -1);
+
+      for (const alphaIdx of alphaNeighbors) {
+        const alpha = mol.atoms[alphaIdx];
+        if (!alpha || alpha.symbol !== "C") continue;
+        if ((alpha.hydrogens ?? 0) === 0) continue;
+
+        // Check if transformation would break aromaticity
+        const wouldBreakAromatic =
+          isAtomInAromaticRing(thiocarbonyl, mol) || isAtomInAromaticRing(alpha, mol);
+
+        sites.push({
+          type: "thione-enethiol",
+          atoms: [cIdx, otherIdx, alphaIdx], // [thiocarbonyl C, S, alpha C]
+          canTransform: !wouldBreakAromatic,
+          priority: 95, // Similar priority to keto-enol
+          metadata: { thiocarbonyl: cIdx, sulfur: otherIdx, alpha: alphaIdx },
+        });
+      }
+    }
+  }
+
+  return sites;
+}
+
+export function detectEnethiolThioneSites(mol: Molecule): TransformationSite[] {
+  const sites: TransformationSite[] = [];
+
+  // Pattern: C=C-SH (enethiol → thione)
+  // Similar to enol-keto but with sulfur
+  for (let alphaIdx = 0; alphaIdx < mol.atoms.length; alphaIdx++) {
+    const alphaC = mol.atoms[alphaIdx];
+    if (!alphaC || alphaC.symbol !== "C") continue;
+
+    // Find C=C double bonds
+    const bonds = mol.bonds.filter(
+      (b) => (b.atom1 === alphaC.id || b.atom2 === alphaC.id) && b.type === BondType.DOUBLE,
+    );
+
+    for (const doubleBond of bonds) {
+      const betaId = doubleBond.atom1 === alphaC.id ? doubleBond.atom2 : doubleBond.atom1;
+      const betaIdx = mol.atoms.findIndex((a) => a.id === betaId);
+      if (betaIdx === -1) continue;
+
+      const betaC = mol.atoms[betaIdx];
+      if (!betaC || betaC.symbol !== "C") continue;
+
+      // Check if beta carbon has SH
+      const betaBonds = mol.bonds.filter(
+        (b) => (b.atom1 === betaC.id || b.atom2 === betaC.id) && b.type === BondType.SINGLE,
+      );
+
+      for (const shBond of betaBonds) {
+        const sId = shBond.atom1 === betaC.id ? shBond.atom2 : shBond.atom1;
+        const sIdx = mol.atoms.findIndex((a) => a.id === sId);
+        if (sIdx === -1) continue;
+
+        const sulfur = mol.atoms[sIdx];
+        if (!sulfur || sulfur.symbol !== "S") continue;
+        if ((sulfur.hydrogens ?? 0) === 0) continue; // Must have H
+
+        // Check if transformation would break aromaticity
+        const wouldBreakAromatic =
+          isAtomInAromaticRing(alphaC, mol) || isAtomInAromaticRing(betaC, mol);
+
+        sites.push({
+          type: "enethiol-thione",
+          atoms: [alphaIdx, betaIdx, sIdx], // [alpha C, beta C (has SH), S]
+          canTransform: !wouldBreakAromatic,
+          priority: 95,
+          metadata: { alpha: alphaIdx, beta: betaIdx, sulfur: sIdx },
+        });
+      }
+    }
+  }
 
   return sites;
 }
@@ -259,14 +384,15 @@ export function detectLactamLactimSites(mol: Molecule): TransformationSite[] {
         const oxygen = mol.atoms[oIdx];
         if (!oxygen || oxygen.symbol !== "O") continue;
 
-        // Check if transformation would break aromaticity
-        const wouldBreakAromatic =
-          isAtomInAromaticRing(nitrogen, mol) || isAtomInAromaticRing(carbon, mol);
+        // In heterocyclic systems (like guanine, uracil), lactam-lactim tautomerism
+        // is valid even when N and C are aromatic, as long as O is exocyclic.
+        // Only block if oxygen is part of the aromatic ring (rare).
+        const oxygenInAromaticRing = isAtomInAromaticRing(oxygen, mol);
 
         sites.push({
           type: "lactam-lactim",
           atoms: [nIdx, cIdx, oIdx], // [N, C, O]
-          canTransform: !wouldBreakAromatic,
+          canTransform: !oxygenInAromaticRing,
           priority: 90,
           metadata: { nitrogen: nIdx, carbon: cIdx, oxygen: oIdx },
         });
@@ -325,6 +451,75 @@ export function detectAminoImineSites(mol: Molecule): TransformationSite[] {
   return sites;
 }
 
+export function detectAmidineSites(mol: Molecule): TransformationSite[] {
+  const sites: TransformationSite[] = [];
+
+  // Pattern: N(-H)-C=N (amidine) - H migrates between the two nitrogens
+  // This covers patterns like: NH2-C=N ↔ NH=C-NH (guanidine, amidines)
+  // Also covers heterocyclic patterns in guanine, adenine, cytosine, etc.
+
+  for (let n1Idx = 0; n1Idx < mol.atoms.length; n1Idx++) {
+    const nitrogen1 = mol.atoms[n1Idx];
+    if (!nitrogen1 || nitrogen1.symbol !== "N") continue;
+    if ((nitrogen1.hydrogens ?? 0) === 0) continue; // Must have H to donate
+
+    // Find N-C bonds
+    const n1Bonds = mol.bonds.filter((b) => b.atom1 === nitrogen1.id || b.atom2 === nitrogen1.id);
+
+    for (const n1Bond of n1Bonds) {
+      // N-C can be single or aromatic
+      if (n1Bond.type !== BondType.SINGLE && n1Bond.type !== BondType.AROMATIC) continue;
+
+      const cId = n1Bond.atom1 === nitrogen1.id ? n1Bond.atom2 : n1Bond.atom1;
+      const cIdx = mol.atoms.findIndex((a) => a.id === cId);
+      if (cIdx === -1) continue;
+
+      const carbon = mol.atoms[cIdx];
+      if (!carbon || carbon.symbol !== "C") continue;
+
+      // Find C=N or C-N(aromatic) bonds to another nitrogen
+      const cBonds = mol.bonds.filter(
+        (b) => (b.atom1 === carbon.id || b.atom2 === carbon.id) && b !== n1Bond,
+      );
+
+      for (const cnBond of cBonds) {
+        // Look for C=N double bond or aromatic C-N
+        if (cnBond.type !== BondType.DOUBLE && cnBond.type !== BondType.AROMATIC) continue;
+
+        const n2Id = cnBond.atom1 === carbon.id ? cnBond.atom2 : cnBond.atom1;
+        const n2Idx = mol.atoms.findIndex((a) => a.id === n2Id);
+        if (n2Idx === -1) continue;
+
+        const nitrogen2 = mol.atoms[n2Idx];
+        if (!nitrogen2 || nitrogen2.symbol !== "N") continue;
+        if (n2Idx === n1Idx) continue; // Can't be the same nitrogen
+
+        // Check if N2 can accept a hydrogen
+        // N2 should be sp2 (in C=N) or aromatic without too many H
+        const n2Hydrogens = nitrogen2.hydrogens ?? 0;
+        if (n2Hydrogens >= 2) continue; // Already has max H for this pattern
+
+        // Valid amidine site: H can move from N1 to N2
+        sites.push({
+          type: "amidine",
+          atoms: [n1Idx, cIdx, n2Idx], // [N-donor, C, N-acceptor]
+          canTransform: true,
+          priority: 85,
+          metadata: {
+            donor: n1Idx,
+            carbon: cIdx,
+            acceptor: n2Idx,
+            donorH: nitrogen1.hydrogens,
+            acceptorH: n2Hydrogens,
+          },
+        });
+      }
+    }
+  }
+
+  return sites;
+}
+
 export function detectImineEnamineSites(mol: Molecule): TransformationSite[] {
   const sites: TransformationSite[] = [];
 
@@ -373,6 +568,17 @@ export function detectImineEnamineSites(mol: Molecule): TransformationSite[] {
       const alpha = mol.atoms[alphaIdx];
       if (!alpha || alpha.symbol !== "C") continue;
       if ((alpha.hydrogens ?? 0) === 0) continue;
+
+      // Check if alpha carbon already has a C=C double bond (would create allene)
+      // The transformation changes C-alpha to C=alpha, so if alpha already has a double bond to another C, skip
+      const alphaBonds = mol.bonds.filter((b) => b.atom1 === alpha.id || b.atom2 === alpha.id);
+      const alphaHasDoubleBondToCarbon = alphaBonds.some((b) => {
+        if (b.type !== BondType.DOUBLE) return false;
+        const neighborId = b.atom1 === alpha.id ? b.atom2 : b.atom1;
+        const neighbor = mol.atoms.find((a) => a.id === neighborId);
+        return neighbor?.symbol === "C";
+      });
+      if (alphaHasDoubleBondToCarbon) continue; // Skip - would create allene
 
       // Check if transformation would break aromaticity
       const wouldBreakAromatic =
@@ -636,6 +842,20 @@ export function detect15KetoEnolSites(mol: Molecule): TransformationSite[] {
             const delta = mol.atoms[deltaIdx];
             if (!delta || delta.symbol !== "C") continue;
             if ((delta.hydrogens ?? 0) === 0) continue;
+
+            // Check if delta carbon already has a C=C double bond to another carbon (not gamma)
+            // This would create an allene when we add gamma=delta
+            const deltaBonds = mol.bonds.filter(
+              (b) => b.atom1 === delta.id || b.atom2 === delta.id,
+            );
+            const deltaHasOtherDoubleBondToCarbon = deltaBonds.some((b) => {
+              if (b.type !== BondType.DOUBLE) return false;
+              const neighborId = b.atom1 === delta.id ? b.atom2 : b.atom1;
+              if (neighborId === gamma.id) return false; // Ignore gamma-delta bond (doesn't exist yet as double)
+              const neighbor = mol.atoms.find((a) => a.id === neighborId);
+              return neighbor?.symbol === "C";
+            });
+            if (deltaHasOtherDoubleBondToCarbon) continue; // Skip - would create allene
 
             // Check if transformation would break aromaticity
             const wouldBreakAromatic =
@@ -1753,9 +1973,12 @@ export function identifyAllTransformationSites(mol: Molecule): TransformationSit
   sites.push(...detectKetoEnolSites(mol));
   sites.push(...detect15KetoEnolSites(mol));
   sites.push(...detectEnolKetoSites(mol));
+  sites.push(...detectThioneEnethiolSites(mol));
+  sites.push(...detectEnethiolThioneSites(mol));
   sites.push(...detectPhenolQuinoneSites(mol));
   sites.push(...detectLactamLactimSites(mol));
   sites.push(...detectAminoImineSites(mol));
+  sites.push(...detectAmidineSites(mol));
   sites.push(...detectImineEnamineSites(mol));
   sites.push(...detectNitrosoOximeSites(mol));
   sites.push(...detectAromaticHeteroatomHShift(mol));

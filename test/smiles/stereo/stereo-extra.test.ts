@@ -42,8 +42,9 @@ describe("SMILES Stereo Extras", () => {
     );
     expect(stereoSingle).toBeDefined();
     // Canonical generator should drop stereo markers in small rings
+    // Atoms with double bonds are visited first due to higher bond order
     const gen = generateSMILES(mol);
-    expect(gen).toBe("FC1CC=C1F");
+    expect(gen).toBe("FC1=CCC1F");
   });
 
   it("handles cis alkene with same substituents (Z-configuration)", () => {

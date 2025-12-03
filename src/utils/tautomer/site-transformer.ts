@@ -4,6 +4,7 @@ import type { TransformationSite } from "./site-detector";
 import { computeImplicitHydrogens } from "src/utils/implicit-hydrogens";
 import { enrichMolecule } from "src/utils/molecule-enrichment";
 import { validateValences } from "src/validators/valence-validator";
+import { kekulize } from "src/utils/kekulize";
 
 const debugTransform = !!process.env.OPENCHEM_DEBUG_TAUTOMER;
 
@@ -19,11 +20,92 @@ function cloneMolecule(m: Molecule): Molecule {
 }
 
 function clearAromaticity(atoms: Atom[], bonds: Bond[]): { atoms: Atom[]; bonds: Bond[] } {
-  const clearedAtoms = atoms.map((a) => ({ ...a, aromatic: false }) as Atom);
-  const clearedBonds = bonds.map((b) =>
-    b.type === BondType.AROMATIC ? ({ ...b, type: BondType.SINGLE } as Bond) : b,
-  );
-  return { atoms: clearedAtoms, bonds: clearedBonds };
+  // First kekulize to get proper alternating single/double bonds
+  const tempMol = { atoms, bonds } as Molecule;
+  const kekulized = kekulize(tempMol);
+
+  // Then clear aromatic flags from atoms
+  const clearedAtoms = kekulized.atoms.map((a) => ({ ...a, aromatic: false }) as Atom);
+
+  return { atoms: clearedAtoms, bonds: kekulized.bonds as Bond[] };
+}
+
+/**
+ * Set up proper cyclohexadienone ring structure for phenol → quinone transformation.
+ * Starting from the carbonyl carbon, sets up alternating single/double bonds around the ring.
+ * Pattern: C(=O)-C=C-C=C-C where the carbonyl C has two single bonds to ring neighbors.
+ */
+function setupQuinoneRing(
+  mol: Molecule,
+  atoms: Atom[],
+  bonds: Bond[],
+  carbonylIdx: number,
+  ring: number[],
+): void {
+  const carbonyl = atoms[carbonylIdx];
+  if (!carbonyl) return;
+
+  // Find position of carbonyl in ring
+  const carbonylPos = ring.indexOf(carbonyl.id);
+  if (carbonylPos === -1) return;
+
+  const ringSize = ring.length;
+  if (ringSize !== 6) return; // Only handle 6-membered rings
+
+  if (debugTransform) {
+    console.log(`[setupQuinoneRing] Ring: ${ring.join(",")}, carbonylPos: ${carbonylPos}`);
+  }
+
+  // Mark all ring atoms as non-aromatic
+  for (const atomId of ring) {
+    const atomIdx = atoms.findIndex((a) => a.id === atomId);
+    if (atomIdx !== -1 && atoms[atomIdx]) {
+      atoms[atomIdx] = { ...atoms[atomIdx], aromatic: false } as Atom;
+    }
+  }
+
+  // Set up alternating bonds around the ring starting from carbonyl
+  // For cyclohexadienone: C(=O)-C=C-C=C-C-
+  // Carbonyl has SINGLE bonds to both ring neighbors
+  // Then alternating: double, single, double, single around the ring
+  for (let offset = 0; offset < ringSize; offset++) {
+    const pos1 = (carbonylPos + offset) % ringSize;
+    const pos2 = (carbonylPos + offset + 1) % ringSize;
+    const atomId1 = ring[pos1];
+    const atomId2 = ring[pos2];
+
+    if (atomId1 === undefined || atomId2 === undefined) continue;
+
+    const bondIdx = bonds.findIndex(
+      (b) =>
+        (b.atom1 === atomId1 && b.atom2 === atomId2) ||
+        (b.atom1 === atomId2 && b.atom2 === atomId1),
+    );
+
+    if (bondIdx === -1 || !bonds[bondIdx]) continue;
+
+    // Carbonyl's bonds (offset 0 and offset 5) should be SINGLE
+    // Others alternate: offset 1 = DOUBLE, 2 = SINGLE, 3 = DOUBLE, 4 = SINGLE
+    let bondType: BondType;
+    if (offset === 0 || offset === ringSize - 1) {
+      // Bonds adjacent to carbonyl are single
+      bondType = BondType.SINGLE;
+    } else if (offset % 2 === 1) {
+      // Odd offsets from carbonyl are double (positions 1, 3)
+      bondType = BondType.DOUBLE;
+    } else {
+      // Even offsets (2, 4) are single
+      bondType = BondType.SINGLE;
+    }
+
+    if (debugTransform) {
+      console.log(
+        `[setupQuinoneRing] offset ${offset}: bond ${atomId1}-${atomId2} -> ${bondType === BondType.SINGLE ? "SINGLE" : "DOUBLE"}`,
+      );
+    }
+
+    bonds[bondIdx] = { ...bonds[bondIdx], type: bondType } as Bond;
+  }
 }
 
 function findBondIndexBetween(mol: Molecule, atomId1: number, atomId2: number): number {
@@ -129,22 +211,24 @@ function transformKetoEnol(mol: Molecule, site: TransformationSite): Transformat
       } as Bond;
     }
   } else if (isPhenolQuinone) {
-    // Phenol → Quinone: Ar-OH + Ar-H → Ar=O + Ar-H2
-    // Note: This breaks aromaticity locally but creates conjugated quinone
+    // Phenol → Quinone: Ar-OH → Ar=O with proper alternating double bonds
+    // This creates cyclohexadienone (O=C1C=CC=CC1) from phenol (Oc1ccccc1)
 
     // Remove H from oxygen (OH → O)
     newAtoms[oxygenIdx] = {
       ...oxygen,
       hydrogens: Math.max(0, (oxygen.hydrogens ?? 0) - 1),
+      isBracket: true,
     } as Atom;
 
-    // Add H to adjacent carbon
+    // Add H to adjacent carbon (alpha carbon gets extra H)
     newAtoms[alphaIdx] = {
       ...alpha,
       hydrogens: (alpha.hydrogens ?? 0) + 1,
+      isBracket: true,
     } as Atom;
 
-    // Change Ar-O to Ar=O (aromatic → double bond)
+    // Change C-O to C=O (single → double bond)
     const coBondIdx = findBondIndexBetween(mol, carbonyl.id, oxygen.id);
     if (coBondIdx !== -1) {
       newBonds[coBondIdx] = {
@@ -153,7 +237,40 @@ function transformKetoEnol(mol: Molecule, site: TransformationSite): Transformat
       } as Bond;
     }
 
-    // Break aromaticity on the carbon-oxygen carbon
+    // Find the 6-membered aromatic ring containing the carbonyl carbon
+    const ring = mol.rings?.find((r) => r.length === 6 && r.includes(carbonyl.id));
+
+    if (ring) {
+      // Set up proper quinone ring structure with alternating double bonds
+      setupQuinoneRing(mol, newAtoms as Atom[], newBonds as Bond[], carbonylIdx, [...ring]);
+
+      // Skip clearAromaticity - we've already set up the correct bond pattern
+      const transformed = {
+        atoms: newAtoms as readonly Atom[],
+        bonds: newBonds as readonly Bond[],
+        rings: mol.rings,
+        ringInfo: mol.ringInfo,
+      } as Molecule;
+
+      const withHydrogens = computeImplicitHydrogens(transformed);
+      const final = enrichMolecule(withHydrogens);
+
+      // Validate
+      const errors: ParseError[] = [];
+      try {
+        validateValences(final.atoms, final.bonds, errors);
+      } catch (_e) {
+        return { success: false, error: "Phenol-quinone valence validation failed" };
+      }
+
+      if (errors.length > 0) {
+        return { success: false, error: errors[0]?.message ?? "Phenol-quinone validation error" };
+      }
+
+      return { success: true, molecule: final };
+    }
+
+    // Fallback: if no 6-membered ring found, just mark carbonyl as non-aromatic
     newAtoms[carbonylIdx] = {
       ...carbonyl,
       aromatic: false,
@@ -283,6 +400,164 @@ function transformEnolKeto(mol: Molecule, site: TransformationSite): Transformat
   const final = enrichMolecule(withHydrogens);
 
   // Validate
+  const errors: ParseError[] = [];
+  try {
+    validateValences(final.atoms, final.bonds, errors);
+  } catch (_e) {
+    return { success: false, error: "Valence validation failed" };
+  }
+
+  if (errors.length > 0) {
+    return { success: false, error: errors[0]?.message ?? "Validation error" };
+  }
+
+  return { success: true, molecule: final };
+}
+
+function transformThioneEnethiol(mol: Molecule, site: TransformationSite): TransformationResult {
+  // Transform: C-C(=S)-C → C=C(-SH)-C (thione → enethiol)
+  // Site atoms: [thiocarbonyl C, S, alpha C]
+  const carbonylIdx = site.atoms[0];
+  const sulfurIdx = site.atoms[1];
+  const alphaIdx = site.atoms[2];
+
+  if (carbonylIdx === undefined || sulfurIdx === undefined || alphaIdx === undefined) {
+    return { success: false, error: "Invalid site atoms array" };
+  }
+
+  const carbonyl = mol.atoms[carbonylIdx];
+  const sulfur = mol.atoms[sulfurIdx];
+  const alpha = mol.atoms[alphaIdx];
+
+  if (!carbonyl || !sulfur || !alpha) {
+    return { success: false, error: "Invalid atom indices" };
+  }
+
+  // Transform: Ca-Cb(=S) → Ca=Cb(-SH)
+  const newAtoms = mol.atoms.slice();
+  const newBonds = mol.bonds.slice();
+
+  // Add H to sulfur
+  newAtoms[sulfurIdx] = {
+    ...sulfur,
+    hydrogens: (sulfur.hydrogens ?? 0) + 1,
+  } as Atom;
+
+  // Remove H from alpha carbon
+  newAtoms[alphaIdx] = {
+    ...alpha,
+    hydrogens: Math.max(0, (alpha.hydrogens ?? 0) - 1),
+  } as Atom;
+
+  // Change C=S to C-S
+  const csBondIdx = findBondIndexBetween(mol, carbonyl.id, sulfur.id);
+  if (csBondIdx !== -1) {
+    newBonds[csBondIdx] = {
+      ...newBonds[csBondIdx],
+      type: BondType.SINGLE,
+    } as Bond;
+  }
+
+  // Change Ca-Cb to Ca=Cb
+  const ccBondIdx = findBondIndexBetween(mol, carbonyl.id, alpha.id);
+  if (ccBondIdx !== -1) {
+    newBonds[ccBondIdx] = {
+      ...newBonds[ccBondIdx],
+      type: BondType.DOUBLE,
+    } as Bond;
+  }
+
+  const { atoms: clearedAtoms, bonds: clearedBonds } = clearAromaticity(newAtoms, newBonds);
+
+  const transformed = {
+    atoms: clearedAtoms as readonly Atom[],
+    bonds: clearedBonds as readonly Bond[],
+    rings: mol.rings,
+    ringInfo: mol.ringInfo,
+  } as Molecule;
+
+  const withHydrogens = computeImplicitHydrogens(transformed);
+  const final = enrichMolecule(withHydrogens);
+
+  const errors: ParseError[] = [];
+  try {
+    validateValences(final.atoms, final.bonds, errors);
+  } catch (_e) {
+    return { success: false, error: "Valence validation failed" };
+  }
+
+  if (errors.length > 0) {
+    return { success: false, error: errors[0]?.message ?? "Validation error" };
+  }
+
+  return { success: true, molecule: final };
+}
+
+function transformEnethiolThione(mol: Molecule, site: TransformationSite): TransformationResult {
+  // Transform: C=C(-SH)-C → C-C(=S)-C (enethiol → thione)
+  // Site atoms: [alpha C, beta C (has SH), S]
+  const alphaIdx = site.atoms[0];
+  const betaIdx = site.atoms[1];
+  const sulfurIdx = site.atoms[2];
+
+  if (alphaIdx === undefined || betaIdx === undefined || sulfurIdx === undefined) {
+    return { success: false, error: "Invalid site atoms array" };
+  }
+
+  const alpha = mol.atoms[alphaIdx];
+  const beta = mol.atoms[betaIdx];
+  const sulfur = mol.atoms[sulfurIdx];
+
+  if (!alpha || !beta || !sulfur) {
+    return { success: false, error: "Invalid atom indices" };
+  }
+
+  // Transform: Ca=Cb(-SH) → Ca-Cb(=S)
+  const newAtoms = mol.atoms.slice();
+  const newBonds = mol.bonds.slice();
+
+  // Remove H from sulfur
+  newAtoms[sulfurIdx] = {
+    ...sulfur,
+    hydrogens: Math.max(0, (sulfur.hydrogens ?? 0) - 1),
+  } as Atom;
+
+  // Add H to alpha carbon
+  newAtoms[alphaIdx] = {
+    ...alpha,
+    hydrogens: (alpha.hydrogens ?? 0) + 1,
+  } as Atom;
+
+  // Change Ca=Cb to Ca-Cb
+  const ccBondIdx = findBondIndexBetween(mol, alpha.id, beta.id);
+  if (ccBondIdx !== -1) {
+    newBonds[ccBondIdx] = {
+      ...newBonds[ccBondIdx],
+      type: BondType.SINGLE,
+    } as Bond;
+  }
+
+  // Change Cb-S to Cb=S
+  const csBondIdx = findBondIndexBetween(mol, beta.id, sulfur.id);
+  if (csBondIdx !== -1) {
+    newBonds[csBondIdx] = {
+      ...newBonds[csBondIdx],
+      type: BondType.DOUBLE,
+    } as Bond;
+  }
+
+  const { atoms: clearedAtoms, bonds: clearedBonds } = clearAromaticity(newAtoms, newBonds);
+
+  const transformed = {
+    atoms: clearedAtoms as readonly Atom[],
+    bonds: clearedBonds as readonly Bond[],
+    rings: mol.rings,
+    ringInfo: mol.ringInfo,
+  } as Molecule;
+
+  const withHydrogens = computeImplicitHydrogens(transformed);
+  const final = enrichMolecule(withHydrogens);
+
   const errors: ParseError[] = [];
   try {
     validateValences(final.atoms, final.bonds, errors);
@@ -428,6 +703,97 @@ function transformAminoImine(mol: Molecule, site: TransformationSite): Transform
   const final = enrichMolecule(withHydrogens);
 
   // Validate
+  const errors: ParseError[] = [];
+  try {
+    validateValences(final.atoms, final.bonds, errors);
+  } catch (_e) {
+    return { success: false, error: "Valence validation failed" };
+  }
+
+  if (errors.length > 0) {
+    return { success: false, error: errors[0]?.message ?? "Validation error" };
+  }
+
+  return { success: true, molecule: final };
+}
+
+function transformAmidine(mol: Molecule, site: TransformationSite): TransformationResult {
+  // Transform: N1(-H)-C=N2 → N1=C-N2(-H) (amidine tautomerism)
+  // Site atoms: [N-donor, C, N-acceptor]
+  const donorIdx = site.atoms[0];
+  const carbonIdx = site.atoms[1];
+  const acceptorIdx = site.atoms[2];
+
+  if (donorIdx === undefined || carbonIdx === undefined || acceptorIdx === undefined) {
+    return { success: false, error: "Invalid site atoms array" };
+  }
+
+  const donor = mol.atoms[donorIdx];
+  const carbon = mol.atoms[carbonIdx];
+  const acceptor = mol.atoms[acceptorIdx];
+
+  if (!donor || !carbon || !acceptor) {
+    return { success: false, error: "Invalid atom indices" };
+  }
+
+  if ((donor.hydrogens ?? 0) < 1) {
+    return { success: false, error: "Donor nitrogen has no H to transfer" };
+  }
+
+  const newAtoms = mol.atoms.slice();
+  const newBonds = mol.bonds.slice();
+
+  // Remove H from donor nitrogen
+  newAtoms[donorIdx] = {
+    ...donor,
+    hydrogens: Math.max(0, (donor.hydrogens ?? 0) - 1),
+  } as Atom;
+
+  // Add H to acceptor nitrogen
+  newAtoms[acceptorIdx] = {
+    ...acceptor,
+    hydrogens: (acceptor.hydrogens ?? 0) + 1,
+  } as Atom;
+
+  // Find and change the bonds
+  const donorCBondIdx = findBondIndexBetween(mol, donor.id, carbon.id);
+  const acceptorCBondIdx = findBondIndexBetween(mol, acceptor.id, carbon.id);
+
+  if (donorCBondIdx === -1 || acceptorCBondIdx === -1) {
+    return { success: false, error: "Could not find required bonds" };
+  }
+
+  const donorCBond = newBonds[donorCBondIdx];
+  const acceptorCBond = newBonds[acceptorCBondIdx];
+
+  if (!donorCBond || !acceptorCBond) {
+    return { success: false, error: "Bond lookup failed" };
+  }
+
+  // Change donor-C bond to double (was single or aromatic)
+  newBonds[donorCBondIdx] = {
+    ...donorCBond,
+    type: BondType.DOUBLE,
+  } as Bond;
+
+  // Change acceptor-C bond to single (was double or aromatic)
+  newBonds[acceptorCBondIdx] = {
+    ...acceptorCBond,
+    type: BondType.SINGLE,
+  } as Bond;
+
+  const { atoms: clearedAtoms, bonds: clearedBonds } = clearAromaticity(newAtoms, newBonds);
+
+  const transformed = {
+    atoms: clearedAtoms as readonly Atom[],
+    bonds: clearedBonds as readonly Bond[],
+    rings: mol.rings,
+    ringInfo: mol.ringInfo,
+  } as Molecule;
+
+  const withHydrogens = computeImplicitHydrogens(transformed);
+  const final = enrichMolecule(withHydrogens);
+
   const errors: ParseError[] = [];
   try {
     validateValences(final.atoms, final.bonds, errors);
@@ -616,23 +982,24 @@ function transformAromaticHShift(mol: Molecule, site: TransformationSite): Trans
 
   // Transform: Move H from donor to acceptor
   // [XH]...Y <-> X...[YH] where X,Y are aromatic heteroatoms
-  const newAtoms = mol.atoms.slice();
+  const newAtoms = mol.atoms.map((a) => ({ ...a })) as (Atom & { isBracket?: boolean })[];
 
-  // Remove H from donor
+  // Remove H from donor - mark as bracket to preserve H count through computeImplicitHydrogens
   newAtoms[donorIdx] = {
     ...donor,
     hydrogens: Math.max(0, (donor.hydrogens ?? 0) - 1),
-  } as Atom;
+    isBracket: true,
+  } as Atom & { isBracket: boolean };
 
-  // Add H to acceptor
+  // Add H to acceptor - mark as bracket to preserve H count through computeImplicitHydrogens
   newAtoms[acceptorIdx] = {
     ...acceptor,
     hydrogens: (acceptor.hydrogens ?? 0) + 1,
-  } as Atom;
+    isBracket: true,
+  } as Atom & { isBracket: boolean };
 
   // For aromatic systems, we typically DON'T want to clear aromaticity
   // because the H-shift maintains the aromatic system
-  // However, we need to recompute implicit hydrogens
 
   const transformed = {
     atoms: newAtoms as readonly Atom[],
@@ -648,7 +1015,6 @@ function transformAromaticHShift(mol: Molecule, site: TransformationSite): Trans
   let final = enrichMolecule(withHydrogens);
 
   // For aromatic H-shifts, we MUST re-perceive aromaticity to validate the transformation
-  // Import perceiveAromaticity
   const { perceiveAromaticity } = require("src/utils/aromaticity-perceiver");
   const { atoms: reperceivedAtoms, bonds: reperceivedBonds } = perceiveAromaticity(
     final.atoms,
@@ -1201,47 +1567,95 @@ function transformIsocyanide(mol: Molecule, site: TransformationSite): Transform
 
 function transformSpecialImine(mol: Molecule, site: TransformationSite): TransformationResult {
   // Special imine cases (RDKit rules 7, 8, 9)
-  // These are edge case imines with specific patterns
+  // Pattern: [N!H0]-[C]=[C] ↔ [N]=[C]-[C!H0]
+  // Site atoms: [nitrogenIdx, carbon1Idx, carbon2Idx]
   const nitrogenIdx = site.atoms[0];
-  const carbonIdx = site.atoms[1];
+  const carbon1Idx = site.atoms[1];
+  const carbon2Idx = site.atoms[2];
 
-  if (nitrogenIdx === undefined || carbonIdx === undefined) {
+  if (nitrogenIdx === undefined || carbon1Idx === undefined || carbon2Idx === undefined) {
     return { success: false, error: "Invalid site atoms array" };
   }
 
   const nitrogen = mol.atoms[nitrogenIdx];
-  const carbon = mol.atoms[carbonIdx];
+  const carbon1 = mol.atoms[carbon1Idx];
+  const carbon2 = mol.atoms[carbon2Idx];
 
-  if (!nitrogen || !carbon) {
+  if (!nitrogen || !carbon1 || !carbon2) {
     return { success: false, error: "Invalid atom indices" };
   }
 
-  // Transform: Similar to imine-enamine but for special cases
   const newAtoms = mol.atoms.slice();
   const newBonds = mol.bonds.slice();
 
-  // Add H to nitrogen
-  newAtoms[nitrogenIdx] = {
-    ...nitrogen,
-    hydrogens: (nitrogen.hydrogens ?? 0) + 1,
-  } as Atom;
+  // Determine transformation direction based on current state
+  const ncBondIdx = findBondIndexBetween(mol, nitrogen.id, carbon1.id);
+  const ccBondIdx = findBondIndexBetween(mol, carbon1.id, carbon2.id);
 
-  // Remove H from carbon
-  newAtoms[carbonIdx] = {
-    ...carbon,
-    hydrogens: Math.max(0, (carbon.hydrogens ?? 0) - 1),
-  } as Atom;
+  if (ncBondIdx === -1 || ccBondIdx === -1) {
+    return { success: false, error: "Required bonds not found" };
+  }
 
-  // Toggle N=C to N-C or vice versa
-  const ncBondIdx = findBondIndexBetween(mol, nitrogen.id, carbon.id);
-  if (ncBondIdx !== -1) {
-    const currentBond = newBonds[ncBondIdx];
-    if (currentBond) {
-      newBonds[ncBondIdx] = {
-        ...currentBond,
-        type: currentBond.type === BondType.DOUBLE ? BondType.SINGLE : BondType.DOUBLE,
-      } as Bond;
+  const ncBond = newBonds[ncBondIdx];
+  const ccBond = newBonds[ccBondIdx];
+
+  if (!ncBond || !ccBond) {
+    return { success: false, error: "Bond objects not found" };
+  }
+
+  // Forward: NH2-C=C → =NH-C-CH (N loses H, far C gains H)
+  // Reverse: =NH-C-CH → NH2-C=C (N gains H, far C loses H)
+  if (ncBond.type === BondType.SINGLE && ccBond.type === BondType.DOUBLE) {
+    // Forward transformation: NH2-C=C → =NH-C-CH
+    if ((nitrogen.hydrogens ?? 0) === 0) {
+      return { success: false, error: "Nitrogen has no H to donate" };
     }
+
+    // Remove H from nitrogen
+    newAtoms[nitrogenIdx] = {
+      ...nitrogen,
+      hydrogens: Math.max(0, (nitrogen.hydrogens ?? 0) - 1),
+    } as Atom;
+
+    // Add H to far carbon
+    newAtoms[carbon2Idx] = {
+      ...carbon2,
+      hydrogens: (carbon2.hydrogens ?? 0) + 1,
+    } as Atom;
+
+    // N-C single → N=C double
+    newBonds[ncBondIdx] = { ...ncBond, type: BondType.DOUBLE } as Bond;
+
+    // C=C double → C-C single
+    newBonds[ccBondIdx] = { ...ccBond, type: BondType.SINGLE } as Bond;
+  } else if (ncBond.type === BondType.DOUBLE && ccBond.type === BondType.SINGLE) {
+    // Reverse transformation: =NH-C-CH → NH2-C=C
+    if ((carbon2.hydrogens ?? 0) === 0) {
+      return { success: false, error: "Far carbon has no H to donate" };
+    }
+
+    // Add H to nitrogen
+    newAtoms[nitrogenIdx] = {
+      ...nitrogen,
+      hydrogens: (nitrogen.hydrogens ?? 0) + 1,
+    } as Atom;
+
+    // Remove H from far carbon
+    newAtoms[carbon2Idx] = {
+      ...carbon2,
+      hydrogens: Math.max(0, (carbon2.hydrogens ?? 0) - 1),
+    } as Atom;
+
+    // N=C double → N-C single
+    newBonds[ncBondIdx] = { ...ncBond, type: BondType.SINGLE } as Bond;
+
+    // C-C single → C=C double
+    newBonds[ccBondIdx] = { ...ccBond, type: BondType.DOUBLE } as Bond;
+  } else {
+    return {
+      success: false,
+      error: `Unexpected bond types: N-C=${ncBond.type}, C-C=${ccBond.type}`,
+    };
   }
 
   const { atoms: clearedAtoms, bonds: clearedBonds } = clearAromaticity(newAtoms, newBonds);
@@ -1444,11 +1858,20 @@ export function applySiteTransformation(
     case "enol-keto":
       result = transformEnolKeto(cloned, site);
       break;
+    case "thione-enethiol":
+      result = transformThioneEnethiol(cloned, site);
+      break;
+    case "enethiol-thione":
+      result = transformEnethiolThione(cloned, site);
+      break;
     case "lactam-lactim":
       result = transformLactamLactim(cloned, site);
       break;
     case "amino-imine":
       result = transformAminoImine(cloned, site);
+      break;
+    case "amidine":
+      result = transformAmidine(cloned, site);
       break;
     case "imine-enamine":
       result = transformImineEnamine(cloned, site);

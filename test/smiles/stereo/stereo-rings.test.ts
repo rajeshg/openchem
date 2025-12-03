@@ -10,7 +10,8 @@ describe("Ring Stereochemistry Handling", () => {
       expect(res.errors).toHaveLength(0);
       const mol = res.molecules[0]!;
       const gen = generateSMILES(mol);
-      expect(gen).toBe("FC1CC=C1F");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(gen).toBe("FC1=CCC1F");
     });
 
     it("clears stereo markers in 5-membered ring with double bond", () => {
@@ -19,7 +20,8 @@ describe("Ring Stereochemistry Handling", () => {
       expect(res.errors).toHaveLength(0);
       const mol = res.molecules[0]!;
       const gen = generateSMILES(mol);
-      expect(gen).toBe("FC1CCC=C1F");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(gen).toBe("FC1=CCCC1F");
     });
 
     it("clears stereo markers in 6-membered ring with double bond", () => {
@@ -28,7 +30,8 @@ describe("Ring Stereochemistry Handling", () => {
       expect(res.errors).toHaveLength(0);
       const mol = res.molecules[0]!;
       const gen = generateSMILES(mol);
-      expect(gen).toBe("FC1CCCC=C1F");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(gen).toBe("FC1=CCCCC1F");
     });
 
     it("clears stereo on multiple substituents in small ring", () => {
@@ -47,7 +50,8 @@ describe("Ring Stereochemistry Handling", () => {
       expect(res.errors).toHaveLength(0);
       const mol = res.molecules[0]!;
       const gen = generateSMILES(mol);
-      expect(gen).toBe("FC=1CC=CC1");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(gen).toBe("FC1=CC=CC1");
     });
   });
 
@@ -141,7 +145,8 @@ describe("Ring Stereochemistry Handling", () => {
       expect(res.errors).toHaveLength(0);
       const mol = res.molecules[0]!;
       const gen = generateSMILES(mol);
-      expect(gen).toBe("FC1CC=C1F");
+      // Atoms with double bonds are visited first due to higher bond order
+      expect(gen).toBe("FC1=CCC1F");
     });
 
     it("handles exocyclic bond with no stereo markers", () => {
