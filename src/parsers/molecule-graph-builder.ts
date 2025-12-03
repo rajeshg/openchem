@@ -123,6 +123,26 @@ export class MoleculeGraphBuilder
     }
   }
 
+  convertRingDoubleBondsToSingle(atomIdx: number): void {
+    if (atomIdx < 0 || atomIdx >= this.atoms.length) return;
+
+    const atom = this.atoms[atomIdx]!;
+    atom.aromatic = false;
+
+    this.bonds.forEach((bond) => {
+      if (bond.atom1 === atomIdx || bond.atom2 === atomIdx) {
+        if (bond.type === BondTypeEnum.DOUBLE || bond.type === BondTypeEnum.AROMATIC) {
+          bond.type = BondTypeEnum.SINGLE;
+          if (process.env.VERBOSE) {
+            console.log(
+              `[builder] Converted ring bond ${bond.atom1}-${bond.atom2} from ${bond.type} to SINGLE for alkylidene`,
+            );
+          }
+        }
+      }
+    });
+  }
+
   setCharge(atomIdx: number, charge: number): void {
     if (atomIdx >= 0 && atomIdx < this.atoms.length) {
       const atom = this.atoms[atomIdx]!;
@@ -191,6 +211,52 @@ export class MoleculeGraphBuilder
       }
     }
 
+    if (atomIndices.length > 2) {
+      const bondType = aromatic ? BondTypeEnum.AROMATIC : BondTypeEnum.SINGLE;
+      this.addBond(atomIndices[atomIndices.length - 1]!, atomIndices[0]!, bondType);
+    }
+
+    return atomIndices;
+  }
+
+  /**
+   * Create a cyclic chain with heteroatom replacements.
+   * @param size Total ring size
+   * @param heteroatoms Array of {position, element} where position is 1-based (IUPAC numbering)
+   * @param aromatic Whether the ring is aromatic
+   */
+  createCyclicChainWithHeteroatoms(
+    size: number,
+    heteroatoms: Array<{ position: number; element: string }>,
+    aromatic = false,
+  ): number[] {
+    const atomIndices: number[] = [];
+
+    // Convert 1-based positions to 0-based indices for internal use
+    const heteroPositions = new Map<number, string>();
+    for (const h of heteroatoms) {
+      heteroPositions.set(h.position - 1, h.element); // Convert to 0-based
+    }
+
+    for (let i = 0; i < size; i++) {
+      let atomIdx: number;
+      const heteroElement = heteroPositions.get(i);
+      if (heteroElement) {
+        // Add heteroatom
+        atomIdx = this.addAtom(heteroElement, aromatic);
+      } else {
+        // Add carbon
+        atomIdx = aromatic ? this.addAtom("C", true) : this.addCarbon();
+      }
+      atomIndices.push(atomIdx);
+
+      if (i > 0) {
+        const bondType = aromatic ? BondTypeEnum.AROMATIC : BondTypeEnum.SINGLE;
+        this.addBond(atomIndices[i - 1]!, atomIdx, bondType);
+      }
+    }
+
+    // Close the ring
     if (atomIndices.length > 2) {
       const bondType = aromatic ? BondTypeEnum.AROMATIC : BondTypeEnum.SINGLE;
       this.addBond(atomIndices[atomIndices.length - 1]!, atomIndices[0]!, bondType);
@@ -361,6 +427,54 @@ export class MoleculeGraphBuilder
 
   createPyrazoleSaturated(): number[] {
     return this.ringBuilder.createPyrazoleSaturated();
+  }
+
+  createBenzothiopheneRing(): number[] {
+    return this.ringBuilder.createBenzothiopheneRing();
+  }
+
+  createBenzimidazoleRing(): number[] {
+    return this.ringBuilder.createBenzimidazoleRing();
+  }
+
+  createBenzoxazoleRing(): number[] {
+    return this.ringBuilder.createBenzoxazoleRing();
+  }
+
+  createBenzothiazoleRing(): number[] {
+    return this.ringBuilder.createBenzothiazoleRing();
+  }
+
+  createIndazoleRing(): number[] {
+    return this.ringBuilder.createIndazoleRing();
+  }
+
+  createBenzotriazoleRing(): number[] {
+    return this.ringBuilder.createBenzotriazoleRing();
+  }
+
+  create134OxadiazoleRing(): number[] {
+    return this.ringBuilder.create134OxadiazoleRing();
+  }
+
+  create124OxadiazoleRing(): number[] {
+    return this.ringBuilder.create124OxadiazoleRing();
+  }
+
+  create123OxadiazoleRing(): number[] {
+    return this.ringBuilder.create123OxadiazoleRing();
+  }
+
+  create134ThiadiazoleRing(): number[] {
+    return this.ringBuilder.create134ThiadiazoleRing();
+  }
+
+  create124ThiadiazoleRing(): number[] {
+    return this.ringBuilder.create124ThiadiazoleRing();
+  }
+
+  create123ThiadiazoleRing(): number[] {
+    return this.ringBuilder.create123ThiadiazoleRing();
   }
 
   addHydroxyl(atomIdx: number): void {

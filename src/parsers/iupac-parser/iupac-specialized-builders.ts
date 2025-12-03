@@ -174,6 +174,7 @@ export class IUPACSpecializedBuilders {
     substituentTokens: IUPACToken[],
     multiplierTokens: IUPACToken[],
     prefixTokens: IUPACToken[],
+    isSaturatedForm: boolean = false,
   ): Molecule {
     const nPrefixToken = prefixTokens.find((p) => this.isNSubstitutionPrefix(p));
     if (!nPrefixToken) {
@@ -195,21 +196,43 @@ export class IUPACSpecializedBuilders {
       parentSmiles === "c1cscn1" ||
       parentSmiles === "c1scnc1"
     ) {
-      mainChainAtoms = builder.createThiazoleRing();
+      // Use saturated form when indicated (e.g., "4H-1,3-thiazole")
+      if (isSaturatedForm) {
+        mainChainAtoms = builder.createThiazoleSaturated();
+        if (process.env.VERBOSE) {
+          console.log("[n-amine] Creating SATURATED thiazole ring");
+        }
+      } else {
+        mainChainAtoms = builder.createThiazoleRing();
+      }
     } else if (
       parentValue === "oxazole" ||
       parentValue === "oxazol" ||
       parentSmiles === "c1cocn1" ||
       parentSmiles === "c1ocnc1"
     ) {
-      mainChainAtoms = builder.createOxazoleRing();
+      if (isSaturatedForm) {
+        mainChainAtoms = builder.createOxazoleSaturated();
+        if (process.env.VERBOSE) {
+          console.log("[n-amine] Creating SATURATED oxazole ring");
+        }
+      } else {
+        mainChainAtoms = builder.createOxazoleRing();
+      }
     } else if (
       parentValue === "imidazole" ||
       parentValue === "imidazol" ||
       parentSmiles === "c1c[nH]cn1" ||
       parentSmiles === "c1cncc[nH]1"
     ) {
-      mainChainAtoms = builder.createImidazoleRing();
+      if (isSaturatedForm) {
+        mainChainAtoms = builder.createImidazoleSaturated();
+        if (process.env.VERBOSE) {
+          console.log("[n-amine] Creating SATURATED imidazole ring");
+        }
+      } else {
+        mainChainAtoms = builder.createImidazoleRing();
+      }
     } else if (
       parentValue === "pyrrole" ||
       parentValue === "pyrrol" ||

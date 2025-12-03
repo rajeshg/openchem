@@ -1036,12 +1036,17 @@ export class IUPACSubstituentApplicator {
           }
         } else if (modifiedSubstValue === "methylidene") {
           // Add methylidene: =CH2 (exocyclic double bond with CH2)
+          // First, convert any existing ring double bonds from this atom to single
+          // This is needed when the ring was created with a Kekule form that doesn't
+          // account for the exocyclic double bond (e.g., 4H-thiazole with methylidene)
+          builder.convertRingDoubleBondsToSingle(atomIdx);
           const cIdx = builder.addAtom("C");
           builder.addBond(atomIdx, cIdx, BondTypeEnum.DOUBLE);
           // Add 2 hydrogens to the methylidene carbon
           // (implicit hydrogens will be added automatically)
         } else if (modifiedSubstValue === "ethylidene") {
           // Add ethylidene: =CH-CH3
+          builder.convertRingDoubleBondsToSingle(atomIdx);
           const c1 = builder.addAtom("C");
           const c2 = builder.addAtom("C");
           builder.addBond(atomIdx, c1, BondTypeEnum.DOUBLE);

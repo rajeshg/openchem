@@ -1207,6 +1207,59 @@ export class IUPACTokenizer {
     // If we found a multiplier-based match, return it (it's longer and more specific than stem components)
     if (bestMatch) return bestMatch;
 
+    // Try to match bare multiplier stems followed by hyphen (for cycloalkane substituents)
+    // E.g., "hexacos-1-yl" where "hexacos" is the 26-carbon stem
+    // This is needed after "cyclo" prefix where we get "hexacos-1-yl" not "hexacosane"
+    if (this.rules.multipliers && this.rules.multipliers.basic) {
+      const multiplierEntries = Object.entries(this.rules.multipliers.basic).sort((a, b) => {
+        // Sort by multiplier name length (longest first)
+        const aName = String(a[1]);
+        const bName = String(b[1]);
+        const aLen = aName.includes("|")
+          ? Math.max(...aName.split("|").map((x: string) => x.length))
+          : aName.length;
+        const bLen = bName.includes("|")
+          ? Math.max(...bName.split("|").map((x: string) => x.length))
+          : bName.length;
+        return bLen - aLen;
+      });
+
+      for (const [atomCount, nameOrNames] of multiplierEntries) {
+        const nameStr = String(nameOrNames);
+        const names = nameStr.includes("|") ? nameStr.split("|") : [nameStr];
+
+        for (const multiplierName of names) {
+          if (str.startsWith(multiplierName)) {
+            const remainder = str.substring(multiplierName.length);
+            // Check if followed by hyphen (for substituent forms like "hexacos-1-yl")
+            if (remainder.startsWith("-")) {
+              const carbonCount = parseInt(atomCount);
+              const smiles = "C".repeat(carbonCount);
+
+              if (bestMatch === null || multiplierName.length > bestMatch.length) {
+                bestMatch = {
+                  type: "PARENT",
+                  value: multiplierName,
+                  position: pos,
+                  length: multiplierName.length,
+                  metadata: {
+                    smiles,
+                    atomCount: carbonCount,
+                    isRing: false,
+                    fromMultiplier: true,
+                    isBareMultiplier: true, // Flag to indicate this is just the stem
+                  },
+                };
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // If we found a bare multiplier match, return it
+    if (bestMatch) return bestMatch;
+
     // Try alkanes from rules.alkanes dictionary
     for (const [smiles, name] of Object.entries(this.rules.alkanes)) {
       if (str.startsWith(name)) {

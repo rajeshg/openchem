@@ -48,6 +48,103 @@ export class IUPACGraphBuilder
   }
 
   /**
+   * Parse heteroatom replacement info from a cyclo prefix.
+   * Examples:
+   *   "azacyclo" → [{count: 1, element: "N"}]
+   *   "dioxacyclo" → [{count: 2, element: "O"}]
+   *   "oxathiacyclo" → [{count: 1, element: "O"}, {count: 1, element: "S"}]
+   */
+  private parseHeteroatomsFromCycloPrefix(
+    prefixValue: string,
+  ): Array<{ count: number; element: string }> {
+    const result: Array<{ count: number; element: string }> = [];
+
+    // Remove "cyclo" suffix to get heteroatom part
+    const cycloIdx = prefixValue.indexOf("cyclo");
+    if (cycloIdx < 0) return result;
+
+    const heteroPart = prefixValue.substring(0, cycloIdx);
+    if (!heteroPart) return result;
+
+    // Heteroatom prefixes and their element mappings
+    const heteroMap: Record<string, string> = {
+      aza: "N",
+      oxa: "O",
+      thia: "S",
+      phospha: "P",
+      arsa: "As",
+      stiba: "Sb",
+      bismuta: "Bi",
+      selena: "Se",
+      tellura: "Te",
+    };
+
+    // Multiplier prefixes
+    const multipliers: Record<string, number> = {
+      di: 2,
+      tri: 3,
+      tetra: 4,
+      penta: 5,
+      hexa: 6,
+      hepta: 7,
+      octa: 8,
+      nona: 9,
+      deca: 10,
+    };
+
+    let remaining = heteroPart.toLowerCase();
+
+    while (remaining.length > 0) {
+      let count = 1;
+
+      // Check for multiplier prefix
+      for (const [mult, val] of Object.entries(multipliers)) {
+        if (remaining.startsWith(mult)) {
+          count = val;
+          remaining = remaining.substring(mult.length);
+          break;
+        }
+      }
+
+      // Check for heteroatom prefix
+      let matched = false;
+      for (const [prefix, element] of Object.entries(heteroMap)) {
+        if (remaining.startsWith(prefix)) {
+          result.push({ count, element });
+          remaining = remaining.substring(prefix.length);
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        // Unknown prefix, stop parsing
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Look up a trivial name and return its SMILES if found.
+   * Searches the trivialNames section of opsin-rules.json.
+   */
+  private lookupTrivialName(name: string): string | null {
+    if (!this.rules.trivialNames) return null;
+
+    const normalizedName = name.toLowerCase();
+
+    for (const [smiles, data] of Object.entries(this.rules.trivialNames)) {
+      if (data.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
+        return smiles;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Build a molecule from IUPAC tokens using graph construction
    */
   build(tokens: IUPACToken[]): Molecule {
@@ -624,6 +721,7 @@ export class IUPACGraphBuilder
           substituentTokens,
           multiplierTokens,
           prefixTokens,
+          isSaturatedForm,
         );
       }
     }
@@ -631,6 +729,7 @@ export class IUPACGraphBuilder
     // Check for cyclo prefix that modifies the main parent chain (not substituents)
     // Only treat cyclo as modifying the parent if there's no substituent between it and the parent
     let hasCycloPrefix = false;
+    let cycloPrefixToken: IUPACToken | undefined;
     if (adjustedParentTokens.length > 0) {
       const parentToken = adjustedParentTokens[0]!;
       const cycloPrefix = prefixTokens.find((p) => p.metadata?.isCyclic === true);
@@ -640,6 +739,7 @@ export class IUPACGraphBuilder
         );
         if (!substBetween) {
           hasCycloPrefix = true;
+          cycloPrefixToken = cycloPrefix;
         }
       }
     }
@@ -1194,7 +1294,7 @@ export class IUPACGraphBuilder
         }
       }
 
-      // Detect spiro notation in PREFIX (e.g., "spiro[4.5]decane")
+      // Detect spiro notation in PREFIX (e.g., "spiro[4.5]decane", "1-oxaspiro[4.5]decane")
       const spiroPrefix = prefixTokens.find(
         (p) =>
           p.value?.includes("spiro") &&
@@ -1204,28 +1304,155 @@ export class IUPACGraphBuilder
 
       if (spiroPrefix) {
         // Extract bridge notation from PREFIX value
-        // Pattern: optional heteroatom prefix + "spiro[a.b]"
-        const spiroRegex = /^([a-z]+)?spiro\[(\d+)\.(\d+)\]/i;
+        // Pattern: optional multiplier + optional heteroatom prefix + "spiro[a.b]"
+        // Examples: "spiro[4.5]", "oxaspiro[4.5]", "dioxaspiro[4.5]", "azaspiro[3.3]"
+        const spiroRegex = /^(di|tri|tetra)?([a-z]+)?spiro\[(\d+)\.(\d+)\]/i;
         const match = spiroPrefix.value?.match(spiroRegex);
 
         if (match) {
-          const heteroType = match[1] || "";
-          const ringA = parseInt(match[2]!);
-          const ringB = parseInt(match[3]!);
+          const heteroMultiplier = match[1] || "";
+          const heteroType = match[2] || "";
+          const ringA = parseInt(match[3]!);
+          const ringB = parseInt(match[4]!);
 
           if (process.env.VERBOSE) {
             console.log(
-              `[graph-builder] Detected spiro PREFIX: [${ringA}.${ringB}]${heteroType ? ` with ${heteroType}` : ""}`,
+              `[graph-builder] Detected spiro PREFIX: [${ringA}.${ringB}]${heteroType ? ` with ${heteroMultiplier}${heteroType}` : ""}`,
             );
           }
 
-          mainChainAtoms = builder.createSpiroStructure(ringA, ringB);
+          const rawSpiroAtoms = builder.createSpiroStructure(ringA, ringB);
           hasBicyclicOrTricyclicStructure = true;
+
+          // Remap spiro atoms to IUPAC numbering
+          // createSpiroStructure returns: [spiroCenter, ringA_atom1, ..., ringA_atomN, ringB_atom1, ..., ringB_atomN]
+          // IUPAC numbering: positions 1..ringA (ring A), position ringA+1 (spiro center), positions ringA+2..end (ring B)
+          // So we need: [ringA_atoms..., spiroCenter, ringB_atoms...]
+          const spiroCenter = rawSpiroAtoms[0]!;
+          const ringAAtoms = rawSpiroAtoms.slice(1, ringA + 1);
+          const ringBAtoms = rawSpiroAtoms.slice(ringA + 1);
+          mainChainAtoms = [...ringAAtoms, spiroCenter, ...ringBAtoms];
 
           if (process.env.VERBOSE) {
             console.log(
-              `[graph-builder] Spiro structure built. mainChainAtoms: ${JSON.stringify(mainChainAtoms)}`,
+              `[graph-builder] Spiro structure built. Raw atoms: ${JSON.stringify(rawSpiroAtoms)}`,
             );
+            console.log(
+              `[graph-builder] Remapped to IUPAC order: ${JSON.stringify(mainChainAtoms)}`,
+            );
+          }
+
+          // Apply heteroatom replacements if specified
+          // heteroType can be "oxa", "aza", "thia", etc.
+          if (heteroType) {
+            const heteroSymbol =
+              heteroType === "oxa"
+                ? "O"
+                : heteroType === "aza"
+                  ? "N"
+                  : heteroType === "thia"
+                    ? "S"
+                    : null;
+
+            if (heteroSymbol) {
+              // Determine how many heteroatoms to add
+              const heteroCount =
+                heteroMultiplier === "di"
+                  ? 2
+                  : heteroMultiplier === "tri"
+                    ? 3
+                    : heteroMultiplier === "tetra"
+                      ? 4
+                      : 1;
+
+              // Find locants for heteroatom positions from tokens IMMEDIATELY before spiroPrefix
+              // We need to exclude locants that belong to other heteroatom suffixes (like "2-oxa" in "2-oxa-6-azaspiro")
+              // Only use locants that are not followed by a heteroatom suffix before the spiro prefix
+              const heteroSuffixPositions = suffixTokens
+                .filter((s) => s.metadata?.suffixType === "heteroatom")
+                .map((s) => s.position);
+
+              const heteroLocants = locantTokens
+                .filter((l) => {
+                  // Locant must be before spiro prefix
+                  if (l.position >= spiroPrefix.position) return false;
+                  // Check if this locant is followed by a heteroatom suffix (meaning it belongs to that suffix, not the spiro)
+                  const hasHeteroSuffixAfter = heteroSuffixPositions.some(
+                    (pos) => pos > l.position && pos < spiroPrefix.position,
+                  );
+                  return !hasHeteroSuffixAfter;
+                })
+                .flatMap((l) => (l.metadata?.positions as number[]) || [parseInt(l.value)])
+                .filter((pos) => !isNaN(pos));
+
+              if (process.env.VERBOSE) {
+                console.log(
+                  `[graph-builder] Spiro heteroatom replacement: ${heteroCount}x ${heteroSymbol} at positions:`,
+                  heteroLocants,
+                );
+              }
+
+              // Apply heteroatom replacements
+              // Spiro numbering: positions 1..ringA are in ring A, position ringA+1 is the spiro center,
+              // positions ringA+2..ringA+ringB+1 are in ring B
+              for (let i = 0; i < heteroCount; i++) {
+                const pos = heteroLocants[i] ?? i + 1; // Default to positions 1, 2, 3... if no locants
+                const atomIdx = this.locantToAtomIndex(pos, mainChainAtoms);
+
+                if (atomIdx !== null) {
+                  builder.replaceAtom(atomIdx, heteroSymbol);
+                  if (process.env.VERBOSE) {
+                    console.log(
+                      `[graph-builder] Replaced atom at position ${pos} (index ${atomIdx}) with ${heteroSymbol}`,
+                    );
+                  }
+                }
+              }
+            }
+          }
+
+          // Also check for additional heteroatom prefixes in other tokens (e.g., "2-oxa-6-aza...")
+          // These are SUFFIX tokens with metadata.suffixType === "heteroatom"
+          const heteroSuffixTokens = suffixTokens.filter(
+            (s) => s.metadata?.suffixType === "heteroatom",
+          );
+
+          for (const heteroSuffix of heteroSuffixTokens) {
+            const heteroName = heteroSuffix.value.toLowerCase();
+            const heteroSymbol =
+              heteroName === "oxa"
+                ? "O"
+                : heteroName === "aza"
+                  ? "N"
+                  : heteroName === "thia"
+                    ? "S"
+                    : null;
+
+            if (heteroSymbol) {
+              // Find the locant immediately before this suffix
+              const locantBefore = locantTokens
+                .filter((l) => l.position < heteroSuffix.position)
+                .sort((a, b) => b.position - a.position)[0];
+
+              if (locantBefore) {
+                const positions = (locantBefore.metadata?.positions as number[]) || [
+                  parseInt(locantBefore.value),
+                ];
+                for (const pos of positions) {
+                  if (!isNaN(pos)) {
+                    const atomIdx = this.locantToAtomIndex(pos, mainChainAtoms);
+                    if (atomIdx !== null) {
+                      builder.replaceAtom(atomIdx, heteroSymbol);
+                      if (process.env.VERBOSE) {
+                        console.log(
+                          `[graph-builder] Replaced atom at position ${pos} (index ${atomIdx}) with ${heteroSymbol} (from suffix)`,
+                        );
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1378,6 +1605,59 @@ export class IUPACGraphBuilder
         mainChainAtoms = builder.createPyrazineRing();
       } else if (parentValue === "pyridazine" || parentValue === "pyridazin") {
         mainChainAtoms = builder.createPyridazineRing();
+      } else if (parentValue === "benzothiophene" || parentValue === "benzothiophen") {
+        mainChainAtoms = builder.createBenzothiopheneRing();
+      } else if (parentValue === "benzimidazole" || parentValue === "benzimidazol") {
+        mainChainAtoms = builder.createBenzimidazoleRing();
+      } else if (parentValue === "benzoxazole" || parentValue === "benzoxazol") {
+        mainChainAtoms = builder.createBenzoxazoleRing();
+      } else if (parentValue === "benzothiazole" || parentValue === "benzothiazol") {
+        mainChainAtoms = builder.createBenzothiazoleRing();
+      } else if (parentValue === "indazole" || parentValue === "indazol") {
+        mainChainAtoms = builder.createIndazoleRing();
+      } else if (parentValue === "benzotriazole" || parentValue === "benzotriazol") {
+        mainChainAtoms = builder.createBenzotriazoleRing();
+      } else if (parentValue === "oxadiazole" || parentValue === "oxadiazol") {
+        // Check for locants immediately before the parent to determine isomer type
+        // e.g., "1,2,4-oxadiazole" vs "1,3,4-oxadiazole"
+        const locantBeforeParent = locantTokens
+          .filter((l) => l.position < parentToken.position)
+          .sort((a, b) => b.position - a.position)[0];
+
+        const positions = (locantBeforeParent?.metadata?.positions as number[]) || [];
+        const posStr = positions
+          .slice()
+          .sort((a, b) => a - b)
+          .join(",");
+
+        if (posStr === "1,2,4") {
+          mainChainAtoms = builder.create124OxadiazoleRing();
+        } else if (posStr === "1,2,3") {
+          mainChainAtoms = builder.create123OxadiazoleRing();
+        } else {
+          // Default is 1,3,4-oxadiazole (most common)
+          mainChainAtoms = builder.create134OxadiazoleRing();
+        }
+      } else if (parentValue === "thiadiazole" || parentValue === "thiadiazol") {
+        // Check for locants immediately before the parent to determine isomer type
+        const locantBeforeParent = locantTokens
+          .filter((l) => l.position < parentToken.position)
+          .sort((a, b) => b.position - a.position)[0];
+
+        const positions = (locantBeforeParent?.metadata?.positions as number[]) || [];
+        const posStr = positions
+          .slice()
+          .sort((a, b) => a - b)
+          .join(",");
+
+        if (posStr === "1,2,4") {
+          mainChainAtoms = builder.create124ThiadiazoleRing();
+        } else if (posStr === "1,2,3") {
+          mainChainAtoms = builder.create123ThiadiazoleRing();
+        } else {
+          // Default is 1,3,4-thiadiazole (most common)
+          mainChainAtoms = builder.create134ThiadiazoleRing();
+        }
       } else if (parentValue === "benzoate" && parentSmiles === "c1ccccc1C") {
         // Benzoate is benzene + one carbon for the carboxyl group
         // Build benzene ring
@@ -1390,8 +1670,71 @@ export class IUPACGraphBuilder
           console.log("[graph-builder] Built benzoate: benzene ring + carboxyl carbon");
         }
       } else if (hasCycloPrefix && !hasBicyclicOrTricyclicStructure) {
-        // Build cyclic chain (only if we haven't already built bicyclic/tricyclic)
-        mainChainAtoms = builder.createCyclicChain(atomCount);
+        // Build cyclic chain with heteroatom replacements (only if we haven't already built bicyclic/tricyclic)
+        // Check for heteroatom prefixes like "aza", "oxa", "thia" in the cyclo prefix
+        const heteroReplacements: Array<{ position: number; element: string }> = [];
+
+        if (cycloPrefixToken?.value && cycloPrefixToken.metadata?.heteroAtom) {
+          // Parse heteroatoms from prefix (e.g., "azacyclo" → [{count: 1, element: "N"}])
+          const heteroInfo = this.parseHeteroatomsFromCycloPrefix(cycloPrefixToken.value);
+
+          if (heteroInfo.length > 0) {
+            // For cycloalkane heteroatom positions, look for locants:
+            // 1. After the parent token (e.g., "hexacos-1-yl" → locant "1")
+            // 2. Immediately before the cyclo prefix BUT not consumed by substituents
+            //    (e.g., "1,4-dioxacyclodecane" → locants "1,4")
+
+            let positions: number[] = [];
+
+            // First, check for locants after the parent token (for substituent forms like "azacyclohexacos-1-yl")
+            const postParentLocants = locantTokens.filter((l) => l.position > parentToken.position);
+
+            // Then check for locants immediately before the cyclo prefix
+            // These should NOT be immediately followed by a substituent (to avoid capturing "14-oxo-" locants)
+            const preCycloLocants = locantTokens.filter((l) => {
+              if (l.position >= cycloPrefixToken!.position) return false;
+              // Check if there's a substituent between this locant and the cyclo prefix
+              const hasSubstBetween = substituentTokens.some(
+                (s) => l.position < s.position && s.position < cycloPrefixToken!.position,
+              );
+              return !hasSubstBetween;
+            });
+
+            // Use post-parent locants first (for forms like "azacyclohexacos-1-yl")
+            // Otherwise use pre-cyclo locants (for forms like "1-azacyclodecane")
+            const relevantLocants =
+              postParentLocants.length > 0 ? postParentLocants : preCycloLocants;
+
+            for (const locant of relevantLocants) {
+              if (locant.metadata?.positions) {
+                positions.push(...(locant.metadata.positions as number[]));
+              }
+            }
+
+            // Assign positions to heteroatoms
+            let posIdx = 0;
+            for (const h of heteroInfo) {
+              for (let i = 0; i < h.count; i++) {
+                // Use explicit locant if available, otherwise default to position 1
+                const pos = positions[posIdx] ?? (posIdx === 0 ? 1 : atomCount - posIdx);
+                heteroReplacements.push({ position: pos, element: h.element });
+                posIdx++;
+              }
+            }
+
+            if (process.env.VERBOSE) {
+              console.log(
+                `[graph-builder] Heteroatom replacements for cyclic chain: ${JSON.stringify(heteroReplacements)}`,
+              );
+            }
+          }
+        }
+
+        if (heteroReplacements.length > 0) {
+          mainChainAtoms = builder.createCyclicChainWithHeteroatoms(atomCount, heteroReplacements);
+        } else {
+          mainChainAtoms = builder.createCyclicChain(atomCount);
+        }
       } else if (!hasBicyclicOrTricyclicStructure) {
         // Build linear chain (only if we haven't already built bicyclic/tricyclic)
         if (process.env.VERBOSE) {
@@ -1707,14 +2050,67 @@ export class IUPACGraphBuilder
             }
           }
         } else if (type === "stereocenter" && config) {
-          // Implicit R/S - apply to first chiral-capable atom?
-          // This is risky. E.g. "(R)-butan-2-ol". Pos 2 is the chiral center.
-          // We can look for atoms with 4 neighbors (including H) or just atoms that look chiral?
-          // But locantToAtomIndex requires a number.
-          // Try to match locant of suffix? e.g. butan-2-ol -> 2.
-          // If stereocenter matches suffix locant...
-          // For now, let's skip implicit R/S unless we have a good heuristic.
-          // Often IUPAC puts stereo at the front: (2R)-... which has explicit locant.
+          // Implicit R/S - need to infer the stereocenter position
+          // Common patterns:
+          // 1. "(R)-butan-2-ol" - the -2-ol suffix indicates position 2 is the stereocenter
+          // 2. "(S)-2-aminopropanoic acid" - the 2-amino prefix indicates position 2
+          // 3. For simple molecules with one chiral center, find the atom with 4 different substituents
+
+          // Strategy 1: Look for suffix locants (e.g., "-2-ol" -> position 2)
+          let inferredPosition: number | null = null;
+
+          // Check suffix locants (for patterns like "butan-2-ol")
+          for (const locant of _locantTokens) {
+            if (
+              locant.metadata?.positions &&
+              (locant.metadata.positions as number[]).length === 1
+            ) {
+              // Check if there's a suffix that follows this locant
+              const suffixAfter = _suffixTokens.find((s) => s.position > locant.position);
+              if (suffixAfter) {
+                // This locant is associated with a suffix - likely the stereocenter position
+                inferredPosition = (locant.metadata.positions as number[])[0]!;
+                break;
+              }
+            }
+          }
+
+          // Strategy 2: If no suffix locant found, look for the first atom that could be a stereocenter
+          // (has 4 different neighbors including implicit H)
+          if (inferredPosition === null) {
+            for (let i = 0; i < mainChainAtoms.length; i++) {
+              const atomIdx = mainChainAtoms[i]!;
+              const atom = builder.getAtom(atomIdx);
+              if (atom && atom.symbol === "C") {
+                const bonds = builder
+                  .getBonds()
+                  .filter((b) => b.atom1 === atomIdx || b.atom2 === atomIdx);
+                // A stereocenter typically has 4 different substituents
+                // Simplification: look for carbons with exactly 4 single bonds (including to H)
+                const singleBonds = bonds.filter((b) => b.type === BondTypeEnum.SINGLE);
+                if (singleBonds.length >= 3) {
+                  // Likely a stereocenter (3 explicit bonds + implicit H)
+                  inferredPosition = i + 1; // Convert to 1-based
+                  break;
+                }
+              }
+            }
+          }
+
+          if (inferredPosition !== null) {
+            const atomIdx = this.locantToAtomIndex(inferredPosition, mainChainAtoms);
+            if (atomIdx !== null) {
+              const atom = builder.getAtom(atomIdx);
+              if (atom) {
+                atom.chiral = config === "R" ? "@@" : "@";
+                if (process.env.VERBOSE) {
+                  console.log(
+                    `[stereo] Implicit stereocenter inferred at position ${inferredPosition} (atom ${atomIdx}): ${config} -> ${atom.chiral}`,
+                  );
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -2008,6 +2404,7 @@ export class IUPACGraphBuilder
     substituentTokens: IUPACToken[],
     multiplierTokens: IUPACToken[],
     tokens: IUPACToken[],
+    isSaturatedForm: boolean = false,
   ): Molecule {
     return this.specializedBuilders.buildNSubstitutedAmine(
       builder,
@@ -2017,6 +2414,7 @@ export class IUPACGraphBuilder
       substituentTokens,
       multiplierTokens,
       tokens,
+      isSaturatedForm,
     );
   }
 

@@ -4,7 +4,36 @@ import { IUPACTokenizer } from "./iupac-tokenizer";
 import { IUPACGraphBuilder } from "./iupac-graph-builder";
 import { validateValences } from "src/validators/valence-validator";
 import { enrichMolecule } from "src/utils/molecule-enrichment";
+import { parseSMILES } from "../smiles-parser";
 import opsinRulesData from "opsin-rules.json";
+
+/**
+ * Look up a trivial name and return its SMILES if found.
+ * Checks both trivialNames and ringSystems sections.
+ */
+function lookupTrivialName(name: string, rules: OPSINRules): string | null {
+  const normalizedName = name.toLowerCase().trim();
+
+  // Check trivialNames section
+  if (rules.trivialNames) {
+    for (const [smiles, data] of Object.entries(rules.trivialNames)) {
+      if (data.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
+        return smiles;
+      }
+    }
+  }
+
+  // Check ringSystems section (contains heterocycles like tetrazole, imidazole, etc.)
+  if (rules.ringSystems) {
+    for (const [smiles, data] of Object.entries(rules.ringSystems)) {
+      if (data.aliases.some((alias: string) => alias.toLowerCase() === normalizedName)) {
+        return smiles;
+      }
+    }
+  }
+
+  return null;
+}
 
 /**
  * Parse an IUPAC chemical name and convert it to a Molecule object
@@ -27,6 +56,23 @@ export function parseIUPACName(name: string, config?: IUPACParserConfig): IUPACP
 
     // Get OPSIN rules (from opsin-rules.json)
     const rules = (opsinRulesData as OPSINRules) || config?.customRules || ({} as OPSINRules);
+
+    // First, try trivial name lookup (for names like "adamantane", "caffeine", etc.)
+    const trivialSmiles = lookupTrivialName(name, rules);
+    if (trivialSmiles) {
+      if (process.env.VERBOSE) {
+        console.log(`[iupac-parser] Found trivial name: ${name} → ${trivialSmiles}`);
+      }
+      const result = parseSMILES(trivialSmiles);
+      if (result.molecules.length > 0) {
+        const enrichedMolecule = enrichMolecule(result.molecules[0]!);
+        return {
+          molecule: enrichedMolecule,
+          errors: [],
+          warnings,
+        };
+      }
+    }
 
     // Stage 1: Tokenize the IUPAC name
     const tokenizer = new IUPACTokenizer(rules);

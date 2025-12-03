@@ -640,6 +640,268 @@ export class RingStructureBuilders {
   }
 
   /**
+   * Create benzothiophene ring (benzo[b]thiophene)
+   * SMILES: s1ccc2ccccc12
+   * Numbering: S1, C2, C3, C4, C5, C6, C7, C3a, C7a
+   */
+  createBenzothiopheneRing(): number[] {
+    const atoms: number[] = [];
+
+    const s1 = this.context.addAtom("S", true);
+    atoms.push(s1);
+
+    const c2 = this.context.addAtom("C", true);
+    const c3 = this.context.addAtom("C", true);
+    atoms.push(c2, c3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Thiophene ring: S1-C2-C3-C3a-C7a-S1
+    this.context.addBond(s1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, c3, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, s1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
+   * Create benzimidazole ring (benzo[d]imidazole)
+   * SMILES: [nH]1cnc2ccccc12
+   * Numbering: N1, C2, N3, C4, C5, C6, C7, C3a, C7a
+   */
+  createBenzimidazoleRing(): number[] {
+    const atoms: number[] = [];
+
+    const n1 = this.context.addAtom("N", true);
+    atoms.push(n1);
+
+    const c2 = this.context.addAtom("C", true);
+    atoms.push(c2);
+
+    const n3 = this.context.addAtom("N", true);
+    atoms.push(n3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Imidazole ring: N1-C2-N3-C3a-C7a-N1
+    this.context.addBond(n1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, n1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
+   * Create benzoxazole ring (benzo[d]oxazole)
+   * SMILES: o1cnc2ccccc12
+   * Numbering: O1, C2, N3, C4, C5, C6, C7, C3a, C7a
+   */
+  createBenzoxazoleRing(): number[] {
+    const atoms: number[] = [];
+
+    const o1 = this.context.addAtom("O", true);
+    atoms.push(o1);
+
+    const c2 = this.context.addAtom("C", true);
+    atoms.push(c2);
+
+    const n3 = this.context.addAtom("N", true);
+    atoms.push(n3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Oxazole ring: O1-C2-N3-C3a-C7a-O1
+    this.context.addBond(o1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, o1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
+   * Create benzothiazole ring (benzo[d]thiazole)
+   * SMILES: s1cnc2ccccc12
+   * Numbering: S1, C2, N3, C4, C5, C6, C7, C3a, C7a
+   */
+  createBenzothiazoleRing(): number[] {
+    const atoms: number[] = [];
+
+    const s1 = this.context.addAtom("S", true);
+    atoms.push(s1);
+
+    const c2 = this.context.addAtom("C", true);
+    atoms.push(c2);
+
+    const n3 = this.context.addAtom("N", true);
+    atoms.push(n3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Thiazole ring: S1-C2-N3-C3a-C7a-S1
+    this.context.addBond(s1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, s1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
+   * Create indazole ring (benzo[d]pyrazole / 1H-indazole)
+   * SMILES: [nH]1ncc2ccccc12
+   * Numbering: N1, N2, C3, C4, C5, C6, C7, C3a, C7a
+   */
+  createIndazoleRing(): number[] {
+    const atoms: number[] = [];
+
+    const n1 = this.context.addAtom("N", true);
+    atoms.push(n1);
+
+    const n2 = this.context.addAtom("N", true);
+    atoms.push(n2);
+
+    const c3 = this.context.addAtom("C", true);
+    atoms.push(c3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Pyrazole ring: N1-N2-C3-C3a-C7a-N1
+    this.context.addBond(n1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, c3, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, n1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
+   * Create benzotriazole ring (benzo[d][1,2,3]triazole / 1H-benzotriazole)
+   * SMILES: [nH]1nnc2ccccc12
+   * Numbering: N1, N2, N3, C4, C5, C6, C7, C3a, C7a
+   */
+  createBenzotriazoleRing(): number[] {
+    const atoms: number[] = [];
+
+    const n1 = this.context.addAtom("N", true);
+    atoms.push(n1);
+
+    const n2 = this.context.addAtom("N", true);
+    atoms.push(n2);
+
+    const n3 = this.context.addAtom("N", true);
+    atoms.push(n3);
+
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+    const c6 = this.context.addAtom("C", true);
+    const c7 = this.context.addAtom("C", true);
+    atoms.push(c4, c5, c6, c7);
+
+    const c3a = this.context.addAtom("C", true);
+    const c7a = this.context.addAtom("C", true);
+    atoms.push(c3a, c7a);
+
+    // Triazole ring: N1-N2-N3-C3a-C7a-N1
+    this.context.addBond(n1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c3a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7a, n1, BondTypeEnum.AROMATIC);
+
+    // Benzene ring: C4-C5-C6-C7-C7a-C3a-C4
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, c6, BondTypeEnum.AROMATIC);
+    this.context.addBond(c6, c7, BondTypeEnum.AROMATIC);
+    this.context.addBond(c7, c7a, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3a, c4, BondTypeEnum.AROMATIC);
+
+    return atoms;
+  }
+
+  /**
    * Create isoindole ring (benzo[c]pyrrole)
    * SMILES: c1ccc2c(c1)c[nH]2
    * Numbering order: C1, N2, C3, C4, C5, C6, C7, C3a, C7a
@@ -1071,5 +1333,137 @@ export class RingStructureBuilders {
     this.context.addBond(c5, n1, BondTypeEnum.SINGLE);
 
     return [n1, n2, c3, c4, c5];
+  }
+
+  /**
+   * Create 1,3,4-oxadiazole ring (5-membered aromatic ring with O at 1, N at 3,4)
+   * SMILES: c1nnco1
+   * Hantzsch-Widman: O(1), C(2), N(3), N(4), C(5)
+   * @returns Array of atom indices [O, C, N, N, C]
+   */
+  create134OxadiazoleRing(): number[] {
+    const o1 = this.context.addAtom("O", true);
+    const c2 = this.context.addAtom("C", true);
+    const n3 = this.context.addAtom("N", true);
+    const n4 = this.context.addAtom("N", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(o1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, n4, BondTypeEnum.AROMATIC);
+    this.context.addBond(n4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, o1, BondTypeEnum.AROMATIC);
+
+    return [o1, c2, n3, n4, c5];
+  }
+
+  /**
+   * Create 1,2,4-oxadiazole ring (5-membered aromatic ring with O at 1, N at 2,4)
+   * SMILES: c1ncno1
+   * Hantzsch-Widman: O(1), N(2), C(3), N(4), C(5)
+   * @returns Array of atom indices [O, N, C, N, C]
+   */
+  create124OxadiazoleRing(): number[] {
+    const o1 = this.context.addAtom("O", true);
+    const n2 = this.context.addAtom("N", true);
+    const c3 = this.context.addAtom("C", true);
+    const n4 = this.context.addAtom("N", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(o1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, c3, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3, n4, BondTypeEnum.AROMATIC);
+    this.context.addBond(n4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, o1, BondTypeEnum.AROMATIC);
+
+    return [o1, n2, c3, n4, c5];
+  }
+
+  /**
+   * Create 1,2,3-oxadiazole ring (5-membered aromatic ring with O at 1, N at 2,3)
+   * SMILES: c1nncO1 (rarely used, unstable)
+   * Hantzsch-Widman: O(1), N(2), N(3), C(4), C(5)
+   * @returns Array of atom indices [O, N, N, C, C]
+   */
+  create123OxadiazoleRing(): number[] {
+    const o1 = this.context.addAtom("O", true);
+    const n2 = this.context.addAtom("N", true);
+    const n3 = this.context.addAtom("N", true);
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(o1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c4, BondTypeEnum.AROMATIC);
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, o1, BondTypeEnum.AROMATIC);
+
+    return [o1, n2, n3, c4, c5];
+  }
+
+  /**
+   * Create 1,3,4-thiadiazole ring (5-membered aromatic ring with S at 1, N at 3,4)
+   * SMILES: c1nncs1
+   * Hantzsch-Widman: S(1), C(2), N(3), N(4), C(5)
+   * @returns Array of atom indices [S, C, N, N, C]
+   */
+  create134ThiadiazoleRing(): number[] {
+    const s1 = this.context.addAtom("S", true);
+    const c2 = this.context.addAtom("C", true);
+    const n3 = this.context.addAtom("N", true);
+    const n4 = this.context.addAtom("N", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(s1, c2, BondTypeEnum.AROMATIC);
+    this.context.addBond(c2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, n4, BondTypeEnum.AROMATIC);
+    this.context.addBond(n4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, s1, BondTypeEnum.AROMATIC);
+
+    return [s1, c2, n3, n4, c5];
+  }
+
+  /**
+   * Create 1,2,4-thiadiazole ring (5-membered aromatic ring with S at 1, N at 2,4)
+   * SMILES: c1ncns1
+   * Hantzsch-Widman: S(1), N(2), C(3), N(4), C(5)
+   * @returns Array of atom indices [S, N, C, N, C]
+   */
+  create124ThiadiazoleRing(): number[] {
+    const s1 = this.context.addAtom("S", true);
+    const n2 = this.context.addAtom("N", true);
+    const c3 = this.context.addAtom("C", true);
+    const n4 = this.context.addAtom("N", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(s1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, c3, BondTypeEnum.AROMATIC);
+    this.context.addBond(c3, n4, BondTypeEnum.AROMATIC);
+    this.context.addBond(n4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, s1, BondTypeEnum.AROMATIC);
+
+    return [s1, n2, c3, n4, c5];
+  }
+
+  /**
+   * Create 1,2,3-thiadiazole ring (5-membered aromatic ring with S at 1, N at 2,3)
+   * SMILES: c1nncs1 variation
+   * Hantzsch-Widman: S(1), N(2), N(3), C(4), C(5)
+   * @returns Array of atom indices [S, N, N, C, C]
+   */
+  create123ThiadiazoleRing(): number[] {
+    const s1 = this.context.addAtom("S", true);
+    const n2 = this.context.addAtom("N", true);
+    const n3 = this.context.addAtom("N", true);
+    const c4 = this.context.addAtom("C", true);
+    const c5 = this.context.addAtom("C", true);
+
+    this.context.addBond(s1, n2, BondTypeEnum.AROMATIC);
+    this.context.addBond(n2, n3, BondTypeEnum.AROMATIC);
+    this.context.addBond(n3, c4, BondTypeEnum.AROMATIC);
+    this.context.addBond(c4, c5, BondTypeEnum.AROMATIC);
+    this.context.addBond(c5, s1, BondTypeEnum.AROMATIC);
+
+    return [s1, n2, n3, c4, c5];
   }
 }
