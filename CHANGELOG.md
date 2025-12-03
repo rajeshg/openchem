@@ -5,6 +5,26 @@ All notable changes to openchem will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.16] - 2025-12-03
+
+### Fixed
+- **Tautomer enumeration now filters invalid structures**
+  - Added tautomer validator to reject charged atoms (protonation states, not tautomers)
+  - Filters out triple bonds to nitrogen (chemically unreasonable in tautomers)
+  - Prevents allene structures (=C=) from being generated
+  - Validates atom valences before accepting tautomers
+
+### Added
+- **Amidine tautomerism support** for heterocyclic systems
+  - Detects N-C=N patterns (guanine, adenine, cytosine, amidines)
+  - Enables H migration between nitrogens in N-C=N motifs
+- **Lactam-lactim tautomerism in heterocycles**
+  - Now properly handles aromatic heterocycles (previously blocked)
+  - Enables keto-enol tautomerism in uracil, guanine, and similar systems
+
+### Improved
+- **SMILES canonical ordering** now considers bond order sum for better consistency
+
 ## [0.2.15] - 2025-12-02
 
 ### Improved
