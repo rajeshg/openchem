@@ -10,6 +10,7 @@
 openchem provides comprehensive SMARTS (SMiles ARbitrary Target Specification) pattern matching for substructure searching. The implementation follows the official [Daylight SMARTS specification](http://www.daylight.com/dayhtml/doc/theory/theory.smarts.html) closely, with some known differences from RDKit in aromaticity perception and ring membership counting.
 
 **Key Features:**
+
 - ✅ Full SMARTS syntax support (atoms, bonds, logical operators)
 - ✅ Recursive SMARTS patterns
 - ✅ Ring membership primitives (`[R]`, `[Rn]`)
@@ -65,12 +66,14 @@ openchem's SMARTS implementation strictly follows the Daylight specification, wh
 **Root Cause:** Fundamental differences in aromaticity models
 
 #### openchem's Model (Conservative, Ring-Based)
+
 - Uses strict **Hückel's rule** (4n+2 π electrons)
 - Only considers atoms **within aromatic rings** as aromatic
 - Filters to elementary rings of size 5-7
 - Does NOT extend aromaticity to conjugated exocyclic atoms
 
 #### RDKit's Model (Extended, System-Based)
+
 - Uses **extended aromaticity perception**
 - Considers conjugated atoms connected to aromatic systems as aromatic
 - More inclusive for cheminformatics/drug discovery purposes
@@ -81,10 +84,12 @@ openchem's SMARTS implementation strictly follows the Daylight specification, wh
 **SMILES:** `O1C=C[C@H]([C@H]1O2)c3c2cc(OC)c4c3OC(=O)C5=C4CCC(=O)5`
 
 **Atom 15 (Carbonyl Carbon in C(=O)):**
+
 - **openchem**: Aliphatic (not in aromatic ring) ✅ Hückel
 - **RDKit**: Aromatic (conjugated with aromatic system) ✅ Extended
 
 **Atoms 17, 18 (C=C in Lactone Ring):**
+
 - **openchem**: Aliphatic (lactone ring has C=O, not aromatic by Hückel) ✅ Strict
 - **RDKit**: Aromatic (part of extended conjugated aromatic system) ✅ Extended
 
@@ -95,12 +100,14 @@ RDKit canonical SMILES shows lowercase `c` for these atoms: `...c3oc(=O)c4c(c13)
 **Both models are chemically valid** but serve different purposes:
 
 **openchem's approach:**
+
 - Traditional organic chemistry definition
 - Clear, predictable behavior
 - Suitable for educational purposes and basic cheminformatics
 - Follows textbook aromaticity rules
 
 **RDKit's approach:**
+
 - More sophisticated for drug discovery
 - Captures electronic delocalization better
 - Better for similarity searching and pharmacophore matching
@@ -152,6 +159,7 @@ The specification explicitly states that `[Rn]` should count atoms in **<n> SSSR
 **Structure:** C₁₀H₁₆ with 4 bridgehead carbons
 
 #### SSSR Rings
+
 - Mathematical minimum: 12 edges - 10 nodes + 1 = **3 rings**
 - Unique minimal representation
 
@@ -159,7 +167,7 @@ The specification explicitly states that `[Rn]` should count atoms in **<n> SSSR
 
 ```
 Atom 0: in 1 ring
-Atom 1: in 2 rings  
+Atom 1: in 2 rings
 Atom 2: in 2 rings
 Atom 3: in 3 rings  ← Only atom in all 3 SSSR rings
 Atom 4: in 2 rings
@@ -188,19 +196,24 @@ RDKit identifies the 4 bridgehead carbons (1, 3, 5, 7) as being in 3 rings, whic
 ### Example: Other Polycyclic Systems
 
 #### Bicyclo[2.2.1]heptane (Norbornane)
+
 **SMILES:** `C1CC2CCC1C2`  
 **SSSR:** 2 rings  
 **Result:** ✅ Both openchem and RDKit agree
 
 #### Basketane
+
 **SMILES:** `C12C3C4C5C1C6C2C5C3C46`  
-**SSSR:** 6 rings  
+**SSSR:** 6 rings
+
 - **openchem `[R3]`:** 4 atoms (2, 3, 6, 9) ✅ Correct per spec
 - **RDKit `[R3]`:** 2 atoms (0, 1) ⚠️ Incorrect per spec
 
 #### Cubane
+
 **SMILES:** `C12C3C4C1C5C2C3C45`  
-**SSSR:** 5 rings  
+**SSSR:** 5 rings
+
 - **openchem `[R3]`:** 4 atoms ✅ Correct per spec
 - **RDKit `[R3]`:** 8 atoms (all atoms) ⚠️ Incorrect per spec
 
@@ -330,12 +343,12 @@ console.table(results);
 
 ### Complexity
 
-| Operation | Complexity | Notes |
-|-----------|-----------|-------|
-| Pattern compilation | O(P) | P = pattern length |
-| Substructure search | O(N × M) | N = atoms, M = pattern atoms |
-| Ring analysis | O(N²) | Cached per molecule |
-| Aromaticity perception | O(N) | Cached per molecule |
+| Operation              | Complexity | Notes                        |
+| ---------------------- | ---------- | ---------------------------- |
+| Pattern compilation    | O(P)       | P = pattern length           |
+| Substructure search    | O(N × M)   | N = atoms, M = pattern atoms |
+| Ring analysis          | O(N²)      | Cached per molecule          |
+| Aromaticity perception | O(N)       | Cached per molecule          |
 
 ### Optimization Tips
 
@@ -400,10 +413,12 @@ If you're migrating from RDKit and encounter differences:
 ## Implementation Files
 
 ### Core SMARTS Matcher
+
 - **Entry point:** `src/matchers/smarts-matcher.ts`
 - **Main function:** `matchSMARTS(molecule, pattern)`
 
 ### Supporting Modules
+
 - **Aromaticity:** `src/utils/aromaticity-perceiver.ts`
 - **Ring analysis:** `src/utils/ring-analysis.ts`
 - **Ring finding:** `src/utils/ring-finder.ts`

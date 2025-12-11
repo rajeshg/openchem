@@ -10,6 +10,7 @@
 openchem provides comprehensive molecular property calculation and descriptor generation for cheminformatics applications. The library includes basic molecular descriptors, drug-likeness rules, and LogP calculation using the Wildman-Crippen method.
 
 **Key Features:**
+
 - ✅ Basic molecular descriptors (atom count, bond count, element composition)
 - ✅ Phase 1 structural descriptors (valence electrons, amide bonds, spiro/bridgehead atoms, ring classifications)
 - ✅ Drug-likeness rules (Lipinski, Veber, BBB penetration)
@@ -80,10 +81,12 @@ console.log(`LogP: ${logP.toFixed(2)}`);  // LogP: -0.31
 Computes a comprehensive set of basic descriptors.
 
 **Parameters:**
+
 - `molecule` (Molecule) — Molecule object
 - `options` (DescriptorOptions, optional) — Configuration
 
 **Returns:**
+
 ```typescript
 {
   atomCount: number;           // Explicit atoms only
@@ -95,6 +98,7 @@ Computes a comprehensive set of basic descriptors.
 ```
 
 **Options:**
+
 ```typescript
 interface DescriptorOptions {
   includeImplicitH?: boolean;  // Include implicit H in counts (default: true)
@@ -167,6 +171,7 @@ Count the total number of valence electrons in the molecule.
 **Formula:** `sum(outer_electrons - formal_charge + num_hydrogens)` for all atoms
 
 **Examples:**
+
 ```typescript
 getNumValenceElectrons(parseSMILES('CC').molecules[0])      // 14 (ethane)
 getNumValenceElectrons(parseSMILES('C(=O)O').molecules[0])  // 18 (formic acid)
@@ -192,6 +197,7 @@ Count the number of amide bonds (C(=O)-N linkages) in the molecule.
 **Definition:** An amide bond is a single bond between a carbonyl carbon and a nitrogen atom.
 
 **Examples:**
+
 ```typescript
 getNumAmideBonds(parseSMILES('CC(=O)N').molecules[0])   // 1 (acetamide)
 getNumAmideBonds(parseSMILES('NC(=O)N').molecules[0])   // 2 (urea)
@@ -209,6 +215,7 @@ Count the number of spiro atoms (atoms shared by exactly two rings at a single p
 **Definition:** A spiro atom belongs to exactly two rings that share only that atom.
 
 **Examples:**
+
 ```typescript
 getNumSpiroAtoms(parseSMILES('C1CC2(C1)CCC2').molecules[0])  // 1 (spiro[3.3]heptane)
 getNumSpiroAtoms(parseSMILES('c1ccccc1').molecules[0])       // 0 (benzene - no spiro)
@@ -223,6 +230,7 @@ Count the number of bridgehead atoms (atoms belonging to 3 or more rings).
 **Definition:** A bridgehead atom is a ring atom that belongs to at least 3 rings.
 
 **Examples:**
+
 ```typescript
 getNumBridgeheadAtoms(parseSMILES('C1C2CC3CC1CC(C2)C3').molecules[0])  // 4 (adamantane)
 getNumBridgeheadAtoms(parseSMILES('c1ccccc1').molecules[0])            // 0 (benzene)
@@ -237,6 +245,7 @@ getNumBridgeheadAtoms(parseSMILES('c1ccccc1').molecules[0])            // 0 (ben
 Count the number of saturated rings (rings with only single bonds).
 
 **Examples:**
+
 ```typescript
 getNumSaturatedRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
 getNumSaturatedRings(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene - aromatic)
@@ -247,6 +256,7 @@ getNumSaturatedRings(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene - arom
 Count the number of non-aromatic rings.
 
 **Examples:**
+
 ```typescript
 getNumAliphaticRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
 getNumAliphaticRings(parseSMILES('C1=CCCCC1').molecules[0]) // 1 (cyclohexene)
@@ -258,6 +268,7 @@ getNumAliphaticRings(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene)
 Count the number of saturated non-aromatic rings.
 
 **Examples:**
+
 ```typescript
 getNumSaturatedAliphaticRings(parseSMILES('C1CCCCC1').molecules[0])  // 1 (cyclohexane)
 getNumSaturatedAliphaticRings(parseSMILES('C1=CCCCC1').molecules[0]) // 0 (cyclohexene - has C=C)
@@ -268,6 +279,7 @@ getNumSaturatedAliphaticRings(parseSMILES('C1=CCCCC1').molecules[0]) // 0 (cyclo
 Count the number of heterocyclic rings (rings containing at least one non-carbon atom).
 
 **Examples:**
+
 ```typescript
 getNumHeterocycles(parseSMILES('c1ccncc1').molecules[0])  // 1 (pyridine)
 getNumHeterocycles(parseSMILES('C1CCOC1').molecules[0])   // 1 (tetrahydrofuran)
@@ -279,6 +291,7 @@ getNumHeterocycles(parseSMILES('c1ccccc1').molecules[0])  // 0 (benzene - all ca
 Count the number of aromatic heterocyclic rings.
 
 **Examples:**
+
 ```typescript
 getNumAromaticHeterocycles(parseSMILES('c1ccncc1').molecules[0])  // 1 (pyridine)
 getNumAromaticHeterocycles(parseSMILES('o1cccc1').molecules[0])   // 1 (furan)
@@ -290,6 +303,7 @@ getNumAromaticHeterocycles(parseSMILES('C1CCOC1').molecules[0])   // 0 (THF - no
 Count the number of saturated heterocyclic rings.
 
 **Examples:**
+
 ```typescript
 getNumSaturatedHeterocycles(parseSMILES('C1CCOC1').molecules[0])  // 1 (tetrahydrofuran)
 getNumSaturatedHeterocycles(parseSMILES('c1ccncc1').molecules[0]) // 0 (pyridine - aromatic)
@@ -300,6 +314,7 @@ getNumSaturatedHeterocycles(parseSMILES('c1ccncc1').molecules[0]) // 0 (pyridine
 Count the number of non-aromatic heterocyclic rings.
 
 **Examples:**
+
 ```typescript
 getNumAliphaticHeterocycles(parseSMILES('C1CCOC1').molecules[0])  // 1 (tetrahydrofuran)
 getNumAliphaticHeterocycles(parseSMILES('c1ccncc1').molecules[0]) // 0 (pyridine - aromatic)
@@ -314,6 +329,7 @@ Count the number of defined (specified) tetrahedral stereocenters.
 **Definition:** Atoms with explicit stereochemistry notation (@ or @@).
 
 **Examples:**
+
 ```typescript
 getNumAtomStereoCenters(parseSMILES('C[C@H](O)Cl').molecules[0])   // 1 (R configuration)
 getNumAtomStereoCenters(parseSMILES('C[C@@H](O)Cl').molecules[0])  // 1 (S configuration)
@@ -330,6 +346,7 @@ Count the number of potential (unspecified) tetrahedral stereocenters.
 **Definition:** sp3 atoms with 4 distinct substituents where stereochemistry could be specified but isn't.
 
 **Examples:**
+
 ```typescript
 getNumUnspecifiedAtomStereoCenters(parseSMILES('CC(O)Cl').molecules[0])      // 1 (chiral but unspecified)
 getNumUnspecifiedAtomStereoCenters(parseSMILES('C[C@H](O)Cl').molecules[0]) // 0 (stereo is specified)
@@ -337,6 +354,7 @@ getNumUnspecifiedAtomStereoCenters(parseSMILES('CC(C)C').molecules[0])      // 0
 ```
 
 **Notes:**
+
 - Uses simplified heuristic: counts sp3 C/N with 4 substituents and ≥3 distinct neighbor types
 - True chirality requires full topological analysis (future enhancement)
 - Conservative approach: may undercount in complex cases
@@ -368,12 +386,14 @@ Evaluates oral bioavailability using Lipinski's Rule of Five.
 #### `checkLipinskiRuleOfFive(molecule: Molecule)`
 
 **Rules:**
+
 - Molecular weight ≤ 500 Da
 - H-bond donors ≤ 5 (N-H, O-H groups)
 - H-bond acceptors ≤ 10 (N, O atoms)
 - LogP ≤ 5 (Crippen LogP estimate)
 
 **Returns:**
+
 ```typescript
 {
   passes: boolean;           // true if all rules pass
@@ -388,6 +408,7 @@ Evaluates oral bioavailability using Lipinski's Rule of Five.
 ```
 
 **Example:**
+
 ```typescript
 import { parseSMILES, checkLipinskiRuleOfFive } from 'index';
 
@@ -409,10 +430,12 @@ Evaluates oral bioavailability using Veber rules (complementary to Lipinski).
 #### `checkVeberRules(molecule: Molecule)`
 
 **Rules:**
+
 - Rotatable bonds ≤ 10
 - TPSA ≤ 140 Å²
 
 **Returns:**
+
 ```typescript
 {
   passes: boolean;
@@ -425,6 +448,7 @@ Evaluates oral bioavailability using Veber rules (complementary to Lipinski).
 ```
 
 **Example:**
+
 ```typescript
 const result = checkVeberRules(molecule);
 console.log(`TPSA: ${result.properties.tpsa.toFixed(1)} Ų`);
@@ -437,9 +461,11 @@ Predicts blood-brain barrier (BBB) penetration potential.
 #### `checkBBBPenetration(molecule: Molecule)`
 
 **Rule:**
+
 - Likely penetration if TPSA < 90 Å²
 
 **Returns:**
+
 ```typescript
 {
   likelyPenetration: boolean;
@@ -448,6 +474,7 @@ Predicts blood-brain barrier (BBB) penetration potential.
 ```
 
 **Example:**
+
 ```typescript
 const result = checkBBBPenetration(molecule);
 if (result.likelyPenetration) {
@@ -477,13 +504,14 @@ openchem implements **RDKit-compatible** H-bond acceptor and donor counting. The
 
 Different cheminformatics tools define HBA/HBD differently, leading to systematic differences:
 
-| Tool/Source | Definition | Example (Caffeine) |
-|-------------|------------|-------------------|
-| **openchem/RDKit** | SMARTS-based patterns | HBA=6, HBD=0 |
-| **PubChem/Literature** | Strong acceptors only | HBA=3, HBD=0 |
-| **DrugBank** | Varies by version | HBA=3-6, HBD=0 |
+| Tool/Source            | Definition            | Example (Caffeine) |
+| ---------------------- | --------------------- | ------------------ |
+| **openchem/RDKit**     | SMARTS-based patterns | HBA=6, HBD=0       |
+| **PubChem/Literature** | Strong acceptors only | HBA=3, HBD=0       |
+| **DrugBank**           | Varies by version     | HBA=3-6, HBD=0     |
 
 **Why This Happens:**
+
 - **Amide nitrogens**: RDKit counts as acceptors, some tools exclude them
 - **Aromatic nitrogens**: RDKit counts pyridine-like N, some tools use stricter rules
 - **Carbonyl oxygens**: Universal agreement (always acceptors)
@@ -502,6 +530,7 @@ Different cheminformatics tools define HBA/HBD differently, leading to systemati
 ```
 
 **Translation:**
+
 1. O/S with 1H and valence 2, bonded to atom without =O,N,P,S (alcohols, thiols)
 2. O/S with 0H and valence 2 (ethers, sulfides, carbonyls)
 3. Negatively charged O/S
@@ -515,6 +544,7 @@ Different cheminformatics tools define HBA/HBD differently, leading to systemati
 ```
 
 **Translation:**
+
 1. N with hydrogens and valence 3 (amines, amides)
 2. N with hydrogens and +1 charge and valence 4 (ammonium)
 3. O with 1H and neutral charge (alcohols, phenols, carboxylic acids)
@@ -530,6 +560,7 @@ Different cheminformatics tools define HBA/HBD differently, leading to systemati
 LogP (octanol-water partition coefficient) is calculated using the **Wildman-Crippen atom contribution method** with SMARTS-based pattern matching.
 
 **Method Features:**
+
 - 68 atom type patterns
 - Published Wildman-Crippen parameters (exact)
 - SMARTS-based pattern matching with priority ordering
@@ -549,6 +580,7 @@ calcCrippenDescriptors(molecule, includeHs?)  // LogP + molar refractivity
 ```
 
 **Parameters:**
+
 - `molecule` (Molecule) — Molecule to analyze
 - `includeHs` (boolean, optional) — Include explicit hydrogens (default: false)
 
@@ -560,21 +592,23 @@ LogP computation is automatically cached using WeakMap for dramatic performance 
 
 **Performance Impact:**
 
-| Molecule | First Call | Cached Call | Speedup |
-|----------|-----------|-----------|---------|
-| Methane (CH₄) | 14.6 ms | 0.004 ms | 4,171× |
-| Ethanol (C₂H₆O) | 24.4 ms | 0.002 ms | 10,614× |
-| Aspirin (C₉H₈O₄) | 138 ms | 0.001 ms | 92,064× |
-| Caffeine (C₈H₁₀N₄O₂) | 191 ms | 0.002 ms | 83,193× |
-| Strychnine (C₂₁H₂₂N₂O₂) | 12.1 s | 0.003 ms | **4.6 million ×** |
+| Molecule                | First Call | Cached Call | Speedup           |
+| ----------------------- | ---------- | ----------- | ----------------- |
+| Methane (CH₄)           | 14.6 ms    | 0.004 ms    | 4,171×            |
+| Ethanol (C₂H₆O)         | 24.4 ms    | 0.002 ms    | 10,614×           |
+| Aspirin (C₉H₈O₄)        | 138 ms     | 0.001 ms    | 92,064×           |
+| Caffeine (C₈H₁₀N₄O₂)    | 191 ms     | 0.002 ms    | 83,193×           |
+| Strychnine (C₂₁H₂₂N₂O₂) | 12.1 s     | 0.003 ms    | **4.6 million ×** |
 
 **Why This Matters:**
+
 - Bottleneck is Wildman-Crippen atom type matching (68 SMARTS patterns per atom)
 - Cache hit is just a WeakMap lookup: < 0.01 ms
 - Zero memory leaks (automatic garbage collection)
 - No manual cache management needed
 
 **Usage (transparent - no code changes needed):**
+
 ```typescript
 const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O').molecules[0];
 
@@ -633,6 +667,7 @@ Our LogP implementation uses the **published Wildman-Crippen parameters exactly 
 #### 1. Aromatic Sulfur in Heterocycles
 
 **Affected structures:**
+
 - Dithiolones: `C1=CSC(=O)S1`
 - Thiazines: `C1=CC=C2SC=CC(=O)N2C=C1`
 - Thiadiazoles with exocyclic substituents
@@ -640,12 +675,14 @@ Our LogP implementation uses the **published Wildman-Crippen parameters exactly 
 **Difference magnitude:** 0.6-0.8 LogP units
 
 **Root cause:**
+
 - Both implementations correctly identify aromatic sulfurs
 - openchem uses published value: 0.6237 (pattern `[s;a]`, S3 parameter)
 - RDKit appears to use ~0.3 for sulfurs in heterocycles with exocyclic C=O or C=N
 - Suggests RDKit has additional SMARTS patterns or modified parameters
 
 **Example:**
+
 ```
 Dithiolone: C1=CSC(=O)S1
   openchem LogP: 1.77
@@ -656,30 +693,35 @@ Dithiolone: C1=CSC(=O)S1
 #### 2. Complex Nitrogen Heterocycles
 
 **Affected structures:**
+
 - Oxadiazinones with multiple nitrogen substitution
 - Pyrazolones
 
 **Difference magnitude:** 0.3-0.8 LogP units
 
 **Root cause:**
+
 - Differences in aromatic vs aliphatic nitrogen classification in partially saturated rings
 - SMARTS pattern matching order differences
 
 #### 3. Fused Ring Systems with Heteroatoms
 
 **Affected structures:**
+
 - Naphthalene ethers with lactones
 - Benzofuran/benzothiophene derivatives
 
 **Difference magnitude:** 0.2-0.3 LogP units
 
 **Root cause:**
+
 - Minor differences in aromatic carbon classification (C18-C26 patterns)
 - Different handling of aromatic-aliphatic junction carbons
 
 ### Statistical Performance
 
 From 200 diverse molecule test:
+
 - **Mean absolute difference**: ~0.08 LogP units
 - **Median difference**: ~0.05 LogP units
 - **95th percentile**: ~0.20 LogP units
@@ -688,6 +730,7 @@ From 200 diverse molecule test:
 ### Acceptable Range
 
 LogP prediction methods typically have:
+
 - **Experimental error**: ±0.5 LogP units
 - **Method variance**: ±0.3 LogP units between different software
 - **Literature discrepancies**: ±1.0 LogP units for complex molecules
@@ -697,12 +740,14 @@ Our differences (0.2-1.15) are **within the expected range** for complex polycyc
 ### When to Use This Implementation
 
 ✅ **Good for:**
+
 - Simple organic molecules (alkanes, alcohols, aromatics)
 - Standard drug-like molecules
 - High-throughput screening where consistency matters
 - Research requiring published method reproducibility
 
 ⚠️ **Consider RDKit if:**
+
 - Exact RDKit LogP values are required for comparison
 - Working with many sulfur-containing heterocycles
 - Need LogP for regulatory submissions (use validated tools)
@@ -715,11 +760,13 @@ Our differences (0.2-1.15) are **within the expected range** for complex polycyc
 ## Implementation Files
 
 ### Core Modules
+
 - **Molecular properties:** `src/utils/molecular-properties.ts`
 - **Descriptors:** `src/utils/molecular-descriptors.ts`
 - **LogP:** `src/utils/logp.ts`
 
 ### Supporting Modules
+
 - **SMARTS matching:** `src/matchers/smarts-matcher.ts` (used for LogP atom typing)
 - **Aromaticity:** `src/utils/aromaticity-perceiver.ts`
 - **Atom utilities:** `src/utils/atom-utils.ts`
@@ -759,11 +806,11 @@ const smilesList = [
 
 const results = smilesList.map(smiles => {
   const molecule = parseSMILES(smiles).molecules[0];
-  
+
   // LogP is cached automatically
   const logP = computeLogP(molecule);
   const lipinski = checkLipinskiRuleOfFive(molecule);
-  
+
   return {
     smiles,
     logP: logP.toFixed(2),
@@ -787,7 +834,7 @@ import {
 
 function analyzeCompound(smiles: string) {
   const molecule = parseSMILES(smiles).molecules[0];
-  
+
   return {
     basic: computeDescriptors(molecule),
     logP: computeLogP(molecule),
@@ -810,10 +857,10 @@ console.log(JSON.stringify(results, null, 2));
 
 ### External References
 
-- Wildman, S. A.; Crippen, G. M. "Prediction of Physicochemical Parameters by Atomic Contributions." *J. Chem. Inf. Comput. Sci.* 1999, 39, 868-873.
-- Lipinski, C. A. et al. "Experimental and computational approaches to estimate solubility and permeability in drug discovery and development settings." *Adv. Drug Deliv. Rev.* 1997, 23, 3-25.
-- Veber, D. F. et al. "Molecular properties that influence the oral bioavailability of drug candidates." *J. Med. Chem.* 2002, 45, 2615-2623.
-- Ertl, P. et al. "Fast calculation of molecular polar surface area as a sum of fragment-based contributions and its application to the prediction of drug transport properties." *J. Med. Chem.* 2000, 43, 3714-3717.
+- Wildman, S. A.; Crippen, G. M. "Prediction of Physicochemical Parameters by Atomic Contributions." _J. Chem. Inf. Comput. Sci._ 1999, 39, 868-873.
+- Lipinski, C. A. et al. "Experimental and computational approaches to estimate solubility and permeability in drug discovery and development settings." _Adv. Drug Deliv. Rev._ 1997, 23, 3-25.
+- Veber, D. F. et al. "Molecular properties that influence the oral bioavailability of drug candidates." _J. Med. Chem._ 2002, 45, 2615-2623.
+- Ertl, P. et al. "Fast calculation of molecular polar surface area as a sum of fragment-based contributions and its application to the prediction of drug transport properties." _J. Med. Chem._ 2000, 43, 3714-3717.
 
 ---
 

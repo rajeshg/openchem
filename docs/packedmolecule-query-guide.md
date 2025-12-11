@@ -140,7 +140,7 @@ const atomCount2 = molecule.atoms.length;
 ```typescript
 // Filter drug-like molecules without deserialization
 function isSmallMolecule(packed: PackedMolecule): boolean {
-  return packed.query.atomCount <= 50 && 
+  return packed.query.atomCount <= 50 &&
          packed.query.bondCount <= 60;
 }
 
@@ -179,7 +179,7 @@ const mol = new PackedMolecule(parseSMILES('CC(C)CC1=CC=C(C=C1)C(C)C(=O)O').mole
 for (let i = 0; i < mol.query.atomCount; i++) {
   const degree = mol.query.getDegree(i);
   const isAromatic = mol.query.isAromatic(i);
-  
+
   if (degree === 3 && mol.query.getAtomicNumber(i) === 6) {
     console.log(`Carbon ${i}: quaternary, aromatic=${isAromatic}`);
   }

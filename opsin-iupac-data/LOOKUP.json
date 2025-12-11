@@ -3,16 +3,8 @@
   "dataDirectory": "opsin-iupac-data",
   "sourceUrl": "https://github.com/dan2097/opsin",
   "files": {
-    "core_elements": [
-      "elementaryAtoms",
-      "heteroAtoms",
-      "hwHeteroAtoms"
-    ],
-    "hydrocarbons": [
-      "alkanes",
-      "unsaturators",
-      "cyclicUnsaturableHydrocarbon"
-    ],
+    "core_elements": ["elementaryAtoms", "heteroAtoms", "hwHeteroAtoms"],
+    "hydrocarbons": ["alkanes", "unsaturators", "cyclicUnsaturableHydrocarbon"],
     "functional_groups": [
       "suffixes",
       "carboxylicAcids",
@@ -27,16 +19,8 @@
       "arylSubstituents",
       "suffixPrefix"
     ],
-    "ring_systems": [
-      "simpleCyclicGroups",
-      "arylGroups",
-      "fusionComponents",
-      "simpleGroups"
-    ],
-    "multipliers_and_connectors": [
-      "multipliers",
-      "infixes"
-    ],
+    "ring_systems": ["simpleCyclicGroups", "arylGroups", "fusionComponents", "simpleGroups"],
+    "multipliers_and_connectors": ["multipliers", "infixes"],
     "specialized": [
       "carbohydrates",
       "carbohydrateSuffixes",
@@ -53,11 +37,6 @@
       "chargeAndOxidationNumberSpecifiers",
       "miscTokens"
     ],
-    "special": [
-      "germanTokens",
-      "index",
-      "substituents",
-      "regexTokens"
-    ]
+    "special": ["germanTokens", "index", "substituents", "regexTokens"]
   }
 }

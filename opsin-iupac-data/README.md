@@ -13,16 +13,19 @@ This directory contains XML lexicon and rule files for IUPAC chemical nomenclatu
 Files are organized by purpose:
 
 ### Core Elements (3 files)
+
 - `elementaryAtoms.xml` - H, C, N, O, S, P, halogens, etc.
 - `heteroAtoms.xml` - Complex heteroatom definitions
 - `hwHeteroAtoms.xml` - Hantzsch-Widman heteroatom rules
 
 ### Hydrocarbons (3 files)
+
 - `alkanes.xml` - Alkane naming conventions
 - `unsaturators.xml` - Double/triple bond suffixes (ene, yne)
 - `cyclicUnsaturableHydrocarbon.xml` - Aromatic rings
 
 ### Functional Groups (6 files)
+
 - `suffixes.xml` - Core suffix definitions
 - `carboxylicAcids.xml` - COOH naming
 - `nonCarboxylicAcids.xml` - Other acid types
@@ -31,22 +34,26 @@ Files are organized by purpose:
 - `inlineChargeSuffixes.xml` - Charge notation
 
 ### Substituents (4 files)
+
 - `simpleSubstituents.xml` - Alkyl and common groups
 - `multiRadicalSubstituents.xml` - Multi-valent groups
 - `arylSubstituents.xml` - Aromatic prefixes
 - `suffixPrefix.xml` - Prefix rules
 
 ### Ring Systems (4 files)
+
 - `simpleCyclicGroups.xml` - Cyclopropane to cyclooctane, benzene
 - `arylGroups.xml` - Aromatic ring systems
 - `fusionComponents.xml` - Naphthalene, anthracene, etc.
 - `simpleGroups.xml` - General group definitions
 
 ### Multipliers & Connectors (2 files)
+
 - `multipliers.xml` - mono-, di-, tri-, etc.
 - `infixes.xml` - Connecting tokens
 
 ### Specialized (5 files)
+
 - `carbohydrates.xml` - Sugar nomenclature
 - `carbohydrateSuffixes.xml` - Carbohydrate suffixes
 - `aminoAcids.xml` - Amino acid names
@@ -54,6 +61,7 @@ Files are organized by purpose:
 - `atomHydrides.xml` - Hydride naming
 
 ### Validation & Rules (7 files)
+
 - `wordRules.xml` - Name construction rules
 - `regexes.xml` - Pattern matching rules (37KB)
 - `suffixApplicability.xml` - When suffixes apply
@@ -63,6 +71,7 @@ Files are organized by purpose:
 - `miscTokens.xml` - Special cases
 
 ### Special (3 files)
+
 - `germanTokens.xml` - German IUPAC support
 - `index.xml` - Master index
 - `substituents.xml` - Substituent reference
@@ -133,12 +142,14 @@ to molecular structures and generate IUPAC names from structures.
 ## Key Files by Priority
 
 **Most Important** (start here):
+
 1. `LOOKUP.json` - Find what you need
 2. `alkanes.xml` - Basic hydrocarbon names
 3. `suffixes.xml` - Functional group endings
 4. `simpleSubstituents.xml` - Alkyl groups
 
 **Frequently Used**:
+
 - `arylGroups.xml` - Aromatic compounds
 - `regexes.xml` - Pattern validation
 - `multipliers.xml` - Numerical prefixes

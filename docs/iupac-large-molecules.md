@@ -9,6 +9,7 @@
 The openchem IUPAC engine is **not yet production-ready** for 100-atom molecules. While the SMILES parser and basic molecular analysis can handle large structures, the IUPAC name generation has critical gaps that prevent reliable nomenclature for complex molecules.
 
 **Current Success Rates (Estimated):**
+
 - Simple linear/branched alkanes (100 atoms): ~90%
 - Complex polycyclics with stereochemistry: ~10-20%
 - Natural products (steroids, alkaloids, terpenes): ~5%
@@ -19,22 +20,24 @@ The openchem IUPAC engine is **not yet production-ready** for 100-atom molecules
 
 From `test/unit/iupac-engine/smiles-to-iupac-realistic-dataset.json` (127 total molecules):
 
-| Atom Count Range | Molecules Tested | Success Rate | Notes |
-|------------------|------------------|--------------|-------|
-| <10 atoms | 78 | 100% | Excellent coverage |
-| 10-20 atoms | 40 | 100% | Solid performance |
-| 20-30 atoms | 6 | 100% | Good results |
-| 30-40 atoms | 2 | 100% | Basic functionality |
-| 50-100 atoms | 1 | 100% | Limited testing (66 atoms max) |
-| 100+ atoms | 0 | N/A | **Not tested** |
+| Atom Count Range | Molecules Tested | Success Rate | Notes                          |
+| ---------------- | ---------------- | ------------ | ------------------------------ |
+| <10 atoms        | 78               | 100%         | Excellent coverage             |
+| 10-20 atoms      | 40               | 100%         | Solid performance              |
+| 20-30 atoms      | 6                | 100%         | Good results                   |
+| 30-40 atoms      | 2                | 100%         | Basic functionality            |
+| 50-100 atoms     | 1                | 100%         | Limited testing (66 atoms max) |
+| 100+ atoms       | 0                | N/A          | **Not tested**                 |
 
 ### Known Limitations
 
 **Skipped molecules** (from dataset):
+
 - 3 complex alkaloids (30-32 atoms, 7+ fused rings)
 - Reason: Multiple stereocenters + complex polycyclic systems
 
 **Largest successful case:**
+
 ```
 SMILES: CC(C)CC1CCC(CC1)C(C)C
 Atoms: 66
@@ -49,21 +52,25 @@ Name: 1,4-bis(2-methylpropyl)cyclohexane
 **Status:** Not implemented
 
 **Missing capabilities:**
+
 - R/S descriptors for chiral centers
 - E/Z descriptors for double bonds
 - Axial chirality (aR/aS)
 - Planar chirality
 
 **Impact:**
+
 - Most drug molecules (20-50 atoms) have stereochemistry
 - Natural products (50-100+ atoms) have multiple stereocenters
 - Without stereochemistry, names are incomplete and potentially incorrect
 
 **Example failures:**
+
 - Complex alkaloids with 5+ stereocenters: **skipped**
 - Steroids with defined stereochemistry: **would produce incorrect names**
 
 **Implementation estimate:** 8-10 weeks
+
 - Requires tetrahedral geometry analysis
 - CIP (Cahn-Ingold-Prelog) priority rules
 - Integration with IUPAC name generation
@@ -75,28 +82,33 @@ Name: 1,4-bis(2-methylpropyl)cyclohexane
 **Status:** Basic implementation only
 
 **Current capabilities:**
+
 - Simple fused rings (naphthalene, anthracene)
 - Basic spiro systems
 - Simple bridged systems
 
 **Missing capabilities:**
+
 - Advanced polycyclic nomenclature (IUPAC P-23 to P-31)
 - Von Baeyer nomenclature beyond bicyclo[x.y.z]
 - Complex spiro systems with 3+ components
 - Bridged ring systems with multiple bridges
 
 **Impact:**
+
 - Steroids: 4 fused rings with complex stereochemistry
 - Alkaloids: 5-7+ fused rings (skipped in current dataset)
 - Natural product scaffolds: often 3-5 fused/bridged rings
 
 **Example failures:**
+
 ```
 Strychnine: C21H22N2O2 (48 atoms, 7 fused rings)
 Status: SKIPPED (too complex)
 ```
 
 **Implementation estimate:** 6-8 weeks
+
 - Enhanced ring analysis for complex topologies
 - Von Baeyer bridge nomenclature
 - Spiro center numbering for multi-component systems
@@ -108,26 +120,31 @@ Status: SKIPPED (too complex)
 **Status:** Ad-hoc pattern matching
 
 **Current approach:**
+
 - Hardcoded patterns in various rule files
 - No centralized registry
 - No caching of detection results
 
 **Issues for large molecules:**
+
 - Performance degradation with many substituents
 - Risk of missing complex functional groups
 - Difficult to maintain and extend
 
 **Needed:**
+
 - SMARTS-based functional group detection
 - Centralized registry (similar to OPSIN lookup tables)
 - Caching for repeated detection on same molecule
 
 **Impact:**
+
 - 100-atom molecules may have 10-20+ functional groups
 - Without optimization, detection becomes O(n²) or worse
 - May miss edge cases in complex molecules
 
 **Implementation estimate:** 4-6 weeks
+
 - Build SMARTS pattern registry
 - Implement caching layer
 - Migrate existing ad-hoc patterns
@@ -139,26 +156,31 @@ Status: SKIPPED (too complex)
 **Status:** Simple heterocycles only
 
 **Current capabilities:**
+
 - Basic heterocycles: pyridine, furan, thiophene, pyrrole
 - Simple fused heterocycles: quinoline, isoquinoline
 
 **Missing capabilities:**
+
 - Complex fused heterocycles (3+ rings)
 - Replacement nomenclature (IUPAC P-15)
 - Hantzsch-Widman nomenclature for unusual rings
 - Bridged/spiro heterocycles
 
 **Impact:**
+
 - Many alkaloids contain complex fused heterocycles
 - Pharmaceutical compounds often have heterocyclic cores
 - Natural products frequently contain unusual heterocycles
 
 **Example gaps:**
+
 - Indole derivatives with fused rings
 - Purine-like scaffolds
 - Complex nitrogen heterocycles in alkaloids
 
 **Implementation estimate:** 6-8 weeks
+
 - Extend heterocycle detection
 - Implement replacement nomenclature
 - Handle complex fused heterocycles
@@ -170,17 +192,20 @@ Status: SKIPPED (too complex)
 **Status:** Not implemented
 
 **Missing capabilities:**
+
 - Steroid recognition (IUPAC P-101.3)
 - Alkaloid nomenclature
 - Terpene nomenclature
 - Carbohydrate nomenclature
 
 **Impact:**
+
 - Would default to very long systematic names
 - Names would be technically correct but not practical
 - Loss of chemical context and readability
 
 **Example:**
+
 ```
 Cholesterol (C27H46O, 74 atoms)
 Current output: Very long systematic name
@@ -190,6 +215,7 @@ Preferred: cholest-5-en-3β-ol
 **Note:** This is LOW priority because systematic names are still correct, just verbose. Most users working with natural products would use trivial names anyway.
 
 **Implementation estimate:** 8-12 weeks per class
+
 - Requires scaffold recognition
 - SMARTS patterns for each class
 - Class-specific numbering rules
@@ -201,6 +227,7 @@ Preferred: cholest-5-en-3β-ol
 **Status:** Not tested for 50-100+ atom molecules
 
 **Concerns:**
+
 1. **Ring analysis complexity:**
    - Current algorithm finds all elementary rings (DFS-based)
    - Time complexity: O(N²) to O(N³) for dense graphs
@@ -223,17 +250,20 @@ Preferred: cholest-5-en-3β-ol
    - Additional patterns for functional groups (not cached)
 
 **Risk assessment:**
+
 - **High risk:** Chain selection on highly branched 100-atom molecules
 - **Medium risk:** Ring analysis on polycyclic systems (10+ rings)
 - **Low risk:** SMILES parsing and basic molecular analysis
 
 **Testing needed:**
+
 - Benchmark suite with 20-30 molecules (50-100 atoms)
 - Profile CPU and memory usage
 - Identify bottlenecks
 - Add timeout guards for worst-case scenarios
 
 **Implementation estimate:** 2-3 weeks
+
 - Create test dataset
 - Run performance benchmarks
 - Profile and optimize bottlenecks
@@ -274,6 +304,7 @@ Preferred: cholest-5-en-3β-ol
 ```
 
 **Deliverables:**
+
 1. Performance benchmark report
 2. Test dataset with expected results
 3. Updated documentation with scalability limits
@@ -319,6 +350,7 @@ Preferred: cholest-5-en-3β-ol
 ```
 
 **Deliverables:**
+
 1. Stereochemistry module with R/S and E/Z descriptors
 2. Enhanced ring system naming (bridged/spiro/fused)
 3. SMARTS-based functional group registry
@@ -340,12 +372,12 @@ Preferred: cholest-5-en-3β-ol
     - [ ] Implement steroid numbering system
     - [ ] Handle common substitution patterns
     - [ ] Test on 20+ steroids
-  
+
   - [ ] Alkaloid nomenclature (if needed)
     - [ ] Detect common alkaloid scaffolds
     - [ ] Implement class-specific numbering
     - [ ] Test on 10+ alkaloids
-  
+
   - [ ] Terpene nomenclature (if needed)
     - [ ] Detect terpene patterns (isoprene units)
     - [ ] Implement terpene naming rules
@@ -368,6 +400,7 @@ Preferred: cholest-5-en-3β-ol
 ```
 
 **Deliverables:**
+
 1. Steroid recognition and nomenclature module
 2. Enhanced polycyclic nomenclature (P-23 to P-31)
 3. Replacement nomenclature (P-15)
@@ -382,6 +415,7 @@ Preferred: cholest-5-en-3β-ol
 ### Test Dataset Requirements
 
 **Size distribution:**
+
 - 5 molecules: 50-60 atoms
 - 5 molecules: 60-70 atoms
 - 5 molecules: 70-80 atoms
@@ -390,6 +424,7 @@ Preferred: cholest-5-en-3β-ol
 - 5 molecules: 100+ atoms (stress test)
 
 **Structural diversity:**
+
 - Linear/branched alkanes (performance baseline)
 - Simple polycyclics (2-4 fused rings)
 - Complex polycyclics (5+ fused rings)
@@ -398,6 +433,7 @@ Preferred: cholest-5-en-3β-ol
 - Highly branched structures (many substituents)
 
 **Data sources:**
+
 - PubChem: drug molecules, natural products
 - ChEMBL: pharmaceutical compounds
 - DrugBank: FDA-approved drugs
@@ -417,17 +453,20 @@ Preferred: cholest-5-en-3β-ol
 ### Success Criteria
 
 **Phase 1 (Performance):**
+
 - All 30 molecules complete within timeout (30 seconds)
 - Memory usage < 1 GB per molecule
 - No crashes or infinite loops
 
 **Phase 2 (Correctness):**
+
 - 90% match rate for molecules <50 atoms
 - 70% match rate for molecules 50-70 atoms
 - 50% match rate for molecules 70-100 atoms
 - Known limitations documented for failures
 
 **Phase 3 (Natural Products):**
+
 - Steroid names match IUPAC standard (if implemented)
 - Alkaloid names are systematic and correct
 - Natural product classes recognized (if implemented)
@@ -439,18 +478,21 @@ Preferred: cholest-5-en-3β-ol
 ### If You Need 100-Atom Support Immediately
 
 **Option 1: Focus on Performance (2-3 weeks)**
+
 1. Fetch 20-30 large molecules from PubChem
 2. Run performance benchmarks
 3. Identify bottlenecks and add timeout guards
 4. Document what works and what doesn't
 
 **Option 2: Focus on Correctness (8-10 weeks)**
+
 1. Implement stereochemistry (R/S, E/Z)
 2. Enhance complex ring systems (bridged/spiro)
 3. This would handle most drug-like molecules (20-50 atoms)
 4. Test on realistic pharmaceutical compounds
 
 **Option 3: Focus on Natural Products (12-16 weeks)**
+
 1. Implement steroid recognition
 2. Enhance polycyclic nomenclature
 3. Add alkaloid support
@@ -459,6 +501,7 @@ Preferred: cholest-5-en-3β-ol
 ### Recommended Approach
 
 **For general-purpose IUPAC engine:**
+
 1. **Phase 1 first** (performance testing) - 4-6 weeks
    - Understand actual limitations
    - Add safety guards
@@ -516,6 +559,7 @@ The openchem IUPAC engine is **excellent for small-to-medium molecules** (<30 at
 With focused development effort (~6 months), the engine can achieve production-ready support for 100-atom molecules. The recommended approach is to start with **Phase 1 (performance testing)** to understand actual limitations, then implement **Phase 2 (critical features)** for drug-like molecules.
 
 For immediate use cases, the engine can still provide value:
+
 - Parsing and molecular analysis works for any size
 - Names for simple large molecules (linear/branched) are likely correct
 - Complex molecules can fall back to SMILES/InChI representation

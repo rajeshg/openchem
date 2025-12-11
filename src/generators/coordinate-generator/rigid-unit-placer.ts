@@ -101,7 +101,7 @@ function placeRingSystemUnit(
     const atomIds = [...unit.atomIds];
     const bonds = molecule.bonds.map((b) => ({ atom1: b.atom1, atom2: b.atom2 }));
     const templateMatch = findBridgedTemplate(atomIds, bonds);
-    
+
     if (templateMatch) {
       // Apply the template coordinates
       const templateCoords = applyBridgedTemplate(
@@ -109,12 +109,12 @@ function placeRingSystemUnit(
         templateMatch.atomMapping,
         bondLength,
       );
-      
+
       // No parent connection, use template as-is (centered at origin)
       for (const [atomId, coord] of templateCoords) {
         localCoords.set(atomId, coord);
       }
-      
+
       // Successfully placed using template - done!
       return;
     }

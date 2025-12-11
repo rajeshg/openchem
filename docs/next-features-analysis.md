@@ -23,6 +23,7 @@
 Your tautomer generation is **already extensively implemented** but **NOT exported/documented**:
 
 **Core Infrastructure:**
+
 - ✅ `enumerateTautomers()` - Full multi-phase tautomer enumeration (1005 lines!)
 - ✅ `canonicalTautomer()` - Return highest-scoring tautomer
 - ✅ Phase-based enumeration (3 phases with priority rules)
@@ -31,12 +32,14 @@ Your tautomer generation is **already extensively implemented** but **NOT export
 - ✅ Scoring system (aromatic rings +1, charges -10)
 
 **Implemented Rules (4 major classes):**
+
 1. **Keto-enol** (ketone ↔ enol) - Priority 100
-2. **Imine-enamine** (N=C ↔ N-C=C) - Priority 90  
+2. **Imine-enamine** (N=C ↔ N-C=C) - Priority 90
 3. **Amide-imidol** (amide ↔ imidic acid) - Priority 80
 4. **Nitro-aci-nitro** - Priority 85
 
 **Advanced Features:**
+
 - ✅ SMARTS pattern matching for rule application
 - ✅ Manual fallbacks for complex patterns
 - ✅ Hydrogen migration tracking
@@ -45,6 +48,7 @@ Your tautomer generation is **already extensively implemented** but **NOT export
 - ✅ Rule chain tracking (which rules produced each tautomer)
 
 **Code Location:**
+
 - Implementation: `src/utils/tautomer/tautomer-enumerator.ts`
 - Rules: `src/utils/tautomer/tautomer-rules.json`
 - Exports: Already in `index.ts` but not promoted in README
@@ -64,6 +68,7 @@ Your tautomer generation is **already extensively implemented** but **NOT export
 ### Effort Required: **LOW (1-2 days)**
 
 **Why it's easy:**
+
 - ✅ Core algorithm already works (1000+ lines of production code)
 - ✅ Infrastructure complete (validation, scoring, dedup)
 - ✅ Already integrated with SMARTS matching
@@ -72,6 +77,7 @@ Your tautomer generation is **already extensively implemented** but **NOT export
 **What needs to be done:**
 
 #### 1. Write Tests (4-6 hours)
+
 ```typescript
 // test/unit/tautomer/tautomer-enumeration.test.ts
 import { enumerateTautomers, canonicalTautomer } from 'index';
@@ -94,7 +100,9 @@ describe('Tautomer Enumeration', () => {
 ```
 
 #### 2. Add More Rules (2-4 hours)
+
 Add to `tautomer-rules.json`:
+
 - Lactam-lactim
 - Thione-thiol
 - Nitroso-oxime
@@ -102,7 +110,9 @@ Add to `tautomer-rules.json`:
 - Sulfoxide tautomers
 
 #### 3. Documentation (2 hours)
+
 Add to README.md:
+
 ```markdown
 ### Tautomer Enumeration
 
@@ -114,9 +124,9 @@ import { enumerateTautomers, canonicalTautomer, parseSMILES } from 'openchem';
 const mol = parseSMILES('CC(=O)CC(=O)C').molecules[0]; // acetylacetone
 
 // Get all tautomers
-const tautomers = enumerateTautomers(mol, { 
+const tautomers = enumerateTautomers(mol, {
   maxTautomers: 100,
-  maxTransforms: 1000 
+  maxTransforms: 1000
 });
 
 console.log(`Found ${tautomers.length} tautomers`);
@@ -131,6 +141,7 @@ console.log(`Canonical form: ${generateSMILES(canonical)}`);
 ```
 
 #### 4. Polish API (1 hour)
+
 - Maybe add `getAllTautomers()` alias for clarity
 - Add `scoreTautomer()` export for custom scoring
 - Document scoring system
@@ -150,6 +161,7 @@ console.log(`Canonical form: ${generateSMILES(canonical)}`);
 #### Features to Add
 
 **Core Operations:**
+
 ```typescript
 // Immutable API (returns new molecule)
 const edited = editMolecule(mol)
@@ -174,8 +186,9 @@ const fragments = fragmentMolecule(mol, [3, 7]); // break bonds 3 and 7
 ```
 
 **API Functions:**
+
 - `addAtom(mol, symbol, position)` - Add atoms
-- `removeAtom(mol, atomId)` - Delete atoms  
+- `removeAtom(mol, atomId)` - Delete atoms
 - `addBond(mol, atom1, atom2, type)` - Create bonds
 - `removeBond(mol, bondId)` - Break bonds
 - `setAtomProperty(mol, atomId, property, value)` - Modify atoms
@@ -197,22 +210,26 @@ const fragments = fragmentMolecule(mol, [3, 7]); // break bonds 3 and 7
 #### Implementation Plan
 
 **Phase 1: Core Editing (3 days)**
+
 1. Immutable molecule operations
 2. Atom add/remove with automatic ID reassignment
 3. Bond add/remove with validation
 4. Property setters with type checking
 
 **Phase 2: Validation (1 day)**
+
 1. Valence checking after edits
 2. Connectivity validation
 3. Stereochemistry preservation/invalidation
 
 **Phase 3: Advanced Operations (2 days)**
+
 1. Molecule merging
 2. Fragmentation
 3. Substructure replacement
 
 **Phase 4: Builder Pattern (1 day)**
+
 1. Fluent API
 2. Undo/redo support
 3. Transaction batching
@@ -329,9 +346,9 @@ interface ReactionTemplate {
   smarts: "[C:1](=O)[OH].[N:2][H]>>[C:1](=O)[N:2]",
   conditions: "EDC, HOBt",
   examples: [
-    { 
-      reactants: ["CC(=O)O", "CCN"], 
-      product: "CC(=O)NCC" 
+    {
+      reactants: ["CC(=O)O", "CCN"],
+      product: "CC(=O)NCC"
     }
   ]
 }
@@ -340,21 +357,25 @@ interface ReactionTemplate {
 #### Implementation
 
 **Phase 1: Reaction SMARTS Parser (2 days)**
+
 - Parse `reactant1.reactant2>>product` format
 - Extract atom mappings (`:1`, `:2`, etc.)
 - Validate reaction balance
 
 **Phase 2: Transformation Engine (2 days)**
+
 - Match reactants to template
 - Apply atom mapping transformations
 - Build product molecule
 
 **Phase 3: Library Enumeration (2 days)**
+
 - Combinatorial enumeration
 - Reaction filtering (exclude PAINS, reactive groups)
 - Deduplication
 
 **Phase 4: Common Reactions (1 day)**
+
 - Pre-built templates for 20+ common reactions
 - Named reaction database
 
@@ -386,7 +407,7 @@ import { findMCS, alignToMCS, getRGroupDecomposition } from 'openchem';
 
 // Find largest common substructure
 const compounds = [ibuprofen, naproxen, ketoprofen];
-const mcs = findMCS(compounds, { 
+const mcs = findMCS(compounds, {
   atomCompare: 'elements',  // or 'any'
   bondCompare: 'order',     // or 'any'
   ringMatchesRingOnly: true,
@@ -414,11 +435,13 @@ Result:
 #### Algorithm Options
 
 **1. Backtracking (simpler, slower)**
+
 - Recursive search for largest common subgraph
 - Prune search space with heuristics
 - Good for small molecules (< 50 atoms)
 
 **2. Clique-based (faster)**
+
 - Build modular product graph
 - Find maximum clique
 - Better for larger molecules
@@ -426,21 +449,25 @@ Result:
 #### Implementation Plan
 
 **Phase 1: Basic MCS (4 days)**
+
 1. Backtracking algorithm
 2. Atom/bond comparison functions
 3. Isomorphism checking
 
 **Phase 2: Optimization (3 days)**
+
 1. Timeout handling
 2. Early termination heuristics
 3. Ring constraints
 
 **Phase 3: R-group Analysis (2 days)**
+
 1. Core extraction
 2. Side chain identification
 3. R-group labeling
 
 **Phase 4: Alignment (2 days)**
+
 1. 2D coordinate alignment
 2. 3D alignment (if 3D coords available)
 
@@ -463,11 +490,11 @@ Result:
 #### Features
 
 ```typescript
-import { 
-  generate3DCoordinates, 
-  optimizeGeometry, 
+import {
+  generate3DCoordinates,
+  optimizeGeometry,
   generateConformers,
-  computeRMSD 
+  computeRMSD
 } from 'openchem';
 
 // Generate 3D coordinates
@@ -497,21 +524,25 @@ const rmsd = computeRMSD(mol1, mol2, { align: true });
 #### Implementation Phases
 
 **Phase 1: Distance Geometry (1 week)**
+
 - Distance bounds matrix
 - Embed in 3D using distance constraints
 - Refine with error function minimization
 
 **Phase 2: Force Field (1 week)**
+
 - MMFF94 or UFF implementation
 - Energy calculation
 - Gradient descent optimization
 
 **Phase 3: Conformer Generation (3-4 days)**
+
 - ETKDG algorithm (Experimental Torsion Knowledge Distance Geometry)
 - Torsion angle sampling
 - RMSD-based pruning
 
 **Phase 4: 3D Descriptors (2-3 days)**
+
 - Radius of gyration
 - Asphericity
 - Eccentricity
@@ -595,9 +626,9 @@ const hits = matchPharmacophore(database, pharmacophoreQuery);
 import { highlightSubstructure, highlightAtoms, renderSVG } from 'openchem';
 
 // Highlight SMARTS match
-const svg = highlightSubstructure(mol, 'c1ccccc1', { 
+const svg = highlightSubstructure(mol, 'c1ccccc1', {
   color: '#FF0000',
-  opacity: 0.3 
+  opacity: 0.3
 });
 
 // Highlight specific atoms
@@ -623,6 +654,7 @@ const pains = highlightPAINS(mol); // Auto-detect problematic substructures
 #### Implementation
 
 Extend existing `renderSVG()`:
+
 - Add color/stroke parameters to SVG atoms/bonds
 - Layer multiple highlights
 - Add legend/labels
@@ -644,36 +676,37 @@ Extend existing `renderSVG()`:
 
 ### Tier 1: High Impact, Reasonable Effort (Do These First)
 
-| Feature | Impact | Effort | Priority | Time |
-|---------|--------|--------|----------|------|
-| **Molecule Editing** | ⭐⭐⭐⭐⭐ | 1 week | 1 | Foundation for everything |
-| **Murcko Scaffolds** | ⭐⭐⭐⭐ | 2-3 days | 2 | High ROI, low effort |
-| **Tautomer Polish** | ⭐⭐⭐⭐ | 1-2 days | 3 | 90% done already |
-| **Substructure Highlighting** | ⭐⭐⭐ | 1-2 days | 4 | Great UX for playground |
+| Feature                       | Impact     | Effort   | Priority | Time                      |
+| ----------------------------- | ---------- | -------- | -------- | ------------------------- |
+| **Molecule Editing**          | ⭐⭐⭐⭐⭐ | 1 week   | 1        | Foundation for everything |
+| **Murcko Scaffolds**          | ⭐⭐⭐⭐   | 2-3 days | 2        | High ROI, low effort      |
+| **Tautomer Polish**           | ⭐⭐⭐⭐   | 1-2 days | 3        | 90% done already          |
+| **Substructure Highlighting** | ⭐⭐⭐     | 1-2 days | 4        | Great UX for playground   |
 
 **Total Time:** ~2 weeks for all Tier 1
 
 ### Tier 2: High Impact, High Effort (Strategic Investments)
 
-| Feature | Impact | Effort | Priority | Time |
-|---------|--------|--------|----------|------|
-| **3D Coordinates** | ⭐⭐⭐⭐⭐ | 2-3 weeks | 5 | Enables docking prep |
-| **Reaction SMARTS** | ⭐⭐⭐⭐ | 1 week | 6 | Virtual library enum |
-| **MCS Algorithm** | ⭐⭐⭐⭐ | 1-2 weeks | 7 | SAR analysis core |
+| Feature             | Impact     | Effort    | Priority | Time                 |
+| ------------------- | ---------- | --------- | -------- | -------------------- |
+| **3D Coordinates**  | ⭐⭐⭐⭐⭐ | 2-3 weeks | 5        | Enables docking prep |
+| **Reaction SMARTS** | ⭐⭐⭐⭐   | 1 week    | 6        | Virtual library enum |
+| **MCS Algorithm**   | ⭐⭐⭐⭐   | 1-2 weeks | 7        | SAR analysis core    |
 
 **Total Time:** ~5-6 weeks for all Tier 2
 
 ### Tier 3: Nice-to-Have (Future Work)
 
-| Feature | Impact | Effort | Priority | Time |
-|---------|--------|--------|----------|------|
-| **Pharmacophore FP** | ⭐⭐⭐ | 1 week | 8 | Complement Morgan FP |
+| Feature              | Impact | Effort | Priority | Time                 |
+| -------------------- | ------ | ------ | -------- | -------------------- |
+| **Pharmacophore FP** | ⭐⭐⭐ | 1 week | 8        | Complement Morgan FP |
 
 ---
 
 ## Implementation Roadmap
 
 ### Sprint 1 (Week 1-2): Foundation
+
 - ✅ Molecule Editing API (immutable + builder)
 - ✅ Murcko Scaffolds
 - ✅ Tautomer tests + docs
@@ -682,6 +715,7 @@ Extend existing `renderSVG()`:
 **Deliverable:** Core manipulation + visualization ready
 
 ### Sprint 2 (Week 3): Virtual Library
+
 - ✅ Reaction SMARTS parser
 - ✅ Transformation engine
 - ✅ Common reaction templates
@@ -689,6 +723,7 @@ Extend existing `renderSVG()`:
 **Deliverable:** Enumerate virtual libraries
 
 ### Sprint 3 (Week 4-5): Advanced Analysis
+
 - ✅ MCS backtracking algorithm
 - ✅ R-group decomposition
 - ✅ Series alignment
@@ -696,6 +731,7 @@ Extend existing `renderSVG()`:
 **Deliverable:** SAR analysis toolkit
 
 ### Sprint 4 (Week 6-8): 3D Geometry
+
 - ✅ Distance geometry 3D embedding
 - ✅ Force field optimization (MMFF94 lite)
 - ✅ Conformer generation
@@ -732,6 +768,7 @@ If you want to ship something **fast** (1-2 days each):
 **Recommendation:** Start with **Molecule Editing** as it's the most impactful missing piece. Follow with **Murcko Scaffolds** (quick win) and **Tautomer polish** (low-hanging fruit).
 
 This gives you:
+
 - ✅ Core manipulation capabilities (editing)
 - ✅ Industry-standard analysis (Murcko)
 - ✅ Advanced chemistry (tautomers)

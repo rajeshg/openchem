@@ -17,7 +17,9 @@ export function validateTautomer(mol: Molecule): TautomerValidationResult {
   // Check for charged atoms (protonation states, not tautomers)
   const chargedAtoms = mol.atoms.filter((a) => (a.charge ?? 0) !== 0);
   if (chargedAtoms.length > 0) {
-    reasons.push(`charged atoms: ${chargedAtoms.map((a) => `${a.symbol}(${a.charge})`).join(", ")}`);
+    reasons.push(
+      `charged atoms: ${chargedAtoms.map((a) => `${a.symbol}(${a.charge})`).join(", ")}`,
+    );
   }
 
   // Check for triple bonds to nitrogen in rings (chemically unreasonable)

@@ -99,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Examples
 
 Highlight benzene ring in aspirin:
+
 ```json
 {
   "tool": "render",
@@ -112,6 +113,7 @@ Highlight benzene ring in aspirin:
 ```
 
 Highlight multiple functional groups:
+
 ```json
 {
   "tool": "render",

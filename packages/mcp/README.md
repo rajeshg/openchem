@@ -49,6 +49,7 @@ The HTTP server will start on `http://localhost:4141` by default.
 ### 1. **analyze** - Complete Molecular Analysis
 
 Comprehensive analysis including:
+
 - SMILES parsing and canonicalization
 - 40+ molecular descriptors
 - Drug-likeness assessment (Lipinski, Veber rules)
@@ -56,6 +57,7 @@ Comprehensive analysis including:
 - Optional 2D SVG rendering
 
 **Example:**
+
 ```typescript
 {
   "name": "analyze",
@@ -69,11 +71,13 @@ Comprehensive analysis including:
 ### 2. **compare** - Molecular Similarity
 
 Compare two molecules using:
+
 - Morgan fingerprints (ECFP)
 - Tanimoto similarity
 - Property comparison
 
 **Example:**
+
 ```typescript
 {
   "name": "compare",
@@ -87,11 +91,13 @@ Compare two molecules using:
 ### 3. **search** - Substructure Matching
 
 Search for SMARTS patterns:
+
 - Match count and indices
 - Support for complex patterns
 - Aromatic and aliphatic matching
 
 **Example:**
+
 ```typescript
 {
   "name": "search",
@@ -105,6 +111,7 @@ Search for SMARTS patterns:
 ### 4. **render** - 2D Structure Visualization
 
 Generate publication-quality images in SVG or PNG format:
+
 - Automatic layout
 - Stereochemistry display
 - Customizable size
@@ -112,6 +119,7 @@ Generate publication-quality images in SVG or PNG format:
 - **NEW:** Substructure highlighting (pharmacophores, functional groups, PAINS)
 
 **Basic Example:**
+
 ```typescript
 {
   "name": "render",
@@ -125,6 +133,7 @@ Generate publication-quality images in SVG or PNG format:
 ```
 
 **Highlighting Example:**
+
 ```typescript
 {
   "name": "render",
@@ -152,6 +161,7 @@ Generate publication-quality images in SVG or PNG format:
 ```
 
 **Highlight Options:**
+
 - `smarts`: SMARTS pattern to match (e.g., `"c1ccccc1"` for benzene)
 - `atoms`: Array of atom indices to highlight (e.g., `[0, 1, 2]`)
 - `bonds`: Array of bond pairs to highlight (e.g., `[[0, 1], [1, 2]]`)
@@ -164,11 +174,13 @@ Generate publication-quality images in SVG or PNG format:
 ### 5. **convert** - Format Conversion
 
 Convert between formats:
+
 - Canonical SMILES
 - IUPAC names
 - Murcko scaffolds
 
 **Example:**
+
 ```typescript
 {
   "name": "convert",
@@ -182,6 +194,7 @@ Convert between formats:
 ### 6. **identifiers** - Molecular Identifiers
 
 Generate standard identifiers for database lookups:
+
 - InChI (International Chemical Identifier)
 - InChIKey (hashed identifier for exact matching)
 - Canonical SMILES
@@ -189,6 +202,7 @@ Generate standard identifiers for database lookups:
 - Essential for PubChem, ChEMBL, DrugBank integration
 
 **Example:**
+
 ```typescript
 {
   "name": "identifiers",
@@ -199,6 +213,7 @@ Generate standard identifiers for database lookups:
 ```
 
 **Output:**
+
 ```json
 {
   "canonicalSmiles": "CC(=O)Oc1ccccc1C(=O)O",
@@ -212,6 +227,7 @@ Generate standard identifiers for database lookups:
 ### 7. **tautomers** - Tautomer Enumeration
 
 Enumerate and score molecular tautomers:
+
 - Keto-enol tautomers
 - Imine-enamine tautomers
 - Amide-imidol forms
@@ -220,6 +236,7 @@ Enumerate and score molecular tautomers:
 - Essential for drug discovery and docking studies
 
 **Example:**
+
 ```typescript
 {
   "name": "tautomers",
@@ -232,6 +249,7 @@ Enumerate and score molecular tautomers:
 ```
 
 **Output:**
+
 ```json
 {
   "canonicalTautomer": "CC(O)=CC(=O)C",
@@ -246,6 +264,7 @@ Enumerate and score molecular tautomers:
 ### 8. **fileConvert** - MOL/SDF File Format Conversion
 
 Convert between industry-standard molecular file formats:
+
 - SMILES → MOL (V2000 format)
 - MOL → SMILES
 - SMILES → SDF (with properties)
@@ -256,6 +275,7 @@ Convert between industry-standard molecular file formats:
 **Operations:**
 
 #### smilesToMol
+
 ```typescript
 {
   "name": "fileConvert",
@@ -268,6 +288,7 @@ Convert between industry-standard molecular file formats:
 ```
 
 #### molToSmiles
+
 ```typescript
 {
   "name": "fileConvert",
@@ -279,6 +300,7 @@ Convert between industry-standard molecular file formats:
 ```
 
 #### smilesToSDF
+
 ```typescript
 {
   "name": "fileConvert",
@@ -294,6 +316,7 @@ Convert between industry-standard molecular file formats:
 ```
 
 #### sdfToSmiles
+
 ```typescript
 {
   "name": "fileConvert",
@@ -455,6 +478,7 @@ openchem-mcp --port 8080
 ## Performance
 
 Typical response times:
+
 - **analyze** (no rendering): 50-200ms
 - **analyze** (with rendering): 100-400ms
 - **compare**: 100-300ms

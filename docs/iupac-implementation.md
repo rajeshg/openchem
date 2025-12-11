@@ -88,15 +88,15 @@ interface IUPACContext {
   rings: Ring[];                       // SSSR rings
   aromaticRings: number[];             // Indices of aromatic rings
   fusedRingSystems: FusedRingSystem[]; // Detected fusion systems
-  
+
   mainChain?: number[];                // Selected main chain atom IDs
   numbering?: Map<number, number>;     // Atom ID → locant number
-  
+
   functionalGroups: FunctionalGroup[]; // Detected groups (alcohols, ketones, etc.)
   principalGroup?: FunctionalGroup;    // Highest priority group
-  
+
   substituentTree?: SubstituentNode[]; // Tree of substituents
-  
+
   // ... additional fields for stereo, tautomers, etc.
 }
 ```
@@ -119,6 +119,7 @@ const name = assembleName(context);
 Responsible for initializing the context with structural analysis:
 
 **Steps:**
+
 1. **Ring analysis**: Compute SSSR using `findSSSR()` from `ring-analysis.ts`
 2. **Aromaticity perception**: Apply Hückel's rule via `perceiveAromaticity()`
 3. **Fusion detection**: Identify fused ring systems (naphthalene, anthracene, etc.)
@@ -132,7 +133,7 @@ export function buildIUPACContext(molecule: Molecule): IUPACContext {
   const rings = findSSSR(molecule.atoms, molecule.bonds);
   const aromaticRings = perceiveAromaticity(molecule, rings);
   const fusedSystems = detectFusedSystems(rings, molecule);
-  
+
   return {
     molecule,
     rings,
@@ -166,16 +167,16 @@ The main chain selection algorithm implements **IUPAC seniority rules** to choos
 ```typescript
 export function selectMainChain(context: IUPACContext): IUPACContext {
   const candidates = findAllChains(context.molecule);
-  
+
   // Apply seniority rules in order
   let bestChain = candidates[0];
-  
+
   for (const candidate of candidates.slice(1)) {
     if (compareChains(candidate, bestChain, context) > 0) {
       bestChain = candidate;
     }
   }
-  
+
   return { ...context, mainChain: bestChain };
 }
 
@@ -184,15 +185,15 @@ function compareChains(a: number[], b: number[], ctx: IUPACContext): number {
   const heteroA = countHeteroatoms(a, ctx);
   const heteroB = countHeteroatoms(b, ctx);
   if (heteroA !== heteroB) return heteroA - heteroB;
-  
+
   // Rule 2: Length
   if (a.length !== b.length) return a.length - b.length;
-  
+
   // Rule 3: Unsaturation
   const unsatA = countUnsaturation(a, ctx);
   const unsatB = countUnsaturation(b, ctx);
   if (unsatA !== unsatB) return unsatA - unsatB;
-  
+
   // ... continue with remaining rules
 }
 ```
@@ -235,23 +236,23 @@ The numbering engine assigns **locant numbers** to atoms in the main chain using
 ```typescript
 export function assignNumbering(context: IUPACContext): IUPACContext {
   if (!context.mainChain) throw new Error('Main chain not selected');
-  
+
   const chain = context.mainChain;
-  
+
   // Try both directions (1→N and N→1)
   const forward = numberChain(chain, false);
   const reverse = numberChain(chain, true);
-  
+
   // Compare using lowest locant sets
   const better = compareLocantSets(forward, reverse, context);
-  
+
   const numbering = new Map<number, number>();
   const chosen = better === 'forward' ? forward : reverse;
-  
+
   for (let i = 0; i < chosen.length; i++) {
     numbering.set(chosen[i], i + 1); // Locants start at 1
   }
-  
+
   return { ...context, numbering };
 }
 
@@ -263,11 +264,11 @@ function compareLocantSets(
   // Get locant sets for important features
   const heteroA = getHeteroatomLocants(a, ctx);
   const heteroB = getHeteroatomLocants(b, ctx);
-  
+
   // Compare lexicographically
   const cmp = lexicographicCompare(heteroA, heteroB);
   if (cmp !== 0) return cmp < 0 ? 'forward' : 'reverse';
-  
+
   // Continue with multiple bonds, substituents, etc.
   // ...
 }
@@ -329,7 +330,7 @@ function getAromaticRings(context: IUPACContext): number[] {
   if (context.aromaticRings) {
     return context.aromaticRings; // Return cached
   }
-  
+
   const aromatic = perceiveAromaticity(context.molecule, context.rings);
   return aromatic; // Will be cached by caller
 }
@@ -345,15 +346,15 @@ function getAromaticRings(context: IUPACContext): number[] {
 
 ### Data Files Used
 
-| File | Purpose | Examples |
-|------|---------|----------|
-| `alkanes.xml` | Straight-chain hydrocarbon names | methane, ethane, propane |
-| `simpleGroups.xml` | Acyclic parent structures | methyl, ethyl, propyl |
-| `simpleCyclicGroups.xml` | Monocyclic parent structures | cyclopropane, cyclohexane |
-| `suffixes.xml` | Functional group suffixes | -ol, -one, -oic acid |
-| `multipliers.xml` | Numerical prefixes | di-, tri-, tetra- |
-| `fusionComponents.xml` | Fused ring system names | naphthalene, anthracene |
-| `heteroAtoms.xml` | Heteroatom replacement names | oxa-, aza-, thia- |
+| File                     | Purpose                          | Examples                  |
+| ------------------------ | -------------------------------- | ------------------------- |
+| `alkanes.xml`            | Straight-chain hydrocarbon names | methane, ethane, propane  |
+| `simpleGroups.xml`       | Acyclic parent structures        | methyl, ethyl, propyl     |
+| `simpleCyclicGroups.xml` | Monocyclic parent structures     | cyclopropane, cyclohexane |
+| `suffixes.xml`           | Functional group suffixes        | -ol, -one, -oic acid      |
+| `multipliers.xml`        | Numerical prefixes               | di-, tri-, tetra-         |
+| `fusionComponents.xml`   | Fused ring system names          | naphthalene, anthracene   |
+| `heteroAtoms.xml`        | Heteroatom replacement names     | oxa-, aza-, thia-         |
 
 ### Loading OPSIN Data
 
@@ -417,7 +418,7 @@ describe('P-44.1: Main chain selection', () => {
     const mol = parseSMILES(smiles).molecules[0];
     const context = buildIUPACContext(mol);
     const result = selectMainChain(context);
-    
+
     expect(result.mainChain?.length).toBe(5); // Pentane chain
   });
 });
@@ -432,7 +433,7 @@ describe('IUPAC name generation', () => {
   it('generates correct name for complex molecule', () => {
     const smiles = 'CC(=O)Oc1ccccc1C(=O)O'; // Aspirin
     const name = generateIUPACName(smiles);
-    
+
     expect(name).toBe('2-acetoxybenzoic acid');
   });
 });
@@ -448,7 +449,7 @@ describe('RDKit comparison', () => {
     const smiles = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C';
     const ourName = generateIUPACName(smiles);
     const rdkitName = getRDKitName(smiles);
-    
+
     expect(ourName).toBe(rdkitName);
   });
 });
@@ -484,6 +485,7 @@ bun test test/unit/iupac-engine/realistic-iupac-test.test.ts
 **Recommended workflow:**
 
 1. **Write failing test first**:
+
    ```typescript
    it('should name 3-ethyl-2-methylhexane', () => {
      const smiles = 'CCC(C)C(CC)CCC';
@@ -532,13 +534,13 @@ describe('P-31.2: E/Z stereochemistry', () => {
     const name = generateIUPACName(smiles);
     expect(name).toBe('(E)-but-2-ene');
   });
-  
+
   it('assigns (Z) to cis-but-2-ene', () => {
     const smiles = 'C/C=C\\C'; // Cis
     const name = generateIUPACName(smiles);
     expect(name).toBe('(Z)-but-2-ene');
   });
-  
+
   it('handles multiple stereocenters', () => {
     const smiles = 'C/C=C/C=C\\C'; // (2E,4Z)-hexa-2,4-diene
     const name = generateIUPACName(smiles);
@@ -554,7 +556,7 @@ describe('P-31.2: E/Z stereochemistry', () => {
 export function assignEZDescriptors(context: IUPACContext): IUPACContext {
   const doubleBonds = findDoubleBonds(context.molecule);
   const ezAssignments: EZAssignment[] = [];
-  
+
   for (const bond of doubleBonds) {
     const descriptor = determineEZConfiguration(bond, context);
     if (descriptor) {
@@ -562,7 +564,7 @@ export function assignEZDescriptors(context: IUPACContext): IUPACContext {
       ezAssignments.push({ locant, descriptor });
     }
   }
-  
+
   return {
     ...context,
     ezDescriptors: ezAssignments
@@ -576,7 +578,7 @@ function determineEZConfiguration(
   // Implement Cahn-Ingold-Prelog priority rules
   const [highPriority1, lowPriority1] = getPriorities(bond.atom1, context);
   const [highPriority2, lowPriority2] = getPriorities(bond.atom2, context);
-  
+
   if (areOnSameSide(highPriority1, highPriority2, bond)) {
     return 'Z'; // Zusammen (together)
   } else {
@@ -591,7 +593,7 @@ function determineEZConfiguration(
 // src/iupac-engine/naming/iupac-name-assembler.ts
 function assembleFullName(context: IUPACContext): string {
   let name = '';
-  
+
   // Add E/Z descriptors
   if (context.ezDescriptors && context.ezDescriptors.length > 0) {
     const descriptors = context.ezDescriptors
@@ -599,15 +601,15 @@ function assembleFullName(context: IUPACContext): string {
       .join(',');
     name += `(${descriptors})-`;
   }
-  
+
   // Add parent name
   name += context.parentName;
-  
+
   // Add suffixes
   if (context.principalGroup) {
     name += getSuffixName(context.principalGroup);
   }
-  
+
   return name;
 }
 ```
@@ -632,9 +634,9 @@ Update `docs/iupac-rules-reference.md` with implementation status:
 ```markdown
 ### P-31.2: Alkene Stereochemistry
 
-**Status:** ✅ Implemented  
-**Coverage:** Full E/Z configuration support  
-**Limitations:** None  
+**Status:** ✅ Implemented
+**Coverage:** Full E/Z configuration support
+**Limitations:** None
 **Tests:** `test/unit/iupac-engine/p31-ez-stereo.test.ts`
 ```
 
@@ -667,13 +669,13 @@ Update `docs/iupac-rules-reference.md` with implementation status:
 
 ### Algorithmic Complexity
 
-| Operation | Complexity | Notes |
-|-----------|-----------|-------|
-| Ring finding (SSSR) | O(N²) | Bottleneck for large molecules |
-| Main chain selection | O(N² log N) | All chains enumeration + sorting |
-| Numbering | O(N) | Two passes (forward + reverse) |
-| Functional group detection | O(N × G) | N = atoms, G = group patterns |
-| Name assembly | O(N) | Linear string concatenation |
+| Operation                  | Complexity  | Notes                            |
+| -------------------------- | ----------- | -------------------------------- |
+| Ring finding (SSSR)        | O(N²)       | Bottleneck for large molecules   |
+| Main chain selection       | O(N² log N) | All chains enumeration + sorting |
+| Numbering                  | O(N)        | Two passes (forward + reverse)   |
+| Functional group detection | O(N × G)    | N = atoms, G = group patterns    |
+| Name assembly              | O(N)        | Linear string concatenation      |
 
 ### Optimization Strategies
 
@@ -685,10 +687,10 @@ Stop chain enumeration when no better chain possible:
 function findAllChains(molecule: Molecule, maxLength: number): number[][] {
   const chains: number[][] = [];
   let currentBest = 0;
-  
+
   for (const startAtom of molecule.atoms) {
     const chain = growChain(startAtom, molecule);
-    
+
     if (chain.length > currentBest) {
       currentBest = chain.length;
       chains.push(chain);
@@ -696,7 +698,7 @@ function findAllChains(molecule: Molecule, maxLength: number): number[][] {
       break; // Can't beat current best
     }
   }
-  
+
   return chains;
 }
 ```
@@ -712,7 +714,7 @@ function getRings(molecule: Molecule): Ring[] {
   if (ringCache.has(molecule)) {
     return ringCache.get(molecule)!;
   }
-  
+
   const rings = findSSSR(molecule.atoms, molecule.bonds);
   ringCache.set(molecule, rings);
   return rings;
@@ -727,7 +729,7 @@ Defer expensive operations until needed:
 interface IUPACContext {
   molecule: Molecule;
   _rings?: Ring[]; // Cached lazily
-  
+
   get rings(): Ring[] {
     if (!this._rings) {
       this._rings = findSSSR(this.molecule.atoms, this.molecule.bonds);

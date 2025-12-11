@@ -6,17 +6,18 @@ Comprehensive test suite added to prevent regressions in the SVG substructure hi
 
 ## Test Files Created
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `test/svg/highlighting.test.ts` | 38 | Core highlighting functionality (atom/bond highlights, SMARTS, multi-molecule grids) |
-| `test/svg/highlighting-regression.test.ts` | 20 | Regression tests for MCP example queries (#5, #6) |
-| `test/integration/mcp-tool-highlighting.test.ts` | 22 | MCP tool integration (SMARTS matching, rendering, API consistency) |
-| `test/integration/mcp-highlighting-e2e.test.ts` | 17 | End-to-end workflow tests (parse → match → render) |
-| **Total** | **97** | **Complete coverage of highlighting feature** |
+| File                                             | Tests  | Purpose                                                                              |
+| ------------------------------------------------ | ------ | ------------------------------------------------------------------------------------ |
+| `test/svg/highlighting.test.ts`                  | 38     | Core highlighting functionality (atom/bond highlights, SMARTS, multi-molecule grids) |
+| `test/svg/highlighting-regression.test.ts`       | 20     | Regression tests for MCP example queries (#5, #6)                                    |
+| `test/integration/mcp-tool-highlighting.test.ts` | 22     | MCP tool integration (SMARTS matching, rendering, API consistency)                   |
+| `test/integration/mcp-highlighting-e2e.test.ts`  | 17     | End-to-end workflow tests (parse → match → render)                                   |
+| **Total**                                        | **97** | **Complete coverage of highlighting feature**                                        |
 
 ## Test Coverage by Category
 
 ### 1. Core Highlighting Features (38 tests)
+
 - ✅ Atom highlighting with explicit indices
 - ✅ Bond highlighting with explicit atom pairs
 - ✅ SMARTS-based highlighting (benzene, functional groups)
@@ -26,6 +27,7 @@ Comprehensive test suite added to prevent regressions in the SVG substructure hi
 - ✅ Overlapping highlights and stress tests
 
 ### 2. Regression Tests (20 tests)
+
 - ✅ MCP Example Query #5: Multiple molecules (aspirin, ibuprofen, naproxen) with carboxylic acids
 - ✅ MCP Example Query #6: Celecoxib with sulfonamide (yellow) and trifluoromethyl (blue)
 - ✅ SMARTS pattern matching (aromatic rings, functional groups)
@@ -34,6 +36,7 @@ Comprehensive test suite added to prevent regressions in the SVG substructure hi
 - ✅ Large molecule rendering (taxol)
 
 ### 3. MCP Tool Integration (22 tests)
+
 - ✅ SMARTS pattern matching for celecoxib (S(=O)(=O)N, C(F)(F)F)
 - ✅ Carboxylic acid matching across molecules
 - ✅ SVG rendering with highlights
@@ -44,6 +47,7 @@ Comprehensive test suite added to prevent regressions in the SVG substructure hi
 - ✅ API consistency (colors, opacity, overrides)
 
 ### 4. End-to-End Workflow (17 tests)
+
 - ✅ Complete workflow: Parse SMILES → Match SMARTS → Render SVG
 - ✅ Step-by-step validation (parse, match sulfonamide, match CF3, render)
 - ✅ Multiple molecules with same highlight pattern
@@ -55,6 +59,7 @@ Comprehensive test suite added to prevent regressions in the SVG substructure hi
 ## Critical Test Cases
 
 ### Celecoxib Dual Highlighting (User Query #6)
+
 ```typescript
 const celecoxib = "CC1=CC=C(C=C1)C2=CC(=NN2C3=CC=C(C=C3)S(=O)(=O)N)C(F)(F)F";
 const highlights = [
@@ -65,6 +70,7 @@ const highlights = [
 ```
 
 ### Multi-Molecule Carboxylic Acid (User Query #5)
+
 ```typescript
 const molecules = [
   "CC(=O)Oc1ccccc1C(=O)O",  // Aspirin
@@ -76,6 +82,7 @@ const highlight = { smarts: "C(=O)O", color: "red" };
 ```
 
 ### Error Resilience
+
 ```typescript
 // Malformed SMARTS - should not crash
 const highlight = { smarts: "invalid((((pattern", color: "red" };
@@ -107,6 +114,7 @@ bun test
 ## API Contracts Verified
 
 ### matchSMARTS Signature
+
 ```typescript
 function matchSMARTS(
   pattern: string | SMARTSPattern,
@@ -116,6 +124,7 @@ function matchSMARTS(
 ```
 
 ### renderSVG Highlights Parameter
+
 ```typescript
 interface RenderOptions {
   width?: number;
@@ -126,6 +135,7 @@ interface RenderOptions {
 ```
 
 ### SubstructureHighlight Type
+
 ```typescript
 interface SubstructureHighlight {
   smarts?: string;           // SMARTS pattern to match
@@ -142,6 +152,7 @@ interface SubstructureHighlight {
 ## Continuous Integration
 
 Tests run automatically on:
+
 - ✅ Every commit (GitHub Actions)
 - ✅ Before npm publish (`prepublishOnly` hook)
 - ✅ Pull request validation
@@ -149,6 +160,7 @@ Tests run automatically on:
 ## Future Test Expansion
 
 Potential additions:
+
 - [ ] Performance benchmarks for large highlight counts (>100)
 - [ ] Visual regression testing (SVG snapshot comparison)
 - [ ] Multi-threaded rendering stress tests

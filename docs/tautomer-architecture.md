@@ -7,6 +7,7 @@ This document describes the complete architectural refactor of the tautomer enum
 ## Motivation
 
 The original V1 enumerator had fundamental limitations:
+
 - **DFS exploration**: Explored one path deeply before backtracking, missing systematic combinations
 - **Monolithic transformations**: Hard-coded transformations mixed with matching logic
 - **Limited coverage**: Multi-site molecules (e.g., uric acid, hexahydroxybenzene) had poor coverage
@@ -31,6 +32,7 @@ src/utils/tautomer/
 **Purpose**: Identify all transformable sites in a molecule
 
 **Transformation types detected**:
+
 - `keto-enol`: C=O → C-OH (forward)
 - `enol-keto`: C=C(OH) → C-C=O (reverse)
 - `lactam-lactim`: N-C=O → N=C-OH
@@ -39,11 +41,13 @@ src/utils/tautomer/
 - `nitroso-oxime`: C-N=O → C=N-OH
 
 **Key functions**:
+
 - `identifyAllTransformationSites(mol)` — Detect all sites
 - `areSitesCompatible(site1, site2)` — Check if sites share atoms
 - `getCompatibleSiteCombinations(sites)` — Generate valid site masks
 
 **Aromaticity handling**:
+
 - Prevents breaking aromatic rings (e.g., benzene)
 - Allows exocyclic transformations (e.g., phenol OH groups)
 
@@ -52,10 +56,12 @@ src/utils/tautomer/
 **Purpose**: Apply transformations atomically and validate results
 
 **Key functions**:
+
 - `applySiteTransformation(mol, site)` — Transform single site
 - `applyMultiSiteTransformation(mol, sites, mask)` — Transform multiple sites
 
 **Validation**:
+
 - Valence checking after each transformation
 - Implicit hydrogen recomputation
 - Molecular enrichment (aromaticity, ring perception)
@@ -65,6 +71,7 @@ src/utils/tautomer/
 **Purpose**: Detect duplicate tautomers via SMILES canonicalization
 
 **Features**:
+
 - SMILES-based primary deduplication
 - Optional Morgan fingerprint similarity checking (disabled by default)
 - O(1) lookup for duplicate detection
@@ -88,6 +95,7 @@ src/utils/tautomer/
 ```
 
 **Advantages over V1**:
+
 - **Systematic**: Explores all reachable tautomers layer by layer
 - **Complete**: Finds all tautomers within maxTransforms limit
 - **Efficient**: Avoids redundant paths via deduplication
@@ -97,18 +105,19 @@ src/utils/tautomer/
 
 ### V1 vs V2 Comparison
 
-| Molecule | V1 | V2 | RDKit Target | V2 Coverage | Status |
-|----------|----|----|--------------|-------------|--------|
-| **Acetone** | 2 | 2 | 2 | 100% | ➖ SAME |
-| **2,4-Pentanedione** | 4 | 6 | 5 | 120% | ✅ IMPROVED |
-| **Uric acid** | 12 | 12 | 24 | 50% | ➖ SAME |
-| **Alloxan** | 5 | 5 | 12 | 42% | ➖ SAME |
-| **Tetraenol** | 2 | 3 | 30 | 10% | ✅ IMPROVED |
-| **Hexahydroxybenzene** | 4 | 14 | 10 | 140% | ✅ IMPROVED |
-| **Phenol** | 2 | 1 | 2 | 50% | ⚠️ REGRESSED |
-| **Hydroquinone** | 3 | 1 | 3 | 33% | ⚠️ REGRESSED |
+| Molecule               | V1  | V2  | RDKit Target | V2 Coverage | Status       |
+| ---------------------- | --- | --- | ------------ | ----------- | ------------ |
+| **Acetone**            | 2   | 2   | 2            | 100%        | ➖ SAME      |
+| **2,4-Pentanedione**   | 4   | 6   | 5            | 120%        | ✅ IMPROVED  |
+| **Uric acid**          | 12  | 12  | 24           | 50%         | ➖ SAME      |
+| **Alloxan**            | 5   | 5   | 12           | 42%         | ➖ SAME      |
+| **Tetraenol**          | 2   | 3   | 30           | 10%         | ✅ IMPROVED  |
+| **Hexahydroxybenzene** | 4   | 14  | 10           | 140%        | ✅ IMPROVED  |
+| **Phenol**             | 2   | 1   | 2            | 50%         | ⚠️ REGRESSED |
+| **Hydroquinone**       | 3   | 1   | 3            | 33%         | ⚠️ REGRESSED |
 
 **Overall**:
+
 - Total tautomers: **34 → 44 (+29%)**
 - RDKit coverage: **57.9%** (baseline)
 - Improved: 3 molecules
@@ -125,11 +134,13 @@ src/utils/tautomer/
 ### Known Limitations
 
 **Aromatic phenolic compounds** (phenol, hydroquinone):
+
 - Requires enol-keto transformations in aromatic rings
 - Current site detection filters out aromatic carbon-oxygen double bonds
 - Future improvement: Add specialized phenol-quinone site detector
 
 **Complex amino-aromatics** (aniline):
+
 - Aniline (Nc1ccccc1) requires pulling hydrogen from adjacent ring carbon
 - Current amino-imine detector requires H on directly attached carbon
 - Future improvement: Add aromatic-assisted imine-enamine detector
@@ -148,9 +159,9 @@ export OPENCHEM_TAUTOMER_V2=1
 import { enumerateTautomers, canonicalTautomer } from 'index';
 
 // Enumerate all tautomers with V2
-const tautomers = enumerateTautomers(molecule, { 
+const tautomers = enumerateTautomers(molecule, {
   maxTautomers: 50,
-  useV2: true 
+  useV2: true
 });
 
 // Get canonical tautomer with V2
@@ -194,16 +205,19 @@ bun test test/rdkit-comparison/tautomer-comparison.test.ts
 ## Migration Path
 
 ### Phase 1: Parallel Operation (Current)
+
 - V1 remains default
 - V2 available via `useV2: true` or `OPENCHEM_TAUTOMER_V2=1`
 - Both engines tested in parallel
 
 ### Phase 2: V2 as Default (Future)
+
 - Switch default to V2
 - V1 available via `useV2: false`
 - Comprehensive validation against production workloads
 
 ### Phase 3: V1 Deprecation (Future)
+
 - Remove V1 code
 - V2 becomes sole implementation
 - Clean up feature flags
@@ -211,21 +225,25 @@ bun test test/rdkit-comparison/tautomer-comparison.test.ts
 ## Future Improvements
 
 ### 1. Aromatic Phenol-Quinone Transformations
+
 - Add specialized site detector for phenolic compounds
 - Handle Oc1ccccc1 ↔ O=C1C=CC=CC1 transformations
 - Improves phenol and hydroquinone coverage
 
 ### 2. Multi-Site Simultaneous Transformations
+
 - Current: Transform one site at a time (iterative BFS)
 - Future: Transform compatible sites simultaneously in single step
 - Would improve coverage for molecules with many independent sites
 
 ### 3. Resonance Structure Detection
+
 - Identify when different site combinations lead to same tautomer
 - Prune redundant paths earlier
 - Reduce duplicate generation
 
 ### 4. Advanced Scoring
+
 - Incorporate solvation effects
 - pH-dependent tautomer preferences
 - Machine learning-based stability prediction
@@ -240,6 +258,7 @@ bun test test/rdkit-comparison/tautomer-comparison.test.ts
 ## Conclusion
 
 The V2 tautomer enumerator represents a **holistic architectural improvement** that:
+
 - ✅ Improves overall coverage by 29% (34 → 44 tautomers across test set)
 - ✅ Provides systematic BFS exploration (completeness guarantee)
 - ✅ Enables modular site detection (easier to extend)

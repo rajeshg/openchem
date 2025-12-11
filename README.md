@@ -7,6 +7,7 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 ## Features
 
 ### File Format Support
+
 - **SMILES** — Parse and generate canonical SMILES with full stereochemistry
 - **MOL files** — V2000/V3000 format support with 2D coordinate generation
 - **SDF files** — Multi-molecule files with property data
@@ -14,6 +15,7 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 - **IUPAC names** — Bidirectional IUPAC ↔ SMILES conversion
 
 ### Structure Analysis
+
 - **Pattern matching** — SMARTS substructure search
 - **Fingerprints** — Morgan (ECFP) fingerprints with Tanimoto similarity
 - **Murcko scaffolds** — Extract core scaffolds, generic frameworks, scaffold trees
@@ -24,6 +26,7 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 - **Stereochemistry** — Full support for tetrahedral centers, E/Z bonds, extended chirality
 
 ### Molecular Properties
+
 - **Basic** — Formula, mass, atom/bond counts
 - **Structural** — Valence electrons, amide bonds, spiro/bridgehead atoms, ring classifications
 - **Stereochemistry** — Specified and unspecified stereocenter counting
@@ -32,12 +35,14 @@ Production-ready, TypeScript-first library for cheminformatics — works in both
 - **Ring analysis** — Saturated/aliphatic/heterocyclic ring counts
 
 ### Visualization
+
 - **2D rendering** — Publication-quality SVG with automatic layout
 - **Smart positioning** — Overlap-aware fused ring placement
 - **Stereochemistry display** — Wedge/hash bonds for chirality
 - **Customizable** — Element colors, bond styles, canvas size
 
 ### Performance & Quality
+
 - ⚡ **Fast** — Optimized coordinate generation, CSR graph for O(1) lookups
 - 🔬 **Accurate** — 100% RDKit agreement on canonical SMILES (325/325 molecules)
 - ✅ **Well-tested** — 2,093 passing tests including bulk RDKit comparisons
@@ -87,6 +92,7 @@ bun run serve
 ```
 
 The playground provides:
+
 - **2D Structure Visualization** — Clean SVG rendering of molecular structures
 - **Molecular Descriptors** — Formula, mass, TPSA, rotatable bonds, etc.
 - **Drug-Likeness Checks** — Lipinski's Rule of Five, Veber rules, BBB penetration
@@ -181,7 +187,7 @@ console.log(molfile); // Full MOL file with coordinates
 
 // Parse SDF file
 const sdfContent = `
-  Mrv2311 02102409422D          
+  Mrv2311 02102409422D
 
 
   3  2  0  0  0  0            999 V2000
@@ -211,7 +217,8 @@ console.log(inchi); // "InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1
 // Generate InChIKey
 const inchikey = await generateInChIKey(inchi);
 console.log(inchikey); // "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
-```
+
+````
 
 ### Morgan Fingerprints and Similarity
 
@@ -228,7 +235,7 @@ const fp2 = computeMorganFingerprint(ibuprofen.molecules[0], 2, 512);
 // Calculate structural similarity
 const similarity = tanimotoSimilarity(fp1, fp2);
 console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`); // ~45.2%
-```
+````
 
 ### Murcko Scaffolds
 
@@ -253,6 +260,7 @@ console.log(haveSameScaffold(ibuprofen, aspirin)); // true - both have benzene s
 ```
 
 **Applications:**
+
 - Compound library classification
 - Lead series identification
 - Scaffold hopping strategies
@@ -281,6 +289,7 @@ console.log(`Canonical: ${generateSMILES(canonical)}`);
 ```
 
 **Supported tautomer types (26 rules, 100% RDKit coverage):**
+
 - 1,3 and 1,5 keto-enol (carbonyl ↔ enol, conjugated systems)
 - Imine-enamine (C=N ↔ C-NH, including aromatic special cases)
 - 1,5/1,7/1,9/1,11 aromatic heteroatom H shift (pyrrole, indole, large heterocycles)
@@ -294,6 +303,7 @@ console.log(`Canonical: ${generateSMILES(canonical)}`);
 - Edge cases: keten/ynol, cyano/isocyanic acid, formamidinesulfinic acid, isocyanide
 
 **Scoring system** (RDKit-compatible):
+
 - +250 per all-carbon aromatic ring (benzene)
 - +100 per heteroaromatic ring (pyridine)
 - +25 for benzoquinone patterns
@@ -304,6 +314,7 @@ console.log(`Canonical: ${generateSMILES(canonical)}`);
 - -1 per hydrogen on P, S, Se, Te
 
 **Applications:**
+
 - Compound standardization for databases
 - Virtual screening preparation
 - pKa prediction support
@@ -332,6 +343,7 @@ console.log(`Canvas: ${svgResult.width}x${svgResult.height}`); // "300x200"
 openchem has an extensive test suite (unit, integration, and RDKit comparison tests) that exercises parsing, generation, file round-trips, stereochemistry, aromatic perception, and molecular properties. Rather than rely on fragile hard-coded counts in the README, the project keeps comprehensive automated tests in the `test/` folder and runs RDKit parity checks as part of the comparison test suite when RDKit is available.
 
 Highlights:
+
 - Broad unit and integration coverage across parsers, generators, utils, and validators
 - RDKit comparison tests for canonical SMILES and round-trip fidelity (these run when RDKit is available in the test environment)
 - Tests are designed to be self-contained and to skip RDKit-specific checks when RDKit isn't present in the environment
@@ -357,6 +369,7 @@ pnpm add openchem
 ### Example Files
 
 For comprehensive working examples, see:
+
 - [`docs/examples/comprehensive-example.ts`](docs/examples/comprehensive-example.ts) — All major features (SMILES, properties, IUPAC, InChI, SVG, SMARTS, fingerprints)
 - [`docs/examples/example-iupac.ts`](docs/examples/example-iupac.ts) — IUPAC name generation and parsing (both directions)
 - [`docs/examples/example-aromaticity.ts`](docs/examples/example-aromaticity.ts) — Aromaticity perception using Hückel's rule
@@ -366,12 +379,12 @@ For comprehensive working examples, see:
 - [`docs/examples/example-sdf-export.ts`](docs/examples/example-sdf-export.ts) — SDF file generation
 
 Run any example:
+
 ```bash
 bun run docs/examples/comprehensive-example.ts
 ```
 
 ### Basic Parsing
-
 
 ### Running heavy RDKit comparisons
 
@@ -385,6 +398,7 @@ RUN_RDKIT_BULK=1 bun test
 ```
 
 Add `RUN_VERBOSE=1` for more detailed RDKit reporting during the run.
+
 ```typescript
 import { parseSMILES } from 'openchem';
 
@@ -411,11 +425,11 @@ openchem provides comprehensive molecular property calculations for drug discove
 #### Basic Properties
 
 ```typescript
-import { 
-  parseSMILES, 
-  getMolecularFormula, 
-  getMolecularMass, 
-  getExactMass 
+import {
+  parseSMILES,
+  getMolecularFormula,
+  getMolecularMass,
+  getExactMass
 } from 'openchem';
 
 const aspirin = parseSMILES('CC(=O)Oc1ccccc1C(=O)O');
@@ -470,7 +484,7 @@ console.log(ringInfo.rings()); // [[6,7,8,9,10,11]] - atom IDs in the ring
 #### Drug-Likeness Properties
 
 ```typescript
-import { 
+import {
   parseSMILES,
   getFractionCSP3,
   getHBondDonorCount,
@@ -514,11 +528,11 @@ console.log(getTPSA(morphine.molecules[0])); // 52.93 ✓ CNS-active
 #### Drug-Likeness Rule Checkers
 
 ```typescript
-import { 
-  parseSMILES, 
-  checkLipinskiRuleOfFive, 
-  checkVeberRules, 
-  checkBBBPenetration 
+import {
+  parseSMILES,
+  checkLipinskiRuleOfFive,
+  checkVeberRules,
+  checkBBBPenetration
 } from 'openchem';
 
 // Lipinski's Rule of Five (oral drug-likeness)
@@ -618,18 +632,18 @@ const options: SVGRendererOptions = {
   width: 400,
   height: 400,
   padding: 20,
-  
+
   // Bond styling
   bondLineWidth: 2,
   bondLength: 40,
   bondColor: '#000000',
-  
+
   // Atom & text styling
   fontSize: 14,
   fontFamily: 'Arial, sans-serif',
   showCarbonLabels: false, // Hide C labels for cleaner appearance
   showImplicitHydrogens: false, // Hide implicit hydrogens
-  
+
   // Color mapping by element
   atomColors: {
     C: '#222222',
@@ -641,13 +655,13 @@ const options: SVGRendererOptions = {
     Br: '#A62929',
     I: '#940094'
   },
-  
+
   // Background
   backgroundColor: '#FFFFFF',
-  
+
   // Stereochemistry display
   showStereoBonds: true,
-  
+
   // Layout & coordinate generation
   kekulize: true, // Convert aromatic to alternating single/double bonds (default: true)
   moleculeSpacing: 60 // Spacing between molecules in grid layouts
@@ -684,6 +698,7 @@ console.log(result.svg);
 #### Coordinate Generation Features
 
 openchem's coordinate generator provides:
+
 - **Deterministic layouts** — Same molecule always produces same coordinates
 - **Fast performance** — Optimized for speed and quality
 - **Perfect terminal atom placement** — OH, NH₂, and other terminal groups extend radially
@@ -793,11 +808,11 @@ const molecules = [
 
 molecules.forEach(smiles => {
   const mol = parseSMILES(smiles).molecules[0];
-  
+
   // Wildman-Crippen method (more accurate)
   const logP = computeLogP(mol);
   console.log(`${smiles.substring(0, 10)}... LogP: ${logP.toFixed(2)}`);
-  
+
   // Alternative: crippenLogP (alias)
   const logP2 = crippenLogP(mol);
   console.log(`  Crippen LogP: ${logP2.toFixed(2)}`);
@@ -864,6 +879,7 @@ bun test test/parser.test.ts
 openchem provides **38 functions** organized into 8 categories:
 
 **Parsing & Generation (8)**
+
 - `parseSMILES` - Parse SMILES strings
 - `generateSMILES` - Generate canonical/non-canonical SMILES
 - `parseMolfile` - Parse MOL files (V2000/V3000)
@@ -874,6 +890,7 @@ openchem provides **38 functions** organized into 8 categories:
 - `generateInChIKey` - Generate InChIKey strings from molecules
 
 **Pattern Matching & Rendering (6)**
+
 - `renderSVG` - Render molecules as 2D SVG structures
 - `parseSMARTS` - Parse SMARTS pattern strings
 - `matchSMARTS` - Find SMARTS pattern matches in molecules
@@ -882,6 +899,7 @@ openchem provides **38 functions** organized into 8 categories:
 - `tanimotoSimilarity` - Calculate Tanimoto similarity between fingerprints
 
 **Scaffold Analysis (5)**
+
 - `getMurckoScaffold` - Extract Murcko scaffold (rings + linkers)
 - `getBemisMurckoFramework` - Generic scaffold (all C, single bonds)
 - `getScaffoldTree` - Hierarchical scaffold decomposition
@@ -889,20 +907,24 @@ openchem provides **38 functions** organized into 8 categories:
 - `haveSameScaffold` - Compare two molecules' scaffolds
 
 **Tautomer Analysis (2)**
+
 - `enumerateTautomers` - Generate all tautomers with RDKit scoring
 - `canonicalTautomer` - Select highest-scoring canonical tautomer
 
 **Basic Properties (3)**
+
 - `getMolecularFormula` - Hill notation formula
 - `getMolecularMass` - Average molecular mass
 - `getExactMass` - Exact mass (monoisotopic)
 
 **Lipophilicity (3)**
+
 - `computeLogP` - Wildman-Crippen partition coefficient
 - `crippenLogP` - Alias for computeLogP
 - `logP` - Alternative LogP calculation
 
 **Structural Properties (8)**
+
 - `getHeavyAtomCount` - Non-hydrogen atom count
 - `getHeteroAtomCount` - Heteroatom count (N, O, S, etc.)
 - `getRingCount` - Total ring count
@@ -913,6 +935,7 @@ openchem provides **38 functions** organized into 8 categories:
 - `getHBondAcceptorCount` - H-bond acceptor count
 
 **Drug-Likeness (5)**
+
 - `getTPSA` - Topological polar surface area
 - `getRotatableBondCount` - Rotatable bond count
 - `checkLipinskiRuleOfFive` - Lipinski's Rule of Five
@@ -930,6 +953,7 @@ openchem provides **38 functions** organized into 8 categories:
 Parses a SMILES string into molecule structures.
 
 **Returns**: `ParseResult` containing:
+
 - `molecules: Molecule[]` — Array of parsed molecules
 - `errors: string[]` — Parse/validation errors (empty if successful)
 
@@ -938,12 +962,14 @@ Parses a SMILES string into molecule structures.
 Generates SMILES from molecule structure(s).
 
 **Parameters**:
+
 - `input` — Single molecule or array of molecules
 - `canonical` — Generate canonical SMILES (default: `true`)
 
 **Returns**: SMILES string (uses `.` to separate disconnected molecules)
 
 **Canonical SMILES features**:
+
 - RDKit-compatible atom ordering using modified Morgan algorithm
 - Automatic E/Z double bond stereo normalization
 - Deterministic output for identical molecules
@@ -954,6 +980,7 @@ Generates SMILES from molecule structure(s).
 Generates a MOL file (V2000 format) from a molecule structure. Matches RDKit's output structure for compatibility with cheminformatics tools.
 
 **Parameters**:
+
 - `molecule` — Molecule structure to convert
 - `options` — Optional configuration:
   - `title?: string` — Molecule title (default: empty)
@@ -964,6 +991,7 @@ Generates a MOL file (V2000 format) from a molecule structure. Matches RDKit's o
 **Returns**: MOL file content as string with V2000 format
 
 **Features**:
+
 - V2000 MOL format compatible with RDKit and other tools
 - 2D coordinate generation using circular layout
 - Proper atom/bond type mapping (aromatic, charged, isotopic)
@@ -971,6 +999,7 @@ Generates a MOL file (V2000 format) from a molecule structure. Matches RDKit's o
 - Fixed-width formatting matching RDKit output
 
 **Example**:
+
 ```typescript
 import { parseSMILES, generateMolfile } from 'openchem';
 
@@ -985,18 +1014,22 @@ console.log(molfile);
 Parses a MOL file (MDL Molfile format) into a molecule structure. Supports both V2000 and V3000 formats with comprehensive validation.
 
 **Parameters**:
+
 - `input` — MOL file content as a string
 
 **Returns**: `MolfileParseResult` containing:
+
 - `molfile: MolfileData | null` — Raw MOL file data structure (or null on critical errors)
 - `molecule: Molecule | null` — Parsed molecule with enriched properties (or null on errors)
 - `errors: ParseError[]` — Array of parse/validation errors (empty if successful)
 
 **Supported formats**:
+
 - **V2000**: Classic fixed-width format (most common)
 - **V3000**: Extended format with additional features
 
 **Validation features**:
+
 - Validates atom/bond counts match declared values
 - Checks bond references point to valid atoms
 - Validates numeric fields (coordinates, counts, bond types)
@@ -1004,6 +1037,7 @@ Parses a MOL file (MDL Molfile format) into a molecule structure. Supports both 
 - Returns errors without throwing exceptions
 
 **Parsed features**:
+
 - Atom coordinates (2D/3D)
 - Element symbols (organic and periodic table)
 - Charges (both atom block and M CHG property)
@@ -1013,10 +1047,12 @@ Parses a MOL file (MDL Molfile format) into a molecule structure. Supports both 
 - Atom mapping (reaction mapping)
 
 **Limitations**:
+
 - SGroups are parsed but not converted to molecule structure
 - Query atoms/bonds not supported
 
 **Example**:
+
 ```typescript
 import { parseMolfile, generateSMILES } from 'openchem';
 
@@ -1037,7 +1073,7 @@ const result = parseMolfile(molContent);
 if (result.errors.length === 0) {
   console.log(result.molecule?.atoms.length); // 3
   console.log(result.molecule?.bonds.length); // 2
-  
+
   // Convert to SMILES
   const smiles = generateSMILES(result.molecule!);
   console.log(smiles); // "CCO"
@@ -1051,6 +1087,7 @@ if (invalid.errors.length > 0) {
 ```
 
 **Round-trip workflow**:
+
 ```typescript
 import { parseSMILES, generateMolfile, parseMolfile, generateSMILES } from 'openchem';
 
@@ -1068,19 +1105,23 @@ console.log(roundtrip); // "CC(=O)O"
 Parses an SDF (Structure-Data File) into molecule structures with associated properties. SDF files can contain multiple molecules, each with a MOL block and optional property fields.
 
 **Parameters**:
+
 - `input` — SDF file content as a string
 
 **Returns**: `SDFParseResult` containing:
+
 - `records: SDFRecord[]` — Array of parsed records
 - `errors: ParseError[]` — Global parse errors (empty if successful)
 
 **Record structure** (`SDFRecord`):
+
 - `molecule: Molecule | null` — Parsed molecule (null on parse errors)
 - `molfile: MolfileData | null` — Raw MOL file data (null on parse errors)
 - `properties: Record<string, string>` — Property name-value pairs
 - `errors: ParseError[]` — Record-specific errors (empty if successful)
 
 **Features**:
+
 - Multi-record parsing (splits on `$$$$` delimiter)
 - Property block parsing (`>  <NAME>` format)
 - Multi-line property values with blank line handling
@@ -1089,11 +1130,12 @@ Parses an SDF (Structure-Data File) into molecule structures with associated pro
 - Tolerant parsing: continues after invalid records
 
 **Example (single record)**:
+
 ```typescript
 import { parseSDF, generateSMILES } from 'openchem';
 
 const sdfContent = `
-  Mrv2311 02102409422D          
+  Mrv2311 02102409422D
 
 
   3  2  0  0  0  0            999 V2000
@@ -1122,7 +1164,7 @@ if (result.errors.length === 0) {
   console.log(record.properties.ID); // "MOL001"
   console.log(record.properties.NAME); // "Ethanol"
   console.log(record.properties.FORMULA); // "C2H6O"
-  
+
   // Convert to SMILES
   const smiles = generateSMILES(record.molecule!);
   console.log(smiles); // "CCO"
@@ -1135,11 +1177,12 @@ if (result.records[0].errors.length > 0) {
 ```
 
 **Example (multiple records)**:
+
 ```typescript
 import { parseSDF } from 'openchem';
 
 const multiRecordSDF = `
-  Mrv2311 02102409422D          
+  Mrv2311 02102409422D
 
 
   1  0  0  0  0  0            999 V2000
@@ -1153,7 +1196,7 @@ Methane
 
 $$$$
 
-  Mrv2311 02102409422D          
+  Mrv2311 02102409422D
 
 
   2  1  0  0  0  0            999 V2000
@@ -1177,6 +1220,7 @@ console.log(result.records[1].properties.NAME); // "Ethane"
 ```
 
 **Round-trip workflow**:
+
 ```typescript
 import { parseSMILES, writeSDF, parseSDF, generateSMILES } from 'openchem';
 
@@ -1200,6 +1244,7 @@ Generates an InChI (International Chemical Identifier) string from a molecule st
 **Returns**: Promise resolving to InChI string
 
 **Example**:
+
 ```typescript
 import { parseSMILES, generateInChI } from 'openchem';
 
@@ -1213,11 +1258,13 @@ console.log(inchi); // "InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1
 Generates an InChIKey (a hashed, fixed-length version of InChI) from an InChI string. InChIKeys are commonly used for database indexing and fast lookups.
 
 **Parameters**:
+
 - `inchi` — InChI string to convert
 
 **Returns**: Promise resolving to InChIKey string (27 characters)
 
 **Example**:
+
 ```typescript
 const inchikey = await generateInChIKey(inchi);
 console.log(inchikey); // "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
@@ -1228,6 +1275,7 @@ console.log(inchikey); // "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
 Writes molecules to SDF (Structure-Data File) format. Supports single or multiple records with optional property data. SDF files are commonly used for storing chemical databases and transferring molecular data between cheminformatics tools.
 
 **Parameters**:
+
 - `records` — Single record or array of records to write
 - `options` — Optional configuration (same as `MolGeneratorOptions`):
   - `title?: string` — Default title for records (default: empty)
@@ -1236,10 +1284,12 @@ Writes molecules to SDF (Structure-Data File) format. Supports single or multipl
   - `comment?: string` — Default comment (default: empty)
 
 **Returns**: `SDFWriterResult` containing:
+
 - `sdf: string` — Complete SDF file content
 - `errors: string[]` — Any errors encountered (empty if successful)
 
 **Record format**:
+
 ```typescript
 interface SDFRecord {
   molecule: Molecule;
@@ -1248,11 +1298,13 @@ interface SDFRecord {
 ```
 
 **SDF structure**:
+
 - MOL block (V2000 format) for each molecule
 - Property fields (`>  <NAME>`, value, blank line)
 - Record separator (`$$$$`)
 
 **Example (single molecule)**:
+
 ```typescript
 import { parseSMILES, writeSDF } from 'openchem';
 
@@ -1271,6 +1323,7 @@ console.log(result.sdf);
 ```
 
 **Example (multiple molecules)**:
+
 ```typescript
 import { parseSMILES, writeSDF } from 'openchem';
 
@@ -1297,12 +1350,14 @@ console.log(result.sdf);
 ```
 
 **Property formatting**:
+
 - Strings: Written as-is
 - Numbers: Converted to strings
 - Booleans: `"true"` or `"false"`
 - Property names are case-sensitive
 
 **Compatibility**:
+
 - Output compatible with RDKit, OpenBabel, ChemDraw, and other tools
 - Standard SDF format (V2000 MOL blocks)
 - Properties follow MDL SDF specification
@@ -1316,16 +1371,19 @@ console.log(result.sdf);
 Renders molecules as 2D SVG structures with automatic coordinate generation using webcola collision prevention.
 
 **Parameters**:
+
 - `input` — SMILES string, single molecule, array of molecules, or ParseResult
 - `options` — Optional rendering configuration (see SVGRendererOptions below)
 
 **Returns**: `SVGRenderResult` containing:
+
 - `svg: string` — SVG markup ready for display
 - `width: number` — Canvas width in pixels
 - `height: number` — Canvas height in pixels
 - `errors: string[]` — Any rendering errors (empty if successful)
 
 **SVGRendererOptions**:
+
 - `width?: number` — Canvas width (default: 300)
 - `height?: number` — Canvas height (default: 300)
 - `bondLineWidth?: number` — Bond line thickness (default: 2)
@@ -1346,6 +1404,7 @@ Renders molecules as 2D SVG structures with automatic coordinate generation usin
 - `moleculeSpacing?: number` — Space between molecules in grid (default: 60)
 
 **Features**:
+
 - Automatic 2D coordinate generation with collision prevention
 - Ring regularization for 5 and 6-membered rings
 - Fused ring system handling
@@ -1358,10 +1417,12 @@ Renders molecules as 2D SVG structures with automatic coordinate generation usin
 Parses a SMARTS pattern string into a pattern molecule structure.
 
 **Returns**: `ParseResult` containing:
+
 - `molecules: Molecule[]` — Array with pattern molecule
 - `errors: string[]` — Parse errors (empty if successful)
 
 **SMARTS support**:
+
 - Logical operators: `!` (not), `&` (and), `,` (or)
 - Atom properties: `[D1]` (degree), `[H1]` (explicit H), `[v3]` (valence)
 - Connectivity: `[#6X4]` (carbon with degree 4)
@@ -1372,12 +1433,14 @@ Parses a SMARTS pattern string into a pattern molecule structure.
 Finds all matches of a SMARTS pattern in a molecule.
 
 **Parameters**:
+
 - `molecule` — Target molecule to search
 - `pattern` — SMARTS pattern (from `parseSMARTS()`)
 
 **Returns**: Array of matches, where each match is an array of atom indices
 
 **Example**:
+
 ```typescript
 import { parseSMILES, parseSMARTS, matchSMARTS } from 'openchem';
 
@@ -1395,6 +1458,7 @@ Converts aromatic molecules to alternating single/double bond (Kekulé) represen
 **Returns**: New molecule with aromatic bonds replaced by alternating single/double bonds
 
 **Example**:
+
 ```typescript
 import { parseSMILES, kekulize, generateSMILES } from 'openchem';
 
@@ -1408,6 +1472,7 @@ console.log(generateSMILES(kek)); // "C1=CC=CC=C1"
 Generates a Morgan fingerprint (ECFP-like) for molecular similarity searching and compound classification. Uses a modified Morgan algorithm with atom typing and circular neighborhoods.
 
 **Parameters**:
+
 - `molecule` — Molecule to fingerprint
 - `radius` — Fingerprint radius (default: 2, equivalent to ECFP4)
 - `fpSize` — Fingerprint size in bits (default: 2048, RDKit standard)
@@ -1415,6 +1480,7 @@ Generates a Morgan fingerprint (ECFP-like) for molecular similarity searching an
 **Returns**: Uint8Array containing the fingerprint bits
 
 **Example**:
+
 ```typescript
 import { parseSMILES, computeMorganFingerprint } from 'openchem';
 
@@ -1428,12 +1494,14 @@ console.log(fingerprint.length); // 64 (512 bits / 8 bytes)
 Calculates the Tanimoto similarity coefficient between two Morgan fingerprints. Measures structural similarity on a scale from 0 (no similarity) to 1 (identical).
 
 **Parameters**:
+
 - `fp1` — First fingerprint
 - `fp2` — Second fingerprint
 
 **Returns**: Similarity score between 0 and 1
 
 **Example**:
+
 ```typescript
 const similarity = tanimotoSimilarity(fingerprint1, fingerprint2);
 console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
@@ -1448,12 +1516,14 @@ console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
 Extracts the Murcko scaffold from a molecule — the core ring systems and linkers connecting them, with all terminal side chains removed. This is the standard scaffold used in medicinal chemistry for compound classification.
 
 **Parameters**:
+
 - `molecule` — Molecule to analyze
 - `options.includeLinkers` — Include linker atoms between rings (default: `true`)
 
 **Returns**: New `Molecule` containing only the scaffold
 
 **Example**:
+
 ```typescript
 import { parseSMILES, getMurckoScaffold, generateSMILES } from 'openchem';
 
@@ -1469,6 +1539,7 @@ Generates a generic Bemis-Murcko framework — the scaffold with all atoms conve
 **Returns**: New `Molecule` with generic framework
 
 **Example**:
+
 ```typescript
 import { parseSMILES, getBemisMurckoFramework, generateSMILES } from 'openchem';
 
@@ -1484,6 +1555,7 @@ Generates a hierarchical scaffold tree by iteratively removing rings from the Mu
 **Returns**: Array of `Molecule` objects representing scaffolds at different levels
 
 **Example**:
+
 ```typescript
 import { parseSMILES, getScaffoldTree, generateSMILES } from 'openchem';
 
@@ -1502,6 +1574,7 @@ Generates a pure topological framework with all atoms converted to wildcard atom
 **Returns**: New `Molecule` with graph framework
 
 **Example**:
+
 ```typescript
 import { parseSMILES, getGraphFramework, generateSMILES } from 'openchem';
 
@@ -1517,6 +1590,7 @@ Compares two molecules to determine if they share the same Murcko scaffold. Usef
 **Returns**: `true` if scaffolds match, `false` otherwise
 
 **Example**:
+
 ```typescript
 import { parseSMILES, haveSameScaffold } from 'openchem';
 
@@ -1534,18 +1608,21 @@ console.log(haveSameScaffold(aspirin, ibuprofen)); // true - both benzene scaffo
 Enumerates all tautomers for a molecule using transform-based enumeration with RDKit-compatible scoring.
 
 **Options**:
+
 - `maxTautomers?: number` — Maximum tautomers to generate (default: 256)
 - `maxTransforms?: number` — Maximum transform operations (default: 1024)
 - `phases?: number[]` — Rule phases to apply (default: [1, 2, 3])
 - `useFingerprintDedup?: boolean` — Use fingerprint deduplication (default: true)
 
 **Returns**: Array of `TautomerResult` objects with:
+
 - `smiles: string` — SMILES representation
 - `molecule: Molecule` — Molecule object
 - `score: number` — Stability score (higher = more stable)
 - `ruleIds: string[]` — Applied transformation rules
 
 **Scoring system** (RDKit-inspired):
+
 - +250 per all-carbon aromatic ring
 - +100 per heteroaromatic ring
 - +25 for benzoquinone
@@ -1556,6 +1633,7 @@ Enumerates all tautomers for a molecule using transform-based enumeration with R
 - -1 per H on P, S, Se, Te
 
 **Example**:
+
 ```typescript
 import { parseSMILES, enumerateTautomers } from 'openchem';
 
@@ -1578,6 +1656,7 @@ Selects the canonical (most stable) tautomer based on scoring.
 **Returns**: The highest-scoring tautomer as a `Molecule`
 
 **Example**:
+
 ```typescript
 import { parseSMILES, canonicalTautomer, generateSMILES } from 'openchem';
 
@@ -1597,11 +1676,13 @@ Calculates the LogP (partition coefficient) using the Wildman-Crippen method. Lo
 **Returns**: LogP value as a number
 
 **Interpretation**:
+
 - LogP < 0: Hydrophilic (water-loving)
 - 0 ≤ LogP ≤ 5: Optimal range for most drugs
 - LogP > 5: Lipophilic (fat-loving), may have poor water solubility
 
 **Example**:
+
 ```typescript
 import { parseSMILES, computeLogP } from 'openchem';
 
@@ -1672,6 +1753,7 @@ Returns the number of aromatic rings.
 Returns a comprehensive ring information object providing access to SSSR (Smallest Set of Smallest Rings) and ring membership queries. Similar to RDKit's GetRingInfo() functionality.
 
 **Methods**:
+
 - `numRings()` - Number of rings in SSSR
 - `rings()` - Array of rings (each ring is atom ID array)
 - `isAtomInRing(atomIdx)` - Check if atom is in any ring
@@ -1682,6 +1764,7 @@ Returns a comprehensive ring information object providing access to SSSR (Smalle
 - `ringBonds(ringIdx)` - Bonds in specific ring
 
 **Example**:
+
 ```typescript
 const ringInfo = getRingInfo(mol);
 console.log(ringInfo.numRings()); // 2
@@ -1716,6 +1799,7 @@ Returns the count of hydrogen bond acceptors (N and O atoms).
 Returns the Topological Polar Surface Area in Ų (square Ångströms) using the Ertl et al. fragment-based algorithm. TPSA is a key descriptor for predicting drug absorption and bioavailability.
 
 **Guidelines**:
+
 - TPSA < 140 Ų: Good oral bioavailability
 - TPSA < 90 Ų: Likely blood-brain barrier penetration
 - TPSA > 140 Ų: Poor membrane permeability
@@ -1731,11 +1815,13 @@ Returns the count of rotatable bonds (single non-ring bonds between non-terminal
 ##### `checkLipinskiRuleOfFive(molecule: Molecule): LipinskiResult`
 
 Evaluates Lipinski's Rule of Five for oral drug-likeness. Returns result object with:
+
 - `passes`: boolean indicating if all rules pass
 - `violations`: array of violation messages
 - `properties`: { molecularWeight, hbondDonors, hbondAcceptors, logP }
 
 **Rules**:
+
 - Molecular weight ≤ 500 Da
 - H-bond donors ≤ 5
 - H-bond acceptors ≤ 10
@@ -1744,17 +1830,20 @@ Evaluates Lipinski's Rule of Five for oral drug-likeness. Returns result object 
 ##### `checkVeberRules(molecule: Molecule): VeberResult`
 
 Evaluates Veber rules for oral bioavailability. Returns result object with:
+
 - `passes`: boolean indicating if all rules pass
 - `violations`: array of violation messages
 - `properties`: { rotatableBonds, tpsa }
 
 **Rules**:
+
 - Rotatable bonds ≤ 10
 - TPSA ≤ 140 Ų
 
 ##### `checkBBBPenetration(molecule: Molecule): BBBResult`
 
 Predicts blood-brain barrier penetration. Returns result object with:
+
 - `likelyPenetration`: boolean (true if TPSA < 90 Ų)
 - `tpsa`: TPSA value
 
@@ -1840,11 +1929,13 @@ Molecular property calculations like ring finding, hybridization determination, 
 #### Performance Impact
 
 **Benchmark Results** (10,000 molecules, 7 properties each):
+
 - **Parse time**: 1.22 ms/molecule (includes enrichment)
 - **Property query time**: 0.006 ms/molecule (0.5% of parse time)
 - **Rotatable bond queries**: ~3.1 million ops/second (simple array filter vs 47-line calculation)
 
 **Complexity Improvements**:
+
 - Ring finding: Once per molecule (O(n²)) → subsequent queries O(1)
 - Rotatable bonds: O(n×m) nested loops → O(n) array filter
 - Property queries: 200× faster on average
@@ -1852,6 +1943,7 @@ Molecular property calculations like ring finding, hybridization determination, 
 #### Immutability Contract
 
 **Important**: Molecules are immutable after parsing. All enriched properties remain valid for the lifetime of the molecule object. This design:
+
 - Prevents stale cached properties (no mutation = no invalidation needed)
 - Enables safe sharing across threads/workers
 - Simplifies reasoning about molecule state
@@ -1886,14 +1978,17 @@ openchem implements the OpenSMILES specification with high fidelity while priori
 ### Starting Atom Selection (OpenSMILES Section 4.3.4)
 
 **OpenSMILES Recommendation**: Start traversal on heteroatoms first, then terminals.
+
 - Example preference: `OCCC` over `CCCO` for propanol
 - Rationale: Heteroatoms are "more interesting" chemically
 
 **openchem Implementation**: Canonical labels first, heteroatoms as tie-breaker.
+
 - Example: Both `OCCC` and `CCCO` canonicalize to `CCCO`
 - Rationale: Ensures 100% deterministic output for identical molecules
 
 **Why RDKit's Approach**:
+
 1. **Determinism**: Canonical labels guarantee the same molecule always produces identical output, regardless of input order
 2. **Interoperability**: 100% agreement with RDKit enables seamless integration with existing cheminformatics pipelines and databases
 3. **Real-world usage**: Major chemical databases (PubChem, ChEMBL) prioritize canonical determinism over heteroatom preference
@@ -1911,12 +2006,12 @@ openchem implements the OpenSMILES specification with high fidelity while priori
 
 ### Standards Compliance Summary
 
-| Feature | OpenSMILES Spec | openchem Implementation | Rationale |
-|---------|-----------------|------------------------|-----------|
-| **Starting atom** | Heteroatom preference | Canonical labels first | Deterministic output, RDKit parity |
-| **Aromatic validation** | Strict Hückel (4n+2) | Permissive ring validation | Real-world compatibility |
-| **Stereo normalization** | Not specified | Canonical E/Z form | Deterministic stereo representation |
-| **Canonical ordering** | Modified Morgan recommended | Modified Morgan (RDKit-compatible) | 100% RDKit agreement |
+| Feature                  | OpenSMILES Spec             | openchem Implementation            | Rationale                           |
+| ------------------------ | --------------------------- | ---------------------------------- | ----------------------------------- |
+| **Starting atom**        | Heteroatom preference       | Canonical labels first             | Deterministic output, RDKit parity  |
+| **Aromatic validation**  | Strict Hückel (4n+2)        | Permissive ring validation         | Real-world compatibility            |
+| **Stereo normalization** | Not specified               | Canonical E/Z form                 | Deterministic stereo representation |
+| **Canonical ordering**   | Modified Morgan recommended | Modified Morgan (RDKit-compatible) | 100% RDKit agreement                |
 
 All deviations are deliberate choices to maximize **real-world interoperability** while maintaining full compliance with OpenSMILES syntax and semantics. openchem produces valid OpenSMILES that can be read by any compliant parser.
 
@@ -2030,6 +2125,7 @@ openchem implements RDKit-compatible canonical SMILES generation:
 4. **Deterministic Output**: Same molecule always produces the same canonical SMILES, enabling reliable structure comparison and database storage.
 
 **Example of RDKit-compatible behavior**:
+
 ```typescript
 // Both inputs represent the same molecule (hydrogen cyanide)
 parseSMILES('C#N');  // → canonical: "C#N" (carbon first)
@@ -2056,7 +2152,6 @@ if (process.env.VERBOSE) {
 
 This applies to all source and test files. Never leave direct logging statements that print during normal runs.
 
-
 We welcome contributions! openchem maintains strict quality standards:
 
 1. **All tests must pass** — 610/610 required
@@ -2065,6 +2160,7 @@ We welcome contributions! openchem maintains strict quality standards:
 4. **Follow TypeScript conventions** — See `AGENTS.md` for guidelines
 
 To contribute:
+
 ```bash
 # Clone and install
 git clone https://github.com/rajeshg/openchem.git

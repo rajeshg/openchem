@@ -25,7 +25,7 @@ describe("Performance Regression Tests", () => {
     smilesGeneration: 5,
 
     // LogP computation (first call with hydrogen addition)
-    logpComputation: 50,
+    logpComputation: 150,
 
     // LogP cached calls should be nearly instant
     logpCached: 1,

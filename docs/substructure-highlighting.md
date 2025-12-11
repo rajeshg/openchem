@@ -3,6 +3,7 @@
 ## Overview
 
 Add visual substructure highlighting to the `render` tool, allowing users to highlight specific atoms/bonds in molecular structures with custom colors. This is essential for:
+
 - Drug discovery (highlighting pharmacophores, active sites)
 - PAINS detection (problematic substructures)
 - Educational tools (teaching functional groups)
@@ -11,11 +12,13 @@ Add visual substructure highlighting to the `render` tool, allowing users to hig
 ## Current State
 
 **MCP Server**: v0.1.6 with 8 tools
+
 - `render` tool supports SVG/PNG output
 - `search` tool finds SMARTS matches (returns atom indices)
 - No visual highlighting capability
 
-**OpenChem Core**: 
+**OpenChem Core**:
+
 - SVG renderer exists (`src/generators/svg-renderer.ts`)
 - SMARTS matching exists (`matchSMARTS()`)
 - No highlighting API yet
@@ -160,6 +163,7 @@ function inferBondsBetweenAtoms(
 ```
 
 **SVG Rendering Order** (layers from back to front):
+
 1. Background highlights (circles for atoms, thick lines for bonds)
 2. Bonds (normal rendering)
 3. Atoms (normal rendering)
@@ -178,7 +182,7 @@ const renderSchema = z.object({
   width: z.number().default(400),
   height: z.number().default(400),
   outputPath: z.string().optional(),
-  
+
   // NEW: Highlighting support
   highlights: z.array(z.object({
     smarts: z.string().optional().describe("SMARTS pattern to highlight"),
@@ -280,12 +284,15 @@ const renderSchema = z.object({
 ## Implementation Plan
 
 ### Step 1: Core SVG Highlighting (Main Project)
+
 **Time**: 4-6 hours  
 **Files**:
+
 - `src/generators/svg-renderer.ts` - Add highlighting logic
 - `test/svg/highlighting.test.ts` - New test file
 
 **Tasks**:
+
 1. Add `AtomHighlight`, `BondHighlight`, `SubstructureHighlight` types
 2. Implement `renderAtomHighlight()` and `renderBondHighlight()`
 3. Implement `processHighlights()` to convert SMARTS → atom/bond indices
@@ -298,32 +305,40 @@ const renderSchema = z.object({
    - Color/opacity variations
 
 ### Step 2: MCP Tool Integration
+
 **Time**: 2-3 hours  
 **Files**:
+
 - `packages/mcp/src/mcp-tools.ts` - Update `render` tool
 - `packages/mcp/README.md` - Document new feature
 - `packages/mcp/CHANGELOG.md` - Add v0.1.7 notes
 
 **Tasks**:
+
 1. Add `highlights` parameter to `renderSchema`
 2. Pass highlights to `renderSVG()` call
 3. Update tool description for better LLM discoverability
 4. Add example queries to documentation
 
 ### Step 3: Documentation & Examples
+
 **Time**: 1-2 hours  
 **Files**:
+
 - `docs/mcp-example-questions.md` - Add 2-3 new examples
 - `packages/mcp/README.md` - Add highlighting section
 
 **Examples**:
+
 - Question 13: "Show me aspirin with the carboxylic acid highlighted in red"
 - Question 14: "Highlight all aromatic rings in ibuprofen"
 - Question 15: "Show celecoxib with the sulfonamide group highlighted"
 
 ### Step 4: Testing & Validation
+
 **Time**: 1-2 hours  
 **Tasks**:
+
 1. Manual testing with VS Code Copilot
 2. Verify PNG export with highlights
 3. Test multi-molecule rendering with highlights
@@ -334,7 +349,7 @@ const renderSchema = z.object({
 **Core Implementation**: 4-6 hours  
 **MCP Integration**: 2-3 hours  
 **Documentation**: 1-2 hours  
-**Testing**: 1-2 hours  
+**Testing**: 1-2 hours
 
 **Total**: 8-13 hours (~1-2 days)
 
@@ -350,10 +365,8 @@ const renderSchema = z.object({
 
 1. **Performance**: Multiple highlights might slow rendering
    - **Mitigation**: Limit to 5-10 highlights per render
-   
 2. **Color Conflicts**: Overlapping highlights may be hard to see
    - **Mitigation**: Use semi-transparent colors (opacity 0.3-0.5)
-   
 3. **Label Positioning**: Legend may overlap with molecule
    - **Mitigation**: Position legend outside molecule bounds (Phase 2 enhancement)
 

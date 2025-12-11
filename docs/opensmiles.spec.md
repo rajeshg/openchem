@@ -103,37 +103,37 @@ concerned with syntax.
 
 ### 2.2. Grammar
 
-| Section | Formal Grammar |
-| :-- | :-- |
-| **ATOMS** |
-| [Atoms](https://opensmiles.org/opensmiles.html#inatoms) | _atom_ ::= _bracket\_atom_ \| _aliphatic\_organic_ \| _aromatic\_organic_ \| `'*'` |
-| **ORGANIC SUBSET ATOMS** |
-| [Organic Subset](https://opensmiles.org/opensmiles.html#orgsbst) | _aliphatic\_organic_ ::= `'B'` \| `'C'` \| `'N'` \| `'O'` \| `'S'` \| `'P'` \| `'F'` \| `'Cl'` \| `'Br'` \| `'I'` |
-| _aromatic\_organic_ ::= `'b'` \| `'c'` \| `'n'` \| `'o'` \| `'s'` \| `'p'` |
-| **BRACKET ATOMS** |
-| [Bracket Atoms](https://opensmiles.org/opensmiles.html#inatoms) | _bracket\_atom_ ::= `'['` _isotope_? _symbol_ _chiral_? _hcount_? _charge_? _class_? `']'` |
-| _symbol_ ::= _element\_symbols_ \| _aromatic\_symbols_ \| `'*'` |
-| _isotope_ ::= _NUMBER_ |
-| _element\_symbols_ ::= `'H'` \| `'He'` \| `'Li'` \| `'Be'` \| `'B'` \| `'C'` \| `'N'` \| `'O'` \| `'F'` \| `'Ne'` \| `'Na'` \| `'Mg'` \| `'Al'` \| `'Si'` \| `'P'` \| `'S'` \| `'Cl'` \| `'Ar'` \| `'K'` \| `'Ca'` \| `'Sc'` \| `'Ti'` \| `'V'` \| `'Cr'` \| `'Mn'` \| `'Fe'` \| `'Co'` \| `'Ni'` \| `'Cu'` \| `'Zn'` \| `'Ga'` \| `'Ge'` \| `'As'` \| `'Se'` \| `'Br'` \| `'Kr'` \| `'Rb'` \| `'Sr'` \| `'Y'` \| `'Zr'` \| `'Nb'` \| `'Mo'` \| `'Tc'` \| `'Ru'` \| `'Rh'` \| `'Pd'` \| `'Ag'` \| `'Cd'` \| `'In'` \| `'Sn'` \| `'Sb'` \| `'Te'` \| `'I'` \| `'Xe'` \| `'Cs'` \| `'Ba'` \| `'Hf'` \| `'Ta'` \| `'W'` \| `'Re'` \| `'Os'` \| `'Ir'` \| `'Pt'` \| `'Au'` \| `'Hg'` \| `'Tl'` \| `'Pb'` \| `'Bi'` \| `'Po'` \| `'At'` \| `'Rn'` \| `'Fr'` \| `'Ra'` \| `'Rf'` \| `'Db'` \| `'Sg'` \| `'Bh'` \| `'Hs'` \| `'Mt'` \| `'Ds'` \| `'Rg'` \| `'Cn'` \| `'Fl'` \| `'Lv'` \| `'La'` \| `'Ce'` \| `'Pr'` \| `'Nd'` \| `'Pm'` \| `'Sm'` \| `'Eu'` \| `'Gd'` \| `'Tb'` \| `'Dy'` \| `'Ho'` \| `'Er'` \| `'Tm'` \| `'Yb'` \| `'Lu'` \| `'Ac'` \| `'Th'` \| `'Pa'` \| `'U'` \| `'Np'` \| `'Pu'` \| `'Am'` \| `'Cm'` \| `'Bk'` \| `'Cf'` \| `'Es'` \| `'Fm'` \| `'Md'` \| `'No'` \| `'Lr'` |
-| _aromatic\_symbols_ ::= `'b'` \| `'c'` \| `'n'` \| `'o'` \| `'p'` \| `'s'` \| `'se'` \| `'as'` |
-| **CHIRALITY** |
-| [Chirality](https://opensmiles.org/opensmiles.html#chirality) | _chiral_ ::= `'@'` \| `'@@'` \| `'@TH1'` \| `'@TH2'` \| `'@AL1'` \| `'@AL2'` \| `'@SP1'` \| `'@SP2'` \| `'@SP3'` \| `'@TB1'` \| `'@TB2'` \| `'@TB3'` \| … \| `'@TB20'` \| `'@OH1'` \| `'@OH2'` \| `'@OH3'` \| … \| `'@OH30'` \| `'@TB'` _DIGIT_ _DIGIT_ \| `'@OH'` _DIGIT_ _DIGIT_ |
-| **HYDROGENS** |
-| [Hydrogens](https://opensmiles.org/opensmiles.html#hydrogens) | _hcount_ ::= `'H'` \| `'H'` _DIGIT_ |
-| **CHARGES** |
-| [Charge](https://opensmiles.org/opensmiles.html#charge) | _charge_ ::= `'-'` \| `'-'` _DIGIT_? _DIGIT_ \| `'+'` \| `'+'` _DIGIT_? _DIGIT_ \| `'--'` **deprecated** \| `'++'` **deprecated** |
-| **ATOM CLASS** |
-| [Atom Class](https://opensmiles.org/opensmiles.html#atomclass) | _class_ ::= `':'` _NUMBER_ |
-| **BONDS AND CHAINS** |
-| [Bonds](https://opensmiles.org/opensmiles.html#bonds) | _bond_ ::= `'-'` \| `'='` \| `'#'` \| `'$'` \| `':'` \| `'/'` \| `'\'` |
-| _ringbond_ ::= _bond_? _DIGIT_ \| _bond_? `'%'` _DIGIT_ _DIGIT_ |
-| _branched\_atom_ ::= _atom_ _ringbond_\\* _branch_\* |
-| _branch_ ::= `'('` _chain_ `')'` \| `'('` _bond_ _chain_ `')'` \| `'('` _dot_ _chain_ `')'` |
-| _chain_ ::= _branched\_atom_ \| _chain_ _branched\_atom_ \| _chain_ _bond_ _branched\_atom_ \| _chain_ _dot_ _branched\_atom_ |
-| _dot_ ::= `'.'` |
-| **SMILES STRINGS** |
-|  | _smiles_ ::= _terminator_ \| _chain_ _terminator_ |
-| _terminator_ ::= _SPACE_ \| _TAB_ \| _LINEFEED_ \| _CARRIAGE\_RETURN_ \| _END\_OF\_STRING_ |
+| Section                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Formal Grammar                                                                                                                                                                                                                                                                     |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ATOMS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [Atoms](https://opensmiles.org/opensmiles.html#inatoms)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | _atom_ ::= _bracket_atom_ \| _aliphatic_organic_ \| _aromatic_organic_ \| `'*'`                                                                                                                                                                                                    |
+| **ORGANIC SUBSET ATOMS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [Organic Subset](https://opensmiles.org/opensmiles.html#orgsbst)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | _aliphatic_organic_ ::= `'B'` \| `'C'` \| `'N'` \| `'O'` \| `'S'` \| `'P'` \| `'F'` \| `'Cl'` \| `'Br'` \| `'I'`                                                                                                                                                                   |
+| _aromatic_organic_ ::= `'b'` \| `'c'` \| `'n'` \| `'o'` \| `'s'` \| `'p'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **BRACKET ATOMS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| [Bracket Atoms](https://opensmiles.org/opensmiles.html#inatoms)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | _bracket_atom_ ::= `'['` _isotope_? _symbol_ _chiral_? _hcount_? _charge_? _class_? `']'`                                                                                                                                                                                          |
+| _symbol_ ::= _element_symbols_ \| _aromatic_symbols_ \| `'*'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| _isotope_ ::= _NUMBER_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| _element_symbols_ ::= `'H'` \| `'He'` \| `'Li'` \| `'Be'` \| `'B'` \| `'C'` \| `'N'` \| `'O'` \| `'F'` \| `'Ne'` \| `'Na'` \| `'Mg'` \| `'Al'` \| `'Si'` \| `'P'` \| `'S'` \| `'Cl'` \| `'Ar'` \| `'K'` \| `'Ca'` \| `'Sc'` \| `'Ti'` \| `'V'` \| `'Cr'` \| `'Mn'` \| `'Fe'` \| `'Co'` \| `'Ni'` \| `'Cu'` \| `'Zn'` \| `'Ga'` \| `'Ge'` \| `'As'` \| `'Se'` \| `'Br'` \| `'Kr'` \| `'Rb'` \| `'Sr'` \| `'Y'` \| `'Zr'` \| `'Nb'` \| `'Mo'` \| `'Tc'` \| `'Ru'` \| `'Rh'` \| `'Pd'` \| `'Ag'` \| `'Cd'` \| `'In'` \| `'Sn'` \| `'Sb'` \| `'Te'` \| `'I'` \| `'Xe'` \| `'Cs'` \| `'Ba'` \| `'Hf'` \| `'Ta'` \| `'W'` \| `'Re'` \| `'Os'` \| `'Ir'` \| `'Pt'` \| `'Au'` \| `'Hg'` \| `'Tl'` \| `'Pb'` \| `'Bi'` \| `'Po'` \| `'At'` \| `'Rn'` \| `'Fr'` \| `'Ra'` \| `'Rf'` \| `'Db'` \| `'Sg'` \| `'Bh'` \| `'Hs'` \| `'Mt'` \| `'Ds'` \| `'Rg'` \| `'Cn'` \| `'Fl'` \| `'Lv'` \| `'La'` \| `'Ce'` \| `'Pr'` \| `'Nd'` \| `'Pm'` \| `'Sm'` \| `'Eu'` \| `'Gd'` \| `'Tb'` \| `'Dy'` \| `'Ho'` \| `'Er'` \| `'Tm'` \| `'Yb'` \| `'Lu'` \| `'Ac'` \| `'Th'` \| `'Pa'` \| `'U'` \| `'Np'` \| `'Pu'` \| `'Am'` \| `'Cm'` \| `'Bk'` \| `'Cf'` \| `'Es'` \| `'Fm'` \| `'Md'` \| `'No'` \| `'Lr'` |
+| _aromatic_symbols_ ::= `'b'` \| `'c'` \| `'n'` \| `'o'` \| `'p'` \| `'s'` \| `'se'` \| `'as'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **CHIRALITY**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| [Chirality](https://opensmiles.org/opensmiles.html#chirality)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | _chiral_ ::= `'@'` \| `'@@'` \| `'@TH1'` \| `'@TH2'` \| `'@AL1'` \| `'@AL2'` \| `'@SP1'` \| `'@SP2'` \| `'@SP3'` \| `'@TB1'` \| `'@TB2'` \| `'@TB3'` \| … \| `'@TB20'` \| `'@OH1'` \| `'@OH2'` \| `'@OH3'` \| … \| `'@OH30'` \| `'@TB'` _DIGIT_ _DIGIT_ \| `'@OH'` _DIGIT_ _DIGIT_ |
+| **HYDROGENS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| [Hydrogens](https://opensmiles.org/opensmiles.html#hydrogens)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | _hcount_ ::= `'H'` \| `'H'` _DIGIT_                                                                                                                                                                                                                                                |
+| **CHARGES**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [Charge](https://opensmiles.org/opensmiles.html#charge)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | _charge_ ::= `'-'` \| `'-'` _DIGIT_? _DIGIT_ \| `'+'` \| `'+'` _DIGIT_? _DIGIT_ \| `'--'` **deprecated** \| `'++'` **deprecated**                                                                                                                                                  |
+| **ATOM CLASS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| [Atom Class](https://opensmiles.org/opensmiles.html#atomclass)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | _class_ ::= `':'` _NUMBER_                                                                                                                                                                                                                                                         |
+| **BONDS AND CHAINS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| [Bonds](https://opensmiles.org/opensmiles.html#bonds)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | _bond_ ::= `'-'` \| `'='` \| `'#'` \| `'$'` \| `':'` \| `'/'` \| `'\'`                                                                                                                                                                                                             |
+| _ringbond_ ::= _bond_? _DIGIT_ \| _bond_? `'%'` _DIGIT_ _DIGIT_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| _branched_atom_ ::= _atom_ _ringbond_\\\* _branch_\*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| _branch_ ::= `'('` _chain_ `')'` \| `'('` _bond_ _chain_ `')'` \| `'('` _dot_ _chain_ `')'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| _chain_ ::= _branched_atom_ \| _chain_ _branched_atom_ \| _chain_ _bond_ _branched_atom_ \| _chain_ _dot_ _branched_atom_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| _dot_ ::= `'.'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **SMILES STRINGS**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | _smiles_ ::= _terminator_ \| _chain_ _terminator_                                                                                                                                                                                                                                  |
+| _terminator_ ::= _SPACE_ \| _TAB_ \| _LINEFEED_ \| _CARRIAGE_RETURN_ \| _END_OF_STRING_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ## 3\. Reading SMILES
 
@@ -153,11 +153,11 @@ The symbol `'*'` is also accepted as a valid atomic symbol, and represents a "wi
 Examples:
 
 | SMILES | Atomic Symbol |
-| :-- | :-- |
-| `[U]` | Uranium |
-| `[Pb]` | Lead |
-| `[He]` | Helium |
-| `[*]` | Unknown atom |
+| :----- | :------------ |
+| `[U]`  | Uranium       |
+| `[Pb]` | Lead          |
+| `[He]` | Helium        |
+| `[*]`  | Unknown atom  |
 
 #### 3.1.2. Hydrogens
 
@@ -171,11 +171,11 @@ no other bound hydrogen, neutral charge, and an undefined atom class.
 
 Examples:
 
-| SMILES | Name | Comments |
-| :-- | :-- | :-- |
-| `[CH4]` | methane |  |
-| `[ClH]` | hydrochloric acid | `H1` implied |
-| `[ClH1]` | hydrochloric acid |  |
+| SMILES   | Name              | Comments     |
+| :------- | :---------------- | :----------- |
+| `[CH4]`  | methane           |              |
+| `[ClH]`  | hydrochloric acid | `H1` implied |
+| `[ClH1]` | hydrochloric acid |              |
 
 A hydrogen atom cannot have a hydrogen count, for example, `[HH1]` is illegal. Hydrogens connected
 to other hydrogens must be represented as explicit atoms in square brackets. For example molecular
@@ -195,13 +195,13 @@ is a deprecated form and should be avoided.
 
 Examples:
 
-| SMILES | Name | Comments |
-| :-- | :-- | :-- |
-| `[Cl-]` | chloride anion | `-1` charge, `H0` implied |
-| `[OH1-]` | hydroxyl anion | `-1` charge, `H1` |
-| `[OH-1]` | hydroxyl anion | `-1` charge, `H1` |
-| `[Cu+2]` | copper cation | `+2` charge, `H0` implied |
-| `[Cu++]` | copper cation | `+2` charge, `H0` implied |
+| SMILES   | Name           | Comments                  |
+| :------- | :------------- | :------------------------ |
+| `[Cl-]`  | chloride anion | `-1` charge, `H0` implied |
+| `[OH1-]` | hydroxyl anion | `-1` charge, `H1`         |
+| `[OH-1]` | hydroxyl anion | `-1` charge, `H1`         |
+| `[Cu+2]` | copper cation  | `+2` charge, `H0` implied |
+| `[Cu++]` | copper cation  | `+2` charge, `H0` implied |
 
 An implementation is required to accept charges in the range `-15` to `+15`.
 
@@ -210,11 +210,11 @@ An implementation is required to accept charges in the range `-15` to `+15`.
 Isotopic specification is placed inside the square brackets for an atom
 preceding the atomic symbol; for example:
 
-| SMILES | Atomic Symbol |
-| :-- | :-- |
-| `[13CH4]` | methane |
-| `[2H+]` | deuterium ion |
-| `[238U]` | Uranium 238 atom |
+| SMILES    | Atomic Symbol    |
+| :-------- | :--------------- |
+| `[13CH4]` | methane          |
+| `[2H+]`   | deuterium ion    |
+| `[238U]`  | Uranium 238 atom |
 
 An isotope is interpreted as a number, so that `[2H]`,
 `[02H]` and `[002H]` all mean deuterium. If the isotope field
@@ -239,14 +239,13 @@ brackets, H-count, etc.). An atom is specified this way has the
 following properties:
 
 - "implicit hydrogens" are added such that valence of the atom is in
-the lowest normal state for that element
+  the lowest normal state for that element
 
 - the atom’s charge is zero
 
 - the atom has no isotopic specification
 
 - the atom has no chiral specification
-
 
 The implicit hydrogen count is determined by summing the bond orders
 of the bonds connected to the atom. If that sum is equal to a known
@@ -256,24 +255,24 @@ difference between that sum and the next highest known valence.
 
 The "normal valence" for these elements is defined as:
 
-| Element | Valence |
-| :-- | :-- |
-| B | 3 |
-| C | 4 |
-| N | 3 or 5 |
-| O | 2 |
-| P | 3 or 5 |
-| S | 2, 4 or 6 |
-| halogens | 1 |
-| \* | unspecified |
+| Element  | Valence     |
+| :------- | :---------- |
+| B        | 3           |
+| C        | 4           |
+| N        | 3 or 5      |
+| O        | 2           |
+| P        | 3 or 5      |
+| S        | 2, 4 or 6   |
+| halogens | 1           |
+| \*       | unspecified |
 
 Examples:
 
-| SMILES | Name |
-| :-- | :-- |
-| `C` | methane |
-| `N` | ammonia |
-| `Cl` | hydrochloric acid |
+| SMILES | Name              |
+| :----- | :---------------- |
+| `C`    | methane           |
+| `N`    | ammonia           |
+| `Cl`   | hydrochloric acid |
 
 _Note: The remaining atom properties, chirality and ring-closures, are discussed in later sections._
 
@@ -284,8 +283,8 @@ inside brackets, it can have its isotope, chirality, hydrogen count and charge s
 occurs outside of brackets, it has no assumed isotope, a mass of zero, unspecified chirality, a
 hydrogen count of zero, and a charge of zero.
 
-| SMILES | Name |
-| :-- | :-- |
+| SMILES         | Name                     |
+| :------------- | :----------------------- |
 | `Oc1c(*)cccc1` | ortho-substituted phenol |
 
 The `'*'` atom does not have any specific electronic properties or
@@ -307,8 +306,8 @@ same atom class.
 
 The atom class is specified after all other properties in square brackets. For example:
 
-| SMILES | Name |
-| :-- | :-- |
+| SMILES    | Name                       |
+| :-------- | :------------------------- |
 | `[CH4:2]` | methane, atom’s class is 2 |
 
 If the atom class is not specified then the atom class is zero.
@@ -320,30 +319,30 @@ and `[NH4+:005]` have an atom class of 5.
 Atoms that are adjacent in a SMILES string are assumed to
 be joined by a single or aromatic bond (see [Aromaticity](https://opensmiles.org/opensmiles.html#inaromaticity)). For example:
 
-| SMILES | Name |
-| :-- | :-- |
-| `CC` | ethane |
-| `CCO` | ethanol |
+| SMILES  | Name         |
+| :------ | :----------- |
+| `CC`    | ethane       |
+| `CCO`   | ethanol      |
 | `NCCCC` | n-butylamine |
 | `CCCCN` | n-butylamine |
 
 Double, triple and quadruple bonds are represented by `'='`, `'#'`, and `'$'` respectively:
 
-| SMILES | Name |
-| :-- | :-- |
-| `C=C` | ethene |
-| `C#N` | hydrogen cyanide |
-| `CC#CC` | 2-butyne |
-| `CCC=O` | propanol |
+| SMILES                                      | Name                      |
+| :------------------------------------------ | :------------------------ |
+| `C=C`                                       | ethene                    |
+| `C#N`                                       | hydrogen cyanide          |
+| `CC#CC`                                     | 2-butyne                  |
+| `CCC=O`                                     | propanol                  |
 | `[Rh-](Cl)(Cl)(Cl)(Cl)$[Rh-](Cl)(Cl)(Cl)Cl` | octachlorodirhenate (III) |
 
 A single bond can be explicitely represented with `'-'`, but it is rarely
 necessary.
 
-| SMILES |  |
-| :-- | :-- |
-| `C-C` | same as: `CC` |
-| `C-C-O` | same as: `CCO` |
+| SMILES    |                  |
+| :-------- | :--------------- |
+| `C-C`     | same as: `CC`    |
+| `C-C-O`   | same as: `CCO`   |
 | `C-C=C-C` | same as: `CC=CC` |
 
 Note: The remaining bond symbols, `':\/'`, are discussed in
@@ -354,24 +353,24 @@ later sections.
 An atom with three or more bonds is called a **branched atom**, and is
 represented using parentheses.
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
+| Depiction                                                                            | SMILES      | Name              |
+| :----------------------------------------------------------------------------------- | :---------- | :---------------- |
 | ![depict/2-ethyl-1-butanol.gif](https://opensmiles.org/depict/2-ethyl-1-butanol.gif) | `CCC(CC)CO` | 2-ethyl-1-butanol |
 
 Branches can be nested or "stacked" to any depth:
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
-| ![depict/2-4-dimethyl-3-pentanone.gif](https://opensmiles.org/depict/2-4-dimethyl-3-pentanone.gif) | `CC(C)C(=O)C(C)C` | 2,4-dimethyl-3-pentanone |
-| pic here | `OCC(CCC)C(C(C)C)CCC` | 2-propyl-3-isopropyl-1-propanol |
-| ![depict/thiosulfate.gif](https://opensmiles.org/depict/thiosulfate.gif) | `OS(=O)(=S)O` | thiosulfate |
+| Depiction                                                                                          | SMILES                | Name                            |
+| :------------------------------------------------------------------------------------------------- | :-------------------- | :------------------------------ |
+| ![depict/2-4-dimethyl-3-pentanone.gif](https://opensmiles.org/depict/2-4-dimethyl-3-pentanone.gif) | `CC(C)C(=O)C(C)C`     | 2,4-dimethyl-3-pentanone        |
+| pic here                                                                                           | `OCC(CCC)C(C(C)C)CCC` | 2-propyl-3-isopropyl-1-propanol |
+| ![depict/thiosulfate.gif](https://opensmiles.org/depict/thiosulfate.gif)                           | `OS(=O)(=S)O`         | thiosulfate                     |
 
 The SMILES branch/chain rules allow nested parenthetical expressions (branches) to an arbitrary
 depth. For example, the following SMILES, though peculiar, is legal:
 
-| SMILES | Formula |
-| :-- | :-- |
-| `C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C))))))))))))))))))))C` | C22H46 |
+| SMILES                                                           | Formula |
+| :--------------------------------------------------------------- | :------ |
+| `C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C(C))))))))))))))))))))C` | C22H46  |
 
 ### 3.4. Rings
 
@@ -381,21 +380,21 @@ ring-closure number (the "rnum"). When that same rnum is encountered
 later in the string, a bond is made between the two atoms, which typically
 forms a cyclic structure.
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
-| ![depict/cyclohexane.gif](https://opensmiles.org/depict/cyclohexane.gif) | `C1CCCCC1` | cyclohexane |
+| Depiction                                                                                  | SMILES           | Name                 |
+| :----------------------------------------------------------------------------------------- | :--------------- | :------------------- |
+| ![depict/cyclohexane.gif](https://opensmiles.org/depict/cyclohexane.gif)                   | `C1CCCCC1`       | cyclohexane          |
 | ![depict/perhydroisoquinoline.gif](https://opensmiles.org/depict/perhydroisoquinoline.gif) | `N1CC2CCCCC2CC1` | perhydroisoquinoline |
 
 If a bond symbol is present between the atom and rnum, it can be
 present on **either or both** bonded atoms. However, if it appears on
 both bonded atoms, the two bond symbols must be the same.
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
-| ![depict/cyclohexene.gif](https://opensmiles.org/depict/cyclohexene.gif) | `C=1CCCCC=1` | cyclohexene |
-| `C=1CCCCC1` | cyclohexene **(preferred form)** |
-| `C1CCCCC=1` | cyclohexene |
-| `C-1CCCCC=1` | **invalid** |
+| Depiction                                                                | SMILES                           | Name        |
+| :----------------------------------------------------------------------- | :------------------------------- | :---------- |
+| ![depict/cyclohexene.gif](https://opensmiles.org/depict/cyclohexene.gif) | `C=1CCCCC=1`                     | cyclohexene |
+| `C=1CCCCC1`                                                              | cyclohexene **(preferred form)** |
+| `C1CCCCC=1`                                                              | cyclohexene                      |
+| `C-1CCCCC=1`                                                             | **invalid**                      |
 
 Ring closures must be matched pairs in a SMILES string, for example, `C1CCC`
 is not a valid SMILES.
@@ -403,10 +402,10 @@ is not a valid SMILES.
 It is permissible to re-use ring-closure numbers. Once a particular number
 has been encountered twice, that number is available again for subsequent ring closures.
 
-| Depiction | SMILES | Name | Comment |
-| :-- | :-- | :-- | :-- |
+| Depiction                                                                  | SMILES             | Name         | Comment               |
+| :------------------------------------------------------------------------- | :----------------- | :----------- | :-------------------- |
 | ![depict/dicyclohexyl.gif](https://opensmiles.org/depict/dicyclohexyl.gif) | `C1CCCCC1C1CCCCC1` | bicyclohexyl | both SMILES are valid |
-| `C1CCCCC1C2CCCCC2` | bicyclohexyl |  |
+| `C1CCCCC1C2CCCCC2`                                                         | bicyclohexyl       |              |
 
 Note that the ring number zero is valid, for example cyclohexane can be
 written `C0CCCCC0`.
@@ -425,18 +424,18 @@ valid SMILES.
 A single atom can have several ring-closure numbers, such as this spiro
 atom:
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
+| Depiction                                                    | SMILES              | Name                 |
+| :----------------------------------------------------------- | :------------------ | :------------------- |
 | ![depict/spiro.gif](https://opensmiles.org/depict/spiro.gif) | `C12(CCCCC1)CCCCC2` | spiro\[5.5\]undecane |
 
 Two atoms cannot be joined by more than one bond, and an atom cannot be bonded to itself. For
 example, the following are not allowed:
 
-| SMILES | Comments |
-| :-- | :-- |
+| SMILES       | Comments                                         |
+| :----------- | :----------------------------------------------- |
 | `C12CCCCC12` | **illegal, two bonds between one pair of atoms** |
-| `C12C2CCC1` | **illegal, two bonds between one pair of atoms** |
-| `C11` | **illegal, atom bonded to itself** |
+| `C12C2CCC1`  | **illegal, two bonds between one pair of atoms** |
+| `C11`        | **illegal, atom bonded to itself**               |
 
 ### 3.5. Aromaticity
 
@@ -458,25 +457,24 @@ aromaticity will match the chemist’s notion of what is aromatic, but in some c
 Aromaticity can be represented in one of two ways in a SMILES.
 
 - In the Kekule form, using alternating single and double bonds, with
-uppercase symbols for the atoms.
+  uppercase symbols for the atoms.
 
 - An atomic symbol that begins with a lowercase letter is an aromatic atom, such as `'c'`
-for aromatic carbon. When aromatic symbols are used, no bond symbols are needed.
-
+  for aromatic carbon. When aromatic symbols are used, no bond symbols are needed.
 
 A lowercase aromatic symbol is defined as an atom in the sp2 configuration in an
 aromatic or anti-aromatic ring system. For example:
 
-| Depiction | SMILES | Name |
-| :-- | :-- | :-- |
-| ![depict/benzene.gif](https://opensmiles.org/depict/benzene.gif) | `c1ccccc1` | benzene |
-| `C1=CC=CC=C1` |
-| ![depict/indane.gif](https://opensmiles.org/depict/indane.gif) | `c1ccc2CCCc2c1` | indane |
-| `C1=CC=CC(CCC2)=C12` |
-| ![depict/furan.gif](https://opensmiles.org/depict/furan.gif) | `c1occc1` | furan |
-| `C1OC=CC=1` |
-| ![depict/cyclobutadiene.gif](https://opensmiles.org/depict/cyclobutadiene.gif) | `c1ccc1` | cyclobutadiene |
-| `C1=CC=C1` |
+| Depiction                                                                      | SMILES          | Name           |
+| :----------------------------------------------------------------------------- | :-------------- | :------------- |
+| ![depict/benzene.gif](https://opensmiles.org/depict/benzene.gif)               | `c1ccccc1`      | benzene        |
+| `C1=CC=CC=C1`                                                                  |
+| ![depict/indane.gif](https://opensmiles.org/depict/indane.gif)                 | `c1ccc2CCCc2c1` | indane         |
+| `C1=CC=CC(CCC2)=C12`                                                           |
+| ![depict/furan.gif](https://opensmiles.org/depict/furan.gif)                   | `c1occc1`       | furan          |
+| `C1OC=CC=1`                                                                    |
+| ![depict/cyclobutadiene.gif](https://opensmiles.org/depict/cyclobutadiene.gif) | `c1ccc1`        | cyclobutadiene |
+| `C1=CC=C1`                                                                     |
 
 The Kekule form is always acceptable for SMILES input. For output, the aromatic form
 (using lowercase letters) [is preferred](https://opensmiles.org/opensmiles.html#outaromaticity). The lowercase
@@ -497,54 +495,53 @@ A single, isolated ring that meets the following criteria is aromatic:
 - All atoms must be sp2 hybridized.
 
 - The number of available "shared" [π electrons](http://en.wikipedia.org/wiki/Pi_electron)
-must equal 4N+2 where N ≥ 0 ( [Huckel’s rule](http://en.wikipedia.org/wiki/H%C3%BCckel%E2%80%99s_rule)).
-
+  must equal 4N+2 where N ≥ 0 ( [Huckel’s rule](http://en.wikipedia.org/wiki/H%C3%BCckel%E2%80%99s_rule)).
 
 Each element that can participate in an aromatic ring is defined to have the following
 number of π electrons:
 
-| Configuration | π Electrons | Example | Comment |
-| :-: | :-- | :-: | :-- |
-|  |  |  |  |
-| ![depict/aromtype/BX3v3n.svg](https://opensmiles.org/depict/aromtype/BX3v3n.svg) | 0 | ![depict/arom/BX3v3n_ex1.svg](https://opensmiles.org/depict/arom/BX3v3n_ex1.svg) | _OpenSMILES extension_ |
-| ![depict/aromtype/BX2v3n.svg](https://opensmiles.org/depict/aromtype/BX2v3n.svg) | 1 | ![depict/arom/BX2v3n_ex1.svg](https://opensmiles.org/depict/arom/BX2v3n_ex1.svg) | _OpenSMILES extension_ |
-|  |  |  |  |
-| ![depict/aromtype/CX3v3m.svg](https://opensmiles.org/depict/aromtype/CX3v3m.svg) | 2 | ![depict/arom/CX3v3m_ex1.svg](https://opensmiles.org/depict/arom/CX3v3m_ex1.svg) |  |
-| ![depict/aromtype/CX3v4o.svg](https://opensmiles.org/depict/aromtype/CX3v4o.svg) | 0 | ![depict/arom/CX3v4o_ex1.svg](https://opensmiles.org/depict/arom/CX3v4o_ex1.svg) |  |
-| ![depict/aromtype/CX3v3p.svg](https://opensmiles.org/depict/aromtype/CX3v3p.svg) | 0 | ![depict/arom/CX3v3p_ex1.svg](https://opensmiles.org/depict/arom/CX3v3p_ex1.svg) |  |
-| ![depict/aromtype/CX2v3m.svg](https://opensmiles.org/depict/aromtype/CX2v3m.svg) | 1 | ![depict/arom/CX2v3m_ex1.svg](https://opensmiles.org/depict/arom/CX2v3m_ex1.svg) |  |
-| ![depict/aromtype/CX3v4.svg](https://opensmiles.org/depict/aromtype/CX3v4.svg) | 1 | ![depict/arom/CX3v4_ex1.svg](https://opensmiles.org/depict/arom/CX3v4_ex1.svg) |  |
-| ![depict/aromtype/CX2v3p.svg](https://opensmiles.org/depict/aromtype/CX2v3p.svg) | 1 | ![depict/arom/CX2v3p_ex1.svg](https://opensmiles.org/depict/arom/CX2v3p_ex1.svg) |  |
-|  |  |  |  |
-| ![depict/aromtype/NX2v2.svg](https://opensmiles.org/depict/aromtype/NX2v2.svg) | 2 | ![depict/arom/NX2v2_ex1.svg](https://opensmiles.org/depict/arom/NX2v2_ex1.svg) |  |
-| ![depict/aromtype/NX3v3.svg](https://opensmiles.org/depict/aromtype/NX3v3.svg) | 2 | ![depict/arom/NX3v3_ex1.svg](https://opensmiles.org/depict/arom/NX3v3_ex1.svg) |  |
-| ![depict/aromtype/NX2v3.svg](https://opensmiles.org/depict/aromtype/NX2v3.svg) | 1 | ![depict/arom/NX2v3_ex1.svg](https://opensmiles.org/depict/arom/NX2v3_ex1.svg) |  |
-| ![depict/aromtype/NX3v4.svg](https://opensmiles.org/depict/aromtype/NX3v4.svg) | 1 | ![depict/arom/NX3v4_ex1.svg](https://opensmiles.org/depict/arom/NX3v4_ex1.svg) |  |
-| ![depict/aromtype/NX3v5.svg](https://opensmiles.org/depict/aromtype/NX3v5.svg) | 1 | ![depict/arom/NX3v5_ex1.svg](https://opensmiles.org/depict/arom/NX3v5_ex1.svg) | _Non-oxide contributes 2 in Daylight toolkit_ |
-|  |  |  |  |
-| ![depict/aromtype/PX2v2.svg](https://opensmiles.org/depict/aromtype/PX2v2.svg) | 2 | ![depict/arom/PX2v2_ex1.svg](https://opensmiles.org/depict/arom/PX2v2_ex1.svg) |  |
-| ![depict/aromtype/PX3v3.svg](https://opensmiles.org/depict/aromtype/PX3v3.svg) | 2 | ![depict/arom/PX3v3_ex1.svg](https://opensmiles.org/depict/arom/PX3v3_ex1.svg) |  |
-| ![depict/aromtype/PX2v3.svg](https://opensmiles.org/depict/aromtype/PX2v3.svg) | 1 | ![depict/arom/PX2v3_ex1.svg](https://opensmiles.org/depict/arom/PX2v3_ex1.svg) |  |
-| ![depict/aromtype/PX3v4.svg](https://opensmiles.org/depict/aromtype/PX3v4.svg) | 1 | ![depict/arom/PX3v4_ex1.svg](https://opensmiles.org/depict/arom/PX3v4_ex1.svg) |  |
-| ![depict/aromtype/PX3v5.svg](https://opensmiles.org/depict/aromtype/PX3v5.svg) | 1 | ![depict/arom/PX3v5_ex1.svg](https://opensmiles.org/depict/arom/PX3v5_ex1.svg) | _Non-oxide contributes 2 in Daylight toolkit_ |
-|  |  |  |  |
-| ![depict/aromtype/AsX3v3.svg](https://opensmiles.org/depict/aromtype/AsX3v3.svg) | 2 | ![depict/arom/AsX3v3_ex1.svg](https://opensmiles.org/depict/arom/AsX3v3_ex1.svg) |  |
-| ![depict/aromtype/AsX2v3.svg](https://opensmiles.org/depict/aromtype/AsX2v3.svg) | 1 | ![depict/arom/AsX2v3_ex1.svg](https://opensmiles.org/depict/arom/AsX2v3_ex1.svg) | _OpenSMILES extension_ |
-| ![depict/aromtype/AsX3v4.svg](https://opensmiles.org/depict/aromtype/AsX3v4.svg) | 1 | ![depict/arom/AsX3v4_ex1.svg](https://opensmiles.org/depict/arom/AsX3v4_ex1.svg) | _OpenSMILES extension_ |
-|  |  |  |  |
-| ![depict/aromtype/OX2v2.svg](https://opensmiles.org/depict/aromtype/OX2v2.svg) | 2 | ![depict/arom/OX2v2_ex1.svg](https://opensmiles.org/depict/arom/OX2v2_ex1.svg) |  |
-| ![depict/aromtype/OX2v3.svg](https://opensmiles.org/depict/aromtype/OX2v3.svg) | 1 | ![depict/arom/OX2v3_ex1.svg](https://opensmiles.org/depict/arom/OX2v3_ex1.svg) |  |
-|  |  |  |  |
-| ![depict/aromtype/SX2v2.svg](https://opensmiles.org/depict/aromtype/SX2v2.svg) | 2 | ![depict/arom/SX2v2_ex1.svg](https://opensmiles.org/depict/arom/SX2v2_ex1.svg) |  |
-| ![depict/aromtype/SX2v3.svg](https://opensmiles.org/depict/aromtype/SX2v3.svg) | 1 | ![depict/arom/SX2v3_ex1.svg](https://opensmiles.org/depict/arom/SX2v3_ex1.svg) |  |
-| ![depict/aromtype/SX3v4.svg](https://opensmiles.org/depict/aromtype/SX3v4.svg) | 2 | ![depict/arom/SX3v4_ex1.svg](https://opensmiles.org/depict/arom/SX3v4_ex1.svg) | _Possibly chiral_ |
-| ![depict/aromtype/SX3v3p.svg](https://opensmiles.org/depict/aromtype/SX3v3p.svg) | 2 | ![depict/arom/SX3v3p_ex1.svg](https://opensmiles.org/depict/arom/SX3v3p_ex1.svg) | _Possibly chiral, OpenSMILES extension_ |
-|  |  |  |  |
-| ![depict/aromtype/SeX2v2.svg](https://opensmiles.org/depict/aromtype/SeX2v2.svg) | 2 | ![depict/arom/SeX2v2_ex1.svg](https://opensmiles.org/depict/arom/SeX2v2_ex1.svg) |  |
-| ![depict/aromtype/SeX2v3.svg](https://opensmiles.org/depict/aromtype/SeX2v3.svg) | 1 | ![depict/arom/SeX2v3_ex1.svg](https://opensmiles.org/depict/arom/SeX2v3_ex1.svg) |  |
-| ![depict/aromtype/SeX3v4.svg](https://opensmiles.org/depict/aromtype/SeX3v4.svg) | 2 | ![depict/arom/SeX3v4_ex1.svg](https://opensmiles.org/depict/arom/SeX3v4_ex1.svg) | _Possibly chiral_ |
-| ![depict/aromtype/SeX3v3p.svg](https://opensmiles.org/depict/aromtype/SeX3v3p.svg) | 2 | ![depict/arom/SeX3v3p_ex1.svg](https://opensmiles.org/depict/arom/SeX3v3p_ex1.svg) | _Possibly chiral, OpenSMILES extension_ |
-|  |  |  |  |
+|                                   Configuration                                    | π Electrons |                                      Example                                       | Comment                                       |
+| :--------------------------------------------------------------------------------: | :---------- | :--------------------------------------------------------------------------------: | :-------------------------------------------- |
+|                                                                                    |             |                                                                                    |                                               |
+|  ![depict/aromtype/BX3v3n.svg](https://opensmiles.org/depict/aromtype/BX3v3n.svg)  | 0           |  ![depict/arom/BX3v3n_ex1.svg](https://opensmiles.org/depict/arom/BX3v3n_ex1.svg)  | _OpenSMILES extension_                        |
+|  ![depict/aromtype/BX2v3n.svg](https://opensmiles.org/depict/aromtype/BX2v3n.svg)  | 1           |  ![depict/arom/BX2v3n_ex1.svg](https://opensmiles.org/depict/arom/BX2v3n_ex1.svg)  | _OpenSMILES extension_                        |
+|                                                                                    |             |                                                                                    |                                               |
+|  ![depict/aromtype/CX3v3m.svg](https://opensmiles.org/depict/aromtype/CX3v3m.svg)  | 2           |  ![depict/arom/CX3v3m_ex1.svg](https://opensmiles.org/depict/arom/CX3v3m_ex1.svg)  |                                               |
+|  ![depict/aromtype/CX3v4o.svg](https://opensmiles.org/depict/aromtype/CX3v4o.svg)  | 0           |  ![depict/arom/CX3v4o_ex1.svg](https://opensmiles.org/depict/arom/CX3v4o_ex1.svg)  |                                               |
+|  ![depict/aromtype/CX3v3p.svg](https://opensmiles.org/depict/aromtype/CX3v3p.svg)  | 0           |  ![depict/arom/CX3v3p_ex1.svg](https://opensmiles.org/depict/arom/CX3v3p_ex1.svg)  |                                               |
+|  ![depict/aromtype/CX2v3m.svg](https://opensmiles.org/depict/aromtype/CX2v3m.svg)  | 1           |  ![depict/arom/CX2v3m_ex1.svg](https://opensmiles.org/depict/arom/CX2v3m_ex1.svg)  |                                               |
+|   ![depict/aromtype/CX3v4.svg](https://opensmiles.org/depict/aromtype/CX3v4.svg)   | 1           |   ![depict/arom/CX3v4_ex1.svg](https://opensmiles.org/depict/arom/CX3v4_ex1.svg)   |                                               |
+|  ![depict/aromtype/CX2v3p.svg](https://opensmiles.org/depict/aromtype/CX2v3p.svg)  | 1           |  ![depict/arom/CX2v3p_ex1.svg](https://opensmiles.org/depict/arom/CX2v3p_ex1.svg)  |                                               |
+|                                                                                    |             |                                                                                    |                                               |
+|   ![depict/aromtype/NX2v2.svg](https://opensmiles.org/depict/aromtype/NX2v2.svg)   | 2           |   ![depict/arom/NX2v2_ex1.svg](https://opensmiles.org/depict/arom/NX2v2_ex1.svg)   |                                               |
+|   ![depict/aromtype/NX3v3.svg](https://opensmiles.org/depict/aromtype/NX3v3.svg)   | 2           |   ![depict/arom/NX3v3_ex1.svg](https://opensmiles.org/depict/arom/NX3v3_ex1.svg)   |                                               |
+|   ![depict/aromtype/NX2v3.svg](https://opensmiles.org/depict/aromtype/NX2v3.svg)   | 1           |   ![depict/arom/NX2v3_ex1.svg](https://opensmiles.org/depict/arom/NX2v3_ex1.svg)   |                                               |
+|   ![depict/aromtype/NX3v4.svg](https://opensmiles.org/depict/aromtype/NX3v4.svg)   | 1           |   ![depict/arom/NX3v4_ex1.svg](https://opensmiles.org/depict/arom/NX3v4_ex1.svg)   |                                               |
+|   ![depict/aromtype/NX3v5.svg](https://opensmiles.org/depict/aromtype/NX3v5.svg)   | 1           |   ![depict/arom/NX3v5_ex1.svg](https://opensmiles.org/depict/arom/NX3v5_ex1.svg)   | _Non-oxide contributes 2 in Daylight toolkit_ |
+|                                                                                    |             |                                                                                    |                                               |
+|   ![depict/aromtype/PX2v2.svg](https://opensmiles.org/depict/aromtype/PX2v2.svg)   | 2           |   ![depict/arom/PX2v2_ex1.svg](https://opensmiles.org/depict/arom/PX2v2_ex1.svg)   |                                               |
+|   ![depict/aromtype/PX3v3.svg](https://opensmiles.org/depict/aromtype/PX3v3.svg)   | 2           |   ![depict/arom/PX3v3_ex1.svg](https://opensmiles.org/depict/arom/PX3v3_ex1.svg)   |                                               |
+|   ![depict/aromtype/PX2v3.svg](https://opensmiles.org/depict/aromtype/PX2v3.svg)   | 1           |   ![depict/arom/PX2v3_ex1.svg](https://opensmiles.org/depict/arom/PX2v3_ex1.svg)   |                                               |
+|   ![depict/aromtype/PX3v4.svg](https://opensmiles.org/depict/aromtype/PX3v4.svg)   | 1           |   ![depict/arom/PX3v4_ex1.svg](https://opensmiles.org/depict/arom/PX3v4_ex1.svg)   |                                               |
+|   ![depict/aromtype/PX3v5.svg](https://opensmiles.org/depict/aromtype/PX3v5.svg)   | 1           |   ![depict/arom/PX3v5_ex1.svg](https://opensmiles.org/depict/arom/PX3v5_ex1.svg)   | _Non-oxide contributes 2 in Daylight toolkit_ |
+|                                                                                    |             |                                                                                    |                                               |
+|  ![depict/aromtype/AsX3v3.svg](https://opensmiles.org/depict/aromtype/AsX3v3.svg)  | 2           |  ![depict/arom/AsX3v3_ex1.svg](https://opensmiles.org/depict/arom/AsX3v3_ex1.svg)  |                                               |
+|  ![depict/aromtype/AsX2v3.svg](https://opensmiles.org/depict/aromtype/AsX2v3.svg)  | 1           |  ![depict/arom/AsX2v3_ex1.svg](https://opensmiles.org/depict/arom/AsX2v3_ex1.svg)  | _OpenSMILES extension_                        |
+|  ![depict/aromtype/AsX3v4.svg](https://opensmiles.org/depict/aromtype/AsX3v4.svg)  | 1           |  ![depict/arom/AsX3v4_ex1.svg](https://opensmiles.org/depict/arom/AsX3v4_ex1.svg)  | _OpenSMILES extension_                        |
+|                                                                                    |             |                                                                                    |                                               |
+|   ![depict/aromtype/OX2v2.svg](https://opensmiles.org/depict/aromtype/OX2v2.svg)   | 2           |   ![depict/arom/OX2v2_ex1.svg](https://opensmiles.org/depict/arom/OX2v2_ex1.svg)   |                                               |
+|   ![depict/aromtype/OX2v3.svg](https://opensmiles.org/depict/aromtype/OX2v3.svg)   | 1           |   ![depict/arom/OX2v3_ex1.svg](https://opensmiles.org/depict/arom/OX2v3_ex1.svg)   |                                               |
+|                                                                                    |             |                                                                                    |                                               |
+|   ![depict/aromtype/SX2v2.svg](https://opensmiles.org/depict/aromtype/SX2v2.svg)   | 2           |   ![depict/arom/SX2v2_ex1.svg](https://opensmiles.org/depict/arom/SX2v2_ex1.svg)   |                                               |
+|   ![depict/aromtype/SX2v3.svg](https://opensmiles.org/depict/aromtype/SX2v3.svg)   | 1           |   ![depict/arom/SX2v3_ex1.svg](https://opensmiles.org/depict/arom/SX2v3_ex1.svg)   |                                               |
+|   ![depict/aromtype/SX3v4.svg](https://opensmiles.org/depict/aromtype/SX3v4.svg)   | 2           |   ![depict/arom/SX3v4_ex1.svg](https://opensmiles.org/depict/arom/SX3v4_ex1.svg)   | _Possibly chiral_                             |
+|  ![depict/aromtype/SX3v3p.svg](https://opensmiles.org/depict/aromtype/SX3v3p.svg)  | 2           |  ![depict/arom/SX3v3p_ex1.svg](https://opensmiles.org/depict/arom/SX3v3p_ex1.svg)  | _Possibly chiral, OpenSMILES extension_       |
+|                                                                                    |             |                                                                                    |                                               |
+|  ![depict/aromtype/SeX2v2.svg](https://opensmiles.org/depict/aromtype/SeX2v2.svg)  | 2           |  ![depict/arom/SeX2v2_ex1.svg](https://opensmiles.org/depict/arom/SeX2v2_ex1.svg)  |                                               |
+|  ![depict/aromtype/SeX2v3.svg](https://opensmiles.org/depict/aromtype/SeX2v3.svg)  | 1           |  ![depict/arom/SeX2v3_ex1.svg](https://opensmiles.org/depict/arom/SeX2v3_ex1.svg)  |                                               |
+|  ![depict/aromtype/SeX3v4.svg](https://opensmiles.org/depict/aromtype/SeX3v4.svg)  | 2           |  ![depict/arom/SeX3v4_ex1.svg](https://opensmiles.org/depict/arom/SeX3v4_ex1.svg)  | _Possibly chiral_                             |
+| ![depict/aromtype/SeX3v3p.svg](https://opensmiles.org/depict/aromtype/SeX3v3p.svg) | 2           | ![depict/arom/SeX3v3p_ex1.svg](https://opensmiles.org/depict/arom/SeX3v3p_ex1.svg) | _Possibly chiral, OpenSMILES extension_       |
+|                                                                                    |             |                                                                                    |                                               |
 
 #### 3.5.4. Aromaticity Algorithm
 
@@ -561,8 +558,8 @@ bond between two aromatic atoms is assumed to be aromatic unless it is explicitl
 single bond `'-'`. However, a single bond (nonaromatic bond) between two aromatic atoms **must**
 be explicitly represented. For example:
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
+|                             Depiction                              |       SMILES        |   Name   |
+| :----------------------------------------------------------------: | :-----------------: | :------: |
 | ![depict/biphenyl.gif](https://opensmiles.org/depict/biphenyl.gif) | `c1ccccc1-c2ccccc2` | biphenyl |
 
 _Note: Some SMILES parsers interpret a lowercase letter as sp2 anywhere it appears;_
@@ -574,19 +571,18 @@ _[nonstandard parsing](https://opensmiles.org/opensmiles.html#nonstandard) is ex
 
 Hydrogens in a SMILES can be represented in three different ways:
 
-| Method | SMILES | Name | Comments |
-| :-: | :-: | :-: | :-: |
-| implicit hydrogen | `C` | methane | h-count deduced from normal valence (4) |
-| atom property | `[CH4]` | methane | h-count specified for heavy atom |
-| explicit hydrogen | `[H]C([H])([H])[H]` | methane | hydrogens represented as normal atoms |
+|      Method       |       SMILES        |  Name   |                Comments                 |
+| :---------------: | :-----------------: | :-----: | :-------------------------------------: |
+| implicit hydrogen |         `C`         | methane | h-count deduced from normal valence (4) |
+|   atom property   |       `[CH4]`       | methane |    h-count specified for heavy atom     |
+| explicit hydrogen | `[H]C([H])([H])[H]` | methane |  hydrogens represented as normal atoms  |
 
 All three forms are equivalent. However, some situations require that one form must be used:
 
 - Implicit hydrogen count may only be used for elements of the [organic elements](https://opensmiles.org/opensmiles.html#orgsbst) subset.
 
 - Any atom that is specified with square brackets **must** have its attached hydrogens
-explicitly represented, either as a hydrogen count or as normal atoms.
-
+  explicitly represented, either as a hydrogen count or as normal atoms.
 
 A hydrogen that meets one of the following criteria must be represented as an explicit atom:
 
@@ -598,16 +594,15 @@ A hydrogen that meets one of the following criteria must be represented as an ex
 
 - Deuterium `[2H]` and tritium `[3H]`
 
-
 It is permissible to use a mixture of an atom h-count and explicit hydrogen. In such a case,
 the atom’s hydrogen count is the sum of the atomic h-count property and the number of attached
 hydrogens. For example:
 
-| SMILES | Name |
-| :-: | :-: |
-| `[CH4]` | methane |
-| `[H][CH2][H]` | methane |
-| `[2H][CH2]C` | deuteroethane |
+|    SMILES     |     Name      |
+| :-----------: | :-----------: |
+|    `[CH4]`    |    methane    |
+| `[H][CH2][H]` |    methane    |
+| `[2H][CH2]C`  | deuteroethane |
 
 ### 3.7. Disconnected Structures
 
@@ -616,19 +611,19 @@ a bond symbol would occur, but indicates that the atoms are **not**
 bonded. The most common use of the dot-bond symbol is to represent
 disconnected and ionic compounds.
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
-| ![depict/sodium-chloride.gif](https://opensmiles.org/depict/sodium-chloride.gif) | `[Na+].[Cl-]` | sodium chloride |
-| ![depict/phenol-2-amino-ethanol.gif](https://opensmiles.org/depict/phenol-2-amino-ethanol.gif) | `Oc1ccccc1.NCCO` | phenol, 2-amino ethanol |
-| ![depict/diammonium-thiosulfate.gif](https://opensmiles.org/depict/diammonium-thiosulfate.gif) | `[NH4+].[NH4+].[O-]S(=O)(=O)[S-]` | diammonium thiosulfate |
+|                                           Depiction                                            |              SMILES               |          Name           |
+| :--------------------------------------------------------------------------------------------: | :-------------------------------: | :---------------------: |
+|        ![depict/sodium-chloride.gif](https://opensmiles.org/depict/sodium-chloride.gif)        |           `[Na+].[Cl-]`           |     sodium chloride     |
+| ![depict/phenol-2-amino-ethanol.gif](https://opensmiles.org/depict/phenol-2-amino-ethanol.gif) |         `Oc1ccccc1.NCCO`          | phenol, 2-amino ethanol |
+| ![depict/diammonium-thiosulfate.gif](https://opensmiles.org/depict/diammonium-thiosulfate.gif) | `[NH4+].[NH4+].[O-]S(=O)(=O)[S-]` | diammonium thiosulfate  |
 
 The dot can appear most places that a bond symbol is allowed, for example, the phenol example above
 can also be written:
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
-| ![depict/phenol-2-amino-ethanol.gif](https://opensmiles.org/depict/phenol-2-amino-ethanol.gif) | `c1cc(O.NCCO)ccc1` | phenol, 2-amino ethanol |
-| `Oc1cc(.NCCO)ccc1` | phenal, 2-amino ethanol |
+|                                           Depiction                                            |         SMILES          |          Name           |
+| :--------------------------------------------------------------------------------------------: | :---------------------: | :---------------------: |
+| ![depict/phenol-2-amino-ethanol.gif](https://opensmiles.org/depict/phenol-2-amino-ethanol.gif) |   `c1cc(O.NCCO)ccc1`    | phenol, 2-amino ethanol |
+|                                       `Oc1cc(.NCCO)ccc1`                                       | phenal, 2-amino ethanol |
 
 The second example above is an odd, but legal, use of parentheses and the dot bond, since the
 syntax allows a dot most places a regular bond could appear (the exception
@@ -649,10 +644,10 @@ which it is adjacent in the SMILES string are **not** bonded to each other. By c
 two constructs, one can "piece together" fragments of SMILES into a whole molecule. The following
 SMILES illustrate this:
 
-| SMILES/Depiction | Fragment SMILES | Name |
-| :-: | :-: | :-: |
-| `CC` | `C1.C1` | ethane |
-| `CCC` | `C1.C12.C2` | propane |
+|                                             SMILES/Depiction                                             |      Fragment SMILES      |            Name             |
+| :------------------------------------------------------------------------------------------------------: | :-----------------------: | :-------------------------: |
+|                                                   `CC`                                                   |          `C1.C1`          |           ethane            |
+|                                                  `CCC`                                                   |        `C1.C12.C2`        |           propane           |
 | ![depict/1-bromo-2-3-dichlorobenzene.gif](https://opensmiles.org/depict/1-bromo-2-3-dichlorobenzene.gif) | `c1c2c3c4cc1.Br2.Cl3.Cl4` | 1-bromo-2,3-dichlorobenzene |
 
 This feature of SMILES provides a convenient method of enumerating the
@@ -671,22 +666,21 @@ stereochemistry that cannot be encoded into a SMILES include:
 - Gross conformational left or right handedness such as helices
 
 - Mechanical interferences, such as rotatable bonds that are
-constrained by mechanical interferences
+  constrained by mechanical interferences
 
 - Gross conformational stereochemistry such as the shape of a protein after folding
-
 
 #### 3.8.2. Tetrahedral Centers
 
 SMILES uses an atom-centered chirality specification, in which the atom’s left-to-right order in
 the SMILES string itself is used as the basis for the chirality marking.
 
-| **Tetrahedral Chirality** |
-| :-: |
-| look from N towards C (chiral center) | list the neighbors anticlockwise |
-| ![depict/tetrahedral.gif](https://opensmiles.org/depict/tetrahedral.gif) | `N[C@](Br)(O)C` |
-| …or clockwise |
-| `N[C@@](Br)(C)O` |
+|                        **Tetrahedral Chirality**                         |
+| :----------------------------------------------------------------------: | -------------------------------- |
+|                  look from N towards C (chiral center)                   | list the neighbors anticlockwise |
+| ![depict/tetrahedral.gif](https://opensmiles.org/depict/tetrahedral.gif) | `N[C@](Br)(O)C`                  |
+|                              …or clockwise                               |
+|                             `N[C@@](Br)(C)O`                             |
 
 For the structure above, starting with the nitrogen atom, one "looks" toward the chiral
 center. The remaining three neighbor atoms are written by listing them in anticlockwise order using the `'@'`
@@ -699,20 +693,20 @@ A chiral center can be written starting anywhere in the SMILES string, and the c
 whether to list the remaining neighbor in clockwise or anticlockwise order is also arbitrary. The
 following SMILES are all equivalent and all specify the exact same chiral center illustrated above:
 
-| Equivalent SMILES |  |
-| :-: | :-: |
-| `N[C@](Br)(O)C` | `Br[C@](O)(N)C` |
-| `O[C@](Br)(C)N` | `Br[C@](C)(O)N` |
-| `C[C@](Br)(N)O` | `Br[C@](N)(C)O` |
-| `C[C@@](Br)(O)N` | `Br[C@@](N)(O)C` |
+| Equivalent SMILES  |                    |
+| :----------------: | :----------------: |
+|  `N[C@](Br)(O)C`   |  `Br[C@](O)(N)C`   |
+|  `O[C@](Br)(C)N`   |  `Br[C@](C)(O)N`   |
+|  `C[C@](Br)(N)O`   |  `Br[C@](N)(C)O`   |
+|  `C[C@@](Br)(O)N`  |  `Br[C@@](N)(O)C`  |
 | `[C@@](C)(Br)(O)N` | `[C@@](Br)(N)(O)C` |
 
 One exception to the atom order is when these atoms are bonded to the chiral center via a
 ring bond. In these cases, it is to order of the bonds to these atoms that should be considered.
 The two SMILES below are equivalent:
 
-| Equivalent SMILES |  |
-| :-: | :-: |
+|   Equivalent SMILES    |                          |
+| :--------------------: | :----------------------: |
 | `FC1C[C@](Br)(Cl)CCC1` | `[C@]1(Br)(Cl)CCCC(F)C1` |
 
 If one of the neighbor atoms is a hydrogen and is represented as an atomic property of the
@@ -721,8 +715,8 @@ clockwise or anticlockwise accounting. For example, if we replaced the bromine i
 above with a hydrogen atom, its SMILES would be:
 
 | Implicit Hydrogen |
-| :-: |
-| `N[C@H](O)C` |
+| :---------------: |
+|   `N[C@H](O)C`    |
 
 #### 3.8.3. Cis/Trans configuration of Double Bonds
 
@@ -730,12 +724,12 @@ The configuration of atoms around double bonds is specified by the bond symbols 
 These symbols always come in pairs, and indicate cis or trans with a visual "same side" or
 "opposite side" concept. That is:
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
+|                                         Depiction                                          |  SMILES   |                         Name                          |
+| :----------------------------------------------------------------------------------------: | :-------: | :---------------------------------------------------: |
 | ![depict/trans-difluoroethene.gif](https://opensmiles.org/depict/trans-difluoroethene.gif) | `F/C=C/F` | trans-difluoroethane **(both SMILES are equivalent)** |
-| `F\C=C\F` |
-| ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif) | `F\C=C/F` | cis-difluoroethane **(both SMILES are equivalent)** |
-| `F/C=C\F` |
+|                                         `F\C=C\F`                                          |
+|   ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif)   | `F\C=C/F` |  cis-difluoroethane **(both SMILES are equivalent)**  |
+|                                         `F/C=C\F`                                          |
 
 The "visual interpretation" of the `'/'` and `'\'` symbol is that they are thought of as bonds that
 "point" above or below the alkene bond. That is, `F/C=C/Br` means "The `F` is below the first carbon,
@@ -743,11 +737,11 @@ and the `Br` is above the second carbon," leading to the interpretation of a tra
 
 This notation can be confusing when parentheses follow one of the alkene carbons:
 
-| SMILES | Name |
-| :-: | :-: |
-| `F/C=C/F` | trans-difluoroethane |
+|   SMILES    |         Name         |
+| :---------: | :------------------: |
+|  `F/C=C/F`  | trans-difluoroethane |
 | `C(\F)=C/F` |
-| `F\C=C/F` | cis-difluoroethane |
+|  `F\C=C/F`  |  cis-difluoroethane  |
 | `C(/F)=C/F` |
 
 The "visual interpretation" of the "up-ness" or "down-ness" of each single
@@ -759,25 +753,25 @@ _interpreters are known to interpret the `'/'` and `'\'` symbols incorrectly._
 
 A SMILES with conflicting up/down specifications is invalid:
 
-| SMILES | Comment |
-| :-: | :-: |
+|    SMILES     |                                           Comment                                            |
+| :-----------: | :------------------------------------------------------------------------------------------: |
 | `C/C(\F)=C/F` | Invalid SMILES: Both the methyl and fluorine are "down" relative to the first allenal carbon |
 
 It is permissible, but not required, that every atom attached to a double bond be marked. As
 long as at least two neighbor atoms, one on each end of the double bond, is marked, the "up-ness" or
 "down-ness" of the unmarked neighbors can be deduced.
 
-| SMILES | Comment |
-| :-: | :-: |
+|    SMILES     |                           Comment                           |
+| :-----------: | :---------------------------------------------------------: |
 | `F/C(CC)=C/F` | trans-difluoro configuration, position of methyl is implied |
 
 Extended cis and trans configurations can be specified for conjugated allenes with an odd number
 of double bonds:
 
-| SMILES | Name |
-| :-: | :-: |
+|    SMILES     |           Name           |
+| :-----------: | :----------------------: |
 | `F/C=C=C=C/F` | trans-difluorobutatriene |
-| `F/C=C=C=C\F` | cis-difluorobutatriene |
+| `F/C=C=C=C\F` |  cis-difluorobutatriene  |
 
 #### 3.8.4. Tetrahedral Allene-like Systems
 
@@ -785,8 +779,8 @@ Extended tetrahedral configurations can be specified for conjugated allenes with
 of double bonds. The normal tetrahedral rules using `'@'` and `'@@'` apply, but the "neighbor" atoms
 to which the chirality refers are at the ends of the allene system. For example:
 
-| Depiction | SMILES |
-| :-: | :-: |
+|                                       Depiction                                        |       SMILES        |
+| :------------------------------------------------------------------------------------: | :-----------------: |
 | ![depict/tetrahedral-allene.gif](https://opensmiles.org/depict/tetrahedral-allene.gif) | `NC(Br)=[C@]=C(O)C` |
 
 To determine the correct clockwise or anticlockwise specification, the allene is conceptually
@@ -836,35 +830,35 @@ axis as indicated in the table below. A final example, for `@TB6` the viewing ax
 `a` towards `c` and `(b, d, e)` are clockwise ( `@@`).
 
 | Viewing Axis | TB Number | Order |
-| :-: | :-: | :-: |
-| From | Towards |  |
-| `a` | `e` | TB1 | @ |
-| TB2 | @@ |
-| `a` | `d` | TB3 | @ |
-| TB4 | @@ |
-| `a` | `c` | TB5 | @ |
-| TB6 | @@ |
-| `a` | `b` | TB7 | @ |
-| TB8 | @@ |
-| `b` | `e` | TB9 | @ |
-| TB11 | @@ |
-| `b` | `d` | TB10 | @ |
-| TB12 | @@ |
-| `b` | `c` | TB13 | @ |
-| TB14 | @@ |
-| `c` | `e` | TB15 | @ |
-| TB20 | @@ |
-| `c` | `d` | TB16 | @ |
-| TB19 | @@ |
-| `d` | `e` | TB17 | @ |
-| TB18 | @@ |
+| :----------: | :-------: | :---: | --- |
+|     From     |  Towards  |       |
+|     `a`      |    `e`    |  TB1  | @   |
+|     TB2      |    @@     |
+|     `a`      |    `d`    |  TB3  | @   |
+|     TB4      |    @@     |
+|     `a`      |    `c`    |  TB5  | @   |
+|     TB6      |    @@     |
+|     `a`      |    `b`    |  TB7  | @   |
+|     TB8      |    @@     |
+|     `b`      |    `e`    |  TB9  | @   |
+|     TB11     |    @@     |
+|     `b`      |    `d`    | TB10  | @   |
+|     TB12     |    @@     |
+|     `b`      |    `c`    | TB13  | @   |
+|     TB14     |    @@     |
+|     `c`      |    `e`    | TB15  | @   |
+|     TB20     |    @@     |
+|     `c`      |    `d`    | TB16  | @   |
+|     TB19     |    @@     |
+|     `d`      |    `e`    | TB17  | @   |
+|     TB18     |    @@     |
 
 The following SMILES are all equivalent:
 
-| Equivalent SMILES |  |
-| :-: | :-: |
-| `S[As@TB1](F)(Cl)(Br)N` | `S[As@TB2](Br)(Cl)(F)N` |
-| `S[As@TB5](F)(N)(Cl)Br` | `F[As@TB10](S)(Cl)(N)Br` |
+|    Equivalent SMILES     |                          |
+| :----------------------: | :----------------------: |
+| `S[As@TB1](F)(Cl)(Br)N`  | `S[As@TB2](Br)(Cl)(F)N`  |
+| `S[As@TB5](F)(N)(Cl)Br`  | `F[As@TB10](S)(Cl)(N)Br` |
 | `F[As@TB15](Cl)(S)(Br)N` | `Br[As@TB20](Cl)(S)(F)N` |
 
 _A tool like [Daylight’s depict match](http://www.daylight.com/daycgi_tutorials/depictmatch.cgi) can help debugging_
@@ -907,45 +901,45 @@ Finally, for the 4 shape, the connection between the second and third atom deter
 the winding. The table below lists the shapes, axes and orders.
 
 | Shape | Viewing Axis | OH Number | Order |
-| :-: | :-: | :-: | :-: |
-|  | From | Towards |  |
-| `U` | `a` | `f` | OH1 | @ |
-| OH2 | @@ |
-| `a` | `e` | OH3 | @ |
-| OH16 | @@ |
-| `a` | `d` | OH6 | @ |
-| OH18 | @@ |
-| `a` | `c` | OH19 | @ |
-| OH24 | @@ |
-| `a` | `b` | OH25 | @ |
-| OH30 | @@ |
-| `Z` | `a` | `f` | OH4 | @ |
-| OH14 | @@ |
-| `a` | `e` | OH5 | @ |
-| OH15 | @@ |
-| `a` | `d` | OH7 | @ |
-| OH17 | @@ |
-| `a` | `c` | OH20 | @ |
-| OH23 | @@ |
-| `a` | `b` | OH26 | @ |
-| OH29 | @@ |
-| `4` | `a` | `f` | OH10 | @ |
-| OH8 | @@ |
-| `a` | `e` | OH11 | @ |
-| OH9 | @@ |
-| `a` | `d` | OH13 | @ |
-| OH12 | @@ |
-| `a` | `c` | OH22 | @ |
-| OH21 | @@ |
-| `a` | `b` | OH28 | @ |
-| OH27 | @@ |
+| :---: | :----------: | :-------: | :---: | --- |
+|       |     From     |  Towards  |       |
+|  `U`  |     `a`      |    `f`    |  OH1  | @   |
+|  OH2  |      @@      |
+|  `a`  |     `e`      |    OH3    |   @   |
+| OH16  |      @@      |
+|  `a`  |     `d`      |    OH6    |   @   |
+| OH18  |      @@      |
+|  `a`  |     `c`      |   OH19    |   @   |
+| OH24  |      @@      |
+|  `a`  |     `b`      |   OH25    |   @   |
+| OH30  |      @@      |
+|  `Z`  |     `a`      |    `f`    |  OH4  | @   |
+| OH14  |      @@      |
+|  `a`  |     `e`      |    OH5    |   @   |
+| OH15  |      @@      |
+|  `a`  |     `d`      |    OH7    |   @   |
+| OH17  |      @@      |
+|  `a`  |     `c`      |   OH20    |   @   |
+| OH23  |      @@      |
+|  `a`  |     `b`      |   OH26    |   @   |
+| OH29  |      @@      |
+|  `4`  |     `a`      |    `f`    | OH10  | @   |
+|  OH8  |      @@      |
+|  `a`  |     `e`      |   OH11    |   @   |
+|  OH9  |      @@      |
+|  `a`  |     `d`      |   OH13    |   @   |
+| OH12  |      @@      |
+|  `a`  |     `c`      |   OH22    |   @   |
+| OH21  |      @@      |
+|  `a`  |     `b`      |   OH28    |   @   |
+| OH27  |      @@      |
 
 The following SMILES are all equivalent:
 
-| Equivalent SMILES |  |
-| :-: | :-: |
-| `C[Co@](F)(Cl)(Br)(I)S` | `F[Co@@](S)(I)(C)(Cl)Br` |
-| `S[Co@OH5](F)(I)(Cl)(C)Br` | `Br[Co@OH9](C)(S)(Cl)(F)I` |
+|      Equivalent SMILES      |                             |
+| :-------------------------: | :-------------------------: |
+|   `C[Co@](F)(Cl)(Br)(I)S`   |  `F[Co@@](S)(I)(C)(Cl)Br`   |
+| `S[Co@OH5](F)(I)(Cl)(C)Br`  | `Br[Co@OH9](C)(S)(Cl)(F)I`  |
 | `Br[Co@OH12](Cl)(I)(F)(S)C` | `Cl[Co@OH15](C)(Br)(F)(I)S` |
 | `Cl[Co@OH19](C)(I)(F)(S)Br` | `I[Co@OH27](Cl)(Br)(F)(S)C` |
 
@@ -969,24 +963,24 @@ SMILES allows partial stereochemical specifications. It is permissible for some 
 or double bonds to have stereochemical markings in the SMILES, while others in the same SMILES
 string do not. For example:
 
-| SMILES | Comment |
-| :-: | :-: |
-| `F/C=C/C/C=C\C` | completely specified |
-| `F/C=C/CC=CC` | partially specified |
-| `N1[C@H](Cl)[C@@H](Cl)C(Cl)CC1` | partially specified |
+|             SMILES              |       Comment        |
+| :-----------------------------: | :------------------: |
+|         `F/C=C/C/C=C\C`         | completely specified |
+|          `F/C=C/CC=CC`          | partially specified  |
+| `N1[C@H](Cl)[C@@H](Cl)C(Cl)CC1` | partially specified  |
 
 #### 3.8.9. Other Chiral Configurations
 
 The SMILES language supports a number of atom-centered chiral
 configurations:
 
-| SMILES | Configuration |
-| :-: | :-: |
-| `TH` | Tetrahedral |
-| `AL` | Allenal |
-| `SP` | Square Planar |
-| `TB` | Trigonal Bipyramidal |
-| `OH` | Octahedral |
+| SMILES |    Configuration     |
+| :----: | :------------------: |
+|  `TH`  |     Tetrahedral      |
+|  `AL`  |       Allenal        |
+|  `SP`  |    Square Planar     |
+|  `TB`  | Trigonal Bipyramidal |
+|  `OH`  |      Octahedral      |
 
 The shorthand notations `'@'` and `'@@'` correspond to anti-clockwise and
 clockwise tetrahedral chirality, and are the same a `'@TH1'` and
@@ -1049,12 +1043,12 @@ triggered the error message.
 A wide variety of SMILES strings are acceptable as input. For example, all of the following
 represent ethanol:
 
-| SMILES | Name |
-| :-: | :-: |
-| `CCO` | ethanol |
-| `OCC` | ethanol |
-| `C(O)C` | ethanol |
-| `[CH3][CH2][OH]` | ethanol |
+|               SMILES                |  Name   |
+| :---------------------------------: | :-----: |
+|                `CCO`                | ethanol |
+|                `OCC`                | ethanol |
+|               `C(O)C`               | ethanol |
+|          `[CH3][CH2][OH]`           | ethanol |
 | `[H][C]([H])([H])C([H])([H])[O][H]` | ethanol |
 
 However, it is desirable to write SMILES in more standard forms; the first two forms above are
@@ -1069,14 +1063,13 @@ as long as they meet the rules for SMILES. Some examples of systems that might p
 un-normalized SMILES are:
 
 - A system that enumerates combinatorial libraries using the rnum/dot-bond technique
-[discussed above](https://opensmiles.org/opensmiles.html#inatoms). SMILES produced by such a system will typically be a series
-of partial SMILES that are concatenated with dots into a complete molecule.
+  [discussed above](https://opensmiles.org/opensmiles.html#inatoms). SMILES produced by such a system will typically be a series
+  of partial SMILES that are concatenated with dots into a complete molecule.
 
 - Simple pass-through "filters" that don’t have a full SMILES writer, but merely copy the input
-SMILES to the output. An example might be a molecular modeling program that reads SMILES to
-generates logP values, but has no capability to convert its molecular data structures back to a
-SMILES; instead it just copies its input SMILES to its output.
-
+  SMILES to the output. An example might be a molecular modeling program that reads SMILES to
+  generates logP values, but has no capability to convert its molecular data structures back to a
+  SMILES; instead it just copies its input SMILES to its output.
 
 ### 4.3. Standard Form
 
@@ -1094,54 +1087,54 @@ _in the sense that they are not the preferred form for standard normalization._
 
 #### 4.3.1. Atoms
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
-| `CC` | `[CH3][CH3]` | Write atoms in the "organic subset" as bare atomic symbols whenever possible. |
-| `[CH3-]` | `[CH3-1]` | If the charge is `+1` or `-1`, leave off the digit. |
-| `C[13CH](C)C` | `C[13CH1](C)C` | If the hydrogen count is 1, leave off the digit. |
-| `[CH3-]` | `[C-H3]` | Always write the atom properties in the order: Chirality, hydrogen-count, charge. |
-| `C[C@H](Br)Cl` | `C[CH@](Br)Cl` |
-| `[CH3-]` | `[H][C-]([H])[H]` | Represent hydrogens as a property of the heavy atom rather than as explicit atoms, unless other rules (e.g. `[2H]`) require that the hydrogen be explicit. |
+|    Correct     |       Wrong       |                                                                     Normalization Rule                                                                     |
+| :------------: | :---------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|      `CC`      |   `[CH3][CH3]`    |                                       Write atoms in the "organic subset" as bare atomic symbols whenever possible.                                        |
+|    `[CH3-]`    |     `[CH3-1]`     |                                                    If the charge is `+1` or `-1`, leave off the digit.                                                     |
+| `C[13CH](C)C`  |  `C[13CH1](C)C`   |                                                      If the hydrogen count is 1, leave off the digit.                                                      |
+|    `[CH3-]`    |     `[C-H3]`      |                                     Always write the atom properties in the order: Chirality, hydrogen-count, charge.                                      |
+| `C[C@H](Br)Cl` |  `C[CH@](Br)Cl`   |
+|    `[CH3-]`    | `[H][C-]([H])[H]` | Represent hydrogens as a property of the heavy atom rather than as explicit atoms, unless other rules (e.g. `[2H]`) require that the hydrogen be explicit. |
 
 #### 4.3.2. Bonds
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
-| `CC` | `C-C` | Only write `'-'` (single bond) when it is between two aromatic atoms. Never write the `':'` (aromatic bond) symbol. Bonds are single or aromatic by default (as appropriate). |
-| `c1ccccc1` | `c:1:c:c:c:c:c:1` |
+|       Correct       |       Wrong        |                                                                              Normalization Rule                                                                               |
+| :-----------------: | :----------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|        `CC`         |       `C-C`        | Only write `'-'` (single bond) when it is between two aromatic atoms. Never write the `':'` (aromatic bond) symbol. Bonds are single or aromatic by default (as appropriate). |
+|     `c1ccccc1`      | `c:1:c:c:c:c:c:1`  |
 | `c1ccccc1-c2ccccc2` | `c1ccccc1c2ccccc2` |
 
 #### 4.3.3. Cycles
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
-| `c1ccccc1C2CCCC2` | `c1ccccc1C1CCCC1` | Don’t reuse ring-closure digits. |
-| `c1ccccc1C2CCCC2` | `c0ccccc0C1CCCC1` | Begin ring numbering with 1, not zero (or any other number) |
-| `CC1=CCCCC1` | `CC=1CCCCC=1` | Avoid making a ring-closure on a double or triple bond. For the ring-closure digits, choose a single bond whenever possible. |
-| `C1CC2CCCCC2CC1` | `C12(CCCCC1)CCCCC2` | Avoid starting a ring system on an atom that is in two or more rings, such that two ring-closure bonds will be on the same atom. |
-| `C1CCCCC1` | `C%01CCCCC%01` | Use the simpler single-digit form for rnums less than 10. |
+|      Correct      |        Wrong        |                                                        Normalization Rule                                                        |
+| :---------------: | :-----------------: | :------------------------------------------------------------------------------------------------------------------------------: |
+| `c1ccccc1C2CCCC2` |  `c1ccccc1C1CCCC1`  |                                                 Don’t reuse ring-closure digits.                                                 |
+| `c1ccccc1C2CCCC2` |  `c0ccccc0C1CCCC1`  |                                   Begin ring numbering with 1, not zero (or any other number)                                    |
+|   `CC1=CCCCC1`    |    `CC=1CCCCC=1`    |   Avoid making a ring-closure on a double or triple bond. For the ring-closure digits, choose a single bond whenever possible.   |
+| `C1CC2CCCCC2CC1`  | `C12(CCCCC1)CCCCC2` | Avoid starting a ring system on an atom that is in two or more rings, such that two ring-closure bonds will be on the same atom. |
+|    `C1CCCCC1`     |   `C%01CCCCC%01`    |                                    Use the simpler single-digit form for rnums less than 10.                                     |
 
 #### 4.3.4. Starting Atom and Branches
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
-| `OCc1ccccc1` | `c1cc(CO)ccc1` | Start on a terminal atom if possible. |
-| `CC(C)CCCCCC` | `CC(CCCCCC)C` | Try to make "side chains" short; pick the longest chains as the "main branch" of the SMILES. |
-| `OCCC` | `CCCO` | Start on a heteroatom if possible. |
-| `CC` | `C1.C1` | Only use dots for disconnected components. |
+|    Correct    |     Wrong      |                                      Normalization Rule                                      |
+| :-----------: | :------------: | :------------------------------------------------------------------------------------------: |
+| `OCc1ccccc1`  | `c1cc(CO)ccc1` |                            Start on a terminal atom if possible.                             |
+| `CC(C)CCCCCC` | `CC(CCCCCC)C`  | Try to make "side chains" short; pick the longest chains as the "main branch" of the SMILES. |
+|    `OCCC`     |     `CCCO`     |                              Start on a heteroatom if possible.                              |
+|     `CC`      |    `C1.C1`     |                          Only use dots for disconnected components.                          |
 
 #### 4.3.5. Aromaticity
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
+|  Correct   |     Wrong     |                    Normalization Rule                     |
+| :--------: | :-----------: | :-------------------------------------------------------: |
 | `c1ccccc1` | `C1=CC=CC=C1` | Write the aromatic form in preference to the Kekule form. |
 
 #### 4.3.6. Chirality
 
-| Correct | Wrong | Normalization Rule |
-| :-: | :-: | :-: |
-| `BrC(Br)C` | `Br[C@H](Br)C` | Remove chiral markings for atoms that are not chiral. |
-| `FC(F)=CF` | `F/C(/F)=C/F` | Remove cis/trans markings for double bonds that are not cis or trans. |
+|  Correct   |     Wrong      |                          Normalization Rule                           |
+| :--------: | :------------: | :-------------------------------------------------------------------: |
+| `BrC(Br)C` | `Br[C@H](Br)C` |         Remove chiral markings for atoms that are not chiral.         |
+| `FC(F)=CF` | `F/C(/F)=C/F`  | Remove cis/trans markings for double bonds that are not cis or trans. |
 
 ### 4.4. Canonical SMILES
 
@@ -1150,13 +1143,13 @@ above, and additionally, always writes the atoms and bonds of any particular mol
 the _exact same order_, regardless of the source of the molecule or its history in the
 computer. Here are a few examples of Canonical versus non-Canonical SMILES:
 
-| Canonical SMILES | Non-canonical | Name |
-| :-: | :-: | :-: |
-| `OCC` | `CCO` | ethanol |
-| `C(C)O` |
-| `Oc1ccccc1` | `c1ccccc1O` | phenol |
-| `c1(O)ccccc1` |
-| `c1(ccccc1)O` |
+| Canonical SMILES | Non-canonical |  Name   |
+| :--------------: | :-----------: | :-----: |
+|      `OCC`       |     `CCO`     | ethanol |
+|     `C(C)O`      |
+|   `Oc1ccccc1`    |  `c1ccccc1O`  | phenol  |
+|  `c1(O)ccccc1`   |
+|  `c1(ccccc1)O`   |
 
 The primary use of Canonical SMILES is in
 [cheminformatics](http://www.emolecules.com/doc/cheminformatics-101.htm)
@@ -1169,7 +1162,6 @@ system to:
 - Consolidate data about one molecule from a variety of sources into a single record
 
 - Given a molecule, find its record in the database
-
 
 Canonical SMILES should _not_ be considered a universal, global
 identifier (such as a permanent name that spans the WWW). Two
@@ -1220,37 +1212,37 @@ rules before a parser can accept such SMILES.
 The following table lists "relaxed" rules that SMILES parsers may
 accept.
 
-| Rule | Example | Interpreted as … | Details |
-| :-: | :-: | :-: | :-: |
-| Extra parentheses | `C((C))O` | `C(C)O` | Extra parentheses are ignored in places where there is no ambiguity as to the meaning. Note that the form `(CO)N` is never allowed, since it isn’t clear which atom the nitrogen should connect to. |
-| `C((C))O` | `C(C)O` |
-| `(N1CCCC1)` | `N1CCCCC1` |
-| Misplaced dots | `[Na+]..[Cl-]` | `[Na+].[Cl-]` | Two or more dot-bonds in a row are condensed into one. A leading or trailing dot-bond is ignored. Note that a dot that starts a branch is _legal_ in strict SMILES; for example, `C1CC(.[Na+])CC1[O-]` is a legal (though strange) SMILES. |
-| `.CCO` | `CCO` |
-| `CCO.` | `CCO` |
-| Mismatched Ring Bonds | `C1CCC` | `CCCC` | Mismatched ring bonds are ignored. Note that this is almost always a bad idea. For example, `C1CCCCC2` is almost certainly supposed to be cyclohexane `C1CCCCC1`, but with "relaxed" parsing would be interpreted as hexane. |
-| Invalid Cis/Trans specification | `C/C=C` | `CC=C` | Mismatched or incomplete cis/trans bonds are ignored. |
-| `C/C=CC` | `CC=CC` |
-| `CC/=C/C` | `CC=CC` |
-| Conflicting cis/trans specification | `C/C(\F)=C/C` | `CC(F)=CC` | Conflicting cis/trans bonds are ignored. (In this case, both the methyl and fluorine on the left are shown as _trans_ to the methyl on the right, an impossible configuration.) |
-| D and T | `D[CH3]` | `[2H][CH3]` | The symbols `D` and `T` are treated as synonyms for `[2H]` and `[3H]`. |
-| `T[CH3]` | `[3H][CH3]` |
-| Lowercase as sp2 | `CccccC` | `CC=CC=CC` 2,4-hexadiene | Lowercase letters are interpreted as sp2, even outside of ring systems. |
-| `Ccc` | `CC=C` propene |
+|                Rule                 |    Example     |     Interpreted as …     |                                                                                                                  Details                                                                                                                   |
+| :---------------------------------: | :------------: | :----------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|          Extra parentheses          |   `C((C))O`    |         `C(C)O`          |                    Extra parentheses are ignored in places where there is no ambiguity as to the meaning. Note that the form `(CO)N` is never allowed, since it isn’t clear which atom the nitrogen should connect to.                     |
+|              `C((C))O`              |    `C(C)O`     |
+|             `(N1CCCC1)`             |   `N1CCCCC1`   |
+|           Misplaced dots            | `[Na+]..[Cl-]` |      `[Na+].[Cl-]`       | Two or more dot-bonds in a row are condensed into one. A leading or trailing dot-bond is ignored. Note that a dot that starts a branch is _legal_ in strict SMILES; for example, `C1CC(.[Na+])CC1[O-]` is a legal (though strange) SMILES. |
+|               `.CCO`                |     `CCO`      |
+|               `CCO.`                |     `CCO`      |
+|        Mismatched Ring Bonds        |    `C1CCC`     |          `CCCC`          |        Mismatched ring bonds are ignored. Note that this is almost always a bad idea. For example, `C1CCCCC2` is almost certainly supposed to be cyclohexane `C1CCCCC1`, but with "relaxed" parsing would be interpreted as hexane.        |
+|   Invalid Cis/Trans specification   |    `C/C=C`     |          `CC=C`          |                                                                                           Mismatched or incomplete cis/trans bonds are ignored.                                                                                            |
+|              `C/C=CC`               |    `CC=CC`     |
+|              `CC/=C/C`              |    `CC=CC`     |
+| Conflicting cis/trans specification | `C/C(\F)=C/C`  |        `CC(F)=CC`        |                              Conflicting cis/trans bonds are ignored. (In this case, both the methyl and fluorine on the left are shown as _trans_ to the methyl on the right, an impossible configuration.)                               |
+|               D and T               |    `D[CH3]`    |       `[2H][CH3]`        |                                                                                   The symbols `D` and `T` are treated as synonyms for `[2H]` and `[3H]`.                                                                                   |
+|              `T[CH3]`               |  `[3H][CH3]`   |
+|          Lowercase as sp2           |    `CccccC`    | `CC=CC=CC` 2,4-hexadiene |                                                                                  Lowercase letters are interpreted as sp2, even outside of ring systems.                                                                                   |
+|                `Ccc`                | `CC=C` propene |
 
 ### 5.1. SMILES Flavors
 
 It is an unfortunately common misconception that a Canonical SMILES does not
 contain stereochemistry ( [Minkiewicz et al. 2017](http://www.mdpi.com/1420-3049/22/12/2075/htm)) or alternatively that all SMILES must be canonical ( [Sykora and Leahy, 2008](http://pubs.acs.org/doi/abs/10.1021/ci800135h)). SMILES flavors as described by Daylight are summarised below.
 
-| Flavor | Atoms and Bonds Distinctly Ordered | Stereochemistry | Isotopes |
-| :-: | :-: | :-: | :-: |
-| Canonical SMILES | Y | Y/N | Y/N |
-| Arbitrary SMILES | N | Y/N | Y/N |
-| Isomeric SMILES | Y/N | Y | Y |
-| Unique SMILES | Y | N | N |
-| Absolute SMILES | Y | Y | Y |
-| Generic SMILES | N | N | N |
+|      Flavor      | Atoms and Bonds Distinctly Ordered | Stereochemistry | Isotopes |
+| :--------------: | :--------------------------------: | :-------------: | :------: |
+| Canonical SMILES |                 Y                  |       Y/N       |   Y/N    |
+| Arbitrary SMILES |                 N                  |       Y/N       |   Y/N    |
+| Isomeric SMILES  |                Y/N                 |        Y        |    Y     |
+|  Unique SMILES   |                 Y                  |        N        |    N     |
+| Absolute SMILES  |                 Y                  |        Y        |    Y     |
+|  Generic SMILES  |                 N                  |        N        |    N     |
 
 These terms can be confusing and **should be avoided** due to conflicting definitions between vendors and toolkits. For example ChemAxon use the term **Isomeric SMILES** to mean a non-canonical SMILES with stereochemistry and isotopic information specified (see [SMILES, ChemAxon Documentation](https://docs.chemaxon.com/display/docs/SMILES)). OEChem use the term **Isomeric SMILES** to mean a canonical SMILES with stereochemistry and isotopic information specified (see [`OECreateIsoSmiString`](https://docs.eyesopen.com/toolkits/cpp/oechemtk/OEChemFunctions/OECreateIsoSmiString.html)), **Absolute SMILES** to mean a non-canonical SMILES with stereochemistry and isotopic information specified (see [`OECreateAbsSmiString`](https://docs.eyesopen.com/toolkits/cpp/oechemtk/OEChemFunctions/OECreateAbsSmiString.html)), and **Canonical SMILES** to mean a canonical SMILES **without** stereochemistry and isotopic information specified (see [`OECreateCanSmiString`](https://docs.eyesopen.com/toolkits/cpp/oechemtk/OEChemFunctions/OECreateCanSmiString.html)).
 
@@ -1273,11 +1265,11 @@ polymers. Daylight also used the ampersand `'&'` character, (which may
 conflict with the R-group proposal, above), but with the added rule that
 if a number appears more than once, it creates a repeating unit.
 
-| SMILES | Name |
-| :-: | :-: |
+|     SMILES      |    Name     |
+| :-------------: | :---------: |
 | `c1ccccc1C&1&1` | polystyrene |
-| `C&1&1&1&1` | diamond |
-| `c&1&1&1` | graphite |
+|   `C&1&1&1&1`   |   diamond   |
+|    `c&1&1&1`    |  graphite   |
 
 ### 6.3. Atom-based Double Bond Configuration
 
@@ -1300,20 +1292,20 @@ and the conflict is not resolved.
 Including directional labels to explicit hydrogen atoms is a possible resolution but
 does not follow standard-form and complicates the assignment procedure.
 
-| Depiction | SMILES | Comment |
-| :-: | :-: | :-: |
-| ![depict/cyclooctatetraene.gif](https://opensmiles.org/depict/cyclooctatetraene.gif) | `C/1=C/C=C\C=C/C=C\1` | cyclooctatetraene |
-| Todo | `C/1=C/C=C/C=C/C=C\1` | one bond changes two configurations |
+|                                      Depiction                                       |        SMILES         |               Comment               |
+| :----------------------------------------------------------------------------------: | :-------------------: | :---------------------------------: |
+| ![depict/cyclooctatetraene.gif](https://opensmiles.org/depict/cyclooctatetraene.gif) | `C/1=C/C=C\C=C/C=C\1` |          cyclooctatetraene          |
+|                                         Todo                                         | `C/1=C/C=C/C=C/C=C\1` | one bond changes two configurations |
 
 The proposed syntax for double bond configurations uses the `'@'` and `'@@'` atom-based
 specification. For example:
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
+|                                         Depiction                                          |      SMILES      |         Name         |
+| :----------------------------------------------------------------------------------------: | :--------------: | :------------------: |
 | ![depict/trans-difluoroethene.gif](https://opensmiles.org/depict/trans-difluoroethene.gif) | `F[C@@H]=[C@H]F` | trans-difluoroethene |
-| `F[C@H]=[C@@H]F` |
-| ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif) | `F[C@H]=[C@H]F` | cis-difluoroethene |
-| `F[C@@H]=[C@@H]F` |
+|                                      `F[C@H]=[C@@H]F`                                      |
+|   ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif)   | `F[C@H]=[C@H]F`  |  cis-difluoroethene  |
+|                                     `F[C@@H]=[C@@H]F`                                      |
 
 Interpretation of `'@'` and `'@@'` follows the tetrahedral convention:
 The atoms, as encountered in the SMILES string, are either in anticlockwise
@@ -1327,20 +1319,20 @@ position of implicit atoms. It is not always true that a trans form has
 opposite "clock-ness" ( `'@'`, `'@@'` or `'@@'`, `'@'`), and the cis form
 has the same "clock-ness" ( `'@'`, `'@'` or `'@@'`, `'@@'`).
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
+|                                         Depiction                                          |      SMILES      |         Name         |
+| :----------------------------------------------------------------------------------------: | :--------------: | :------------------: |
 | ![depict/trans-difluoroethene.gif](https://opensmiles.org/depict/trans-difluoroethene.gif) | `F[C@@H]=[C@H]F` | trans-difluoroethene |
-| `[C@H](F)=[C@H]F` |
-| ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif) | `F[C@H]=[C@H]F` | cis-difluoroethene |
-| `[C@@H](F)=[C@H]F` |
+|                                     `[C@H](F)=[C@H]F`                                      |
+|   ![depict/cis-difluoroethene.gif](https://opensmiles.org/depict/cis-difluoroethene.gif)   | `F[C@H]=[C@H]F`  |  cis-difluoroethene  |
+|                                     `[C@@H](F)=[C@H]F`                                     |
 
 Atom-based `'@'` and `'@@'` for the stereo-specification of double bonds does not
 suffer from the theoretical flaw illustrated with cyclooctatetraene. The assignments
 are not-shared and adjacent configurations do not need to be considered. This is more
 flexible and and simplifies generation of canonical SMILES.
 
-| Depiction | SMILES | Name |
-| :-: | :-: | :-: |
+|                                      Depiction                                       |                         SMILES                          |       Name        |
+| :----------------------------------------------------------------------------------: | :-----------------------------------------------------: | :---------------: |
 | ![depict/cyclooctatetraene.gif](https://opensmiles.org/depict/cyclooctatetraene.gif) | `[C@H]1=[C@@H][C@@H]=[C@@H][C@@H]=[C@@H][C@@H]=[C@@H]1` | cyclooctatetraene |
 
 Note that the first stereo-specification carbon must be represented as `'@'` since the
@@ -1401,19 +1393,19 @@ Article by Roger Sayle about converting PDB files to SMILES with thorough treatm
 
 **OpenBabel**
 
-[http://openbabel.sourceforge.net/wiki/Radicals\_and\_SMILES\_extensions](http://openbabel.sourceforge.net/wiki/Radicals_and_SMILES_extensions)
+[http://openbabel.sourceforge.net/wiki/Radicals_and_SMILES_extensions](http://openbabel.sourceforge.net/wiki/Radicals_and_SMILES_extensions)
 
 [http://openbabel.sourceforge.net/wiki/SMILES](http://openbabel.sourceforge.net/wiki/SMILES)
 
 **Wikipedia**
 
-[http://en.wikipedia.org/wiki/Simplified\_molecular\_input\_line\_entry\_specification](http://en.wikipedia.org/wiki/Simplified_molecular_input_line_entry_specification)
+[http://en.wikipedia.org/wiki/Simplified_molecular_input_line_entry_specification](http://en.wikipedia.org/wiki/Simplified_molecular_input_line_entry_specification)
 
 ### 7.3. Toolkits
 
 **OpenBabel**
 
-[http://openbabel.sourceforge.net/wiki/Main\_Page](http://openbabel.sourceforge.net/wiki/Main_Page)
+[http://openbabel.sourceforge.net/wiki/Main_Page](http://openbabel.sourceforge.net/wiki/Main_Page)
 
 **The Chemistry Development Kit**
 
@@ -1441,23 +1433,22 @@ Article by Roger Sayle about converting PDB files to SMILES with thorough treatm
 
 [http://inchi.info/](http://inchi.info/)
 
-[http://en.wikipedia.org/wiki/International\_Chemical\_Identifier](http://en.wikipedia.org/wiki/International_Chemical_Identifier)
+[http://en.wikipedia.org/wiki/International_Chemical_Identifier](http://en.wikipedia.org/wiki/International_Chemical_Identifier)
 
 ### 7.4. Some Key Scientific Papers
 
 - David Weininger, SMILES, a Chemical Language and Information System. 1. Introduction to Methodology and Encoding Rules,
-Journal of Chemical Information and Computer Sciences, 1988, 28:31-36.
+  Journal of Chemical Information and Computer Sciences, 1988, 28:31-36.
 
 - David Weininger, Arthur Weininger, and Joseph L Weininger,
-SMILES 2. Algorithm for Generation of Unique SMILES Notation
-Journal of Chemical Information and Computer Sciences, 1989, 29:97-101.
+  SMILES 2. Algorithm for Generation of Unique SMILES Notation
+  Journal of Chemical Information and Computer Sciences, 1989, 29:97-101.
 
 - Morgan’s original canonicalization paper: Morgan, H.L. J.Chem.Doc. 1965, 5, 107
 
 - G.M. Downs et al, Review of Ring Perception Algorithms for Chemical Graphs, J. Chem. Inf. Comput. Cci. 1989, 29, 172-187
 
 - R.Balducci and R, Pearlman, Novel Algorithms for the Rapid Perception of a Unique Optimal Set of Rings, J. Am. Chem. Soc. (date?)
-
 
 ### 7.5. Molecule Editors that can produce SMILES
 
@@ -1473,17 +1464,16 @@ Journal of Chemical Information and Computer Sciences, 1989, 29:97-101.
 
 - [MarvinSketch](http://www.chemaxon.com/product/msketch.html)
 
-
 ## 8\. Revision History
 
-| Revision | Date | Description | Name |
-| :-: | :-: | :-: | :-: |
-| 1.0 | 2007-11-13 | Draft | Craig A. James |
-| 1.0 | 2012-09-29 | Reformatting | Tim Vandermeersch |
-| 1.0 | 2012-09-29 | Corrections | Andrew Dalke & Tim Vandermeersch |
-| 1.0 | 2012-11-17 | SP, TB and OH stereochemistry | Tim Vandermeersch |
-| 1.0 | 2013-09-06 | Corrections | Richard Apodaca |
-| 1.0 | 2013-09-17 | Corrections | John May |
+| Revision |    Date    |          Description          |               Name               |
+| :------: | :--------: | :---------------------------: | :------------------------------: |
+|   1.0    | 2007-11-13 |             Draft             |          Craig A. James          |
+|   1.0    | 2012-09-29 |         Reformatting          |        Tim Vandermeersch         |
+|   1.0    | 2012-09-29 |          Corrections          | Andrew Dalke & Tim Vandermeersch |
+|   1.0    | 2012-11-17 | SP, TB and OH stereochemistry |        Tim Vandermeersch         |
+|   1.0    | 2013-09-06 |          Corrections          |         Richard Apodaca          |
+|   1.0    | 2013-09-17 |          Corrections          |             John May             |
 
 - [ChangeLog](https://github.com/timvdm/OpenSMILES/blob/master/ChangeLog)
 

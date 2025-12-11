@@ -49,16 +49,18 @@ Display molecular structures as inline images in GitHub Copilot Chat and other M
 
 ## Format Options
 
-| Format | Output | Best For |
-|--------|--------|----------|
+| Format          | Output                         | Best For                                 |
+| --------------- | ------------------------------ | ---------------------------------------- |
 | `png` (default) | Base64 PNG in MCP `image` type | **Inline display in chat** (recommended) |
-| `svg` | SVG XML string | Lightweight, editable vector graphics |
+| `svg`           | SVG XML string                 | Lightweight, editable vector graphics    |
 
 ## Examples for Copilot
 
 ### Simple Rendering
+
 **User**: "Show me what benzene looks like"  
 **Copilot calls**:
+
 ```json
 {
   "tool": "render",
@@ -70,8 +72,10 @@ Display molecular structures as inline images in GitHub Copilot Chat and other M
 ```
 
 ### Side-by-Side Comparison
+
 **User**: "Show me aspirin and ibuprofen side by side"  
 **Copilot calls**:
+
 ```json
 [
   {
@@ -96,8 +100,10 @@ Display molecular structures as inline images in GitHub Copilot Chat and other M
 ```
 
 ### Large Molecule
+
 **User**: "Draw cholesterol in high resolution"  
 **Copilot calls**:
+
 ```json
 {
   "tool": "render",
@@ -167,6 +173,7 @@ The `image` content type is automatically recognized by MCP clients (VS Code Cop
 ### Image Too Small
 
 Increase width/height:
+
 ```json
 {
   "width": 600,
@@ -175,6 +182,7 @@ Increase width/height:
 ```
 
 Recommended sizes:
+
 - **Simple molecules**: 300-400px
 - **Drug-like molecules**: 400-500px
 - **Complex natural products**: 600-800px
@@ -182,6 +190,7 @@ Recommended sizes:
 ### Save to File Instead
 
 Add `outputPath` parameter:
+
 ```json
 {
   "format": "png",

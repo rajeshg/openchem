@@ -10,6 +10,7 @@
 openchem's IUPAC parser converts systematic IUPAC names into SMILES strings. The parser uses OPSIN (Open Parser for Systematic IUPAC Nomenclature) data to recognize chemical name patterns and construct molecular graphs.
 
 **Key Features:**
+
 - ✅ Supports IUPAC Blue Book 2013 systematic nomenclature
 - ✅ Recognizes both systematic and trivial names (via OPSIN data)
 - ✅ Handles alkanes, functional groups, aromatics, heterocycles
@@ -54,6 +55,7 @@ if (result.errors.length > 0) {
 ### 1. Acyclic Hydrocarbons
 
 **Alkanes (100% coverage):**
+
 ```typescript
 parseIUPACName('methane')      // CH₄
 parseIUPACName('ethane')       // C₂H₆
@@ -66,6 +68,7 @@ parseIUPACName('decane')       // C₁₀H₂₂
 ```
 
 **Branched Alkanes:**
+
 ```typescript
 parseIUPACName('2-methylpropane')         // (CH₃)₂CHCH₃
 parseIUPACName('2-methylbutane')          // CH₃CH(CH₃)CH₂CH₃
@@ -74,6 +77,7 @@ parseIUPACName('2,3-dimethylbutane')      // (CH₃)₂CHCH(CH₃)₂
 ```
 
 **Alkenes & Alkynes:**
+
 ```typescript
 parseIUPACName('ethene')           // C₂H₄ (ethylene)
 parseIUPACName('propene')          // C₃H₆
@@ -86,6 +90,7 @@ parseIUPACName('propyne')          // HC≡CCH₃
 ### 2. Functional Groups
 
 **Alcohols:**
+
 ```typescript
 parseIUPACName('methanol')         // CH₃OH
 parseIUPACName('ethanol')          // CH₃CH₂OH
@@ -95,6 +100,7 @@ parseIUPACName('butan-2-ol')       // CH₃CH(OH)CH₂CH₃
 ```
 
 **Ketones:**
+
 ```typescript
 parseIUPACName('propan-2-one')     // (CH₃)₂CO (acetone)
 parseIUPACName('butan-2-one')      // CH₃COCH₂CH₃
@@ -102,6 +108,7 @@ parseIUPACName('pentan-3-one')     // CH₃CH₂COCH₂CH₃
 ```
 
 **Aldehydes:**
+
 ```typescript
 parseIUPACName('methanal')         // HCHO (formaldehyde)
 parseIUPACName('ethanal')          // CH₃CHO (acetaldehyde)
@@ -109,6 +116,7 @@ parseIUPACName('propanal')         // CH₃CH₂CHO
 ```
 
 **Carboxylic Acids:**
+
 ```typescript
 parseIUPACName('methanoic acid')   // HCOOH (formic acid)
 parseIUPACName('ethanoic acid')    // CH₃COOH (acetic acid)
@@ -117,6 +125,7 @@ parseIUPACName('butanoic acid')    // CH₃CH₂CH₂COOH
 ```
 
 **Esters:**
+
 ```typescript
 parseIUPACName('methyl ethanoate')     // CH₃COOCH₃ (methyl acetate)
 parseIUPACName('ethyl ethanoate')      // CH₃COOCH₂CH₃ (ethyl acetate)
@@ -124,6 +133,7 @@ parseIUPACName('methyl propanoate')    // CH₃CH₂COOCH₃
 ```
 
 **Amines:**
+
 ```typescript
 parseIUPACName('methanamine')      // CH₃NH₂
 parseIUPACName('ethanamine')       // CH₃CH₂NH₂
@@ -132,6 +142,7 @@ parseIUPACName('propan-2-amine')   // (CH₃)₂CHNH₂
 ```
 
 **Amides:**
+
 ```typescript
 parseIUPACName('ethanamide')               // CH₃CONH₂ (acetamide)
 parseIUPACName('N-methylethanamide')       // CH₃CONHCH₃
@@ -139,6 +150,7 @@ parseIUPACName('N,N-dimethylethanamide')   // CH₃CON(CH₃)₂
 ```
 
 **Nitriles:**
+
 ```typescript
 parseIUPACName('ethanenitrile')    // CH₃CN (acetonitrile)
 parseIUPACName('propanenitrile')   // CH₃CH₂CN
@@ -147,6 +159,7 @@ parseIUPACName('propanenitrile')   // CH₃CH₂CN
 ### 3. Aromatic Compounds
 
 **Simple Aromatics:**
+
 ```typescript
 parseIUPACName('benzene')          // C₆H₆
 parseIUPACName('methylbenzene')    // C₆H₅CH₃ (toluene)
@@ -155,6 +168,7 @@ parseIUPACName('chlorobenzene')    // C₆H₅Cl
 ```
 
 **Fused Ring Systems:**
+
 ```typescript
 parseIUPACName('naphthalene')      // C₁₀H₈
 parseIUPACName('anthracene')       // C₁₄H₁₀
@@ -164,6 +178,7 @@ parseIUPACName('phenanthrene')     // C₁₄H₁₀
 ### 4. Heterocycles
 
 **Aromatic Heterocycles:**
+
 ```typescript
 parseIUPACName('pyridine')         // C₅H₅N
 parseIUPACName('pyrimidine')       // C₄H₄N₂
@@ -174,6 +189,7 @@ parseIUPACName('imidazole')        // C₃H₄N₂
 ```
 
 **Saturated Heterocycles:**
+
 ```typescript
 parseIUPACName('morpholine')       // C₄H₉NO
 parseIUPACName('piperazine')       // C₄H₁₀N₂
@@ -186,6 +202,7 @@ parseIUPACName('oxolane')          // C₄H₈O (tetrahydrofuran)
 ### 5. Cyclic Hydrocarbons
 
 **Monocyclic:**
+
 ```typescript
 parseIUPACName('cyclopropane')     // C₃H₆
 parseIUPACName('cyclobutane')      // C₄H₈
@@ -195,6 +212,7 @@ parseIUPACName('cyclohexene')      // C₆H₁₀
 ```
 
 **Polycyclic:**
+
 ```typescript
 parseIUPACName('bicyclo[2.2.1]heptane')  // norbornane
 parseIUPACName('adamantane')              // C₁₀H₁₆
@@ -217,6 +235,7 @@ parseIUPACName('formic acid')      // → methanoic acid
 ```
 
 **Supported trivial names:**
+
 - C1-C4 carboxylic acids (formic, acetic, propionic, butyric)
 - Common solvents (acetone, isopropanol, acetonitrile)
 - Simple aromatics (toluene, xylene, cumene)
@@ -256,6 +275,7 @@ console.log('Round-trip:', match ? '✓' : '✗');
 ## Known Limitations
 
 ### 1. Complex Natural Products
+
 **Not supported:** Steroids, alkaloids, complex polycyclic systems
 
 ```typescript
@@ -268,6 +288,7 @@ parseIUPACName('quinine')
 **Workaround:** Use SMILES input directly for complex molecules.
 
 ### 2. Complex Stereochemistry
+
 **Limited support:** Advanced E/Z, R/S descriptors
 
 ```typescript
@@ -279,6 +300,7 @@ parseIUPACName('(2R,3S)-2,3-dihydroxybutanoic acid')  // ⚠️
 ```
 
 ### 3. Non-Standard Nomenclature
+
 **Not supported:** Trade names, brand names, non-IUPAC conventions
 
 ```typescript
@@ -376,6 +398,7 @@ The parser uses OPSIN XML data located in `opsin-iupac-data/`:
 - `LOOKUP.json` — Compiled lookup table (26,000+ entries)
 
 **How it works:**
+
 1. Input name is normalized (remove spaces, lowercase)
 2. Citation normalizer handles chemical conventions
 3. Name is split into tokens (prefix, parent, suffix)
@@ -388,11 +411,13 @@ The parser uses OPSIN XML data located in `opsin-iupac-data/`:
 ## Related Documentation
 
 ### For Users:
+
 - **[SMILES → IUPAC Generation](./iupac-generation.md)** — Generate IUPAC names from SMILES
 - **[Comprehensive Example](./examples/example-iupac.ts)** — Full code examples
 - **[README](../README.md)** — Library overview
 
 ### For Developers:
+
 - **[Implementation Guide](./iupac-implementation.md)** — Technical architecture
 - **[Rules Reference](./iupac-rules-reference.md)** — IUPAC Blue Book rules
 
@@ -426,9 +451,11 @@ bun test test/unit/iupac-engine/realistic-iupac-dataset.test.ts
 ### `parseIUPACName(name: string)`
 
 **Parameters:**
+
 - `name` (string) — IUPAC chemical name (systematic or trivial)
 
 **Returns:**
+
 ```typescript
 {
   molecule: Molecule | null,      // Parsed molecule object
@@ -437,6 +464,7 @@ bun test test/unit/iupac-engine/realistic-iupac-dataset.test.ts
 ```
 
 **Example:**
+
 ```typescript
 const result = parseIUPACName('propan-2-ol');
 // { molecule: {...}, errors: [] }
@@ -445,12 +473,14 @@ const result = parseIUPACName('propan-2-ol');
 ### `generateSMILES(molecule: Molecule, canonical?: boolean)`
 
 **Parameters:**
+
 - `molecule` (Molecule) — Molecule object to convert
 - `canonical` (boolean, optional) — Generate canonical SMILES (default: false)
 
 **Returns:** `string` — SMILES representation
 
 **Example:**
+
 ```typescript
 const smiles = generateSMILES(molecule, true);
 // "CC(C)O"

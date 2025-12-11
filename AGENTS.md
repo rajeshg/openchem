@@ -3,6 +3,7 @@
 ## Build/Test/Deploy Commands
 
 ### Testing
+
 - **Run all tests**: `bun test`
 - **Run single test file**: `bun test test/smiles/smiles-parser-basic.test.ts`
 - **Run full test suite with RDKit**: `bun test:full` or `RUN_RDKIT_BULK=1 bun test`
@@ -10,26 +11,32 @@
 - **Type check**: `bun run tsc --noEmit` or `bun run typecheck`
 
 ### Building
+
 - **Full build** (browser bundle + TypeScript declarations): `bun run build`
 - **Browser bundle only** (ESM, minified): `bun run build:browser`
 - **TypeScript declarations only** (.d.ts files): `bun run build:types`
 
 ### Development Server
+
 - **Build and serve**: `bun run serve` → then open http://localhost:3000/smiles-playground.html
 
 **IMPORTANT**: Don't ever publish without explicit instruction to publish a package to npm
+
 ### Publishing to npm
+
 1. **Before publishing**:
    - Update version in `package.json` (follow semantic versioning)
    - Update `CHANGELOG.md` with changes
    - Run `bun run typecheck && bun run test && bun run build`
 
 2. **Dry-run publish** (recommended):
+
    ```bash
    npm publish --dry-run
    ```
 
 3. **Actual publish**:
+
    ```bash
    npm login  # if not logged in
    npm publish
@@ -42,11 +49,13 @@
 ## Code Style Guidelines
 
 ### Debug Logging
+
 - All debug logging (console.log, console.warn, etc.) must be gated behind `if (process.env.VERBOSE) { ... }`.
 - This ensures clean output for normal runs and enables debug output only when VERBOSE is set.
 - Never leave direct logging statements that print during normal test or production runs.
 
 ### Imports
+
 - Separate type imports: `import type { Atom, Bond } from 'types';`
 - Group imports: types first, then external packages, then internal modules
 - **Use path aliases** (not relative paths):
@@ -57,26 +66,31 @@
 - Note: Codebase currently has mixed usage; prefer aliases for new code
 
 ### Types & Naming
+
 - TypeScript strict mode with full type safety (`noUncheckedIndexedAccess`, `noImplicitOverride`)
 - Interfaces for data structures, enums for constants
 - camelCase for variables/functions, PascalCase for types/enums
 - Non-null assertions (`!`) used judiciously in tests when type safety is guaranteed
 
 ### Error Handling
+
 - Return error arrays instead of throwing exceptions
 - Validate inputs early and collect all errors
 
 ### Formatting
+
 - 2-space indentation
 - Consistent spacing around operators
 - Reasonable line length, break long lines logically
 
 ### Testing
+
 - Use bun:test with describe/it blocks
 - Test both success and error cases
 - Compare with RDKit where possible for validation
 
 ### Comments
+
 - Avoid verbose method documentation (e.g., JSDoc). Limit to 3 lines maximum if needed.
 - Do not add comments unless explicitly requested.
 - Ensure code is self-documenting through clear and descriptive naming.
@@ -84,6 +98,7 @@
 ## File Locations
 
 ### Core Functionality
+
 - **SMILES Parser**: `src/parsers/smiles-parser.ts`
 - **SMILES Generator**: `src/generators/smiles-generator.ts`
 - **MOL Generator**: `src/generators/mol-generator.ts`
@@ -93,6 +108,7 @@
 - **Types**: `types.ts`
 
 ### Utilities
+
 - **Atom utilities**: `src/utils/atom-utils.ts`
 - **Bond utilities**: `src/utils/bond-utils.ts`
 - **Molecular properties**: `src/utils/molecular-properties.ts`
@@ -103,23 +119,27 @@
 - **Valence calculation**: `src/utils/valence-calculator.ts`
 
 ### Validators
+
 - **Aromaticity validator**: `src/validators/aromaticity-validator.ts`
 - **Stereo validator**: `src/validators/stereo-validator.ts`
 - **Valence validator**: `src/validators/valence-validator.ts`
 
 ### Drug-Likeness Assessment
+
 - **Lipinski Rule of Five**: `checkLipinskiRuleOfFive()` in `src/utils/molecular-properties.ts`
 - **Veber Rules**: `checkVeberRules()` in `src/utils/molecular-properties.ts`
 - **BBB Penetration**: `checkBBBPenetration()` in `src/utils/molecular-properties.ts`
 - **LogP Calculation**: `computeLogP()` in `src/utils/logp.ts`
 
 ### Generators & SVG Rendering
+
 - **SMILES generator**: `src/generators/smiles-generator.ts`
 - **MOL generator**: `src/generators/mol-generator.ts`
 - **SVG renderer**: `src/generators/svg-renderer.ts` (main module)
 - **SVG rendering support**: `src/generators/svg-renderer/` (coordinate-utils, stereo-bonds, double-bond-renderer, etc.)
 
 ### IUPAC Name Generation
+
 - **Entry point**: `src/iupac-engine/iupac-name-generator.ts` — `generateIUPACName(molecule)`
 - **Rule layers**: `src/iupac-engine/rules/` (8 layers: atomic, functional-groups, parent-chain-selection, numbering, name-assembly, etc.)
 - **Naming logic**: `src/iupac-engine/naming/` (substituent-namer, functional-class-namer, locants)
@@ -128,20 +148,24 @@
 **Documentation:**
 
 **User Guides:**
+
 - **[IUPAC Name → SMILES Parsing](docs/iupac-parsing.md)** — Parse IUPAC names to SMILES
 - **[SMILES → IUPAC Generation](docs/iupac-generation.md)** — Generate systematic IUPAC names from SMILES
 
 **Developer Guides:**
+
 - **[Implementation Guide](docs/iupac-implementation.md)** — Technical architecture, algorithms, state management
 - **[Rules Reference](docs/iupac-rules-reference.md)** — Detailed IUPAC Blue Book rule coverage (P-14, P-44, P-51, etc.)
 - **[Large Molecules Analysis](docs/iupac-large-molecules.md)** — Strategic limitations for complex natural products
 
 **Quick Reference:**
+
 - **Accuracy**: 100% on realistic dataset (149/149 molecules tested, 3 alkaloids skipped)
 - **Strengths**: Simple chains (100%), branched alkanes (100%), functional groups (100%), aromatic systems (100%), heterocycles (100%)
 - **Test Files**: `test/unit/iupac-engine/` (60+ test files, 1419+ passing tests)
 
 ## Dependencies
+
 - **Runtime**: `es-toolkit` for utility functions (prefer over lodash)
 - **Dev/Testing**: `bun:test` for testing, `@rdkit/rdkit` for validation
 - Avoid adding new dependencies without explicit need
@@ -153,12 +177,14 @@
 LogP (octanol-water partition coefficient) is computed using the Wildman-Crippen method. Calculations are internally optimized for repeated calls on the same molecule object.
 
 **Implementation:**
+
 - Algorithm: Wildman-Crippen atom typing with published parameters
 - Entry point: `computeLogP(mol, includeHs?)` in `src/utils/logp.ts`
 - Typical performance: ~100-200 ms for drug-like molecules
 - Immutable molecule design ensures calculation correctness
 
 **Usage:**
+
 ```typescript
 import { parseSMILES, computeLogP, checkLipinskiRuleOfFive } from 'index';
 
@@ -178,6 +204,7 @@ console.log(`LogP contribution to Lipinski: ${result.properties.logP}`);
 Morgan fingerprints (ECFP-like) are computed in `src/utils/morgan-fingerprint.ts` for molecular similarity searching and compound classification.
 
 **Implementation Details:**
+
 - Algorithm: Extended-Connectivity Fingerprints (ECFP) via Morgan algorithm
 - Radius: Configurable (default = 2, equivalent to ECFP4)
 - Bit length: Configurable (default = 2048 bits, RDKit standard)
@@ -185,6 +212,7 @@ Morgan fingerprints (ECFP-like) are computed in `src/utils/morgan-fingerprint.ts
 - Performance: < 1 ms for molecules up to 1000 atoms
 
 **Key Functions:**
+
 - `computeMorganFingerprint(mol, radius?, fpSize?)` — Generate Morgan fingerprint
 - `tanimotoSimilarity(fp1, fp2)` — Compute Tanimoto similarity between two fingerprints
 - `getBitsSet(fingerprint)` — Count number of bits set to 1
@@ -193,14 +221,15 @@ Morgan fingerprints (ECFP-like) are computed in `src/utils/morgan-fingerprint.ts
 
 From validation on 28 diverse drug-like molecules:
 
-| Molecule Type | Typical Density | Examples |
-|---|---|---|
-| Small aliphatic | 0.59%–1.17% | Cyclohexane, n-pentane |
-| Aromatic | 1.47%–2.15% | Benzene, toluene, naphthalene |
-| Drug-like | 2.00%–3.50% | Aspirin, ibuprofen, caffeine |
-| Complex polycyclic | 3.00%–5.27% | Steroids, alkaloids, camphor |
+| Molecule Type      | Typical Density | Examples                      |
+| ------------------ | --------------- | ----------------------------- |
+| Small aliphatic    | 0.59%–1.17%     | Cyclohexane, n-pentane        |
+| Aromatic           | 1.47%–2.15%     | Benzene, toluene, naphthalene |
+| Drug-like          | 2.00%–3.50%     | Aspirin, ibuprofen, caffeine  |
+| Complex polycyclic | 3.00%–5.27%     | Steroids, alkaloids, camphor  |
 
 **Practical Guidelines:**
+
 - Average bit density: **2.49% (13 bits out of 512)**
 - For 2048-bit fingerprints: multiply by ~4× (52 bits typical)
 - Simple molecules: expect < 1.5% density
@@ -208,6 +237,7 @@ From validation on 28 diverse drug-like molecules:
 - Highly substituted/heteroatom-rich: may exceed 5.5%
 
 **Usage Example:**
+
 ```typescript
 import { parseSMILES, computeMorganFingerprint, tanimotoSimilarity, getBitsSet } from 'index';
 
@@ -226,6 +256,7 @@ console.log(`Aspirin fingerprint has ${bitsSet} bits set (${(bitsSet/512*100).to
 ```
 
 **Applications:**
+
 - Compound library screening and deduplication
 - Similarity-based searching in chemical databases
 - Clustering compounds by structural similarity
@@ -233,6 +264,7 @@ console.log(`Aspirin fingerprint has ${bitsSet} bits set (${(bitsSet/512*100).to
 - Assessing molecular diversity
 
 **Accuracy & Validation:**
+
 - **Internally consistent**: same molecule always produces identical fingerprint
 - **Structurally similar molecules have similar fingerprints**
 - **Tanimoto similarity validated** against diverse compound sets
@@ -241,24 +273,28 @@ console.log(`Aspirin fingerprint has ${bitsSet} bits set (${(bitsSet/512*100).to
 - Performance comparable to RDKit for similarity searching
 
 **Test Files (Authoritative Reference):**
+
 - `test/rdkit-comparison/morgan-fingerprint-comparison.test.ts` — Main validation against RDKit C++ (75 molecules)
 - `test/rdkit-comparison/morgan-fingerprint-diverse.test.ts` — Diverse molecule testing (28 molecules, fingerprint stability)
 
 ## Known Issues & Workarounds
 
 ### Aromaticity Perception
+
 - openchem uses strict Hückel's rule (4n+2 π electrons, ring-based)
 - RDKit uses extended aromaticity perception (conjugated systems)
 - Expected differences in complex heterocycles
 - Reference: `docs/smarts-matching.md`
 
 ### LogP Differences
+
 - openchem uses published Wildman-Crippen parameters exactly
 - RDKit may use modified parameters for complex heterocycles
 - Typical differences: 0.2-1.15 LogP units for complex molecules
 - Reference: `docs/molecular-properties.md`
 
 ### Ring Membership Counting
+
 - openchem uses all-rings (all simple cycles) for SMARTS `[Rn]` primitive
 - This matches RDKit behavior but deviates from strict SMARTS spec (SSSR only)
 - SSSR rings still computed and stored in `molecule.rings`
@@ -269,6 +305,7 @@ console.log(`Aspirin fingerprint has ${bitsSet} bits set (${(bitsSet/512*100).to
 ### Overview
 
 openchem provides comprehensive ring detection via `src/utils/ring-analysis.ts`, including:
+
 - **Elementary ring detection** via depth-first search (DFS) cycle detection
 - **SSSR (Smallest Set of Smallest Rings)** computation (also called Minimum Cycle Basis, MCB)
 - **Ring classification** (isolated, fused, spiro, bridged)
@@ -277,6 +314,7 @@ openchem provides comprehensive ring detection via `src/utils/ring-analysis.ts`,
 ### Mathematical Basis
 
 **SSSR Count Formula** (for connected graphs):
+
 ```
 rank = M - N + 1
 where:
@@ -286,6 +324,7 @@ where:
 ```
 
 **Examples:**
+
 - **Cyclohexane** (C₆H₁₂): M=6, N=6 → rank=1 (one 6-membered ring)
 - **Bicyclo[2.2.1]heptane** (C₇H₁₂): M=7, N=7 → rank=1 (fused 5+6 membered rings share edge)
 - **Adamantane** (C₁₀H₁₆): M=12, N=10 → rank=3 (three independent 6-membered rings)
@@ -293,15 +332,18 @@ where:
 ### Key Functions
 
 **Ring Detection:**
+
 - `findRings(atoms, bonds)` — Detect all elementary (simple) cycles using DFS
 - `findSSSR(rings)` — Compute SSSR from elementary rings
 - `findMCB(atoms, bonds)` — Alias for `findSSSR` (MCB = SSSR)
 
 **Ring Classification:**
+
 - `classifyRingSystems(atoms, bonds, rings)` — Categorize rings as isolated/fused/spiro/bridged
 - `isPartOfFusedSystem(ringIdx, classification)` — Check if ring is part of fused system
 
 **Ring Queries:**
+
 - `analyzeRings(molecule)` — Get comprehensive `RingInfo` query interface
 - `getRingsContainingAtom(atom, rings)` — Which rings contain this atom?
 - `getRingAtoms(ring, atoms)` — Get Atom objects for a ring
@@ -310,14 +352,15 @@ where:
 
 ### Performance Characteristics
 
-| Operation | Time Complexity | Notes |
-|-----------|------------------|-------|
-| `findRings()` | O(N²) to O(N³) | DFS-based; worst case for dense graphs |
-| `findSSSR()` | O(rank²) | Fast for simple molecules; rank ≈ 3-5 typical |
-| `classifyRingSystems()` | O(rank²) | Analyzes relationships between rings |
-| Ring queries | O(rank) or O(N) | Linear in ring count or atom count |
+| Operation               | Time Complexity | Notes                                         |
+| ----------------------- | --------------- | --------------------------------------------- |
+| `findRings()`           | O(N²) to O(N³)  | DFS-based; worst case for dense graphs        |
+| `findSSSR()`            | O(rank²)        | Fast for simple molecules; rank ≈ 3-5 typical |
+| `classifyRingSystems()` | O(rank²)        | Analyzes relationships between rings          |
+| Ring queries            | O(rank) or O(N) | Linear in ring count or atom count            |
 
 **Practical performance:**
+
 - Simple molecules (< 30 atoms): < 1 ms
 - Drug-like molecules (30-60 atoms): 1-5 ms
 - Complex polycyclic (60+ atoms): 5-50 ms
@@ -326,18 +369,21 @@ where:
 ### When to Use SSSR vs All Rings
 
 **Use SSSR when:**
+
 - Computing molecular properties (# rings, aromaticity)
 - SMARTS `[Rn]` pattern matching (strict spec compliance)
 - Need minimal representation of ring structure
 - Memory efficiency is important
 
 **Use all elementary rings when:**
+
 - Need complete understanding of all possible cycles
 - Analyzing ring similarity or resonance structures
 - Debugging ring perception issues
 - Chemical intuition requires all cycles (e.g., bridgehead analysis)
 
 **Practical guideline:**
+
 - For molecules < 20 atoms with up to 5 rings: both are equivalent
 - For polycyclic systems (adamantane, cubane, basketane): SSSR is more efficient
 - For fused aromatics (naphthalene, anthracene): both methods identify the same 2-3 core rings
@@ -345,12 +391,14 @@ where:
 ### Implementation Details
 
 **SSSR Algorithm (implemented in openchem):**
+
 1. Find all elementary rings using DFS
 2. Select minimal set that represents all bonds and atoms in rings
 3. Verify mathematical rank constraint (M - N + 1 = number of SSSR rings)
 4. Validate fused ring geometry
 
 **Ring membership counting for `[Rn]` primitives:**
+
 - Count how many SSSR rings contain each atom
 - Atom in N SSSR rings → matches `[RN]` in SMARTS
 - Example: adamantane atom #3 is in 3 SSSR rings → matches `[R3]`
@@ -358,10 +406,12 @@ where:
 ### Known Differences with RDKit
 
 **Adamantane ring membership:**
+
 - openchem `[R3]`: 1 atom (atom #3, the bridgehead) — **correct per SMARTS spec**
 - RDKit `[R3]`: 4 atoms (bridgehead carbons #1,3,5,7) — uses extended ring set
 
 **Root cause:**
+
 - openchem uses strict SSSR (3 rings for adamantane)
 - RDKit uses extended ring detection (includes bridging cycles)
 
@@ -399,6 +449,7 @@ console.log(adamRings.classifyRingSystems());      // bridged system
 ## Common Development Tasks
 
 ### Adding a New Feature
+
 1. Create feature branch: `git checkout -b feature/description`
 2. Add/modify source files in `src/`
 3. Add tests in corresponding `test/` directory
@@ -410,6 +461,7 @@ console.log(adamRings.classifyRingSystems());      // bridged system
 7. Create pull request
 
 ### Fixing a Bug
+
 1. Create bug branch: `git checkout -b fix/description`
 2. Write failing test first (if not already exists)
 3. Fix the bug in `src/`
@@ -420,6 +472,7 @@ console.log(adamRings.classifyRingSystems());      // bridged system
 6. Commit and create pull request
 
 ### Running Specific Tests
+
 ```bash
 # Run single test file
 bun test test/smiles/smiles-parser-basic.test.ts
@@ -438,6 +491,7 @@ bun test test/file.test.ts -t "test name"
 ```
 
 ### Debugging
+
 ```bash
 # Run with verbose output
 bun test --verbose
@@ -497,6 +551,7 @@ openchem/
   - `index.d.ts` — TypeScript type definitions
 
 ### Files Published to npm
+
 ```json
 "files": [
   "dist",           // Compiled JavaScript and types
@@ -512,12 +567,14 @@ Everything else (test/, docs/, scripts/, etc.) is excluded via .npmignore.
 ### After Publishing
 
 1. **Verify package on npm**
+
    ```bash
    npm view openchem@0.2.0
    npm view openchem dist-tags
    ```
 
 2. **Test installation from npm**
+
    ```bash
    mkdir test-install && cd test-install
    npm init -y

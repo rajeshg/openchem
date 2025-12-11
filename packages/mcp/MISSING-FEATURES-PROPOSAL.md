@@ -3,6 +3,7 @@
 ## Current Status
 
 **Exposed (5 tools)**:
+
 1. ✅ `analyze` - Descriptors, drug-likeness, IUPAC names
 2. ✅ `compare` - Morgan fingerprints, Tanimoto similarity
 3. ✅ `search` - SMARTS substructure matching
@@ -17,15 +18,18 @@
 
 ### 🔴 HIGH PRIORITY - User-Facing, High Impact
 
-#### 1. **Tautomer Enumeration & Canonicalization** 
+#### 1. **Tautomer Enumeration & Canonicalization**
+
 **OpenChem APIs**: `enumerateTautomers()`, `canonicalTautomer()`  
 **Why Critical**: Essential for drug discovery, tautomers affect docking/binding  
 **Use Cases**:
+
 - "What are the tautomers of this drug?"
 - "Is this the canonical tautomer?"
 - "Score tautomers for stability"
 
 **Proposed Tool**: `tautomers`
+
 ```typescript
 {
   name: "tautomers",
@@ -51,14 +55,17 @@
 ---
 
 #### 2. **InChI & InChIKey Generation**
+
 **OpenChem APIs**: `generateInChI()`, `generateInChIKey()`  
 **Why Critical**: Standard identifiers for databases (PubChem, ChEMBL, DrugBank)  
 **Use Cases**:
+
 - "What's the InChI for this molecule?"
 - "Search PubChem with this InChIKey"
 - "Convert SMILES to InChI"
 
 **Proposed Tool**: `identifiers`
+
 ```typescript
 {
   name: "identifiers",
@@ -82,14 +89,17 @@
 ---
 
 #### 3. **File Format Conversion (MOL/SDF)**
+
 **OpenChem APIs**: `generateMolfile()`, `parseMolfile()`, `parseSDF()`, `writeSDF()`  
 **Why Critical**: Industry-standard formats for data exchange  
 **Use Cases**:
+
 - "Convert this SMILES to MOL format"
 - "Parse this SDF file and analyze all molecules"
 - "Export molecules as SDF with properties"
 
 **Proposed Tool**: `fileConvert`
+
 ```typescript
 {
   name: "fileConvert",
@@ -112,14 +122,17 @@
 ---
 
 #### 4. **Bulk Operations**
+
 **OpenChem APIs**: `bulkMatchSMARTS()`, `bulkComputeProperties()`, `bulkComputeSimilarities()`, `bulkFilterDrugLike()`  
 **Why Critical**: Performance optimization for large datasets  
 **Use Cases**:
+
 - "Analyze 1000 molecules from this dataset"
 - "Filter drug-like compounds from library"
 - "Find similar molecules in batch"
 
 **Proposed Tool**: `batch`
+
 ```typescript
 {
   name: "batch",
@@ -154,14 +167,17 @@
 ### 🟡 MEDIUM PRIORITY - Specialized Chemistry
 
 #### 5. **Advanced Scaffold Analysis**
+
 **OpenChem APIs**: `getScaffoldTree()`, `getBemisMurckoFramework()`, `getGraphFramework()`, `haveSameScaffold()`  
 **Why Useful**: Drug discovery, series analysis  
 **Use Cases**:
+
 - "Build scaffold tree for this compound series"
 - "Do these drugs share the same scaffold?"
 - "Extract generic framework"
 
 **Proposed Tool**: `scaffolds` (enhancement to existing `convert`)
+
 ```typescript
 {
   name: "scaffolds",
@@ -184,14 +200,17 @@
 ---
 
 #### 6. **IUPAC Name Parsing**
+
 **OpenChem APIs**: `parseIUPACName()`, `IUPACTokenizer`  
 **Why Useful**: Reverse lookup (name → structure)  
 **Use Cases**:
+
 - "Parse 'aspirin' to SMILES"
 - "What structure is 'N,N-dimethylaniline'?"
 - "Convert IUPAC name to molecular formula"
 
 **Proposed Tool**: `parseIUPAC`
+
 ```typescript
 {
   name: "parseIUPAC",
@@ -213,14 +232,17 @@
 ---
 
 #### 7. **Ring Information & Analysis**
+
 **OpenChem APIs**: `getRingInfo()`, `analyzeRings()`, specialized ring properties  
 **Why Useful**: Ring systems are critical in drug design  
 **Use Cases**:
+
 - "Analyze ring systems in this molecule"
 - "How many aromatic rings?"
 - "Identify fused/spiro/bridged systems"
 
 **Proposed Tool**: `rings`
+
 ```typescript
 {
   name: "rings",
@@ -249,6 +271,7 @@
 ### 🟢 LOW PRIORITY - Niche/Advanced
 
 #### 8. **PackedMolecule Query System**
+
 **OpenChem APIs**: `PackedMolecule`, `PackedMoleculeQuery`  
 **Why Niche**: Advanced performance optimization  
 **Use Cases**: Very large-scale similarity searches (millions of molecules)
@@ -258,6 +281,7 @@
 ---
 
 #### 9. **Kekulization**
+
 **OpenChem APIs**: `kekulize()`  
 **Why Niche**: Low-level aromaticity manipulation  
 **Use Cases**: Rare - mostly internal to rendering
@@ -267,6 +291,7 @@
 ---
 
 #### 10. **Advanced Stereochemistry Queries**
+
 **OpenChem APIs**: Various stereo validators/analyzers  
 **Why Niche**: Specialized stereochemistry workflow  
 **Use Cases**: Detailed chirality analysis beyond basic descriptors
@@ -278,6 +303,7 @@
 ## Implementation Roadmap
 
 ### Phase 1: Critical User-Facing (v0.2.0)
+
 **Target**: 2-3 weeks  
 **Priority**: Maximize user value
 
@@ -290,6 +316,7 @@
 ---
 
 ### Phase 2: Performance & Scale (v0.3.0)
+
 **Target**: 1 month after Phase 1  
 **Priority**: Handle real-world datasets
 
@@ -301,6 +328,7 @@
 ---
 
 ### Phase 3: Specialized Chemistry (v0.4.0)
+
 **Target**: 2 months after Phase 2  
 **Priority**: Power users
 
@@ -313,24 +341,26 @@
 
 ## Tool Count Projection
 
-| Version | Tools | Coverage | Target Users |
-|---------|-------|----------|--------------|
-| **v0.1.5 (current)** | 5 | 40% | General users |
-| **v0.2.0 (Phase 1)** | 8 | 65% | Professional chemists |
-| **v0.3.0 (Phase 2)** | 10 | 80% | Computational chemistry |
-| **v0.4.0 (Phase 3)** | 12 | 95% | Expert users |
+| Version              | Tools | Coverage | Target Users            |
+| -------------------- | ----- | -------- | ----------------------- |
+| **v0.1.5 (current)** | 5     | 40%      | General users           |
+| **v0.2.0 (Phase 1)** | 8     | 65%      | Professional chemists   |
+| **v0.3.0 (Phase 2)** | 10    | 80%      | Computational chemistry |
+| **v0.4.0 (Phase 3)** | 12    | 95%      | Expert users            |
 
 ---
 
 ## Decision Framework
 
 ### Add Now If:
+
 - ✅ User requests it explicitly
 - ✅ Enables new use case (not just variation)
 - ✅ 3+ line use case description
 - ✅ Can be tested in < 1 minute
 
 ### Defer If:
+
 - ❌ Internal/low-level utility
 - ❌ < 10% of users would need it
 - ❌ Requires extensive domain knowledge

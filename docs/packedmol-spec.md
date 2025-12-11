@@ -10,20 +10,20 @@
 
 **PackedMol** is a compact, zero-copy, binary representation of molecular structures, optimized for:
 
-* High-performance cheminformatics
-* Deterministic canonicalization
-* Cross-thread transfer (Web Workers, WASM, GPU buffers)
-* Minimal memory footprint
-* Fast graph traversal (CSR adjacency)
+- High-performance cheminformatics
+- Deterministic canonicalization
+- Cross-thread transfer (Web Workers, WASM, GPU buffers)
+- Minimal memory footprint
+- Fast graph traversal (CSR adjacency)
 
 PackedMol is the **internal molecular representation** for OpenChem. It is designed to store all structural information required for:
 
-* SMILES generation
-* IUPAC naming
-* Substructure search
-* Fingerprints (ECFP, topological)
-* Stereochemistry determination
-* Aromaticity perception
+- SMILES generation
+- IUPAC naming
+- Substructure search
+- Fingerprints (ECFP, topological)
+- Stereochemistry determination
+- Aromaticity perception
 
 PackedMol is **lossless**: all information in a classical molfile or typical RDKit `ROMol` can be encoded.
 
@@ -189,15 +189,15 @@ Parity refers to the neighbor ordering given by adjacency listing with a well-de
 
 Aromatic systems are represented by:
 
-* `atomFlags & 1`
-* `bondOrder == 4`
-* `bondFlags & 3` optional Kekulé hints
+- `atomFlags & 1`
+- `bondOrder == 4`
+- `bondFlags & 3` optional Kekulé hints
 
 This enables:
 
-* aromatic ring identification
-* kekulization / de-kekulization
-* SMILES aromatic form generation
+- aromatic ring identification
+- kekulization / de-kekulization
+- SMILES aromatic form generation
 
 ---
 
@@ -205,10 +205,10 @@ This enables:
 
 PackedMol **does not store rings explicitly**, but the CSR adjacency makes:
 
-* SSSR
-* Cycle basis detection
-* Ring perception
-* Aromatic ring detection
+- SSSR
+- Cycle basis detection
+- Ring perception
+- Aromatic ring detection
 
 fast and deterministic.
 
@@ -223,12 +223,12 @@ New arrays can be added after the stereo block without breaking old decoders.
 
 Examples of future extensions:
 
-* 3D coordinates (`Float32Array`)
-* Query SMARTS flags
-* Partial charges
-* Electron donation metadata
-* Fragment/group indexing
-* Advanced stereochemistry (atropisomers, helicenes)
+- 3D coordinates (`Float32Array`)
+- Query SMARTS flags
+- Partial charges
+- Electron donation metadata
+- Fragment/group indexing
+- Advanced stereochemistry (atropisomers, helicenes)
 
 ---
 
@@ -236,18 +236,18 @@ Examples of future extensions:
 
 ### **Allowed:**
 
-* `ArrayBuffer`
-* `SharedArrayBuffer`
-* Transferable objects
-* WASM linear memory views
-* GPU buffers (WebGPU `GPUBuffer`)
+- `ArrayBuffer`
+- `SharedArrayBuffer`
+- Transferable objects
+- WASM linear memory views
+- GPU buffers (WebGPU `GPUBuffer`)
 
 PackedMol is ideal for:
 
-* Worker → Worker transfers
-* GPU fingerprint computation
-* WASM chemical kernels
-* C++ → JS interop via raw pointer offsets
+- Worker → Worker transfers
+- GPU fingerprint computation
+- WASM chemical kernels
+- C++ → JS interop via raw pointer offsets
 
 ---
 
@@ -255,10 +255,10 @@ PackedMol is ideal for:
 
 For typical organic molecules:
 
-* **Atom block:** 8–10 bytes/atom (includes degree field)
-* **Bond block:** ~7–10 bytes/bond
-* **CSR adjacency:** 8 bytes/bond
-* **Stereochemistry:** 1–2 bytes per stereo element
+- **Atom block:** 8–10 bytes/atom (includes degree field)
+- **Bond block:** ~7–10 bytes/bond
+- **CSR adjacency:** 8 bytes/bond
+- **Stereochemistry:** 1–2 bytes per stereo element
 
 Real-world examples:
 
@@ -274,19 +274,19 @@ Real-world examples:
 
 PackedMol encoding is **100% deterministic**:
 
-* Atoms sorted by canonical ordering
-* Neighbors sorted by atom index
-* Bond ordering fixed
-* No nullable fields or variable-length structures
+- Atoms sorted by canonical ordering
+- Neighbors sorted by atom index
+- Bond ordering fixed
+- No nullable fields or variable-length structures
 
 Identical molecules → identical PackedMol.
 
 This makes PackedMol ideal for:
 
-* hashing (OpenChemKey)
-* caching
-* fingerprint generation
-* graph isomorphism testing
+- hashing (OpenChemKey)
+- caching
+- fingerprint generation
+- graph isomorphism testing
 
 ---
 
@@ -296,12 +296,12 @@ OpenChemKey is a canonical fingerprint/hash derived directly from PackedMol.
 
 Properties:
 
-* canonicalized
-* collision-resistant
-* fast (linear time)
-* independent of input SMILES
-* smaller than InChIKey
-* closer to graph-isomorphism invariant
+- canonicalized
+- collision-resistant
+- fast (linear time)
+- independent of input SMILES
+- smaller than InChIKey
+- closer to graph-isomorphism invariant
 
 PackedMol is the underlying canonical graph structure.
 
@@ -387,4 +387,3 @@ degreeOffset = [0, 2, 4, 5, 6]
 bondTargets  = [1,2, 0,3, 0, 1]
 bondAdj      = [0,1, 0,2, 3, 3] (bond indices)
 ```
-

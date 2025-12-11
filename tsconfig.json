@@ -1,42 +1,42 @@
 {
-   "compilerOptions": {
-     "lib": ["ESNext"],
-     "target": "ES2020",
-     "module": "Preserve",
-     "moduleDetection": "force",
-     "jsx": "react-jsx",
-     "allowJs": true,
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "target": "ES2020",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
 
-     "moduleResolution": "bundler",
-     "allowImportingTsExtensions": true,
-     "verbatimModuleSyntax": true,
-     "noEmit": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
 
-     "strict": true,
-     "skipLibCheck": true,
-     "noFallthroughCasesInSwitch": true,
-     "noUncheckedIndexedAccess": true,
-     "noImplicitOverride": true,
-     "downlevelIteration": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "downlevelIteration": true,
 
-     "noUnusedLocals": false,
-     "noUnusedParameters": false,
-     "noPropertyAccessFromIndexSignature": false,
-     "baseUrl": ".",
-     "paths": {
-       "src/*": ["src/*"],
-       "test/*": ["test/*"],
-       "types": ["types.ts"],
-       "index": ["index.ts"],
-       "openchem": ["index.ts"]
-     }
-   },
-   "exclude": [
-     "packages/*/src",
-     "packages/*/dist",
-     "node_modules",
-     "dist",
-     "test-*.ts",
-     "scripts/debug-*.ts"
-   ]
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"],
+      "test/*": ["test/*"],
+      "types": ["types.ts"],
+      "index": ["index.ts"],
+      "openchem": ["index.ts"],
+    },
+  },
+  "exclude": [
+    "packages/*/src",
+    "packages/*/dist",
+    "node_modules",
+    "dist",
+    "test-*.ts",
+    "scripts/debug-*.ts",
+  ],
 }

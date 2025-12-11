@@ -24,8 +24,20 @@
       "src/*": ["src/*"],
       "test/*": ["test/*"],
       "types": ["types.ts"],
-      "index": ["index.ts"]
-    }
+      "index": ["index.ts"],
+    },
   },
-  "exclude": ["src/third-party/**/*", "test/**/*", "scripts/**/*", "categorize-failures.ts", "generate-comparison.ts", "debug-*.ts", "test-*.ts", "check-*.ts", "check_*.ts", "verify-*.ts", "analyze-*.ts"]
+  "exclude": [
+    "src/third-party/**/*",
+    "test/**/*",
+    "scripts/**/*",
+    "categorize-failures.ts",
+    "generate-comparison.ts",
+    "debug-*.ts",
+    "test-*.ts",
+    "check-*.ts",
+    "check_*.ts",
+    "verify-*.ts",
+    "analyze-*.ts",
+  ],
 }

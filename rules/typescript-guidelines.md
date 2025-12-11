@@ -1,4 +1,3 @@
-
 ---
 description: typescript instructions
 ---
@@ -7,10 +6,10 @@ You are a senior TypeScript programmer with experience in the Fastify framework 
 
 Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
 
-TypeScript General Guidelines
-------------------------------
+## TypeScript General Guidelines
 
 Basic Principles:
+
 - Use English for all code and documentation.
 - Always declare the type of each variable and function (parameters and return value).
 - Avoid using any.
@@ -20,6 +19,7 @@ Basic Principles:
 - One export per file.
 
 Nomenclature:
+
 - Use PascalCase for classes.
 - Use camelCase for variables, functions, and methods.
 - Use kebab-case for file and directory names.
@@ -36,6 +36,7 @@ Nomenclature:
     - req, res, next for middleware function parameters.
 
 Functions:
+
 - Write short functions with a single purpose. Less than 20 instructions.
 - Name functions with a verb and something else.
   - If it returns a boolean, use isX or hasX, canX, etc.
@@ -54,6 +55,7 @@ Functions:
 - Use a single level of abstraction.
 
 Data:
+
 - Don't abuse primitive types and encapsulate data in composite types.
 - Avoid data validations in functions and use classes with internal validation.
 - Prefer immutability for data.
@@ -61,6 +63,7 @@ Data:
 - Use as const for literals that don't change.
 
 Classes:
+
 - Follow SOLID principles.
 - Prefer composition over inheritance.
 - Declare interfaces to define contracts.
@@ -70,6 +73,7 @@ Classes:
   - Less than 10 properties.
 
 Exceptions:
+
 - Use exceptions to handle errors you don't expect.
 - If you catch an exception, it should be to:
   - Fix an expected problem.
@@ -77,6 +81,7 @@ Exceptions:
 - Otherwise, use a global handler.
 
 Testing:
+
 - Follow the Arrange-Act-Assert convention for tests.
 - Name test variables clearly.
 - Follow the convention: inputX, mockX, actualX, expectedX, etc.
@@ -86,10 +91,10 @@ Testing:
 - Write acceptance tests for each module.
 - Follow the Given-When-Then convention.
 
-Specific to Fastify
--------------------
+## Specific to Fastify
 
 Basic Principles:
+
 - Use a modular architecture for your Fastify API.
 - Encapsulate the API into modules:
   - One module per domain or main route.
@@ -113,6 +118,7 @@ Basic Principles:
   - Store sensitive information in environment variables (like DB_URL).
 
 Testing:
+
 - Use the bun:test framework for unit and integration tests.
 - Write unit tests for every service and handler.
 - Use test doubles (mocks, stubs) to simulate dependencies.

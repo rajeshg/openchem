@@ -30,13 +30,13 @@ OpenChem provides a **Model Context Protocol (MCP) server** that exposes chemist
 
 ### Available Tools
 
-| Tool | Purpose | Example Use |
-|------|---------|-------------|
-| `analyze` | Complete molecular analysis (40+ descriptors, drug-likeness, IUPAC name) | "Analyze aspirin" |
-| `compare` | Molecular similarity (Morgan fingerprints, Tanimoto) | "Compare aspirin to ibuprofen" |
-| `search` | Substructure matching (SMARTS patterns) | "Find benzene rings in this molecule" |
-| `render` | 2D structure visualization (SVG) | "Draw this molecule" |
-| `convert` | Format conversion (canonical SMILES, IUPAC, scaffold) | "Convert to IUPAC name" |
+| Tool      | Purpose                                                                  | Example Use                           |
+| --------- | ------------------------------------------------------------------------ | ------------------------------------- |
+| `analyze` | Complete molecular analysis (40+ descriptors, drug-likeness, IUPAC name) | "Analyze aspirin"                     |
+| `compare` | Molecular similarity (Morgan fingerprints, Tanimoto)                     | "Compare aspirin to ibuprofen"        |
+| `search`  | Substructure matching (SMARTS patterns)                                  | "Find benzene rings in this molecule" |
+| `render`  | 2D structure visualization (SVG)                                         | "Draw this molecule"                  |
+| `convert` | Format conversion (canonical SMILES, IUPAC, scaffold)                    | "Convert to IUPAC name"               |
 
 ---
 
@@ -122,6 +122,7 @@ openchem-mcp --http --port 8080
 ```
 
 Expected output:
+
 ```
 ✨ OpenChem MCP Server v0.1.4 (HTTP mode)
 📍 Running on http://localhost:4141
@@ -218,6 +219,7 @@ VS Code will automatically spawn the server when needed (no manual start require
 Claude Desktop has native MCP support via `claude_desktop_config.json`.
 
 **Location:**
+
 ```
 ~/Library/Application Support/Claude/claude_desktop_config.json  (macOS)
 %APPDATA%/Claude/claude_desktop_config.json  (Windows)
@@ -254,6 +256,7 @@ ChatGPT does **not** natively support MCP protocol. You need to:
 **Option A: Wait for Native Support**
 
 OpenAI has not announced MCP support yet. Monitor:
+
 - https://github.com/modelcontextprotocol
 - ChatGPT release notes
 
@@ -286,12 +289,12 @@ await mcpClient.connect(transport);
 // REST endpoint for ChatGPT
 app.post("/api/analyze", async (req, res) => {
   const { smiles } = req.body;
-  
+
   const result = await mcpClient.callTool("analyze", {
     smiles,
     includeRendering: false
   });
-  
+
   res.json(JSON.parse(result.content[0].text));
 });
 
@@ -364,13 +367,13 @@ transport = StreamableHTTPClientTransport("http://localhost:3000/mcp")
 async with ClientSession(transport) as session:
     # Initialize
     await session.initialize()
-    
+
     # Call analyze tool
     result = await session.call_tool("analyze", {
         "smiles": "CC(=O)Oc1ccccc1C(=O)O",
         "includeRendering": False
     })
-    
+
     data = json.loads(result.content[0].text)
     print(f"Molecular Weight: {data['properties']['molecularWeight']}")
     print(f"LogP: {data['properties']['logP']}")
@@ -469,7 +472,7 @@ primary_region = "sjc"
 
 [build]
   builder = "oven/bun"
-  
+
 [env]
   PORT = "8080"
 
@@ -552,9 +555,9 @@ for (const mol of molecules) {
     smiles: mol.smiles,
     includeRendering: false
   });
-  
+
   const data = JSON.parse(result.content[0].text);
-  
+
   results.push({
     Name: mol.name,
     SMILES: mol.smiles,
@@ -606,14 +609,14 @@ await mcpClient.connect(transport);
 app.post("/api/analyze", async (req, res) => {
   try {
     const { smiles } = req.body;
-    
+
     const result = await mcpClient.callTool("analyze", {
       smiles,
       includeRendering: true,
       renderWidth: 400,
       renderHeight: 400
     });
-    
+
     res.json(JSON.parse(result.content[0].text));
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -644,7 +647,7 @@ app.listen(8080, () => {
   <input id="smiles" type="text" placeholder="Enter SMILES (e.g., CCO)" />
   <button onclick="analyze()">Analyze</button>
   <div id="result"></div>
-  
+
   <script>
     async function analyze() {
       const smiles = document.getElementById('smiles').value;
@@ -653,9 +656,9 @@ app.listen(8080, () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ smiles })
       });
-      
+
       const data = await response.json();
-      
+
       document.getElementById('result').innerHTML = `
         <h2>${data.iupacName}</h2>
         <div>${data.rendering.svg}</div>
@@ -680,6 +683,7 @@ app.listen(8080, () => {
 **Symptom:** `EADDRINUSE` error
 
 **Solution:**
+
 ```bash
 # Check what's using port 3000
 lsof -i :3000
@@ -695,12 +699,14 @@ PORT=8080 bun run mcp:remote
 **Symptom:** Claude shows "Server unavailable"
 
 **Checklist:**
+
 1. ✅ Server is running: `curl http://localhost:3000/health`
 2. ✅ Config file exists and is valid JSON
 3. ✅ Config points to correct URL: `http://localhost:3000/mcp` (not `/mcp/sse`)
 4. ✅ Restart Claude Desktop after config change
 
 **macOS Config Location:**
+
 ```bash
 cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```
@@ -712,11 +718,13 @@ cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
 **Symptom:** `Failed to parse SMILES`
 
 **Common issues:**
+
 - Invalid SMILES syntax (use `parseSMILES()` to test)
 - Typos in aromatic notation (`C` vs `c`)
 - Missing brackets around complex atoms
 
 **Test SMILES locally:**
+
 ```bash
 bun -e "import { parseSMILES } from './index.ts'; console.log(parseSMILES('CCO'))"
 ```
@@ -726,11 +734,13 @@ bun -e "import { parseSMILES } from './index.ts'; console.log(parseSMILES('CCO')
 ### High latency / slow responses
 
 **Typical causes:**
+
 - Network issues (test with local server first)
 - Large molecules (> 100 atoms may take longer)
 - Rendering enabled (adds 50-200ms)
 
 **Optimize:**
+
 ```typescript
 // Disable rendering for faster analysis
 await client.callTool("analyze", {
@@ -780,12 +790,12 @@ async function callWithRetry(tool, args) {
 
 ### Integration Priorities
 
-| Client | Status | Effort |
-|--------|--------|--------|
-| Claude Desktop | ✅ Native support | 5 minutes |
-| Custom Node.js app | ✅ MCP SDK client | 30 minutes |
-| Python app | ✅ MCP Python SDK | 30 minutes |
-| ChatGPT Desktop | ❌ No MCP support | Build bridge API |
+| Client             | Status            | Effort              |
+| ------------------ | ----------------- | ------------------- |
+| Claude Desktop     | ✅ Native support | 5 minutes           |
+| Custom Node.js app | ✅ MCP SDK client | 30 minutes          |
+| Python app         | ✅ MCP Python SDK | 30 minutes          |
+| ChatGPT Desktop    | ❌ No MCP support | Build bridge API    |
 | Cloudflare Workers | ❌ SDK limitation | Wait for SDK update |
 
 ### Next Steps

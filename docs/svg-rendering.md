@@ -10,6 +10,7 @@
 openchem provides a complete 2D molecular structure rendering system that generates clean, chemically accurate SVG diagrams from SMILES strings or Molecule objects. The renderer automatically computes 2D coordinates and produces ChemDraw-style visualizations.
 
 **Key Features:**
+
 - ✅ Automatic 2D coordinate generation
 - ✅ Multiple bond types (single, double, triple, aromatic)
 - ✅ Stereochemistry support (wedge/hash bonds)
@@ -81,12 +82,14 @@ fs.writeFileSync('aspirin.svg', result.svg);
 ### `renderSVG(molecule: Molecule, options?: SVGRenderOptions)`
 
 **Parameters:**
+
 - `molecule` (Molecule) — Molecule object to render
 - `options` (SVGRenderOptions, optional) — Rendering configuration
 
 **Returns:** `string` — SVG markup
 
 **Options:**
+
 ```typescript
 interface SVGRendererOptions {
   width?: number;              // SVG width (default: 400)
@@ -100,6 +103,7 @@ interface SVGRendererOptions {
 ```
 
 **Returns:**
+
 ```typescript
 interface SVGRenderResult {
   svg: string;                 // Complete SVG markup
@@ -116,6 +120,7 @@ interface SVGRenderResult {
 openchem uses a rigid unit architecture for coordinate generation, providing high-quality 2D layouts with perfect ring geometry:
 
 **Key features:**
+
 - ✅ **Rigid unit detection** — Ring systems and chains identified as rigid bodies
 - ✅ **Perfect regular polygons** — Mathematically precise ring geometry
 - ✅ **DOF-based optimization** — Only rotations and translations, no internal distortion
@@ -147,6 +152,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Identify all ring systems and classify their relationships
 
 **Algorithm:**
+
 - Detect rings using graph cycle detection
 - Group rings into fused systems (rings sharing edges)
 - Classify as isolated, fused, spiro, or bridged
@@ -159,6 +165,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Identify rigid units (ring systems and chain segments)
 
 **Algorithm:**
+
 - Ring systems become single rigid units
 - Chains between ring systems become rigid chain units
 - Single atoms connected to multiple units become bridges
@@ -171,6 +178,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Place each rigid unit with perfect internal geometry
 
 **Algorithm:**
+
 - Generate perfect regular polygons for each ring size
 - For fused ring systems, place rings sequentially:
   - Align shared edges exactly
@@ -187,6 +195,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Optimize unit positions without distorting internal geometry
 
 **Algorithm:**
+
 - Each unit has only 3 degrees of freedom: translation (x, y) and rotation (θ)
 - Minimize bond length deviation for connecting bonds
 - Try multiple rotation angles and optional flips
@@ -201,6 +210,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Detect and resolve any remaining atom overlaps
 
 **Algorithm:**
+
 - Compute pairwise atom distances
 - Identify overlaps (distance < threshold)
 - Apply repulsive forces to separate atoms
@@ -213,6 +223,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Rotate molecule to canonical orientation
 
 **Algorithm:**
+
 - Identify principal ring system
 - Rotate to align largest ring horizontally
 - Position longest chain direction appropriately
@@ -224,6 +235,7 @@ The coordinate generation follows a multi-stage pipeline:
 **Purpose:** Convert coordinates to visual SVG elements
 
 **Algorithm:**
+
 - Draw bonds as lines (single/double/triple/aromatic)
 - Render wedge/hash bonds for stereochemistry
 - Add atom labels (heteroatoms, charges, isotopes)
@@ -239,22 +251,27 @@ The coordinate generation follows a multi-stage pipeline:
 ### Bond Types
 
 **Single bonds:**
+
 - Solid straight lines
 - Uniform thickness (default 1.5px)
 
 **Double bonds:**
+
 - Two parallel lines with slight spacing
 - Centered on bond axis
 
 **Triple bonds:**
+
 - Three parallel lines with closer spacing
 - Centered on bond axis
 
 **Aromatic bonds:**
+
 - Alternating single/double representation
 - Optional: circle inside ring (not currently implemented)
 
 **Stereo bonds:**
+
 - **Wedge (solid)**: Bond toward viewer (filled triangle)
 - **Hash (dashed)**: Bond away from viewer (parallel dashed lines)
 
@@ -263,16 +280,19 @@ The coordinate generation follows a multi-stage pipeline:
 ### Atom Labels
 
 **Show labels for:**
+
 - Heteroatoms (N, O, S, P, halogens, etc.)
 - Charged atoms (NH₄⁺, O⁻, etc.)
 - Isotopes (¹³C, ²H, etc.)
 - Radicals (C•)
 
 **Hide labels for:**
+
 - Normal carbons (chemical convention)
 - Implicit hydrogens on carbons
 
 **Element colors (default scheme):**
+
 - Carbon: black (#000000)
 - Nitrogen: blue (#0000FF)
 - Oxygen: red (#FF0000)
@@ -281,27 +301,32 @@ The coordinate generation follows a multi-stage pipeline:
 - Halogens: dark green (#006400)
 
 **Monochrome scheme:**
+
 - All elements: black (#000000)
 
 ### Geometry Guidelines
 
 **Bond angles:**
+
 - sp² centers: 120°
 - sp³ centers: 109.5° (simplified to 90°/120° in 2D)
 - Avoid acute angles (< 60°) except in small rings
 - Maintain balanced symmetry
 
 **Bond lengths:**
+
 - Uniform across molecule (default: 40px)
 - Recommended range: 30-60px
 - Avoid stretched or compressed bonds
 
 **Ring geometry:**
+
 - Draw as regular polygons
 - Fused rings share exact edge geometry
 - No distortion at fusion points
 
 **Spacing:**
+
 - Maintain uniform spacing between atoms
 - No overlaps between bonds, labels, or hydrogens
 - Keep molecule centered and planar
@@ -321,12 +346,14 @@ quality_score = Σ(rule_score × weight) / Σ(weight)
 ```
 
 **High priority rules (weight > 0.9):**
+
 - Bond angles (0.9)
 - Stereochemistry consistency (1.0)
 - Layout optimization (1.0)
 - Geometric optimization (1.0)
 
 **Medium priority rules (weight 0.7-0.9):**
+
 - Bond lengths (0.8)
 - Ring geometry (0.85)
 - Spacing (0.8)
@@ -334,6 +361,7 @@ quality_score = Σ(rule_score × weight) / Σ(weight)
 - Global consistency (0.9)
 
 **Lower priority rules (weight < 0.7):**
+
 - Aromatic representation (0.7)
 - Label alignment (0.6)
 - Color/contrast (0.6)
@@ -388,13 +416,13 @@ svgs.forEach((svg, i) => {
 <html>
 <body>
   <div id="molecule-container"></div>
-  
+
   <script type="module">
     import { parseSMILES, renderSVG } from 'openchem';
-    
+
     const molecule = parseSMILES('c1ccccc1').molecules[0];
     const svg = renderSVG(molecule);
-    
+
     document.getElementById('molecule-container').innerHTML = svg;
   </script>
 </body>
@@ -407,13 +435,13 @@ svgs.forEach((svg, i) => {
 
 ### Coordinate Generation Complexity
 
-| Operation | Complexity | Notes |
-|-----------|-----------|-------|
-| Ring finding (SSSR) | O(N²) | Bottleneck for large molecules |
-| Ring placement | O(R) | R = number of rings |
-| Chain expansion | O(N) | N = number of atoms |
-| Force relaxation | O(N²) | Can be expensive for 100+ atoms |
-| SVG generation | O(N + B) | N = atoms, B = bonds |
+| Operation           | Complexity | Notes                           |
+| ------------------- | ---------- | ------------------------------- |
+| Ring finding (SSSR) | O(N²)      | Bottleneck for large molecules  |
+| Ring placement      | O(R)       | R = number of rings             |
+| Chain expansion     | O(N)       | N = number of atoms             |
+| Force relaxation    | O(N²)      | Can be expensive for 100+ atoms |
+| SVG generation      | O(N + B)   | N = atoms, B = bonds            |
 
 ### Performance Guidelines
 
@@ -478,18 +506,18 @@ renderSVG(parseSMILES('C[C@@H](N)C(=O)O').molecules[0]);
 
 **Location:** `src/generators/coordinate-generator/`
 
-| Module | Purpose |
-|--------|---------|
-| `index.ts` | Entry point, pipeline orchestration |
-| `types.ts` | Type definitions |
-| `ring-system-detector.ts` | Ring detection and classification |
-| `rigid-unit-detector.ts` | Identify rigid units (ring systems, chains) |
-| `rigid-unit-placer.ts` | Place units with perfect geometry |
-| `rigid-body-minimizer.ts` | DOF-based optimization (rotation/translation only) |
-| `overlap-resolver.ts` | Collision detection and resolution |
-| `orientation-optimizer.ts` | Canonical orientation |
-| `geometry-utils.ts` | Vector math, rotations, distance checks |
-| `macrocycle-placer.ts` | Special handling for large rings |
+| Module                     | Purpose                                            |
+| -------------------------- | -------------------------------------------------- |
+| `index.ts`                 | Entry point, pipeline orchestration                |
+| `types.ts`                 | Type definitions                                   |
+| `ring-system-detector.ts`  | Ring detection and classification                  |
+| `rigid-unit-detector.ts`   | Identify rigid units (ring systems, chains)        |
+| `rigid-unit-placer.ts`     | Place units with perfect geometry                  |
+| `rigid-body-minimizer.ts`  | DOF-based optimization (rotation/translation only) |
+| `overlap-resolver.ts`      | Collision detection and resolution                 |
+| `orientation-optimizer.ts` | Canonical orientation                              |
+| `geometry-utils.ts`        | Vector math, rotations, distance checks            |
+| `macrocycle-placer.ts`     | Special handling for large rings                   |
 
 ### SVG Renderer
 
@@ -530,14 +558,17 @@ bun run scripts/save-rendered-svgs.mjs
 ## Known Limitations
 
 ### 1. Large Molecules (> 100 atoms)
+
 **Issue:** Coordinate generation can be slow
 **Workaround:** Use simpler layout algorithm or pre-compute coordinates
 
 ### 2. Complex Polycyclic Systems
+
 **Issue:** Fused ring layout may not be optimal for very complex systems
 **Status:** Works well for common cases (naphthalene, anthracene, steroids)
 
 ### 3. 3D Stereochemistry Display
+
 **Issue:** Only basic wedge/hash support, no 3D perspective
 **Status:** Sufficient for most 2D chemical drawings
 

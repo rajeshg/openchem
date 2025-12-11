@@ -61,9 +61,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **Source:** https://github.com/rdkit/rdkit
 
 **Scientific References:**
-- Morgan Fingerprints: Rogers & Hahn, *J. Chem. Inf. Model.* **50**:742-754 (2010)
-- Wildman-Crippen LogP: Wildman & Crippen, *J. Chem. Inf. Comput. Sci.* **39**:868-873 (1999)
-- TPSA: Ertl et al., *J. Med. Chem.* **43**:3714-3717 (2000)
+
+- Morgan Fingerprints: Rogers & Hahn, _J. Chem. Inf. Model._ **50**:742-754 (2010)
+- Wildman-Crippen LogP: Wildman & Crippen, _J. Chem. Inf. Comput. Sci._ **39**:868-873 (1999)
+- TPSA: Ertl et al., _J. Med. Chem._ **43**:3714-3717 (2000)
 
 ---
 
@@ -125,6 +126,7 @@ openchem includes a WebAssembly build of the InChI library for generating Intern
 ### License
 
 The InChI library is dual-licensed:
+
 1. **IUPAC-InChI Trust License** for the core InChI algorithm
 2. **Apache-2.0** for the WASM wrapper implementation
 
@@ -136,11 +138,11 @@ The InChI library is dual-licensed:
 
 All third-party licenses are compatible with openchem's MIT license:
 
-| Component | License | Compatible |
-|-----------|---------|------------|
-| RDKit-derived code | BSD-3-Clause | ✅ Yes |
-| OPSIN data | MIT | ✅ Yes |
-| InChI WASM | Apache-2.0 / InChI Trust | ✅ Yes |
+| Component          | License                  | Compatible |
+| ------------------ | ------------------------ | ---------- |
+| RDKit-derived code | BSD-3-Clause             | ✅ Yes     |
+| OPSIN data         | MIT                      | ✅ Yes     |
+| InChI WASM         | Apache-2.0 / InChI Trust | ✅ Yes     |
 
 ---
 
@@ -149,9 +151,11 @@ All third-party licenses are compatible with openchem's MIT license:
 When using openchem, the following attributions are recommended:
 
 1. **For RDKit-derived algorithms:**
+
    > "This software uses algorithms derived from RDKit (https://github.com/rdkit/rdkit)"
 
 2. **For IUPAC name parsing/generation:**
+
    > "IUPAC nomenclature data from OPSIN by Daniel Lowe (https://github.com/dan2097/opsin)"
 
 3. **For InChI generation:**
@@ -162,6 +166,7 @@ When using openchem, the following attributions are recommended:
 ## Full License Texts
 
 For complete license texts, see:
+
 - **openchem**: `LICENSE` (MIT)
 - **RDKit**: https://github.com/rdkit/rdkit/blob/master/license.txt
 - **OPSIN**: https://github.com/dan2097/opsin/blob/master/LICENSE.txt
@@ -169,4 +174,4 @@ For complete license texts, see:
 
 ---
 
-*Last updated: 2025-11-23*
+_Last updated: 2025-11-23_

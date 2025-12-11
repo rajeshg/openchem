@@ -12,15 +12,18 @@ A lightweight, remote-first Model Context Protocol (MCP) server for chemistry an
 ## Tools
 
 ### 1. **analyze** - Complete Molecular Analysis
+
 Comprehensive analysis including parsing, 40+ descriptors, drug-likeness, IUPAC name, and optional 2D rendering.
 
 **Input:**
+
 - `smiles` (string): SMILES string of the molecule
 - `includeRendering` (boolean, optional): Include 2D SVG rendering
 - `renderWidth` (number, optional): SVG width in pixels
 - `renderHeight` (number, optional): SVG height in pixels
 
 **Output:**
+
 ```json
 {
   "smiles": "CC(=O)Oc1ccccc1C(=O)O",
@@ -46,14 +49,17 @@ Comprehensive analysis including parsing, 40+ descriptors, drug-likeness, IUPAC 
 ```
 
 ### 2. **compare** - Molecular Similarity
+
 Compare two molecules using Morgan fingerprints (Tanimoto similarity) and property comparison.
 
 **Input:**
+
 - `smiles1` (string): First molecule SMILES
 - `smiles2` (string): Second molecule SMILES
 - `fingerprintRadius` (number, optional): Morgan fingerprint radius (default: 2)
 
 **Output:**
+
 ```json
 {
   "molecule1": {
@@ -74,13 +80,16 @@ Compare two molecules using Morgan fingerprints (Tanimoto similarity) and proper
 ```
 
 ### 3. **search** - Substructure Matching
+
 Search for substructures using SMARTS patterns.
 
 **Input:**
+
 - `smiles` (string): Molecule to search in
 - `pattern` (string): SMARTS pattern
 
 **Output:**
+
 ```json
 {
   "smiles": "c1ccccc1",
@@ -91,14 +100,17 @@ Search for substructures using SMARTS patterns.
 ```
 
 ### 4. **render** - 2D Structure Visualization
+
 Generate publication-quality 2D SVG rendering.
 
 **Input:**
+
 - `smiles` (string): Molecule to render
 - `width` (number, optional): Width in pixels (default: 300)
 - `height` (number, optional): Height in pixels (default: 300)
 
 **Output:**
+
 ```json
 {
   "smiles": "c1ccccc1",
@@ -109,13 +121,16 @@ Generate publication-quality 2D SVG rendering.
 ```
 
 ### 5. **convert** - Format Conversion
+
 Convert between molecular formats: canonical SMILES, IUPAC name, Murcko scaffold.
 
 **Input:**
+
 - `smiles` (string): Input SMILES
 - `outputFormat` (enum): `"canonical"` | `"iupac"` | `"scaffold"`
 
 **Output (canonical):**
+
 ```json
 {
   "input": "C1=CC=CC=C1",
@@ -125,6 +140,7 @@ Convert between molecular formats: canonical SMILES, IUPAC name, Murcko scaffold
 ```
 
 **Output (iupac):**
+
 ```json
 {
   "input": "CC(=O)Oc1ccccc1C(=O)O",
@@ -135,6 +151,7 @@ Convert between molecular formats: canonical SMILES, IUPAC name, Murcko scaffold
 ```
 
 **Output (scaffold):**
+
 ```json
 {
   "input": "c1ccc(cc1)CCN",
@@ -222,9 +239,11 @@ console.log(result.content[0].text);
 ## Endpoints
 
 ### `GET /health`
+
 Health check endpoint.
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -234,14 +253,17 @@ Health check endpoint.
 ```
 
 ### `POST /mcp` or `POST /mcp/sse`
+
 Main MCP endpoint for tool execution via HTTP + SSE.
 
 Both `/mcp` and `/mcp/sse` routes are supported for flexibility.
 
 ### `GET /mcp?lastEventId=...` or `GET /mcp/sse?lastEventId=...`
+
 SSE stream endpoint for reconnection and resumability.
 
 ### `DELETE /mcp` or `DELETE /mcp/sse`
+
 Terminate MCP session.
 
 ## Deployment
@@ -330,6 +352,7 @@ res.setHeader("Access-Control-Allow-Origin", "https://your-domain.com");
 - ⚠️ No authentication (add via middleware or reverse proxy)
 
 For production deployments, consider:
+
 - Reverse proxy (nginx, Caddy) for rate limiting
 - API key authentication
 - HTTPS/TLS termination
@@ -361,15 +384,18 @@ curl http://localhost:3000/health
 ## Troubleshooting
 
 ### Server won't start
+
 - Check if port 3000 is already in use: `lsof -i :3000`
 - Try a different port: `PORT=8080 bun run mcp:remote`
 
 ### Connection refused from MCP client
+
 - Ensure server is running: `curl http://localhost:3000/health`
 - Check firewall settings
 - Verify client URL matches server address
 
 ### Tools return errors
+
 - Validate SMILES syntax: `parseSMILES("CC")` should succeed
 - Check server logs for detailed error messages
 - Enable verbose logging: `VERBOSE=1 bun run mcp:remote`

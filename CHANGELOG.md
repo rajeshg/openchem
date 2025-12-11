@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.16] - 2025-12-03
 
 ### Fixed
+
 - **Tautomer enumeration now filters invalid structures**
   - Added tautomer validator to reject charged atoms (protonation states, not tautomers)
   - Filters out triple bonds to nitrogen (chemically unreasonable in tautomers)
@@ -15,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Validates atom valences before accepting tautomers
 
 ### Added
+
 - **Amidine tautomerism support** for heterocyclic systems
   - Detects N-C=N patterns (guanine, adenine, cytosine, amidines)
   - Enables H migration between nitrogens in N-C=N motifs
@@ -23,17 +25,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enables keto-enol tautomerism in uracil, guanine, and similar systems
 
 ### Improved
+
 - **SMILES canonical ordering** now considers bond order sum for better consistency
 
 ## [0.2.15] - 2025-12-02
 
 ### Improved
+
 - **SVG rendering follows skeletal formula conventions**
   - Carbon atoms are now implicit (no "C" labels) at vertices and endpoints
   - Heteroatom labels combine with hydrogens (e.g., "OH" instead of separate "O" and "H")
   - Use `showCarbonLabels: true` option to explicitly show carbon labels if needed
 
 ### Changed
+
 - **Coordinate generator refactored to rigid-unit architecture**
   - Better handling of polycyclic and bridged ring systems
   - Improved bond length uniformity for fused aromatics (100% for naphthalene, pyrene, coronene)
@@ -43,12 +48,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `generateCoordinatesMap` returns `Map<number, Vec2>` (internal use)
 
 ### Removed
+
 - Obsolete coordinate generation modules (replaced by rigid-unit architecture)
 - Development scripts for SVG debugging
 
 ## [0.2.14] - 2025-11-30
 
 ### Added
+
 - **Polycyclic template system** (experimental) - Pre-computed coordinate templates for 14 common molecular scaffolds
   - Aromatic hydrocarbons: naphthalene, anthracene, phenanthrene, pyrene, fluorene
   - N-heterocycles: indole, quinoline, purine, carbazole
@@ -65,11 +72,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation** - 3 new docs (808 lines): template system overview, coordinate generation improvements, MCP examples
 
 ### Fixed
+
 - **SVG highlight rendering order** - Highlights now appear on top of bonds (not behind)
   - Highlights render after bonds but before atom labels
   - Ensures substructure highlights are clearly visible
 
 ### Technical Details
+
 - Template matching uses middle ring shared edge analysis for fusion type detection
 - Dibenzofuran template added to handle 3-ring oxygen heterocycles
 - Fluorene template excludes heteroatoms (N, O, S) to prevent false matches
@@ -78,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TODO: Implement VF2 graph isomorphism for proper atom-to-atom matching
 
 ### Notes
+
 - Templates are disabled by default due to atom mapping limitations
 - Template matching is production-ready (100% accurate)
 - Atom mapping is experimental (needs graph isomorphism for correct bond angles)
@@ -86,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.13] - 2025-11-29
 
 ### Added
+
 - **Automatic molecular orientation optimization** - Molecules now render in canonical, chemically intuitive orientations
   - PCA-based principal axis calculation for intelligent orientation detection
   - Molecule type detection system (8 categories: linear-fused-rings, single-ring, linear-chain, branched-chain, bridged-rings, spiro, mixed-rings, isolated-atom)
@@ -97,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fully backward compatible (can disable with `optimizeOrientation: false`)
 
 ### Technical Details
+
 - Principal Component Analysis (PCA) computes molecular major axis via covariance matrix eigenvalues
 - Rotation applied to all coordinates around centroid
 - Aspect ratio validation ensures correct orientation (horizontal for linear systems, square for compact molecules)
@@ -104,11 +116,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complex molecules handled: caffeine, ibuprofen, paracetamol, testosterone, codeine, cholesterol, vitamin E
 
 ### Fixed
-- TypeScript typecheck now excludes debug scripts (test-*.ts, scripts/debug-*.ts) to prevent errors from uncommitted utility files
+
+- TypeScript typecheck now excludes debug scripts (test-_.ts, scripts/debug-_.ts) to prevent errors from uncommitted utility files
 
 ## [0.2.12] - 2025-11-28
 
 ### Added
+
 - **SVG substructure highlighting** - Highlight specific atoms and bonds in rendered molecules
   - New types: `AtomHighlight`, `BondHighlight`, `SubstructureHighlight`
   - Support for SMARTS-based highlighting (automatically finds and highlights patterns)
@@ -120,6 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enables visual highlighting of functional groups, pharmacophores, and structural features
 
 ### Technical Details
+
 - Highlights are processed BEFORE kekulization to support aromatic SMARTS patterns
 - Multi-molecule rendering: each molecule is independently processed for highlights
 - Atom highlights render as colored circles with adjustable radius
@@ -132,6 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.11] - 2025-11-27
 
 ### Changed
+
 - **MCP server extracted to `@openchem/mcp` package**
   - The Model Context Protocol server has been moved to a separate package for better separation of concerns
   - Core `openchem` library now has **zero dependencies**
@@ -139,6 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Browser-friendly (no Node.js-specific imports in core library)
 
 ### Removed
+
 - MCP server and CLI (moved to `@openchem/mcp` package)
 - Dependencies: `@modelcontextprotocol/sdk`, `zod` (moved to `@openchem/mcp`)
 - npm scripts: `mcp:remote`, `mcp:dev` (use `@openchem/mcp` package instead)
@@ -153,14 +170,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Before (v0.2.10):
 \`\`\`bash
 npm install openchem
-bun run mcp:remote  # or: bun run src/mcp-server-remote.ts
+bun run mcp:remote # or: bun run src/mcp-server-remote.ts
 \`\`\`
 
 After (v0.2.11):
 \`\`\`bash
-npm install openchem           # Core library
-npm install -g @openchem/mcp   # MCP server
-openchem-mcp                   # Start server
+npm install openchem # Core library
+npm install -g @openchem/mcp # MCP server
+openchem-mcp # Start server
 \`\`\`
 
 For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@openchem/mcp)
@@ -168,6 +185,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.10] - 2025-11-26
 
 ### Fixed
+
 - **TypeScript declaration paths** - Fixed path resolution in .d.ts files
   - Added `tsc-alias` to resolve path aliases in generated declarations
   - Converts path aliases (`types`, `src/*`) to relative paths (`./types`, `./src/*`)
@@ -177,12 +195,14 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.9] - 2025-11-26
 
 ### Added
+
 - **Core TypeScript type exports** - Export essential types for TypeScript users
   - Exported types: `Atom`, `Bond`, `Molecule`, `ParseResult`, `ParseError`, `RingInfo`, `Chain`, `MultipleBond`
   - Exported enums: `BondType`, `StereoType`
   - Enables proper type checking for package consumers
 
 ### Changed
+
 - **Modern ESM-only package** - Simplified to ESM-only with proper TypeScript declarations
   - Generate `.d.ts` declaration files during build
   - Modern `exports` field with `types` condition
@@ -192,6 +212,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.8] - 2025-11-26
 
 ### Added
+
 - **Model Context Protocol (MCP) Server** - Remote HTTP + SSE server for AI agents
   - Lightweight Node.js/Bun HTTP server (87 lines)
   - 5 composite tools: analyze, compare, search, render, convert
@@ -206,6 +227,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.7] - 2025-11-26
 
 ### Fixed
+
 - **Test Timeout Issue** - Increased timeout for complex tautomer enumeration test
   - Test: "canonical selection is stable with many tautomers"
   - Issue: Curcumin molecule with 100 tautomers was timing out at 5000ms
@@ -215,6 +237,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.6] - 2025-11-26
 
 ### Added
+
 - **Complete RDKit Tautomer Coverage** - Achieved 100% parity with RDKit's 37 transformation rules
   - 12 new transformation types implemented:
     - Furanone (5-membered lactone ⟷ hydroxyfuran)
@@ -245,6 +268,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
     - `SESSION-SUMMARY.md` - Complete session summary
 
 ### Fixed
+
 - **SMILES Canonicalization Bug** - Isotope atoms incorrectly prioritized in canonical ordering
   - Before: `[13C]/C=C/C` (incorrect - starts with isotope)
   - After: `C/C=C/[13C]` (correct - matches RDKit)
@@ -252,18 +276,21 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
   - Impact: +13 tests fixed, full RDKit stereo SMILES compatibility
 
 ### Changed
+
 - Refactored tautomer enumeration system for better performance and maintainability
 - Removed old rule-based JSON files (`tautomer-rules.json`, `tautomer-rules.ts`)
 - Total test count increased from 2389 to 2456 (+67 tests)
 - Code cleanup: -4,971 net lines (improved code density and removed obsolete docs)
 
 ### Performance
+
 - Small molecules (< 10 atoms): < 1ms
 - Drug-like molecules (20-40 atoms): 1-50ms
 - Large molecules (40+ atoms): < 100ms
 - No timeouts or crashes on complex bridged/fused ring systems
 
 ### Compatibility
+
 - Zero breaking changes - all existing APIs remain compatible
 - 100% test pass rate (2456/2456 tests passing)
 - Full RDKit tautomer rule parity achieved
@@ -271,6 +298,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.5] - 2025-11-23
 
 ### Added
+
 - **Murcko Scaffold Analysis** - Extract core molecular scaffolds for drug discovery
   - `getMurckoScaffold()` - Extract rings + linkers (remove side chains)
   - `getBemisMurckoFramework()` - Generic scaffold (all C, single bonds)
@@ -287,6 +315,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 - Added scaffold analysis section to README with usage examples
 
 ### Documentation
+
 - Added Murcko scaffolds to Feature list
 - Added "Scaffold Analysis (5)" category to API Reference
 - Detailed API documentation for all 5 scaffold functions
@@ -295,6 +324,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.4] - 2025-11-23
 
 ### Fixed
+
 - Fixed rotatable bond calculation to match RDKit behavior for ester/amide bonds
 - Removed incorrect conjugation check that excluded N-Aryl bonds in rotatable bond detection
 - Fixed SMARTS bulk test aromaticity differences (16 failures → 0)
@@ -304,6 +334,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 - Added `kekule-form-aromaticity` category for known SMARTS matching differences
 
 ### Changed
+
 - Updated `determineHybridization()` function signature to remove unused `atoms` parameter
 - Updated `getBertzCT()` function signature to remove unused `cutoff` parameter
 - Prefixed unused `mol` parameter in `getNumRadicalElectrons()` with underscore
@@ -311,11 +342,13 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 ## [0.2.3] - 2025-11-23
 
 ### Changed
+
 - Restored full CHANGELOG history from previous versions
 
 ## [0.2.2] - 2025-11-23
 
 ### Added
+
 - **New Descriptors API** - Clean namespace for 50+ molecular properties
   - `Descriptors.all()` - Get all common properties at once
   - `Descriptors.basic()` - Formula, mass, atom counts
@@ -329,6 +362,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 - Type definitions for all descriptor categories
 
 ### Changed
+
 - **Playground UX redesign**
   - Moved examples from scrollable left sidebar to compact pill buttons at top
   - Changed from 3-column to 2-column layout (Structure + Summary/Descriptors)
@@ -339,6 +373,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
 - Updated validation scripts to use new API
 
 ### Removed
+
 - **Legacy descriptor exports** (40+ functions) - Use `Descriptors` namespace instead
   - Removed: `getMolecularFormula`, `getMolecularMass`, `getExactMass`
   - Removed: `getHBondDonorCount`, `getHBondAcceptorCount`, `getTPSA`
@@ -348,6 +383,7 @@ For detailed MCP documentation, see [@openchem/mcp](https://npmjs.com/package/@o
   - Kept: Specialized utilities (charge descriptors, advanced structural functions)
 
 ### Migration Guide
+
 ```typescript
 // Before (v0.2.1)
 import {
@@ -380,6 +416,7 @@ const logP = Descriptors.logP(mol);
 ```
 
 ### Benefits
+
 - **Cleaner API**: 1 import instead of 50+
 - **Better discoverability**: Type `Descriptors.` → autocomplete shows all options
 - **Flexible**: Compute all/category/individual properties as needed
@@ -389,18 +426,21 @@ const logP = Descriptors.logP(mol);
 ## [0.2.1] - 2025-10-24
 
 ### Added
+
 - **InChI Generation**: WASM-based InChI generation with automatic caching optimization
   - `generateInChI(mol)` for generating InChI strings
   - Automatic WASM module initialization and caching
   - Full InChI specification support
 
 ### Enhanced
+
 - Morgan fingerprint standardization to 2048 bits (RDKit standard)
 - Improved WASM module handling with persistent caching
 
 ## [0.2.0] - 2025-10-24
 
 ### Added
+
 - **SVG Molecular Rendering**: Full 2D structure visualization with:
   - Ring detection and regularization (triangles, squares, pentagons, hexagons)
   - Aromatic bond rendering (alternating inner lines with directional indicators)
@@ -420,12 +460,14 @@ const logP = Descriptors.logP(mol);
   - Component-based layout for disconnected molecules
 
 ### Enhanced
+
 - Aromatic bond representation in SMILES parser (explicit `:` symbol support)
 - SMILES generator now produces aromatic form by default
 - Ring analysis with improved SSSR computation
 - Molecular descriptor calculations with extended options
 
 ### Performance
+
 - LogP computation caching via WeakMap (4.6 million× speedup for complex molecules)
 - Optimized ring template caching for SVG rendering
 - Improved coordinate generation with early convergence detection
@@ -433,6 +475,7 @@ const logP = Descriptors.logP(mol);
 ## [Unreleased]
 
 ### Planned
+
 - Additional molecular descriptor calculations
 - Extended support for reaction SMARTS
 - Performance optimizations for large molecules
@@ -441,6 +484,7 @@ const logP = Descriptors.logP(mol);
 ## [0.1.3] - 2025-10-22
 
 ### Performance
+
 - Optimized SMILES parser with improved tokenization and parsing efficiency
 - Refactored aromaticity perceiver for faster perception of aromatic rings
 - Enhanced ring analysis algorithms for improved performance on complex molecules
@@ -448,32 +492,38 @@ const logP = Descriptors.logP(mol);
 - New SMILES tokenizer for streamlined lexical analysis
 
 ### Changed
+
 - Internal parser implementations refined for better performance characteristics
 - Ring detection now uses optimized cycle basis computation
 
 ## [0.1.2] - 2025-10-21
 
 ### Changed
+
 - Complete rebranding from kimchi to openchem across entire codebase
 - Updated all documentation, examples, and tests to reflect new project name
 - Updated copyright headers and project references
 
 ### Fixed
+
 - All references to old project name removed
 - Package metadata fully aligned with new identity
 
 ## [0.1.1] - 2025-10-22
 
 ### Added
+
 - `publishConfig.access: "public"` to ensure public npm package visibility
 - Comprehensive documentation for npm publishing workflow
 
 ### Fixed
+
 - Scoped package name updated to `@rajgolla/openchem` for public registry
 
 ## [0.1.0] - 2024-10-21
 
 ### Added
+
 - Initial public release of openchem cheminformatics library
 - Complete SMILES parser supporting full OpenSMILES specification
 - Canonical SMILES generation with RDKit-compatible canonicalization
@@ -499,9 +549,9 @@ const logP = Descriptors.logP(mol);
 - Interactive HTML playground for testing
 
 ### Features
+
 - TypeScript-first with full type definitions
 - Production-ready implementation
 - Lightweight dependency footprint (webcola for layout, es-toolkit for utilities)
 - Well-tested against RDKit for compatibility
 - Comprehensive documentation and examples
-
