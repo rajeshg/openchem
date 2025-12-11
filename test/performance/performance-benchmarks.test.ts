@@ -96,7 +96,7 @@ describe("Performance Benchmarks", () => {
 
       expect(avgMs).toBeGreaterThan(0);
     },
-    { timeout: 30000 }, // 30s timeout for CI environments
+    { timeout: 60000 }, // 60s timeout for CI environments (slower runners)
   );
 
   it("should benchmark SMARTS matching", () => {

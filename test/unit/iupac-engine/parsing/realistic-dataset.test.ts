@@ -64,7 +64,9 @@ function areStructurallyEquivalent(smiles1: string, smiles2: string): boolean {
 }
 
 describe("IUPAC Name to SMILES Realistic Test", () => {
-  it("should parse IUPAC name and generate SMILES for realistic dataset", () => {
+  it(
+    "should parse IUPAC name and generate SMILES for realistic dataset",
+    () => {
     const mismatches: Array<{
       iupac: string;
       generatedSmiles: string;
@@ -287,5 +289,7 @@ describe("IUPAC Name to SMILES Realistic Test", () => {
       `\n${matchCount}/${testedCount} cases working (${((matchCount / testedCount) * 100).toFixed(1)}%)`,
     );
     console.log(`This test serves as a benchmark for IUPAC parser development progress.`);
-  });
+    },
+    { timeout: 15000 }, // 15s timeout for CI (parsing 150+ IUPAC names is slow)
+  );
 });

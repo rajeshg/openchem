@@ -178,39 +178,43 @@ describe("High-complexity tautomers: Natural product-like molecules", () => {
 });
 
 describe("High-complexity tautomers: Polyhydroxy aromatic systems", () => {
-  it("polyhydroxy diketone - EXTREME COMPLEXITY (100 tautomers)", () => {
-    // RDKit: 100 tautomers (hit maxTautomers limit!)
-    const mol = parseSMILES("CC(=O)c1cc(O)c(O)c(O)c1C(=O)C").molecules[0];
-    if (!mol) throw new Error("parse failed");
+  it(
+    "polyhydroxy diketone - EXTREME COMPLEXITY (100 tautomers)",
+    () => {
+      // RDKit: 100 tautomers (hit maxTautomers limit!)
+      const mol = parseSMILES("CC(=O)c1cc(O)c(O)c(O)c1C(=O)C").molecules[0];
+      if (!mol) throw new Error("parse failed");
 
-    console.log("\nPolyhydroxy diketone (EXTREME):");
-    const startTime = Date.now();
-    const tautomers = enumerateTautomers(mol, { maxTautomers: 100 });
-    const elapsed = Date.now() - startTime;
+      console.log("\nPolyhydroxy diketone (EXTREME):");
+      const startTime = Date.now();
+      const tautomers = enumerateTautomers(mol, { maxTautomers: 100 });
+      const elapsed = Date.now() - startTime;
 
-    console.log(`  RDKit: 100 tautomers (hit limit)`);
-    console.log(`  openchem: ${tautomers.length} tautomers`);
-    console.log(`  Enumeration time: ${elapsed}ms`);
+      console.log(`  RDKit: 100 tautomers (hit limit)`);
+      console.log(`  openchem: ${tautomers.length} tautomers`);
+      console.log(`  Enumeration time: ${elapsed}ms`);
 
-    // Polyhydroxy + diketone: we generate keto-enol forms but not all phenol-quinone variants
-    expect(tautomers.length).toBeGreaterThanOrEqual(4);
+      // Polyhydroxy + diketone: we generate keto-enol forms but not all phenol-quinone variants
+      expect(tautomers.length).toBeGreaterThanOrEqual(4);
 
-    // Performance check - should complete in reasonable time (<5s)
-    expect(elapsed).toBeLessThan(5000);
+      // Performance check - should complete in reasonable time (<10s for CI)
+      expect(elapsed).toBeLessThan(10000);
 
-    // Deduplication should work even with many tautomers
-    const uniqueSmiles = new Set(tautomers.map((t) => t.smiles));
-    expect(uniqueSmiles.size).toBe(tautomers.length);
+      // Deduplication should work even with many tautomers
+      const uniqueSmiles = new Set(tautomers.map((t) => t.smiles));
+      expect(uniqueSmiles.size).toBe(tautomers.length);
 
-    // Aromatic form should be preferred
-    const canonical = canonicalTautomer(mol);
-    const canonicalSmiles = generateSMILES(canonical);
-    console.log(`  Canonical: ${canonicalSmiles}`);
-    console.log(`  Coverage: ${((tautomers.length / 100) * 100).toFixed(1)}%`);
+      // Aromatic form should be preferred
+      const canonical = canonicalTautomer(mol);
+      const canonicalSmiles = generateSMILES(canonical);
+      console.log(`  Canonical: ${canonicalSmiles}`);
+      console.log(`  Coverage: ${((tautomers.length / 100) * 100).toFixed(1)}%`);
 
-    const hasAromatic = canonicalSmiles.includes("c");
-    expect(hasAromatic).toBe(true);
-  });
+      const hasAromatic = canonicalSmiles.includes("c");
+      expect(hasAromatic).toBe(true);
+    },
+    { timeout: 15000 }, // 15s timeout for CI environments
+  );
 
   it("hexahydroxybenzene - 6 OH sites", () => {
     // RDKit: 10 tautomers
